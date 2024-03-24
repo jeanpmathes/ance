@@ -10,7 +10,7 @@
 #include "lang/utility/ResolvingHandle.h"
 
 class Application;
-class CompileContext;
+class Execution;
 
 namespace lang
 {
@@ -32,11 +32,11 @@ namespace lang
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
         void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                     lang::PredefinedFunction&                             function,
-                                    CompileContext&                                       context) const override;
+                                    Execution&                                            exec) const override;
         void buildRequestedOverload(lang::Type const&         parameter_element,
                                     lang::Type const&         return_type,
                                     lang::PredefinedFunction& function,
-                                    CompileContext&           context) const override;
+                                    Execution&                exec) const override;
 
       private:
         inline static unsigned int size_ = 0;

@@ -1,6 +1,5 @@
 #include "UnitConstant.h"
 
-#include "compiler/CompileContext.h"
 #include "compiler/Execution.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
@@ -12,9 +11,9 @@ std::string lang::UnitConstant::toString() const
     return "()";
 }
 
-Shared<lang::Constant> lang::UnitConstant::embed(CompileContext& context) const
+Shared<lang::Constant> lang::UnitConstant::embed(Execution& exec) const
 {
-    return context.exec().getDefault(type());
+    return exec.getDefault(type());
 }
 
 bool lang::UnitConstant::equals(lang::Constant const* other) const

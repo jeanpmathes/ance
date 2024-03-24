@@ -1,6 +1,5 @@
 #include "TypeAlias.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/Type.h"
@@ -201,9 +200,9 @@ bool lang::TypeAlias::validateSubscript(lang::Location    indexed_location,
 
 Shared<lang::Value> lang::TypeAlias::buildSubscript(Shared<lang::Value> indexed,
                                                     Shared<lang::Value> index,
-                                                    CompileContext&     context) const
+                                                    Execution&          exec) const
 {
-    return actual_->buildSubscript(indexed, index, context);
+    return actual_->buildSubscript(indexed, index, exec);
 }
 
 bool lang::TypeAlias::isImplicitlyConvertibleTo(lang::Type const& other) const
@@ -220,9 +219,9 @@ bool lang::TypeAlias::validateImplicitConversion(lang::Type const& other,
 
 Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::Type const&   other,
                                                              Shared<lang::Value> value,
-                                                             CompileContext&     context) const
+                                                             Execution&          exec) const
 {
-    return actual_->buildImplicitConversion(other, value, context);
+    return actual_->buildImplicitConversion(other, value, exec);
 }
 
 bool lang::TypeAlias::isCastingPossibleTo(lang::Type const& other) const
@@ -239,9 +238,9 @@ bool lang::TypeAlias::validateCast(lang::Type const& other,
 
 Shared<lang::Value> lang::TypeAlias::buildCast(lang::Type const&   other,
                                                Shared<lang::Value> value,
-                                               CompileContext&     context) const
+                                               Execution&          exec) const
 {
-    return actual_->buildCast(other, value, context);
+    return actual_->buildCast(other, value, exec);
 }
 
 bool lang::TypeAlias::isOperatorDefined(lang::UnaryOperator op) const
@@ -263,9 +262,9 @@ bool lang::TypeAlias::validateOperator(lang::UnaryOperator op,
 
 Shared<lang::Value> lang::TypeAlias::buildOperator(lang::UnaryOperator op,
                                                    Shared<lang::Value> value,
-                                                   CompileContext&     context) const
+                                                   Execution&          exec) const
 {
-    return actual_->buildOperator(op, value, context);
+    return actual_->buildOperator(op, value, exec);
 }
 
 bool lang::TypeAlias::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -290,9 +289,9 @@ bool lang::TypeAlias::validateOperator(lang::BinaryOperator op,
 Shared<lang::Value> lang::TypeAlias::buildOperator(lang::BinaryOperator op,
                                                    Shared<lang::Value>  left,
                                                    Shared<lang::Value>  right,
-                                                   CompileContext&      context) const
+                                                   Execution&           exec) const
 {
-    return actual_->buildOperator(op, left, right, context);
+    return actual_->buildOperator(op, left, right, exec);
 }
 
 bool lang::TypeAlias::hasMember(lang::Identifier const& name) const
@@ -317,9 +316,9 @@ bool lang::TypeAlias::validateMemberAccess(lang::Identifier const& name, Validat
 
 Shared<lang::Value> lang::TypeAlias::buildMemberAccess(Shared<lang::Value>     value,
                                                        lang::Identifier const& name,
-                                                       CompileContext&         context) const
+                                                       Execution&              exec) const
 {
-    return actual_->buildMemberAccess(value, name, context);
+    return actual_->buildMemberAccess(value, name, exec);
 }
 
 bool lang::TypeAlias::definesIndirection() const
@@ -337,30 +336,29 @@ bool lang::TypeAlias::validateIndirection(lang::Location location, ValidationLog
     return actual_->validateIndirection(location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildIndirection(Shared<lang::Value> value, CompileContext& context) const
+Shared<lang::Value> lang::TypeAlias::buildIndirection(Shared<lang::Value> value, Execution& exec) const
 {
-    return actual_->buildIndirection(value, context);
+    return actual_->buildIndirection(value, exec);
 }
 
 void lang::TypeAlias::performDefaultInitializer(Shared<lang::Value> ptr,
                                                 Shared<lang::Value> count,
-                                                CompileContext&     context) const
+                                                Execution&          exec) const
 {
-    actual_->performDefaultInitializer(ptr, count, context);
+    actual_->performDefaultInitializer(ptr, count, exec);
 }
 
 void lang::TypeAlias::performCopyInitializer(Shared<lang::Value> destination,
                                              Shared<lang::Value> count,
-                                             CompileContext&     context) const
+                                             Execution&          exec) const
 {
-    actual_->performCopyInitializer(destination, count, context);
+    actual_->performCopyInitializer(destination, count, exec);
 }
 
 void lang::TypeAlias::performFinalizer(Shared<lang::Value> ptr,
-                                       Shared<lang::Value> count,
-                                       CompileContext&     context) const
+                                       Shared<lang::Value> count, Execution& exec) const
 {
-    actual_->performFinalizer(ptr, count, context);
+    actual_->performFinalizer(ptr, count, exec);
 }
 
 bool lang::TypeAlias::isTriviallyDefaultConstructible() const
@@ -387,26 +385,26 @@ bool lang::TypeAlias::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Ty
 
 void lang::TypeAlias::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>>,
                                              lang::PredefinedFunction&,
-                                             CompileContext&) const
+                                             Execution&) const
 {
     assert(false);// Overloads are rerouted to the actual type by base class.
 }
 
-void lang::TypeAlias::buildDeclaration(CompileContext& context) const
+void lang::TypeAlias::buildDeclaration(Execution& exec) const
 {
-    registerExecutionType(context);
+    registerExecutionType(exec);
 }
 
-void lang::TypeAlias::buildDefinition(CompileContext&) const {}
+void lang::TypeAlias::buildDefinition(Execution&) const {}
 
 std::string lang::TypeAlias::createMangledName() const
 {
     return getActualType().getMangledName();
 }
 
-void lang::TypeAlias::registerExecutionType(CompileContext& context) const
+void lang::TypeAlias::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerAlias(self(), getDefinitionLocation());
+    return exec.registerAlias(self(), getDefinitionLocation());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeAlias::getDeclarationDependencies()

@@ -26,7 +26,7 @@ namespace lang
     class Signature;
 }
 
-class CompileContext;
+class Execution;
 class ValidationLogger;
 
 namespace lang
@@ -143,11 +143,11 @@ namespace lang
          * Define this function as a runtime function, meaning it is part of the runtime library.
          * @param return_type The return type of the function.
          * @param parameters The parameters for this function.
-         * @param context The compile context.
+         * @param exec The execution context.
          */
         void defineAsRuntime(lang::ResolvingHandle<lang::Type>    return_type,
                              std::vector<Shared<lang::Parameter>> parameters,
-                             CompileContext&                      context);
+                             Execution&                           exec);
 
         /**
          * Define this function with a given definition.
@@ -245,9 +245,9 @@ namespace lang
 
         /**
          * Create the declaration of this function, allowing building function code and calling this function.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void buildDeclaration(CompileContext& context) const;
+        void buildDeclaration(Execution& exec) const;
 
         /**
          * Validate a call to this function.
@@ -263,10 +263,10 @@ namespace lang
         /**
          * Build a call to this function.
          * @param arguments The arguments to pass to the function.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The return value.
          */
-        Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> const& arguments, CompileContext& context) const;
+        Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> const& arguments, Execution& exec) const;
 
         lang::Scope&                     scope() override;
         [[nodiscard]] lang::Scope const& scope() const override;
@@ -288,7 +288,7 @@ namespace lang
         void resolveFollowingOrder() override;
         void postResolve() override;
 
-        void buildEntityDeclarationsFollowingOrder(CompileContext& context) const override;
+        void buildEntityDeclarationsFollowingOrder(Execution& exec) const override;
 
         ResolvingHandle<lang::Entity> getUndefinedClone(Context& new_context) const override;
 

@@ -8,12 +8,14 @@
 #include <llvm/Target/TargetMachine.h>
 
 #include "TargetDescriptor.h"
-#include "compiler/CompileContext.h"
+
+#include "compiler/NativeBuild.h"
 #include "compiler/Runtime.h"
 #include "lang/construct/Function.h"
 #include "lang/utility/Owners.h"
 
 class Unit;
+class SourceTree;
 
 /**
  * Represents the compile step, which transforms a unit into a llvm module.
@@ -51,19 +53,17 @@ class AnceCompiler
   private:
     static constexpr char const* INTERNAL_FUNCTION_SUFFIX = "$lang";
 
-    Unit&            unit_;
-    TargetDescriptor target_descriptor_;
-
     llvm::LLVMContext llvm_context_;
     llvm::Module      module_;
     llvm::IRBuilder<> ir_;
     llvm::DIBuilder   di_;
+
+    Unit&               unit_;
+    TargetDescriptor    target_descriptor_;
     Runtime           runtime_;
+    NativeBuild         native_build_;
 
-    NativeBuild*         native_build_ {nullptr};
     llvm::TargetMachine* target_machine_ {nullptr};
-
-    CompileContext context_;
 };
 
 #endif

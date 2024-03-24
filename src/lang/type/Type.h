@@ -36,7 +36,7 @@ namespace lang
     class IntegerType;
 }
 
-class CompileContext;
+class Execution;
 class ValidationLogger;
 class Storage;
 
@@ -540,137 +540,133 @@ namespace lang
          * Build a subscript access.
          * @param indexed The indexed value.
          * @param index The index to use.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The return value.
          */
         Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
                                            Shared<lang::Value> index,
-                                           CompileContext&     context) const;
+                                           Execution&          exec) const;
 
         /**
          * Build a binary operation.
          * @param op The operation.
          * @param left The left value, must be of this type.
          * @param right The right value.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The result value.
          */
         Shared<lang::Value> buildOperator(lang::BinaryOperator op,
                                           Shared<lang::Value>  left,
                                           Shared<lang::Value>  right,
-                                          CompileContext&      context) const;
+                                          Execution&           exec) const;
 
         /**
          * Build a unary operation.
          * @param op The operation.
          * @param value The value to operate on.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The result value.
          */
         Shared<lang::Value> buildOperator(lang::UnaryOperator op,
-                                          Shared<lang::Value> value,
-                                          CompileContext&     context) const;
+                                          Shared<lang::Value> value, Execution& exec) const;
 
         /**
          * Build an implicit conversion.
          * @param other The type to convert to.
          * @param value The value to convert.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The converted value.
          */
         Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
                                                     Shared<lang::Value> value,
-                                                    CompileContext&     context) const;
+                                                    Execution&          exec) const;
 
         /**
          * Build an explicit cast.
          * @param other The type to cast to.
          * @param value The value to cast.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The casted value.
          */
         Shared<lang::Value> buildCast(lang::Type const&   other,
-                                      Shared<lang::Value> value,
-                                      CompileContext&     context) const;
+                                      Shared<lang::Value> value, Execution& exec) const;
 
         /**
          * Build a member access.
          * @param value The value to access.
          * @param name The name of the member.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The result value.
          */
         Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                               lang::Identifier const& name,
-                                              CompileContext&         context) const;
+                                              Execution&              exec) const;
 
         /**
          * Build indirection.
          * @param value The value to indirect.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The result value, which is a reference of indirection return type.
          */
-        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context) const;
+        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, Execution& exec) const;
 
         /**
          * Build the default initializer for this type.
          * @param ptr A pointer to where the value should be initialized.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context) const;
+        void performDefaultInitializer(Shared<lang::Value> ptr, Execution& exec) const;
 
         /**
          * Build the default initializer for this type, initializing multiple instances.
          * @param ptr The pointer to the first instance.
          * @param count The number of instances to initialize.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
         void performDefaultInitializer(Shared<lang::Value> ptr,
-                                       Shared<lang::Value> count,
-                                       CompileContext&     context) const;
+                                       Shared<lang::Value> count, Execution& exec) const;
 
         /**
          * Build the copy initializer for this type.
          * @param destination A pointer to where the value should be initialized.
          * @param source A pointer to the original value.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
         void performCopyInitializer(Shared<lang::Value> destination,
-                                    Shared<lang::Value> source,
-                                    CompileContext&     context) const;
+                                    Shared<lang::Value> source, Execution& exec) const;
 
         /**
          * Build the destructor for this type.
          * @param ptr The pointer to the value to destruct.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void performFinalizer(Shared<lang::Value> ptr, CompileContext& context) const;
+        void performFinalizer(Shared<lang::Value> ptr, Execution& exec) const;
 
         /**
          * Build the default destructor for this type.
          * @param ptr The pointer to the value to destruct.
          * @param count The number of instances to destruct.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const;
+        void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, Execution& exec) const;
 
         /**
          * Register the type for execution.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void registerExecutionType(CompileContext& context) const;
+        void registerExecutionType(Execution& exec) const;
 
         /**
          * Build the backing required for the declaration.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void buildDeclaration(CompileContext& context) const;
+        void buildDeclaration(Execution& exec) const;
 
         /**
          * Build the backing required for the definition of this type.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void buildDefinition(CompileContext& context) const;
+        void buildDefinition(Execution& exec) const;
 
         [[nodiscard]] lang::TypeDefinition*       getDefinition();
         [[nodiscard]] lang::TypeDefinition const* getDefinition() const;
@@ -742,12 +738,11 @@ namespace lang
          * Transform a value so it matches an expected type.
          * @param expected The expected type.
          * @param value The value to transform.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return A value with the expected type. It can be the same value as passed in.
          */
         static Shared<lang::Value> makeMatching(lang::Type const&   expected,
-                                                Shared<lang::Value> value,
-                                                CompileContext&     context);
+                                                Shared<lang::Value> value, Execution& exec);
 
         template<typename Expected>
         static lang::ResolvingHandle<Expected> makeMatching(lang::ResolvingHandle<Entity> value)

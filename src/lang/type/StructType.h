@@ -31,17 +31,17 @@ namespace lang
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                               lang::Identifier const& name,
-                                              CompileContext&         context) const override;
+                                              Execution&              exec) const override;
 
       protected:
-        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
+        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, Execution& exec) const override;
         void performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                     Shared<lang::Value> src_ptr,
-                                                    CompileContext&     context) const override;
-        void performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
+                                                    Execution&          exec) const override;
+        void performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, Execution& exec) const override;
 
         std::string createMangledName() const override;
-        void        registerExecutionType(CompileContext& context) const override;
+        void        registerExecutionType(Execution& exec) const override;
 
       public:
         std::vector<lang::ResolvingHandle<lang::Type>> getDeclarationDependencies() override;

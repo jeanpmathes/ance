@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/constant/UnitConstant.h"
@@ -116,9 +115,9 @@ bool lang::FunctionDefinition::isImported() const
 void lang::FunctionDefinition::resolveFollowingOrder() {}
 void lang::FunctionDefinition::postResolve() {}
 
-void lang::FunctionDefinition::buildDeclaration(CompileContext& context) const
+void lang::FunctionDefinition::buildDeclaration(Execution& exec) const
 {
-    context.exec().registerFunction(function());
+    exec.registerFunction(function());
 }
 
 bool lang::FunctionDefinition::validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
@@ -156,9 +155,9 @@ bool lang::FunctionDefinition::doCallValidation(std::vector<std::reference_wrapp
 }
 
 Shared<lang::Value> lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Value>> arguments,
-                                                        CompileContext&                  context) const
+                                                        Execution&                       exec) const
 {
-    return context.exec().performFunctionCall(function(), std::move(arguments));
+    return exec.performFunctionCall(function(), std::move(arguments));
 }
 
 std::vector<Shared<lang::Parameter>> const& lang::FunctionDefinition::parameters() const
@@ -171,7 +170,7 @@ std::vector<Shared<lang::Parameter>> lang::FunctionDefinition::parameters()
     return parameters_;
 }
 
-void lang::FunctionDefinition::buildDeclarationsFollowingOrder(CompileContext&) const {}
+void lang::FunctionDefinition::buildDeclarationsFollowingOrder(Execution&) const {}
 
 lang::BasicBlock const* lang::FunctionDefinition::getEntryBlock() const
 {

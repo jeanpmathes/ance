@@ -2,6 +2,7 @@
 #define ANCE_SRC_COMPILER_EXECUTION_H_
 
 #include <any>
+#include <filesystem>
 #include <map>
 #include <utility>
 #include <variant>
@@ -18,6 +19,8 @@
 
 class Expression;
 class LiteralExpression;
+class Unit;
+class Runtime;
 
 namespace lang
 {
@@ -28,6 +31,7 @@ namespace lang
     class Member;
     class Scope;
     class Type;
+    class Context;
 
     class Parameter;
     class Constant;
@@ -48,6 +52,9 @@ namespace lang
 class Execution
 {
   public:
+    Execution(Unit& unit, Runtime& runtime);
+    virtual ~Execution() = default;
+
     /**
      * Get the default constant for the given type.
      * @param type The type to get the constant value for.
@@ -187,8 +194,7 @@ class Execution
      * @param function The function of which the body is defined.
      * @param builder A function that is called to build the body of the function.
      */
-    virtual void defineFunctionBody(lang::Function const&                       function,
-                                    std::function<void(CompileContext&)> const& builder) = 0;
+    virtual void defineFunctionBody(lang::Function const&                       function, std::function<void(Execution&)> const& builder) = 0;
 
     /**
      * Call a function.
@@ -610,9 +616,44 @@ class Execution
     virtual void releaseValue(std::any handle)    = 0;
     virtual void releaseConstant(std::any handle) = 0;
 
-    virtual CompileContext& cc() = 0;
+    Unit&          unit();
+    Runtime&       runtime();
+    lang::Context& ctx();
 
-    virtual ~Execution() = default;
+    /**
+     * Get the path to the source file that contains the given location.
+     * @param location The location.
+     * @return The path to the source file.
+     */
+    virtual std::filesystem::path getSourceFilePath(lang::Location location) = 0;
+
+    /**
+     * Set the current debug location.
+     * @param location The source location.
+     * @param scope The current scope.
+     */
+    virtual void setDebugLocation(lang::Location location, lang::Scope const& scope) = 0;
+
+    /**
+     * Reset the previous debug location.
+     */
+    virtual void resetDebugLocation() = 0;
+
+    /**
+     * Get whether all debug locations were popped.
+     * @return True if all locations were popped correctly.
+     */
+    virtual bool allDebugLocationsPopped() = 0;
+
+    /**
+     * Get a string describing the current location in the source code.
+     * @return The location string.
+     */
+    virtual std::string getLocationString() = 0;
+
+  private:
+    Unit&    unit_;
+    Runtime& runtime_;
 };
 
 #endif

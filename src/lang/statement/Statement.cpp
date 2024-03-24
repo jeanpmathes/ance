@@ -1,6 +1,5 @@
 #include "Statement.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/BasicBlock.h"
 #include "lang/construct/Function.h"

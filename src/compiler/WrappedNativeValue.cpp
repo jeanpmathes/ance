@@ -2,8 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
-
 #include "compiler/NativeBuild.h"
 
 WrappedNativeValue::WrappedNativeValue(lang::Type const& type, llvm::Value* value, NativeBuild& native_build)

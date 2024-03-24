@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Value.h"
@@ -59,36 +58,36 @@ bool lang::SequenceType::validateSubscript(lang::Location,
 
 Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> indexed,
                                                        Shared<lang::Value> index,
-                                                       CompileContext&     context) const
+                                                       Execution&          exec) const
 {
-    return buildSubscript(indexed, index, true, context);
+    return buildSubscript(indexed, index, true, exec);
 }
 
 Shared<lang::Value> lang::SequenceType::buildSubscriptInBounds(Shared<lang::Value> indexed,
                                                                Shared<lang::Value> index,
-                                                               CompileContext&     context) const
+                                                               Execution&          exec) const
 {
-    return buildSubscript(indexed, index, false, context);
+    return buildSubscript(indexed, index, false, exec);
 }
 
 Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> indexed,
                                                        Shared<lang::Value> index,
                                                        bool                check_bounds,
-                                                       CompileContext&     context) const
+                                                       Execution&          exec) const
 {
-    if (getSubscriptReturnType().getStateCount().isUnit()) return context.exec().getDefault(getSubscriptReturnType());
+    if (getSubscriptReturnType().getStateCount().isUnit()) return exec.getDefault(getSubscriptReturnType());
 
     Optional<uint64_t> bounds = check_bounds ? size_ : std::nullopt;
 
-    index                             = lang::Type::makeMatching(context.ctx().getSizeType(), index, context);
-    Shared<lang::Value> index_as_diff = context.exec().computeConversionOnI(index, context.ctx().getDiffType());
+    index                             = lang::Type::makeMatching(exec.ctx().getSizeType(), index, exec);
+    Shared<lang::Value> index_as_diff = exec.computeConversionOnI(index, exec.ctx().getDiffType());
 
     Shared<lang::Value> sequence_ptr =
-        getIndexingMode() == Execution::IndexingMode::POINTER ? indexed : context.exec().computeAddressOf(indexed);
+        getIndexingMode() == Execution::IndexingMode::POINTER ? indexed : exec.computeAddressOf(indexed);
     Shared<lang::Value> element_ptr =
-        context.exec().computeElementPointer(sequence_ptr, index_as_diff, getIndexingMode(), bounds);
+        exec.computeElementPointer(sequence_ptr, index_as_diff, getIndexingMode(), bounds);
 
-    return context.exec().computeReferenceFromPointer(element_ptr);
+    return exec.computeReferenceFromPointer(element_ptr);
 }
 
 bool lang::SequenceType::isTriviallyDefaultConstructible() const
@@ -106,53 +105,52 @@ bool lang::SequenceType::isTriviallyDestructible() const
     return element_type_->getDefinition()->isTriviallyDestructible();
 }
 
-void lang::SequenceType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr,
-                                                                   CompileContext&     context) const
+void lang::SequenceType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, Execution& exec) const
 {
     if (size_.hasValue())
     {
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Value> index_value = context.exec().getDiffN(static_cast<std::ptrdiff_t>(index));
+            Shared<lang::Value> index_value = exec.getDiffN(static_cast<std::ptrdiff_t>(index));
             Shared<lang::Value> element_ptr =
-                context.exec().computeElementPointer(ptr, index_value, getIndexingMode(), std::nullopt);
+                exec.computeElementPointer(ptr, index_value, getIndexingMode(), std::nullopt);
 
-            element_type_->performDefaultInitializer(element_ptr, context);
+            element_type_->performDefaultInitializer(element_ptr, exec);
         }
     }
 }
 
 void lang::SequenceType::performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                                 Shared<lang::Value> src_ptr,
-                                                                CompileContext&     context) const
+                                                                Execution&          exec) const
 {
     if (size_.hasValue())
     {
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Value> index_value = context.exec().getDiffN(static_cast<std::ptrdiff_t>(index));
+            Shared<lang::Value> index_value = exec.getDiffN(static_cast<std::ptrdiff_t>(index));
 
             Shared<lang::Value> dst_element_ptr =
-                context.exec().computeElementPointer(dts_ptr, index_value, getIndexingMode(), std::nullopt);
+                exec.computeElementPointer(dts_ptr, index_value, getIndexingMode(), std::nullopt);
             Shared<lang::Value> src_element_ptr =
-                context.exec().computeElementPointer(src_ptr, index_value, getIndexingMode(), std::nullopt);
+                exec.computeElementPointer(src_ptr, index_value, getIndexingMode(), std::nullopt);
 
-            element_type_->performCopyInitializer(dst_element_ptr, src_element_ptr, context);
+            element_type_->performCopyInitializer(dst_element_ptr, src_element_ptr, exec);
         }
     }
 }
 
-void lang::SequenceType::performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::SequenceType::performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, Execution& exec) const
 {
     if (size_.hasValue())
     {
         for (uint64_t index = 0; index < size_.value(); index++)
         {
-            Shared<lang::Value> index_value = context.exec().getDiffN(static_cast<std::ptrdiff_t>(index));
+            Shared<lang::Value> index_value = exec.getDiffN(static_cast<std::ptrdiff_t>(index));
             Shared<lang::Value> element_ptr =
-                context.exec().computeElementPointer(ptr, index_value, getIndexingMode(), std::nullopt);
+                exec.computeElementPointer(ptr, index_value, getIndexingMode(), std::nullopt);
 
-            element_type_->performFinalizer(element_ptr, context);
+            element_type_->performFinalizer(element_ptr, exec);
         }
     }
 }
@@ -169,22 +167,21 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::SequenceType::getDefinition
     return {};
 }
 
-Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values,
-                                                    CompileContext&                  context) const
+Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values, Execution& exec) const
 {
     assert(size_.hasValue());
     assert(values.size() == size_.value());
 
-    Shared<lang::Value> sequence_ptr = context.exec().performStackAllocation(self());
+    Shared<lang::Value> sequence_ptr = exec.performStackAllocation(self());
 
     for (uint64_t index = 0; index < size_.value(); index++)
     {
-        Shared<lang::Value> index_value = context.exec().getDiffN(static_cast<std::ptrdiff_t>(index));
+        Shared<lang::Value> index_value = exec.getDiffN(static_cast<std::ptrdiff_t>(index));
         Shared<lang::Value> element_ptr =
-            context.exec().computeElementPointer(sequence_ptr, index_value, getIndexingMode(), std::nullopt);
+            exec.computeElementPointer(sequence_ptr, index_value, getIndexingMode(), std::nullopt);
 
-        context.exec().performStoreToAddress(element_ptr, values[index]);
+        exec.performStoreToAddress(element_ptr, values[index]);
     }
 
-    return context.exec().performLoadFromAddress(sequence_ptr);
+    return exec.performLoadFromAddress(sequence_ptr);
 }

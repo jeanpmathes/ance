@@ -1,6 +1,5 @@
 #include "UnitType.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/constant/BooleanConstant.h"
@@ -18,9 +17,9 @@ std::string lang::UnitType::createMangledName() const
     return std::string(name().text());
 }
 
-void lang::UnitType::registerExecutionType(CompileContext& context) const
+void lang::UnitType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerUnitType(self());
+    return exec.registerUnitType(self());
 }
 
 bool lang::UnitType::isUnitType() const
@@ -28,17 +27,17 @@ bool lang::UnitType::isUnitType() const
     return true;
 }
 
-void lang::UnitType::performDefaultInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&) const
+void lang::UnitType::performDefaultInitializer(Shared<lang::Value>, Shared<lang::Value>, Execution&) const
 {
     // No runtime initialization required.
 }
 
-void lang::UnitType::performCopyInitializer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&) const
+void lang::UnitType::performCopyInitializer(Shared<lang::Value>, Shared<lang::Value>, Execution&) const
 {
     // No runtime copy required.
 }
 
-void lang::UnitType::performFinalizer(Shared<lang::Value>, Shared<lang::Value>, CompileContext&) const
+void lang::UnitType::performFinalizer(Shared<lang::Value>, Shared<lang::Value>, Execution&) const
 {
     // No runtime finalization required.
 }
@@ -70,11 +69,11 @@ bool lang::UnitType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::UnitType::buildOperator(lang::BinaryOperator op,
                                                   Shared<lang::Value>,
                                                   Shared<lang::Value>,
-                                                  CompileContext& context) const
+                                                  Execution& exec) const
 {
-    if (op == BinaryOperator::EQUAL) return BooleanConstant::createTrue(context.ctx());
+    if (op == BinaryOperator::EQUAL) return BooleanConstant::createTrue(exec.ctx());
 
-    if (op == BinaryOperator::NOT_EQUAL) return BooleanConstant::createFalse(context.ctx());
+    if (op == BinaryOperator::NOT_EQUAL) return BooleanConstant::createFalse(exec.ctx());
 
     throw std::logic_error("Unit type does not support operator '" + op.toString() + "'");
 }

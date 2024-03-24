@@ -4,7 +4,6 @@
 
 #include <boost/locale/encoding_utf.hpp>
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
 #include "lang/construct/constant/CharConstant.h"
@@ -108,24 +107,24 @@ std::string lang::StringConstant::toString() const
     return prefix_ + literal_;
 }
 
-Shared<lang::Constant> lang::StringConstant::embed(CompileContext& context) const
+Shared<lang::Constant> lang::StringConstant::embed(Execution& exec) const
 {
     switch (kind_)
     {
         case BYTE:
         {
             auto const& data = std::get<std::string>(data_);
-            return context.exec().getByteString(data);
+            return exec.getByteString(data);
         }
         case CHAR:
         {
             auto const& data = std::get<std::u32string>(data_);
-            return context.exec().getCodepointString(data);
+            return exec.getCodepointString(data);
         }
         case C_STRING:
         {
             auto const& data = std::get<std::string>(data_);
-            return context.exec().getCString(data);
+            return exec.getCString(data);
         }
     }
 }

@@ -1,6 +1,5 @@
 #include "SpecialMemberFunction.h"
 
-#include "compiler/CompileContext.h"
 #include "compiler/Unit.h"
 #include "lang/ApplicationVisitor.h"
 

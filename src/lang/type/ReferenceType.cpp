@@ -1,7 +1,7 @@
 #include "ReferenceType.h"
 
 #include "compiler/Application.h"
-#include "compiler/CompileContext.h"
+
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Value.h"
 #include "lang/scope/GlobalScope.h"
@@ -84,9 +84,9 @@ bool lang::ReferenceType::validateSubscript(lang::Location    indexed_location,
 
 Shared<lang::Value> lang::ReferenceType::buildSubscript(Shared<lang::Value> indexed,
                                                         Shared<lang::Value> index,
-                                                        CompileContext&     context) const
+                                                        Execution&          exec) const
 {
-    return element_type_->buildSubscript(context.exec().performDereference(indexed), index, context);
+    return element_type_->buildSubscript(exec.performDereference(indexed), index, exec);
 }
 
 bool lang::ReferenceType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -111,9 +111,9 @@ bool lang::ReferenceType::validateOperator(lang::BinaryOperator op,
 Shared<lang::Value> lang::ReferenceType::buildOperator(lang::BinaryOperator op,
                                                        Shared<lang::Value>  left,
                                                        Shared<lang::Value>  right,
-                                                       CompileContext&      context) const
+                                                       Execution&           exec) const
 {
-    return element_type_->buildOperator(op, context.exec().performDereference(left), right, context);
+    return element_type_->buildOperator(op, exec.performDereference(left), right, exec);
 }
 
 bool lang::ReferenceType::isOperatorDefined(lang::UnaryOperator op) const
@@ -135,9 +135,9 @@ bool lang::ReferenceType::validateOperator(lang::UnaryOperator op,
 
 Shared<lang::Value> lang::ReferenceType::buildOperator(lang::UnaryOperator op,
                                                        Shared<lang::Value> value,
-                                                       CompileContext&     context) const
+                                                       Execution&          exec) const
 {
-    return element_type_->buildOperator(op, context.exec().performDereference(value), context);
+    return element_type_->buildOperator(op, exec.performDereference(value), exec);
 }
 
 bool lang::ReferenceType::hasMember(lang::Identifier const& name) const
@@ -162,9 +162,9 @@ bool lang::ReferenceType::validateMemberAccess(lang::Identifier const& name, Val
 
 Shared<lang::Value> lang::ReferenceType::buildMemberAccess(Shared<lang::Value>     value,
                                                            lang::Identifier const& name,
-                                                           CompileContext&         context) const
+                                                           Execution&              exec) const
 {
-    return element_type_->buildMemberAccess(context.exec().performDereference(value), name, context);
+    return element_type_->buildMemberAccess(exec.performDereference(value), name, exec);
 }
 
 bool lang::ReferenceType::definesIndirection() const
@@ -182,9 +182,9 @@ bool lang::ReferenceType::validateIndirection(lang::Location location, Validatio
     return element_type_->validateIndirection(location, validation_logger);
 }
 
-Shared<lang::Value> lang::ReferenceType::buildIndirection(Shared<lang::Value> value, CompileContext& context) const
+Shared<lang::Value> lang::ReferenceType::buildIndirection(Shared<lang::Value> value, Execution& exec) const
 {
-    return element_type_->buildIndirection(context.exec().performDereference(value), context);
+    return element_type_->buildIndirection(exec.performDereference(value), exec);
 }
 
 bool lang::ReferenceType::isTriviallyDefaultConstructible() const
@@ -204,21 +204,21 @@ bool lang::ReferenceType::isTriviallyDestructible() const
 
 void lang::ReferenceType::createConstructors() {}
 
-void lang::ReferenceType::buildDeclaration(CompileContext& context) const
+void lang::ReferenceType::buildDeclaration(Execution& exec) const
 {
-    registerExecutionType(context);
+    registerExecutionType(exec);
 }
 
-void lang::ReferenceType::buildDefinition(CompileContext&) const {}
+void lang::ReferenceType::buildDefinition(Execution&) const {}
 
 std::string lang::ReferenceType::createMangledName() const
 {
     return std::string("ref") + "(" + element_type_->getMangledName() + ")";
 }
 
-void lang::ReferenceType::registerExecutionType(CompileContext& context) const
+void lang::ReferenceType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerReferenceType(self());
+    return exec.registerReferenceType(self());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::ReferenceType::getDeclarationDependencies()

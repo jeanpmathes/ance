@@ -2,7 +2,6 @@
 
 #include <set>
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Value.h"
 #include "lang/expression/Expression.h"

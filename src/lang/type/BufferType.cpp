@@ -1,7 +1,7 @@
 #include "BufferType.h"
 
 #include "compiler/Application.h"
-#include "compiler/CompileContext.h"
+
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Value.h"
 #include "lang/scope/GlobalScope.h"
@@ -77,9 +77,9 @@ std::string lang::BufferType::createMangledName() const
     return std::string("ptr_b") + "(" + element_type_->getMangledName() + ")";
 }
 
-void lang::BufferType::registerExecutionType(CompileContext& context) const
+void lang::BufferType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerAddressType(self());
+    return exec.registerAddressType(self());
 }
 
 Execution::IndexingMode lang::BufferType::getIndexingMode() const

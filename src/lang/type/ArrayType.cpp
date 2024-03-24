@@ -1,7 +1,7 @@
 #include "ArrayType.h"
 
 #include "compiler/Application.h"
-#include "compiler/CompileContext.h"
+
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 #include "lang/type/SizeType.h"
@@ -68,9 +68,9 @@ std::string lang::ArrayType::createMangledName() const
          + std::string(")");
 }
 
-void lang::ArrayType::registerExecutionType(CompileContext& context) const
+void lang::ArrayType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerArrayType(self());
+    return exec.registerArrayType(self());
 }
 
 Execution::IndexingMode lang::ArrayType::getIndexingMode() const

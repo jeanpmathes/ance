@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Constant.h"
@@ -51,28 +50,28 @@ lang::Assigner lang::GlobalVariable::assigner() const
     return assigner_;
 }
 
-void lang::GlobalVariable::buildDeclaration(CompileContext& context) const
+void lang::GlobalVariable::buildDeclaration(Execution& exec) const
 {
-    context.exec().registerGlobalVariable(*this, is_import_, init_);
+    exec.registerGlobalVariable(*this, is_import_, init_);
 }
 
-void lang::GlobalVariable::buildInitialization(CompileContext& context) const
+void lang::GlobalVariable::buildInitialization(Execution& exec) const
 {
     if (init_.hasValue())
     {
         if (auto* function_init = std::get_if<std::reference_wrapper<lang::Function>>(&init_.value()))
         {
-            function_init->get().buildCall({}, context);
+            function_init->get().buildCall({}, exec);
         }
     }
 }
 
-void lang::GlobalVariable::buildFinalization(CompileContext& context) const
+void lang::GlobalVariable::buildFinalization(Execution& exec) const
 {
-    type().performFinalizer(context.exec().computeAddressOfVariable(self()), context);
+    type().performFinalizer(exec.computeAddressOfVariable(self()), exec);
 }
 
-Shared<lang::Value> lang::GlobalVariable::getValuePointer(CompileContext& context) const
+Shared<lang::Value> lang::GlobalVariable::getValuePointer(Execution& exec) const
 {
-    return context.exec().computeAddressOfVariable(self());
+    return exec.computeAddressOfVariable(self());
 }

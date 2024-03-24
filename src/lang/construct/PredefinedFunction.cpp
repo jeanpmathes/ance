@@ -1,6 +1,5 @@
 #include "PredefinedFunction.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 
 lang::PredefinedFunction::PredefinedFunction(lang::Function&                      function,

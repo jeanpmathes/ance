@@ -12,7 +12,7 @@ namespace lang
     {
       protected:
         std::string createMangledName() const override;
-        void        registerExecutionType(CompileContext& context) const override;
+        void        registerExecutionType(Execution& exec) const override;
 
       public:
         ~FloatingPointType() override = default;
@@ -28,7 +28,7 @@ namespace lang
                                                        ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
                                                     Shared<lang::Value> value,
-                                                    CompileContext&     context) const override;
+                                                    Execution&          exec) const override;
 
         bool                isCastingPossibleTo(lang::Type const& other) const override;
         bool                validateCast(lang::Type const& other,
@@ -36,7 +36,7 @@ namespace lang
                                          ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildCast(lang::Type const&   other,
                                       Shared<lang::Value> value,
-                                      CompileContext&     context) const override;
+                                      Execution&          exec) const override;
 
         bool                isOperatorDefined(lang::UnaryOperator op) const override;
         lang::Type const&   getOperatorResultType(lang::UnaryOperator op) const override;
@@ -45,7 +45,7 @@ namespace lang
                                              ValidationLogger&   validation_logger) const override;
         Shared<lang::Value> buildOperator(lang::UnaryOperator op,
                                           Shared<lang::Value> value,
-                                          CompileContext&     context) const override;
+                                          Execution&          exec) const override;
 
         bool                isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::Type const&   getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const override;
@@ -57,7 +57,7 @@ namespace lang
         Shared<lang::Value> buildOperator(lang::BinaryOperator op,
                                           Shared<lang::Value>  left,
                                           Shared<lang::Value>  right,
-                                          CompileContext&      context) const override;
+                                          Execution&           exec) const override;
 
         [[nodiscard]] virtual size_t getPrecision() const = 0;
 

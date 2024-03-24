@@ -1,6 +1,5 @@
 #include "Delete.h"
 
-#include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"

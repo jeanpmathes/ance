@@ -11,7 +11,7 @@
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
 
-class CompileContext;
+class Execution;
 
 namespace lang
 {
@@ -26,9 +26,9 @@ class Runtime
   public:
     /**
      * Initialize the runtime.
-     * @param context The current compile context.
+     * @param exec The current execution context.
      */
-    void init(CompileContext& context);
+    void init(Execution& exec);
 
     /**
      * Check whether a name is reserved by the runtime.
@@ -79,46 +79,46 @@ class Runtime
      * @param allocation The allocator to use.
      * @param type The type of the value to allocate memory for.
      * @param count The number of elements to allocate.
-     * @param context The current compile context.
+     * @param exec The current execution context.
      * @return A pointer to the allocated memory.
      */
     Shared<lang::Value> allocate(Allocator                     allocation,
                                  lang::Type const&             type,
                                  Optional<Shared<lang::Value>> count,
-                                 CompileContext&               context);
+                                 Execution&                    exec);
 
     /**
      * Free dynamically allocated memory.
      * @param address A pointer to the memory.
      * @param delete_buffer Whether the memory is a single element or a buffer of multiple elements.
-     * @param context The current compile context.
+     * @param exec The current execution context.
      */
-    void deleteDynamic(Shared<lang::Value> address, bool delete_buffer, CompileContext& context);
+    void deleteDynamic(Shared<lang::Value> address, bool delete_buffer, Execution& exec);
 
     /**
      * Build an assertion. Only performed when assertions are enabled.
      * @param value The boolean value to assert.
      * @param description The description of the assertion.
-     * @param context The current compile context.
+     * @param exec The current execution context.
      */
-    void buildAssert(Shared<lang::Value> value, std::string const& description, CompileContext& context);
+    void buildAssert(Shared<lang::Value> value, std::string const& description, Execution& exec);
 
     /**
      * Build an abort.
      * @param reason The description of the abort.
-     * @param context The current compile context.
+     * @param exec The current execution context.
      */
-    void buildAbort(std::string const& reason, CompileContext& context);
+    void buildAbort(std::string const& reason, Execution& exec);
 
   private:
     bool is_initialized_ {false};
 
-    Shared<lang::Value> allocateAutomatic(lang::Type const& type, Shared<lang::Value> count, CompileContext& context);
+    Shared<lang::Value> allocateAutomatic(lang::Type const& type, Shared<lang::Value> count, Execution& exec);
 
     Shared<lang::Value> allocateDynamic(lang::Type const&   type,
                                         Shared<lang::Value> count,
                                         bool                is_buffer,
-                                        CompileContext&     context);
+                                        Execution&          exec);
 };
 
 #endif

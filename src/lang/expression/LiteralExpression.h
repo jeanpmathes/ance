@@ -22,7 +22,7 @@ class LiteralExpression
     LiteralExpression(Shared<lang::LiteralConstant> constant, lang::Location location);
 
     [[nodiscard]] lang::LiteralConstant const& constant() const;
-    [[nodiscard]] Shared<lang::Constant>       constant(CompileContext& context);
+    [[nodiscard]] Shared<lang::Constant>       constant(Execution& exec);
 
     bool validate(ValidationLogger& validation_logger) const override;
 

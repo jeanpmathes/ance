@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
 #include "lang/type/FixedWidthIntegerType.h"
@@ -103,10 +102,10 @@ bool lang::IntegerConstant::validate(ValidationLogger& validation_logger, lang::
     return true;
 }
 
-Shared<lang::Constant> lang::IntegerConstant::embed(CompileContext& context) const
+Shared<lang::Constant> lang::IntegerConstant::embed(Execution& exec) const
 {
     llvm::APInt const integer(static_cast<unsigned int>(integer_type_->getNativeBitSize()), text_, radix_);
-    return context.exec().getInteger(integer, type());
+    return exec.getInteger(integer, type());
 }
 
 bool lang::IntegerConstant::equals(lang::Constant const* other) const

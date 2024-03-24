@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "lang/type/Type.h"
 
 lang::FloatConstant::FloatConstant(std::string const&                number,
@@ -25,9 +24,9 @@ std::string lang::FloatConstant::toString() const
     return text_ + suffix;
 }
 
-Shared<lang::Constant> lang::FloatConstant::embed(CompileContext& context) const
+Shared<lang::Constant> lang::FloatConstant::embed(Execution& exec) const
 {
-    return context.exec().getFloatingPoint(float_, type());
+    return exec.getFloatingPoint(float_, type());
 }
 
 bool lang::FloatConstant::equals(lang::Constant const* other) const

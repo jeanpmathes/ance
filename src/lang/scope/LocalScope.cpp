@@ -14,7 +14,7 @@ void lang::LocalScope::resolveFollowingOrder()
     for (auto sub_scope : code_block_.getSubScopesInOrder()) { sub_scope.get().resolve(); }
 }
 
-void lang::LocalScope::buildEntityDeclarationsFollowingOrder(CompileContext& context) const
+void lang::LocalScope::buildEntityDeclarationsFollowingOrder(Execution& exec) const
 {
-    for (auto sub_scope : code_block_.getSubScopesInOrder()) { sub_scope.get().buildEntityDeclarations(context); }
+    for (auto sub_scope : code_block_.getSubScopesInOrder()) { sub_scope.get().buildEntityDeclarations(exec); }
 }

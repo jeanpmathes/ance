@@ -64,14 +64,14 @@ namespace lang
         [[nodiscard]] std::vector<std::reference_wrapper<lang::Description const>> getDescriptionsInDefinitionOrder()
             const;
 
-        void buildEntityDeclarations(CompileContext& context) const override;
+        void buildEntityDeclarations(Execution& exec) const override;
 
         /**
          * Build all initialization required by global entities.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void buildEntityInitializations(CompileContext& context) const;
-        void buildEntityFinalizations(CompileContext& context) const override;
+        void buildEntityInitializations(Execution& exec) const;
+        void buildEntityFinalizations(Execution& exec) const override;
 
       protected:
         virtual void onResolve() {}

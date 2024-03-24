@@ -1,6 +1,5 @@
 #include "FloatingPointType.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/type/FixedWidthIntegerType.h"
@@ -16,9 +15,9 @@ std::string lang::FloatingPointType::createMangledName() const
     return std::string(name().text());
 }
 
-void lang::FloatingPointType::registerExecutionType(CompileContext& context) const
+void lang::FloatingPointType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerFloatingPointType(self());
+    return exec.registerFloatingPointType(self());
 }
 
 lang::FloatingPointType const* lang::FloatingPointType::isFloatingPointType() const
@@ -45,9 +44,9 @@ bool lang::FloatingPointType::validateImplicitConversion(lang::Type const&, lang
 
 Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::Type const&   other,
                                                                      Shared<lang::Value> value,
-                                                                     CompileContext&     context) const
+                                                                     Execution&          exec) const
 {
-    return context.exec().computeConversionOnFP(value, other);
+    return exec.computeConversionOnFP(value, other);
 }
 
 bool lang::FloatingPointType::isCastingPossibleTo(lang::Type const& other) const
@@ -62,16 +61,16 @@ bool lang::FloatingPointType::validateCast(lang::Type const&, lang::Location, Va
 
 Shared<lang::Value> lang::FloatingPointType::buildCast(lang::Type const&   other,
                                                        Shared<lang::Value> value,
-                                                       CompileContext&     context) const
+                                                       Execution&          exec) const
 {
     if (other.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
     {
-        return context.exec().computeConversionOnFP(value, other);
+        return exec.computeConversionOnFP(value, other);
     }
 
     if (other.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
     {
-        return context.exec().computeConversionOnFP(value, other);
+        return exec.computeConversionOnFP(value, other);
     }
 
     throw std::logic_error("Invalid cast");
@@ -94,9 +93,9 @@ bool lang::FloatingPointType::validateOperator(lang::UnaryOperator, lang::Locati
 
 Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator op,
                                                            Shared<lang::Value> value,
-                                                           CompileContext&     context) const
+                                                           Execution&          exec) const
 {
-    return context.exec().performOperator(op, value);
+    return exec.performOperator(op, value);
 }
 
 bool lang::FloatingPointType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -130,11 +129,11 @@ bool lang::FloatingPointType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator op,
                                                            Shared<lang::Value>  left,
                                                            Shared<lang::Value>  right,
-                                                           CompileContext&      context) const
+                                                           Execution&           exec) const
 {
-    if (left->type().isReferenceType()) left = context.exec().performDereference(left);
+    if (left->type().isReferenceType()) left = exec.performDereference(left);
 
-    return context.exec().performOperator(op, left, right);
+    return exec.performOperator(op, left, right);
 }
 
 bool lang::FloatingPointType::isTriviallyDefaultConstructible() const

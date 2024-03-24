@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Parameter.h"
 #include "lang/scope/LocalScope.h"
@@ -62,42 +61,40 @@ lang::OwningHandle<lang::Variable> lang::LocalVariable::makeParameterVariable(la
     return lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
-void lang::LocalVariable::buildDeclaration(CompileContext& context) const
+void lang::LocalVariable::buildDeclaration(Execution& exec) const
 {
-    context.exec().declareLocalVariable(*this);
+    exec.declareLocalVariable(*this);
 }
 
-void lang::LocalVariable::buildInitialization(CompileContext& context) const
+void lang::LocalVariable::buildInitialization(Execution& exec) const
 {
-    context.exec().defineLocalVariable(*this, scope(), parameter_index_, location());
+    exec.defineLocalVariable(*this, scope(), parameter_index_, location());
 
-    Shared<lang::Value> pointer = getValuePointer(context);
+    Shared<lang::Value> pointer = getValuePointer(exec);
 
     if (initializer_.hasValue())
     {
-        Shared<lang::Value> value = context.exec().computeInitializerValue(initializer_);
+        Shared<lang::Value> value = exec.computeInitializerValue(initializer_);
 
-        value = lang::Type::makeMatching(type(), value, context);
+        value = lang::Type::makeMatching(type(), value, exec);
 
         if (type().isReferenceType() || parameter_index_.hasValue())
-        {
-            context.exec().performStoreToAddress(pointer, value);
-        }
+        { exec.performStoreToAddress(pointer, value); }
         else
         {
-            Shared<lang::Value> value_ptr = context.exec().computeAddressOf(value);
-            type().performCopyInitializer(pointer, value_ptr, context);
+            Shared<lang::Value> value_ptr = exec.computeAddressOf(value);
+            type().performCopyInitializer(pointer, value_ptr, exec);
         }
     }
-    else { type().performDefaultInitializer(pointer, context); }
+    else { type().performDefaultInitializer(pointer, exec); }
 }
 
-void lang::LocalVariable::buildFinalization(CompileContext& context) const
+void lang::LocalVariable::buildFinalization(Execution& exec) const
 {
-    if (!type().isReferenceType()) { type().performFinalizer(getValuePointer(context), context); }
+    if (!type().isReferenceType()) { type().performFinalizer(getValuePointer(exec), exec); }
 }
 
-Shared<lang::Value> lang::LocalVariable::getValuePointer(CompileContext& context) const
+Shared<lang::Value> lang::LocalVariable::getValuePointer(Execution& exec) const
 {
-    return context.exec().computeAddressOfVariable(self());
+    return exec.computeAddressOfVariable(self());
 }

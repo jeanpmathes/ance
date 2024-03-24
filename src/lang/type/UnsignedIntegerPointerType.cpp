@@ -1,6 +1,5 @@
 #include "UnsignedIntegerPointerType.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 
 lang::UnsignedIntegerPointerType::UnsignedIntegerPointerType() : TypeDefinition(lang::Identifier::like("uiptr")) {}
@@ -20,31 +19,31 @@ bool lang::UnsignedIntegerPointerType::acceptOverloadRequest(std::vector<Resolvi
 void lang::UnsignedIntegerPointerType::buildRequestedOverload(
     std::vector<std::reference_wrapper<lang::Type const>> parameters,
     lang::PredefinedFunction&                             function,
-    CompileContext&                                       context) const
+    Execution&                                            exec) const
 {
-    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
+    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, exec); }
 }
 
 void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::Type const&         parameter_element,
                                                               lang::Type const&         return_type,
                                                               lang::PredefinedFunction& function,
-                                                              CompileContext&           context) const
+                                                              Execution&                exec) const
 {
     if (parameter_element.isAddressType())
     {
         lang::Function* fn = &function.function();
 
-        context.exec().defineFunctionBody(function.function(), [fn](CompileContext& cc) {
-            Shared<lang::Value> argument = cc.exec().getParameterValue(*fn, 0);
-            Shared<lang::Value> result   = cc.exec().computePointerToInteger(argument);
+        exec.defineFunctionBody(function.function(), [fn](Execution& e) {
+            Shared<lang::Value> argument = e.getParameterValue(*fn, 0);
+            Shared<lang::Value> result   = e.computePointerToInteger(argument);
 
-            cc.exec().performReturn(result);
+            e.performReturn(result);
         });
 
         return;
     }
 
-    IntegerType::buildRequestedOverload(parameter_element, return_type, function, context);
+    IntegerType::buildRequestedOverload(parameter_element, return_type, function, exec);
 }
 
 std::string lang::UnsignedIntegerPointerType::createMangledName() const

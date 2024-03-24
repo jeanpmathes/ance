@@ -59,7 +59,7 @@ namespace lang
 
         [[nodiscard]] std::string toString() const override;
 
-        Shared<lang::Constant> embed(CompileContext& context) const override;
+        Shared<lang::Constant> embed(Execution& exec) const override;
 
         bool equals(lang::Constant const* other) const override;
 

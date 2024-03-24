@@ -32,7 +32,7 @@ namespace lang
 }
 
 class Statement;
-class CompileContext;
+class Execution;
 class ValidationLogger;
 
 namespace lang
@@ -179,14 +179,14 @@ namespace lang
 
         /**
          * Build the declarations for all entities in this scope.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        virtual void buildEntityDeclarations(CompileContext& context) const = 0;
+        virtual void buildEntityDeclarations(Execution& exec) const = 0;
         /**
          * Build the finalization for all entities in this scope.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        virtual void buildEntityFinalizations(CompileContext& context) const = 0;
+        virtual void buildEntityFinalizations(Execution& exec) const = 0;
 
       private:
         void addDependency(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared);

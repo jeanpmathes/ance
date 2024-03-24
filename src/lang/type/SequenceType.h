@@ -35,14 +35,14 @@ namespace lang
                                               ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
                                            Shared<lang::Value> index,
-                                           CompileContext&     context) const override;
+                                           Execution&          exec) const override;
         Shared<lang::Value> buildSubscriptInBounds(Shared<lang::Value> indexed,
                                                    Shared<lang::Value> index,
-                                                   CompileContext&     context) const;
+                                                   Execution&          exec) const;
         Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
                                            Shared<lang::Value> index,
                                            bool                check_bounds,
-                                           CompileContext&     context) const;
+                                           Execution&          exec) const;
 
       protected:
         virtual Execution::IndexingMode getIndexingMode() const = 0;
@@ -55,19 +55,19 @@ namespace lang
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
+        void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, Execution& exec) const override;
         void performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                     Shared<lang::Value> src_ptr,
-                                                    CompileContext&     context) const override;
-        void performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const override;
+                                                    Execution&          exec) const override;
+        void performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, Execution& exec) const override;
 
         /**
          * Create a value with the given elements. Only valid if the type is sized.
          * @param values The elements of the value. All values must be of the element type, and the count must match the size.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The value.
          */
-        Shared<lang::Value> createValue(std::vector<Shared<lang::Value>> values, CompileContext& context) const;
+        Shared<lang::Value> createValue(std::vector<Shared<lang::Value>> values, Execution& exec) const;
 
       protected:
         lang::ResolvingHandle<lang::Type> element_type_;

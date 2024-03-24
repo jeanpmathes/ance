@@ -18,7 +18,7 @@ namespace lang
         RuntimeFunction(Function&                            function,
                         lang::ResolvingHandle<lang::Type>    return_type,
                         std::vector<Shared<lang::Parameter>> parameters,
-                        CompileContext&                      context);
+                        Execution&                           exec);
 
         void setup() override;
 

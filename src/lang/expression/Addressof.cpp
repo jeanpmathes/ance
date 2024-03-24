@@ -1,6 +1,5 @@
 #include "Addressof.h"
 
-#include "compiler/CompileContext.h"
 #include "compiler/Execution.h"
 #include "lang/ApplicationVisitor.h"
 #include "validation/ValidationLogger.h"

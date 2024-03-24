@@ -38,7 +38,7 @@ namespace lang
                                          ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildCast(lang::Type const&   other,
                                       Shared<lang::Value> value,
-                                      CompileContext&     context) const override;
+                                      Execution&          exec) const override;
 
       private:
         uint64_t bit_size_;

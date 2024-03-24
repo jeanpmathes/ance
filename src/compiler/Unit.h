@@ -22,7 +22,7 @@ namespace lang
 }
 
 class Statement;
-class CompileContext;
+class Execution;
 class ValidationLogger;
 class Project;
 class ProjectDescription;

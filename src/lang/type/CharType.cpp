@@ -1,6 +1,5 @@
 #include "CharType.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/Value.h"
@@ -45,16 +44,16 @@ bool lang::CharType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::CharType::buildOperator(lang::BinaryOperator op,
                                                   Shared<lang::Value>  left,
                                                   Shared<lang::Value>  right,
-                                                  CompileContext&      context) const
+                                                  Execution&           exec) const
 {
-    if (right->type().isReferenceType()) right = context.exec().performDereference(right);
+    if (right->type().isReferenceType()) right = exec.performDereference(right);
 
-    lang::ResolvingHandle<lang::Type> int_type = context.ctx().getFixedWidthIntegerType(SIZE_IN_BITS, false);
+    lang::ResolvingHandle<lang::Type> int_type = exec.ctx().getFixedWidthIntegerType(SIZE_IN_BITS, false);
 
-    Shared<lang::Value> left_as_int  = context.exec().performIntegerReinterpretation(left, int_type);
-    Shared<lang::Value> right_as_int = context.exec().performIntegerReinterpretation(right, int_type);
+    Shared<lang::Value> left_as_int  = exec.performIntegerReinterpretation(left, int_type);
+    Shared<lang::Value> right_as_int = exec.performIntegerReinterpretation(right, int_type);
 
-    return context.exec().performOperator(op, left_as_int, right_as_int);
+    return exec.performOperator(op, left_as_int, right_as_int);
 }
 
 bool lang::CharType::isCastingPossibleTo(lang::Type const& other) const
@@ -72,15 +71,14 @@ bool lang::CharType::validateCast(lang::Type const& other,
 }
 
 Shared<lang::Value> lang::CharType::buildCast(lang::Type const&   other,
-                                              Shared<lang::Value> value,
-                                              CompileContext&     context) const
+                                              Shared<lang::Value> value, Execution& exec) const
 {
     if (other.isFixedWidthIntegerType(SIZE_IN_BITS, false))
     {
-        return context.exec().performIntegerReinterpretation(value, other);
+        return exec.performIntegerReinterpretation(value, other);
     }
 
-    return TypeDefinition::buildCast(other, value, context);
+    return TypeDefinition::buildCast(other, value, exec);
 }
 
 bool lang::CharType::isTriviallyDefaultConstructible() const
@@ -103,9 +101,9 @@ std::string lang::CharType::createMangledName() const
     return "c";
 }
 
-void lang::CharType::registerExecutionType(CompileContext& context) const
+void lang::CharType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerCodepointType(self());
+    return exec.registerCodepointType(self());
 }
 
 lang::ResolvingHandle<lang::Type> lang::CharType::clone(lang::Context& new_context) const

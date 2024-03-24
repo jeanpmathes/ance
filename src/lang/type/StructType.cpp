@@ -2,7 +2,6 @@
 
 #include <llvm/IR/Constant.h>
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Value.h"
 #include "lang/scope/Scope.h"
@@ -43,9 +42,9 @@ std::string lang::StructType::createMangledName() const
     return "struct(" + name() + ")";
 }
 
-void lang::StructType::registerExecutionType(CompileContext& context) const
+void lang::StructType::registerExecutionType(Execution& exec) const
 {
-    context.exec().registerStruct(self(), members_, getDefinitionLocation());
+    exec.registerStruct(self(), members_, getDefinitionLocation());
 }
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::StructType::getDeclarationDependencies()
@@ -104,41 +103,41 @@ bool lang::StructType::validateMemberAccess(lang::Identifier const& name, Valida
 
 Shared<lang::Value> lang::StructType::buildMemberAccess(Shared<lang::Value>     value,
                                                         lang::Identifier const& name,
-                                                        CompileContext&         context) const
+                                                        Execution&              exec) const
 {
-    Shared<lang::Value> struct_ptr = context.exec().computeAddressOf(value);
-    Shared<lang::Value> member_ptr = context.exec().computeMemberPointer(struct_ptr, name);
+    Shared<lang::Value> struct_ptr = exec.computeAddressOf(value);
+    Shared<lang::Value> member_ptr = exec.computeMemberPointer(struct_ptr, name);
 
-    return context.exec().computeReferenceFromPointer(member_ptr);
+    return exec.computeReferenceFromPointer(member_ptr);
 }
 
-void lang::StructType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::StructType::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, Execution& exec) const
 {
     for (auto member : members_)
     {
-        Shared<lang::Value> member_ptr = context.exec().computeMemberPointer(ptr, member.get().name());
-        member.get().buildInitialization(member_ptr, context);
+        Shared<lang::Value> member_ptr = exec.computeMemberPointer(ptr, member.get().name());
+        member.get().buildInitialization(member_ptr, exec);
     }
 }
 
 void lang::StructType::performSingleCopyInitializerDefinition(Shared<lang::Value> dts_ptr,
                                                               Shared<lang::Value> src_ptr,
-                                                              CompileContext&     context) const
+                                                              Execution&          exec) const
 {
     for (auto member : members_)
     {
-        Shared<lang::Value> dst_member_ptr = context.exec().computeMemberPointer(dts_ptr, member.get().name());
-        Shared<lang::Value> src_member_ptr = context.exec().computeMemberPointer(src_ptr, member.get().name());
-        member.get().type()->performCopyInitializer(dst_member_ptr, src_member_ptr, context);
+        Shared<lang::Value> dst_member_ptr = exec.computeMemberPointer(dts_ptr, member.get().name());
+        Shared<lang::Value> src_member_ptr = exec.computeMemberPointer(src_ptr, member.get().name());
+        member.get().type()->performCopyInitializer(dst_member_ptr, src_member_ptr, exec);
     }
 }
 
-void lang::StructType::performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::StructType::performSingleDefaultFinalizerDefinition(Shared<lang::Value> ptr, Execution& exec) const
 {
     for (auto member : members_)
     {
-        Shared<lang::Value> member_ptr = context.exec().computeMemberPointer(ptr, member.get().name());
-        member.get().type()->performFinalizer(member_ptr, context);
+        Shared<lang::Value> member_ptr = exec.computeMemberPointer(ptr, member.get().name());
+        member.get().type()->performFinalizer(member_ptr, exec);
     }
 }
 bool lang::StructType::isTriviallyDefaultConstructible() const

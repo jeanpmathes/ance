@@ -29,7 +29,7 @@ namespace lang
         Shared<lang::Value> buildOperator(lang::BinaryOperator op,
                                           Shared<lang::Value>  left,
                                           Shared<lang::Value>  right,
-                                          CompileContext&      context) const override;
+                                          Execution&           exec) const override;
 
         bool                isCastingPossibleTo(Type const& other) const override;
         bool                validateCast(Type const&       other,
@@ -37,7 +37,7 @@ namespace lang
                                          ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildCast(lang::Type const&   other,
                                       Shared<lang::Value> value,
-                                      CompileContext&     context) const override;
+                                      Execution&          exec) const override;
 
       protected:
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
@@ -45,7 +45,7 @@ namespace lang
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
         std::string createMangledName() const override;
-        void        registerExecutionType(CompileContext& context) const override;
+        void        registerExecutionType(Execution& exec) const override;
 
       public:
         lang::ResolvingHandle<lang::Type> clone(lang::Context& new_context) const override;

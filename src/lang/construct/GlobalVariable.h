@@ -50,11 +50,11 @@ namespace lang
         [[nodiscard]] bool                 isConstant() const;
         [[nodiscard]] lang::Assigner       assigner() const;
 
-        void buildDeclaration(CompileContext& context) const override;
-        void buildInitialization(CompileContext& context) const override;
-        void buildFinalization(CompileContext& context) const override;
+        void buildDeclaration(Execution& exec) const override;
+        void buildInitialization(Execution& exec) const override;
+        void buildFinalization(Execution& exec) const override;
 
-        Shared<lang::Value> getValuePointer(CompileContext& context) const override;
+        Shared<lang::Value> getValuePointer(Execution& exec) const override;
 
       private:
         lang::AccessModifier access_;

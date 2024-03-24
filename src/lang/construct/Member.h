@@ -62,14 +62,14 @@ namespace lang
          * Gets the constant initializer of the member.
          * @return The constant initializer of the member.
          */
-        Shared<lang::Constant> getConstantInitializer(CompileContext& context);
+        Shared<lang::Constant> getConstantInitializer(Execution& exec);
 
         /**
          * Build the initialization of this member.
          * @param ptr The pointer to the member.
-         * @param context The compile context.
+         * @param exec The execution context.
          */
-        void buildInitialization(Shared<lang::Value> ptr, CompileContext& context);
+        void buildInitialization(Shared<lang::Value> ptr, Execution& exec);
 
         Owned<Member> expand(lang::Context& new_context) const;
 

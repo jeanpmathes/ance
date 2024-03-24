@@ -1,6 +1,5 @@
 #include "NullValueType.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/type/Type.h"
@@ -29,9 +28,9 @@ bool lang::NullValueType::validateImplicitConversion(lang::Type const&, lang::Lo
 
 Shared<lang::Value> lang::NullValueType::buildImplicitConversion(lang::Type const& other,
                                                                  Shared<lang::Value>,
-                                                                 CompileContext& context) const
+                                                                 Execution& exec) const
 {
-    return context.exec().getNull(other);
+    return exec.getNull(other);
 }
 
 std::string lang::NullValueType::createMangledName() const
@@ -39,9 +38,9 @@ std::string lang::NullValueType::createMangledName() const
     return "nullptr";
 }
 
-void lang::NullValueType::registerExecutionType(CompileContext& context) const
+void lang::NullValueType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerOpaqueAddressType(self());
+    return exec.registerOpaqueAddressType(self());
 }
 
 Optional<lang::ResolvingHandle<lang::Type>> lang::NullValueType::getPointeeType()

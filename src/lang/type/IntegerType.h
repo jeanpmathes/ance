@@ -49,7 +49,7 @@ namespace lang
                                                        ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
                                                     Shared<lang::Value> value,
-                                                    CompileContext&     context) const override;
+                                                    Execution&          exec) const override;
 
       public:
         bool                isCastingPossibleTo(Type const& other) const override;
@@ -58,17 +58,17 @@ namespace lang
                                          ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildCast(lang::Type const&   other,
                                       Shared<lang::Value> value,
-                                      CompileContext&     context) const override;
+                                      Execution&          exec) const override;
 
       protected:
         bool acceptOverloadRequest(std::vector<lang::ResolvingHandle<lang::Type>> parameters) override;
         void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                     lang::PredefinedFunction&                             function,
-                                    CompileContext&                                       context) const override;
+                                    Execution&                                            exec) const override;
         void buildRequestedOverload(lang::Type const&         cc,
                                     lang::Type const&         return_type,
                                     lang::PredefinedFunction& function,
-                                    CompileContext&           context) const override;
+                                    Execution&                exec) const override;
 
         using TypeDefinition::buildOperator;
 
@@ -79,7 +79,7 @@ namespace lang
                                              ValidationLogger&   validation_logger) const override;
         Shared<lang::Value> buildOperator(lang::UnaryOperator op,
                                           Shared<lang::Value> value,
-                                          CompileContext&     context) const override;
+                                          Execution&          exec) const override;
 
         bool                isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::Type const&   getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const override;
@@ -91,13 +91,13 @@ namespace lang
         Shared<lang::Value> buildOperator(lang::BinaryOperator op,
                                           Shared<lang::Value>  left,
                                           Shared<lang::Value>  right,
-                                          CompileContext&      context) const override;
+                                          Execution&           exec) const override;
 
         [[nodiscard]] bool isTriviallyDefaultConstructible() const override;
         [[nodiscard]] bool isTriviallyCopyConstructible() const override;
         [[nodiscard]] bool isTriviallyDestructible() const override;
 
-        void registerExecutionType(CompileContext& context) const override;
+        void registerExecutionType(Execution& exec) const override;
     };
 }
 

@@ -488,28 +488,28 @@ std::vector<std::reference_wrapper<lang::Description const>> lang::UnorderedScop
     return descriptions;
 }
 
-void lang::UnorderedScope::buildEntityDeclarations(CompileContext&) const
+void lang::UnorderedScope::buildEntityDeclarations(Execution&) const
 {
     throw std::logic_error("Must be handled by visitor");
 }
 
-void lang::UnorderedScope::buildEntityInitializations(CompileContext& context) const
+void lang::UnorderedScope::buildEntityInitializations(Execution& exec) const
 {
     for (auto& group : description_order_.value())
     {
         if (group.kind == ResolvableKind::DEFINITION) continue;
 
-        for (auto& description : group.descriptions) { description.get().buildInitialization(context); }
+        for (auto& description : group.descriptions) { description.get().buildInitialization(exec); }
     }
 }
 
-void lang::UnorderedScope::buildEntityFinalizations(CompileContext& context) const
+void lang::UnorderedScope::buildEntityFinalizations(Execution& exec) const
 {
     for (auto& group : description_order_.value())
     {
         if (group.kind == ResolvableKind::DEFINITION) continue;
 
-        for (auto& description : group.descriptions) { description.get().buildFinalization(context); }
+        for (auto& description : group.descriptions) { description.get().buildFinalization(exec); }
     }
 }
 

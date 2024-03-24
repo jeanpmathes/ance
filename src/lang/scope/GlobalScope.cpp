@@ -1,6 +1,5 @@
 #include "GlobalScope.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Assigner.h"

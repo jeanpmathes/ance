@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "compiler/Application.h"
-#include "compiler/CompileContext.h"
+
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/GlobalScope.h"
 #include "validation/Utilities.h"

@@ -3,7 +3,7 @@
 #include <boost/locale/encoding_utf.hpp>
 
 #include "compiler/Application.h"
-#include "compiler/CompileContext.h"
+
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/CharType.h"
 #include "lang/type/FixedWidthIntegerType.h"
@@ -39,11 +39,11 @@ std::string lang::CharConstant::toString() const
     return prefix_ + content_;
 }
 
-Shared<lang::Constant> lang::CharConstant::embed(CompileContext& context) const
+Shared<lang::Constant> lang::CharConstant::embed(Execution& exec) const
 {
-    if (type().isCharType()) { return context.exec().getCodepoint(char_); }
+    if (type().isCharType()) { return exec.getCodepoint(char_); }
 
-    if (type().isFixedWidthIntegerType(8, false)) { return context.exec().getByte(static_cast<uint8_t>(char_)); }
+    if (type().isFixedWidthIntegerType(8, false)) { return exec.getByte(static_cast<uint8_t>(char_)); }
 
     throw std::logic_error("Invalid type for char constant");
 }

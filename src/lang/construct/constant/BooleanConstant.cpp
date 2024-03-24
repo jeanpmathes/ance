@@ -1,6 +1,5 @@
 #include "BooleanConstant.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/Context.h"
 #include "lang/type/BooleanType.h"
@@ -15,9 +14,9 @@ std::string lang::BooleanConstant::toString() const
     return boolean_ ? "true" : "false";
 }
 
-Shared<lang::Constant> lang::BooleanConstant::embed(CompileContext& context) const
+Shared<lang::Constant> lang::BooleanConstant::embed(Execution& exec) const
 {
-    return context.exec().getBoolean(boolean_, type());
+    return exec.getBoolean(boolean_, type());
 }
 
 bool lang::BooleanConstant::equals(lang::Constant const* other) const

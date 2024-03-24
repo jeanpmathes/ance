@@ -4,7 +4,7 @@
 
 #include <llvm/IR/DIBuilder.h>
 
-#include "compiler/CompileContext.h"
+#include "compiler/Execution.h"
 
 lang::Location::Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column, size_t file_index)
     : start_line_(start_line)
@@ -78,11 +78,11 @@ lang::Location lang::Location::getFirst(lang::Location a, lang::Location b)
     return a.line() < b.line() ? a : b;
 }
 
-std::string lang::Location::toString(CompileContext& context)
+std::string lang::Location::toString(Execution& exec)
 {
     if (isGlobal()) return "<internal>";
 
-    return context.getSourceFilePath(*this).generic_string() + ":" + std::to_string(line()) + ":"
+    return exec.getSourceFilePath(*this).generic_string() + ":" + std::to_string(line()) + ":"
          + std::to_string(column());
 }
 

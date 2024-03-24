@@ -4,7 +4,7 @@
 #include "compiler/Execution.h"
 
 class Expression;
-class CompileContext;
+class Execution;
 
 namespace lang
 {

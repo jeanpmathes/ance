@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 #include "lang/statement/Statement.h"
@@ -17,9 +16,9 @@ lang::LiteralConstant const& LiteralExpression::constant() const
     return *constant_;
 }
 
-Shared<lang::Constant> LiteralExpression::constant(CompileContext& context)
+Shared<lang::Constant> LiteralExpression::constant(Execution& exec)
 {
-    return constant_->embed(context);
+    return constant_->embed(exec);
 }
 
 void LiteralExpression::defineType(lang::ResolvingHandle<lang::Type> type)

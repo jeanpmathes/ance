@@ -1,6 +1,5 @@
 #include "NativeBuilder.h"
 
-#include "compiler/CompileContext.h"
 #include "compiler/NativeBuild.h"
 #include "compiler/RoughlyCastedValue.h"
 #include "lang/type/ArrayType.h"
@@ -15,34 +14,34 @@ NativeBuilder::NativeBuilder(NativeBuild& native_build) : native_build_(native_b
 void NativeBuilder::preVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable)
 {
     auto const* located = dynamic_cast<lang::Located const*>(&visitable);
-    if (located != nullptr) { native_build_.cc().setDebugLocation(located->location(), located->scope()); }
+    if (located != nullptr) { native_build_.setDebugLocation(located->location(), located->scope()); }
 }
 
 void NativeBuilder::postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable)
 {
     auto const* located = dynamic_cast<lang::Located const*>(&visitable);
-    if (located != nullptr) { native_build_.cc().resetDebugLocation(); }
+    if (located != nullptr) { native_build_.resetDebugLocation(); }
 }
 
 std::any NativeBuilder::visit(lang::GlobalScope const& global_scope)
 {
-    if (native_build_.cc().unit().isUsingRuntime()) native_build_.cc().runtime().init(native_build_.cc());
+    if (native_build_.unit().isUsingRuntime()) native_build_.runtime().init(native_build_);
 
     g_phase_ = G_Phase::DECLARE;
 
-    for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().buildDeclaration(native_build_.cc()); }
+    for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().buildDeclaration(native_build_); }
 
     for (auto& description : global_scope.getDescriptionsInDeclarationOrder()) { visitTree(description); }
 
-    native_build_.cc().ctx().buildDeclarations(native_build_.cc());
+    native_build_.ctx().buildDeclarations(native_build_);
 
     g_phase_ = G_Phase::DEFINE;
 
-    for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().buildDefinition(native_build_.cc()); }
+    for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().buildDefinition(native_build_); }
 
     for (auto& description : global_scope.getDescriptionsInDefinitionOrder()) { visitTree(description); }
 
-    native_build_.cc().ctx().buildDefinitions(native_build_.cc());
+    native_build_.ctx().buildDefinitions(native_build_);
 
     g_phase_ = G_Phase::INVALID;
 
@@ -60,7 +59,7 @@ std::any NativeBuilder::visit(lang::VariableDescription const& variable_descript
     {
         case G_Phase::DECLARE:
         {
-            variable_description.variable()->buildDeclaration(native_build_.cc());
+            variable_description.variable()->buildDeclaration(native_build_);
         }
         break;
         case G_Phase::DEFINE:
@@ -85,12 +84,12 @@ std::any NativeBuilder::visit(lang::StructDescription const& struct_description)
     {
         case G_Phase::DECLARE:
         {
-            struct_description.type().buildDeclaration(native_build_.cc());
+            struct_description.type().buildDeclaration(native_build_);
         }
         break;
         case G_Phase::DEFINE:
         {
-            struct_description.type().buildDefinition(native_build_.cc());
+            struct_description.type().buildDefinition(native_build_);
         }
         break;
         default:
@@ -106,12 +105,12 @@ std::any NativeBuilder::visit(lang::AliasDescription const& alias_description)
     {
         case G_Phase::DECLARE:
         {
-            alias_description.type().buildDeclaration(native_build_.cc());
+            alias_description.type().buildDeclaration(native_build_);
         }
         break;
         case G_Phase::DEFINE:
         {
-            alias_description.type().buildDefinition(native_build_.cc());
+            alias_description.type().buildDefinition(native_build_);
         }
         break;
         default:
@@ -132,7 +131,7 @@ std::any NativeBuilder::visit(lang::Function const& function)
     {
         case G_Phase::DECLARE:
         {
-            function.buildDeclaration(native_build_.cc());
+            function.buildDeclaration(native_build_);
         }
         break;
         case G_Phase::DEFINE:
@@ -146,7 +145,7 @@ std::any NativeBuilder::visit(lang::Function const& function)
                 llvm::BasicBlock::Create(native_build_.llvmContext(), "decl", native_build_.getCurrentFunction());
 
             native_build_.ir().SetInsertPoint(decl);
-            function.buildEntityDeclarations(native_build_.cc());
+            function.buildEntityDeclarations(native_build_);
 
             llvm::BasicBlock* defs =
                 llvm::BasicBlock::Create(native_build_.llvmContext(), "defs", native_build_.getCurrentFunction());
@@ -154,9 +153,7 @@ std::any NativeBuilder::visit(lang::Function const& function)
             native_build_.ir().CreateBr(defs);
             native_build_.ir().SetInsertPoint(defs);
             for (auto& parameter : function.parameters())
-            {
-                parameter->argument().buildInitialization(native_build_.cc());
-            }
+            { parameter->argument().buildInitialization(native_build_); }
 
             bb_phase_ = BB_Phase::PREPARE;
             bb_visited_.clear();
@@ -251,7 +248,7 @@ std::any NativeBuilder::visit(lang::bb::def::Finalizing const& finalizing_bb)
         {
             native_build_.ir().SetInsertPoint(bb_map_[this_ptr]);
 
-            finalizing_bb.scope().buildEntityFinalizations(native_build_.cc());
+            finalizing_bb.scope().buildEntityFinalizations(native_build_);
 
             if (finalizing_bb.next() != nullptr)
             {
@@ -330,7 +327,7 @@ std::any NativeBuilder::visit(lang::bb::def::Returning const& returning_bb)
             lang::Scope const* current = &returning_bb.scope();
             while (current->isPartOfFunction())
             {
-                current->buildEntityFinalizations(native_build_.cc());
+                current->buildEntityFinalizations(native_build_);
                 current = &current->scope();
             }
 
@@ -341,7 +338,7 @@ std::any NativeBuilder::visit(lang::bb::def::Returning const& returning_bb)
             {
                 Shared<lang::Value> return_value = getV(returning_bb.ret());
 
-                return_value = lang::Type::makeMatching(return_type, return_value, native_build_.cc());
+                return_value = lang::Type::makeMatching(return_type, return_value, native_build_);
 
                 native_build_.performReturn(return_value);
             }
@@ -378,7 +375,7 @@ std::any NativeBuilder::visit(lang::bb::def::Branching const& branching_bb)
 
             Shared<lang::Value> truth = getV(branching_bb.condition());
             Shared<lang::Value> boolean_truth =
-                lang::Type::makeMatching(native_build_.cc().ctx().getBooleanType(), truth, native_build_.cc());
+                lang::Type::makeMatching(native_build_.ctx().getBooleanType(), truth, native_build_);
 
             native_build_.ir().CreateCondBr(native_build_.llvmContentValue(boolean_truth),
                                             bb_map_[&branching_bb.trueNext()->definition()],
@@ -478,13 +475,13 @@ std::any NativeBuilder::visit(Allocation const& allocation)
     if (allocation.count() != nullptr)
     {
         count = getV(*allocation.count());
-        count = lang::Type::makeMatching(native_build_.cc().ctx().getSizeType(), count.value(), native_build_.cc());
+        count = lang::Type::makeMatching(native_build_.ctx().getSizeType(), count.value(), native_build_);
     }
 
     auto const& allocated_type = lang::Type::makeMatching<lang::Type>(allocation.allocatedType());
 
     Shared<lang::Value> allocated =
-        native_build_.cc().runtime().allocate(allocation.allocator(), allocated_type, count, native_build_.cc());
+        native_build_.runtime().allocate(allocation.allocator(), allocated_type, count, native_build_);
 
     return erase(allocated);
 }
@@ -507,14 +504,14 @@ std::any NativeBuilder::visit(ArrayDefinition const& array_definition)
     {
         Shared<lang::Value> value = getV(element.get());
 
-        value = lang::Type::makeMatching(array_element_type, value, native_build_.cc());
+        value = lang::Type::makeMatching(array_element_type, value, native_build_);
         values.emplace_back(std::move(value));
     }
 
     lang::ArrayType const* array_type = array_definition.type().isArrayType();
     assert(array_type);
 
-    auto value = array_type->createValue(std::move(values), native_build_.cc());
+    auto value = array_type->createValue(std::move(values), native_build_);
 
     return erase(value);
 }
@@ -526,10 +523,10 @@ std::any NativeBuilder::visit(BinaryOperation const& binary_operation)
 
     if (!lang::Type::areSame(right->type(), binary_operation.getRightType()))
     {
-        right = right->type().buildImplicitConversion(binary_operation.getRightType(), right, native_build_.cc());
+        right = right->type().buildImplicitConversion(binary_operation.getRightType(), right, native_build_);
     }
 
-    Shared<lang::Value> result = left->type().buildOperator(binary_operation.op(), left, right, native_build_.cc());
+    Shared<lang::Value> result = left->type().buildOperator(binary_operation.op(), left, right, native_build_);
 
     return erase(result);
 }
@@ -556,14 +553,14 @@ std::any NativeBuilder::visit(Cast const& cast)
     if (lang::Type::areSame(value->type(), target_type)) { return erase(value); }
     else
     {
-        Shared<lang::Value> casted_value = value->type().buildCast(target_type, value, native_build_.cc());
+        Shared<lang::Value> casted_value = value->type().buildCast(target_type, value, native_build_);
         return erase(casted_value);
     }
 }
 
 std::any NativeBuilder::visit(LiteralExpression const& constant_literal)
 {
-    Shared<lang::Constant> constant = constant_literal.constant().embed(native_build_.cc());
+    Shared<lang::Constant> constant = constant_literal.constant().embed(native_build_);
     Shared<lang::Value>    value    = constant;
 
     return erase(value);
@@ -582,7 +579,7 @@ std::any NativeBuilder::visit(FunctionCall const& function_call)
         arg_values.emplace_back(std::move(value));
     }
 
-    Shared<lang::Value> return_value = function_call.function().buildCall(arg_values, native_build_.cc());
+    Shared<lang::Value> return_value = function_call.function().buildCall(arg_values, native_build_);
 
     return erase(return_value);
 }
@@ -595,7 +592,7 @@ std::any NativeBuilder::visit(IfSelect const&)
 std::any NativeBuilder::visit(Indirection const& indirection)
 {
     Shared<lang::Value> value     = getV(indirection.value());
-    Shared<lang::Value> reference = value->type().buildIndirection(value, native_build_.cc());
+    Shared<lang::Value> reference = value->type().buildIndirection(value, native_build_);
 
     return erase(reference);
 }
@@ -610,7 +607,7 @@ std::any NativeBuilder::visit(MemberAccess const& member_access)
     Shared<lang::Value>     struct_value = getV(member_access.value());
     lang::Identifier const& member       = member_access.member();
 
-    Shared<lang::Value> value = struct_value->type().buildMemberAccess(struct_value, member, native_build_.cc());
+    Shared<lang::Value> value = struct_value->type().buildMemberAccess(struct_value, member, native_build_);
 
     return erase(value);
 }
@@ -651,7 +648,7 @@ std::any NativeBuilder::visit(Subscript const& subscript)
     Shared<lang::Value> indexed = getV(subscript.indexed());
     Shared<lang::Value> index   = getV(subscript.index());
 
-    Shared<lang::Value> value = indexed->type().buildSubscript(indexed, index, native_build_.cc());
+    Shared<lang::Value> value = indexed->type().buildSubscript(indexed, index, native_build_);
 
     return erase(value);
 }
@@ -659,7 +656,7 @@ std::any NativeBuilder::visit(Subscript const& subscript)
 std::any NativeBuilder::visit(UnaryOperation const& unary_operation)
 {
     Shared<lang::Value> operand = getV(unary_operation.operand());
-    Shared<lang::Value> result  = operand->type().buildOperator(unary_operation.op(), operand, native_build_.cc());
+    Shared<lang::Value> result  = operand->type().buildOperator(unary_operation.op(), operand, native_build_);
 
     return erase(result);
 }
@@ -670,7 +667,7 @@ std::any NativeBuilder::visit(VariableAccess const& variable_access)
 
     if (assign_)
     {
-        Shared<lang::Value> pointer   = variable.getValuePointer(native_build_.cc());
+        Shared<lang::Value> pointer   = variable.getValuePointer(native_build_);
         Shared<lang::Value> reference = native_build_.computeReferenceFromPointer(pointer);
 
         return erase(reference);
@@ -683,7 +680,7 @@ std::any NativeBuilder::visit(VariableAccess const& variable_access)
     }
     else
     {
-        Shared<lang::Value> value = variable.getValue(native_build_.cc());
+        Shared<lang::Value> value = variable.getValue(native_build_);
 
         return erase(value);
     }
@@ -701,7 +698,7 @@ std::any NativeBuilder::visit(VectorDefinition const& vector_definition)
     for (auto& element : elements)
     {
         Shared<lang::Value> value = getV(element.get());
-        value                     = lang::Type::makeMatching(vector_element_type, value, native_build_.cc());
+        value                     = lang::Type::makeMatching(vector_element_type, value, native_build_);
 
         values.emplace_back(std::move(value));
     }
@@ -709,7 +706,7 @@ std::any NativeBuilder::visit(VectorDefinition const& vector_definition)
     lang::VectorType const* vector_type = vector_definition.type().isVectorType();
     assert(vector_type);
 
-    Shared<lang::Value> value = vector_type->createValue(std::move(values), native_build_.cc());
+    Shared<lang::Value> value = vector_type->createValue(std::move(values), native_build_);
 
     return erase(value);
 }
@@ -722,11 +719,9 @@ std::any NativeBuilder::visit(lang::CodeBlock const&)
 std::any NativeBuilder::visit(Assertion const& assertion)
 {
     Shared<lang::Value> condition = getV(assertion.condition());
-    std::string const   message   = std::format("Assertion failed at [{}] {}",
-                                            native_build_.cc().unit().getName(),
-                                            native_build_.cc().getLocationString());
+    std::string const   message   = std::format("Assertion failed at [{}] {}", native_build_.unit().getName(), native_build_.getLocationString());
 
-    native_build_.cc().runtime().buildAssert(condition, message, native_build_.cc());
+    native_build_.runtime().buildAssert(condition, message, native_build_);
 
     return {};
 }
@@ -743,7 +738,7 @@ std::any NativeBuilder::visit(Assignment const& assignment_statement)
     lang::Type const& target_type = assignment_statement.assignable().assignableType();
 
     if (lang::Type::areSame(destination_reference->type().getElementType(),
-                            native_build_.cc().ctx().getReferenceType(target_type)))
+                            native_build_.ctx().getReferenceType(target_type)))
     {
         // For target type T, destination reference type is &&T, so we need to dereference it to get &T.
 
@@ -756,14 +751,14 @@ std::any NativeBuilder::visit(Assignment const& assignment_statement)
     (void) y;
 
     Shared<lang::Value> assigned_value = getV(assignment_statement.assigned());
-    assigned_value                     = lang::Type::makeMatching(target_type, assigned_value, native_build_.cc());
+    assigned_value                     = lang::Type::makeMatching(target_type, assigned_value, native_build_);
 
     if (target_type.getStateCount().isUnit()) return {};
 
     Shared<lang::Value> destination_pointer = native_build_.computePointerFromReference(destination_reference);
     Shared<lang::Value> value_pointer       = native_build_.computeAddressOf(assigned_value);
 
-    target_type.performCopyInitializer(destination_pointer, value_pointer, native_build_.cc());
+    target_type.performCopyInitializer(destination_pointer, value_pointer, native_build_);
 
     return {};
 }
@@ -783,7 +778,7 @@ std::any NativeBuilder::visit(Delete const& delete_statement)
     Shared<lang::Value> to_delete        = getV(delete_statement.toDelete());
     bool const          is_buffer_delete = delete_statement.isBufferDelete();
 
-    native_build_.cc().runtime().deleteDynamic(to_delete, is_buffer_delete, native_build_.cc());
+    native_build_.runtime().deleteDynamic(to_delete, is_buffer_delete, native_build_);
 
     return {};
 }
@@ -792,7 +787,7 @@ std::any NativeBuilder::visit(Erase const& erase_statement)
 {
     auto const& variable = lang::Type::makeMatching<lang::Variable>(erase_statement.variable());
 
-    variable.buildFinalization(native_build_.cc());
+    variable.buildFinalization(native_build_);
 
     return {};
 }
@@ -813,7 +808,7 @@ std::any NativeBuilder::visit(LocalReferenceVariableDefinition const& local_refe
 {
     lang::Variable const& variable = local_reference_variable_definition.variable();
 
-    variable.buildInitialization(native_build_.cc());
+    variable.buildInitialization(native_build_);
 
     return {};
 }
@@ -822,7 +817,7 @@ std::any NativeBuilder::visit(LocalVariableDefinition const& local_variable_defi
 {
     lang::Variable const& variable = local_variable_definition.variable();
 
-    variable.buildInitialization(native_build_.cc());
+    variable.buildInitialization(native_build_);
 
     return {};
 }

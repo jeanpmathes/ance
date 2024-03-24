@@ -1,6 +1,5 @@
 #include "SizeType.h"
 
-#include "compiler/CompileContext.h"
 #include "compiler/Unit.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"

@@ -18,7 +18,7 @@ namespace lang
 }
 
 class Expression;
-class CompileContext;
+class Execution;
 class ValidationLogger;
 
 /**

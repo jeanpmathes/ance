@@ -2,7 +2,6 @@
 
 #include "lang/scope/GlobalScope.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/Type.h"
 

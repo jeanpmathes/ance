@@ -27,21 +27,20 @@ namespace lang
         Shared<lang::Value> buildOperator(lang::BinaryOperator op,
                                           Shared<lang::Value>  left,
                                           Shared<lang::Value>  right,
-                                          CompileContext&      context) const override;
+                                          Execution&           exec) const override;
 
         void performDefaultInitializer(Shared<lang::Value> ptr,
                                        Shared<lang::Value> count,
-                                       CompileContext&     context) const override;
+                                       Execution&          exec) const override;
         void performCopyInitializer(Shared<lang::Value> ptr,
                                     Shared<lang::Value> original,
-                                    CompileContext&     context) const override;
+                                    Execution&          exec) const override;
         void performFinalizer(Shared<lang::Value> ptr,
-                              Shared<lang::Value> count,
-                              CompileContext&     context) const override;
+                              Shared<lang::Value> count, Execution& exec) const override;
 
       protected:
         std::string createMangledName() const override;
-        void        registerExecutionType(CompileContext& context) const override;
+        void        registerExecutionType(Execution& exec) const override;
 
       public:
         bool isTriviallyDefaultConstructible() const override;

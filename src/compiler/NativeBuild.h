@@ -4,12 +4,14 @@
 #include "Execution.h"
 
 #include <map>
+#include <stack>
 
 #include <llvm/IR/DIBuilder.h>
 #include <llvm/IR/IRBuilder.h>
 
-class CompileContext;
+class Execution;
 class NativeBuilder;
+class SourceTree;
 
 /**
  * A class to build operations as native LLVM IR.
@@ -17,12 +19,12 @@ class NativeBuilder;
 class NativeBuild : public Execution
 {
   public:
-    NativeBuild(CompileContext&      context,
+    NativeBuild(SourceTree&        tree,
+                Runtime&           runtime,
                 llvm::LLVMContext&   c,
                 llvm::Module&        m,
                 llvm::IRBuilder<>&   ir,
-                llvm::DIBuilder&     di,
-                llvm::DICompileUnit* di_unit);
+                llvm::DIBuilder&   di);
     ~NativeBuild() override = default;
 
     static void initialize();
@@ -52,8 +54,7 @@ class NativeBuild : public Execution
 
     void                registerFunction(lang::Function const& function) override;
     Shared<lang::Value> getParameterValue(lang::Function const& function, size_t index) override;
-    void                defineFunctionBody(lang::Function const&                       function,
-                                           std::function<void(CompileContext&)> const& builder) override;
+    void                defineFunctionBody(lang::Function const&                       function, std::function<void(Execution&)> const& builder) override;
     Shared<lang::Value> performFunctionCall(lang::Function const&            function,
                                             std::vector<Shared<lang::Value>> arguments) override;
 
@@ -137,8 +138,6 @@ class NativeBuild : public Execution
     void releaseValue(std::any handle) override;
     void releaseConstant(std::any handle) override;
 
-    CompileContext& cc() override;
-
     llvm::IRBuilder<>& ir();
     llvm::DIBuilder&   di();
     llvm::LLVMContext& llvmContext();
@@ -155,15 +154,28 @@ class NativeBuild : public Execution
     llvm::Function* getCurrentFunction();
     void            setCurrentFunction(lang::Function const* function);
 
+    /**
+     * Get the debug information for a source file that contains the given location.
+     * @param location The location.
+     * @return The debug information for the source file.
+     */
+    llvm::DIFile* getSourceFile(lang::Location location);
+
+    std::filesystem::path getSourceFilePath(lang::Location location) override;
+
+    void        setDebugLocation(lang::Location location, lang::Scope const& scope) override;
+    void        resetDebugLocation() override;
+    bool        allDebugLocationsPopped() override;
+    std::string getLocationString() override;
+
   private:
-    CompileContext& context_;
     NativeBuilder*  visitor_ = nullptr;
 
     llvm::LLVMContext&   llvm_context_;
     llvm::Module&        llvm_module_;
-    llvm::DICompileUnit* llvm_di_unit_;
     llvm::IRBuilder<>&   ir_builder_;
     llvm::DIBuilder&     di_builder_;
+    llvm::DICompileUnit* llvm_di_unit_ = nullptr;
 
     std::map<std::string, llvm::Constant*>    byte_strings_      = {};
     std::map<std::u32string, llvm::Constant*> codepoint_strings_ = {};
@@ -212,6 +224,21 @@ class NativeBuild : public Execution
 
     std::list<Value>           values_;
     std::list<llvm::Constant*> constants_;
+
+    struct DebugLocation {
+        llvm::DebugLoc di_location;
+        lang::Location location;
+    };
+
+    DebugLocation current_debug_location_ {.di_location = {}, .location = lang::Location::global()};
+    std::stack<DebugLocation, std::vector<DebugLocation>> debug_loc_stack_;
+
+    struct SourceFile {
+        std::filesystem::path path;
+        llvm::DIFile*         debug_info;
+    };
+
+    std::vector<SourceFile> source_files_ {};
 };
 
 #endif

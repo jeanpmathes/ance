@@ -15,7 +15,7 @@ namespace lang
 }
 
 class ValidationLogger;
-class CompileContext;
+class Execution;
 
 namespace lang
 {
@@ -63,11 +63,11 @@ namespace lang
          */
         [[nodiscard]] bool isFinal() const;
 
-        virtual void buildDeclaration(CompileContext& context) const    = 0;
-        virtual void buildInitialization(CompileContext& context) const = 0;
-        virtual void buildFinalization(CompileContext& context) const   = 0;
+        virtual void buildDeclaration(Execution& exec) const    = 0;
+        virtual void buildInitialization(Execution& exec) const = 0;
+        virtual void buildFinalization(Execution& exec) const   = 0;
 
-        virtual Shared<lang::Value> getValuePointer(CompileContext& context) const = 0;
+        virtual Shared<lang::Value> getValuePointer(Execution& exec) const = 0;
 
         lang::ResolvingHandle<lang::Variable> self();
         [[nodiscard]] lang::Variable const&   self() const;

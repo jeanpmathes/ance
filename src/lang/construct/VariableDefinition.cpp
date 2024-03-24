@@ -1,6 +1,5 @@
 #include "VariableDefinition.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Variable.h"
 #include "lang/scope/Scope.h"

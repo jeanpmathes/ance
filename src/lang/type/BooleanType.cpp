@@ -1,6 +1,5 @@
 #include "BooleanType.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/Value.h"
@@ -40,9 +39,9 @@ std::string lang::BooleanType::createMangledName() const
     return "b";
 }
 
-void lang::BooleanType::registerExecutionType(CompileContext& context) const
+void lang::BooleanType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerBooleanType(self());
+    return exec.registerBooleanType(self());
 }
 
 bool lang::BooleanType::isOperatorDefined(lang::UnaryOperator op) const
@@ -62,9 +61,9 @@ bool lang::BooleanType::validateOperator(lang::UnaryOperator, lang::Location, Va
 
 Shared<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator op,
                                                      Shared<lang::Value> value,
-                                                     CompileContext&     context) const
+                                                     Execution&          exec) const
 {
-    return context.exec().performOperator(op, value);
+    return exec.performOperator(op, value);
 }
 
 bool lang::BooleanType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -93,11 +92,11 @@ bool lang::BooleanType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator op,
                                                      Shared<lang::Value>  left,
                                                      Shared<lang::Value>  right,
-                                                     CompileContext&      context) const
+                                                     Execution&           exec) const
 {
-    if (right->type().isReferenceType()) right = context.exec().performDereference(right);
+    if (right->type().isReferenceType()) right = exec.performDereference(right);
 
-    return context.exec().performOperator(op, left, right);
+    return exec.performOperator(op, left, right);
 }
 
 bool lang::BooleanType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters)
@@ -112,32 +111,32 @@ bool lang::BooleanType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::
 
 void lang::BooleanType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                                lang::PredefinedFunction&                             function,
-                                               CompileContext&                                       context) const
+                                               Execution&                                            exec) const
 {
-    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, context); }
+    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, exec); }
 }
 
 void lang::BooleanType::buildRequestedOverload(lang::Type const&         parameter_element,
                                                lang::Type const&         return_type,
                                                lang::PredefinedFunction& function,
-                                               CompileContext&           context) const
+                                               Execution&                exec) const
 {
     if (parameter_element.isFixedWidthIntegerType() || parameter_element.isSizeType() || parameter_element.isDiffType())
     {
         lang::Type const* return_type_ptr = &return_type;
         lang::Function*   fn              = &function.function();
 
-        context.exec().defineFunctionBody(function.function(), [return_type_ptr, fn](CompileContext& cc) {
-            Shared<lang::Value> original = cc.exec().getParameterValue(*fn, 0);
+        exec.defineFunctionBody(function.function(), [return_type_ptr, fn](Execution& e) {
+            Shared<lang::Value> original = e.getParameterValue(*fn, 0);
 
-            Shared<lang::Constant> zero    = cc.exec().getZero(original->type());
-            Shared<lang::Value> is_nonzero = cc.exec().performOperator(lang::BinaryOperator::NOT_EQUAL, original, zero);
+            Shared<lang::Constant> zero       = e.getZero(original->type());
+            Shared<lang::Value>    is_nonzero = e.performOperator(lang::BinaryOperator::NOT_EQUAL, original, zero);
 
-            Shared<lang::Constant> true_const  = cc.exec().getBoolean(true, *return_type_ptr);
-            Shared<lang::Constant> false_const = cc.exec().getBoolean(false, *return_type_ptr);
-            Shared<lang::Value>    converted   = cc.exec().performSelect(is_nonzero, true_const, false_const);
+            Shared<lang::Constant> true_const  = e.getBoolean(true, *return_type_ptr);
+            Shared<lang::Constant> false_const = e.getBoolean(false, *return_type_ptr);
+            Shared<lang::Value>    converted   = e.performSelect(is_nonzero, true_const, false_const);
 
-            cc.exec().performReturn(converted);
+            e.performReturn(converted);
         });
     }
 }

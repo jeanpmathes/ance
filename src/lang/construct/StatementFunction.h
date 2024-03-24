@@ -23,7 +23,7 @@ namespace lang
 }
 
 class Statement;
-class CompileContext;
+class Execution;
 
 namespace lang
 {
@@ -52,7 +52,7 @@ namespace lang
         void determineFlow() override;
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
-        void buildDeclarationsFollowingOrder(CompileContext& context) const override;
+        void buildDeclarationsFollowingOrder(Execution& exec) const override;
 
         BasicBlock const*                                   getEntryBlock() const override;
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const override;

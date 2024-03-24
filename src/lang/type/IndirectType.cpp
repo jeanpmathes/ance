@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "compiler/Runtime.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Value.h"
@@ -27,17 +26,17 @@ bool lang::IndirectType::validateIndirection(lang::Location, ValidationLogger&) 
     return true;
 }
 
-Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<lang::Value> value, CompileContext& context) const
+Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<lang::Value> value, Execution& exec) const
 {
-    auto const& value_reference = context.ctx().getReferenceType(*value_type_);
+    auto const& value_reference = exec.ctx().getReferenceType(*value_type_);
 
-    if (getIndirectionType().getStateCount().isUnit()) return context.exec().getDefault(value_reference);
+    if (getIndirectionType().getStateCount().isUnit()) return exec.getDefault(value_reference);
 
-    if (context.ctx().isContainingRuntime())
+    if (exec.ctx().isContainingRuntime())
     {
-        Shared<lang::Value> not_null = context.exec().computeAddressIsNotNull(value);
-        context.runtime().buildAssert(not_null, "Null pointer dereference at " + context.getLocationString(), context);
+        Shared<lang::Value> not_null = exec.computeAddressIsNotNull(value);
+        exec.runtime().buildAssert(not_null, "Null pointer dereference at " + exec.getLocationString(), exec);
     }
 
-    return context.exec().computeReferenceFromPointer(value);
+    return exec.computeReferenceFromPointer(value);
 }

@@ -1,6 +1,5 @@
 #include "AddressType.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/construct/Value.h"
@@ -37,11 +36,11 @@ bool lang::AddressType::validateCast(lang::Type const&, lang::Location, Validati
 
 Shared<lang::Value> lang::AddressType::buildCast(lang::Type const&   other,
                                                  Shared<lang::Value> value,
-                                                 CompileContext&     context) const
+                                                 Execution&          exec) const
 {
-    if (other.isAddressType()) { return context.exec().computeCastedAddress(value, other); }
+    if (other.isAddressType()) { return exec.computeCastedAddress(value, other); }
 
-    if (other.isUnsignedIntegerPointerType()) { return context.exec().computePointerToInteger(value); }
+    if (other.isUnsignedIntegerPointerType()) { return exec.computePointerToInteger(value); }
 
     throw std::logic_error("Invalid cast");
 }
@@ -87,33 +86,33 @@ bool lang::AddressType::validateOperator(lang::BinaryOperator,
 Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
                                                      Shared<lang::Value>  left,
                                                      Shared<lang::Value>  right,
-                                                     CompileContext&      context) const
+                                                     Execution&           exec) const
 {
-    if (right->type().isReferenceType()) right = context.exec().performDereference(right);
+    if (right->type().isReferenceType()) right = exec.performDereference(right);
 
     if (op.isEquality())
     {
-        Shared<lang::Value> left_as_integer  = context.exec().computePointerToInteger(left);
-        Shared<lang::Value> right_as_integer = context.exec().computePointerToInteger(right);
+        Shared<lang::Value> left_as_integer  = exec.computePointerToInteger(left);
+        Shared<lang::Value> right_as_integer = exec.computePointerToInteger(right);
 
-        return context.exec().performOperator(op, left_as_integer, right_as_integer);
+        return exec.performOperator(op, left_as_integer, right_as_integer);
     }
 
     if (op == lang::BinaryOperator::ADDITION)
     {
         if (getPointeeType()->getStateCount().isUnit())
-            return context.exec().getDefault(getOperatorResultType(op, right->type()));
+            return exec.getDefault(getOperatorResultType(op, right->type()));
         else
         {
             if (right->type().isSizeType())
-                right = right->type().buildImplicitConversion(context.ctx().getDiffType(), right, context);
+                right = right->type().buildImplicitConversion(exec.ctx().getDiffType(), right, exec);
             Shared<lang::Value> pointer =
-                context.exec().computeElementPointer(left, right, Execution::IndexingMode::POINTER, std::nullopt);
-            return context.exec().computeCastedAddress(pointer, self());
+                exec.computeElementPointer(left, right, Execution::IndexingMode::POINTER, std::nullopt);
+            return exec.computeCastedAddress(pointer, self());
         }
     }
 
-    if (op == lang::BinaryOperator::SUBTRACTION) { return context.exec().computeAddressDiff(left, right); }
+    if (op == lang::BinaryOperator::SUBTRACTION) { return exec.computeAddressDiff(left, right); }
 
     throw std::logic_error("Invalid operator for address type");
 }

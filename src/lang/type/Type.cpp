@@ -3,7 +3,6 @@
 #include <queue>
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "compiler/WrappedConstant.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/ArrayType.h"
@@ -498,109 +497,106 @@ bool lang::Type::validateIndirection(lang::Location location, ValidationLogger& 
 
 Shared<lang::Value> lang::Type::buildSubscript(Shared<lang::Value> indexed,
                                                Shared<lang::Value> index,
-                                               CompileContext&     context) const
+                                               Execution&          exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildSubscript(std::move(indexed), std::move(index), context);
+    return definition_.value()->buildSubscript(std::move(indexed), std::move(index), exec);
 }
 
 Shared<lang::Value> lang::Type::buildOperator(lang::BinaryOperator op,
                                               Shared<lang::Value>  left,
                                               Shared<lang::Value>  right,
-                                              CompileContext&      context) const
+                                              Execution&           exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildOperator(op, std::move(left), std::move(right), context);
+    return definition_.value()->buildOperator(op, std::move(left), std::move(right), exec);
 }
 
 Shared<lang::Value> lang::Type::buildOperator(lang::UnaryOperator op,
-                                              Shared<lang::Value> value,
-                                              CompileContext&     context) const
+                                              Shared<lang::Value> value, Execution& exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildOperator(op, std::move(value), context);
+    return definition_.value()->buildOperator(op, std::move(value), exec);
 }
 
 Shared<lang::Value> lang::Type::buildImplicitConversion(lang::Type const&   other,
                                                         Shared<lang::Value> value,
-                                                        CompileContext&     context) const
+                                                        Execution&          exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildImplicitConversion(other, std::move(value), context);
+    return definition_.value()->buildImplicitConversion(other, std::move(value), exec);
 }
 
 Shared<lang::Value> lang::Type::buildCast(lang::Type const&   other,
-                                          Shared<lang::Value> value,
-                                          CompileContext&     context) const
+                                          Shared<lang::Value> value, Execution& exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildCast(other, std::move(value), context);
+    return definition_.value()->buildCast(other, std::move(value), exec);
 }
 
 Shared<lang::Value> lang::Type::buildMemberAccess(Shared<lang::Value>     value,
                                                   lang::Identifier const& name,
-                                                  CompileContext&         context) const
+                                                  Execution&              exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildMemberAccess(std::move(value), name, context);
+    return definition_.value()->buildMemberAccess(std::move(value), name, exec);
 }
 
-Shared<lang::Value> lang::Type::buildIndirection(Shared<lang::Value> value, CompileContext& context) const
+Shared<lang::Value> lang::Type::buildIndirection(Shared<lang::Value> value, Execution& exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildIndirection(std::move(value), context);
+    return definition_.value()->buildIndirection(std::move(value), exec);
 }
 
-void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, Execution& exec) const
 {
     assert(isDefined());
-    definition_.value()->performDefaultInitializer(ptr, context);
+    definition_.value()->performDefaultInitializer(ptr, exec);
 }
 
 void lang::Type::performCopyInitializer(Shared<lang::Value> destination,
                                         Shared<lang::Value> source,
-                                        CompileContext&     context) const
+                                        Execution&          exec) const
 {
     assert(isDefined());
-    definition_.value()->performCopyInitializer(destination, source, context);
+    definition_.value()->performCopyInitializer(destination, source, exec);
 }
 
 void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr,
-                                           Shared<lang::Value> count,
-                                           CompileContext&     context) const
+                                           Shared<lang::Value> count, Execution& exec) const
 {
     assert(isDefined());
-    definition_.value()->performDefaultInitializer(ptr, count, context);
+    definition_.value()->performDefaultInitializer(ptr, count, exec);
 }
 
-void lang::Type::performFinalizer(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::Type::performFinalizer(Shared<lang::Value> ptr, Execution& exec) const
 {
     assert(isDefined());
-    definition_.value()->performFinalizer(ptr, context);
+    definition_.value()->performFinalizer(ptr, exec);
 }
 
-void lang::Type::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, CompileContext& context) const
+void lang::Type::performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, Execution& exec) const
 {
     assert(isDefined());
-    definition_.value()->performFinalizer(ptr, count, context);
+    definition_.value()->performFinalizer(ptr, count, exec);
 }
 
-void lang::Type::registerExecutionType(CompileContext& context) const
+void lang::Type::registerExecutionType(Execution& exec) const
 {
     assert(isDefined());
-    definition_.value()->registerExecutionType(context);
+    definition_.value()->registerExecutionType(exec);
 }
 
-void lang::Type::buildDeclaration(CompileContext& context) const
+void lang::Type::buildDeclaration(Execution& exec) const
 {
     assert(isDefined());
-    definition_.value()->buildDeclaration(context);
+    definition_.value()->buildDeclaration(exec);
 }
 
-void lang::Type::buildDefinition(CompileContext& context) const
+void lang::Type::buildDefinition(Execution& exec) const
 {
     assert(isDefined());
-    definition_.value()->buildDefinition(context);
+    definition_.value()->buildDefinition(exec);
 }
 
 lang::TypeDefinition* lang::Type::getDefinition()
@@ -654,18 +650,17 @@ bool lang::Type::checkMismatch(lang::Type const& expected,
 }
 
 Shared<lang::Value> lang::Type::makeMatching(lang::Type const&   expected,
-                                             Shared<lang::Value> value,
-                                             CompileContext&     context)
+                                             Shared<lang::Value> value, Execution& exec)
 {
-    if (areSame(expected, value->type())) return context.exec().computeAsActualType(value);
+    if (areSame(expected, value->type())) return exec.computeAsActualType(value);
 
     if (value->type().isImplicitlyConvertibleTo(expected))
-        return value->type().buildImplicitConversion(expected, value, context);
+        return value->type().buildImplicitConversion(expected, value, exec);
 
     if (value->type().isReferenceType())
     {
-        Shared<lang::Value> referenced = context.exec().performDereference(value);
-        return makeMatching(expected, referenced, context);
+        Shared<lang::Value> referenced = exec.performDereference(value);
+        return makeMatching(expected, referenced, exec);
     }
 
     assert(false && "Cannot make the value matching, was mismatch checked before?");

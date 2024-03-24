@@ -1,6 +1,5 @@
 #include "Allocation.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 #include "lang/type/SizeType.h"

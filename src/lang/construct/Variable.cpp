@@ -3,7 +3,6 @@
 #include <iostream>
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/GlobalVariable.h"
@@ -106,19 +105,19 @@ bool lang::Variable::isFinal() const
     return definition_.value()->isFinal();
 }
 
-void lang::Variable::buildDeclaration(CompileContext& context) const
+void lang::Variable::buildDeclaration(Execution& exec) const
 {
-    definition_.value()->buildDeclaration(context);
+    definition_.value()->buildDeclaration(exec);
 }
 
-void lang::Variable::buildInitialization(CompileContext& context) const
+void lang::Variable::buildInitialization(Execution& exec) const
 {
-    definition_.value()->buildInitialization(context);
+    definition_.value()->buildInitialization(exec);
 }
 
-void lang::Variable::buildFinalization(CompileContext& context) const
+void lang::Variable::buildFinalization(Execution& exec) const
 {
-    definition_.value()->buildFinalization(context);
+    definition_.value()->buildFinalization(exec);
 }
 
 bool lang::Variable::validateGetValue(ValidationLogger&, lang::Location) const
@@ -147,15 +146,15 @@ bool lang::Variable::validateSetValue(lang::Type const& value_type,
     return lang::Type::checkMismatch(targetType(), value_type, assigned_location, validation_logger);
 }
 
-Shared<lang::Value> lang::Variable::getValuePointer(CompileContext& context) const
+Shared<lang::Value> lang::Variable::getValuePointer(Execution& exec) const
 {
-    return definition_.value()->getValuePointer(context);
+    return definition_.value()->getValuePointer(exec);
 }
 
-Shared<lang::Value> lang::Variable::getValue(CompileContext& context) const
+Shared<lang::Value> lang::Variable::getValue(Execution& exec) const
 {
-    Shared<lang::Value> pointer = getValuePointer(context);
-    return context.exec().performLoadFromAddress(pointer);
+    Shared<lang::Value> pointer = getValuePointer(exec);
+    return exec.performLoadFromAddress(pointer);
 }
 
 lang::ResolvingHandle<lang::Variable> lang::Variable::toUndefined() const

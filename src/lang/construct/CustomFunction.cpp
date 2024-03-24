@@ -4,7 +4,6 @@
 
 #include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
 
-#include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"

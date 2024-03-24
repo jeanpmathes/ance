@@ -24,12 +24,12 @@ namespace lang
          * @param parameter_element The element type of the parameter type of the overload.
          * @param return_type The return type.
          * @param function The function to build.
-         * @param context The current compilation context.
+         * @param exec The current execution context.
          */
         virtual void buildRequestedOverload(lang::Type const&         parameter_element,
                                             lang::Type const&         return_type,
                                             lang::PredefinedFunction& function,
-                                            CompileContext&           context) const;
+                                            Execution&                exec) const;
     };
 }
 

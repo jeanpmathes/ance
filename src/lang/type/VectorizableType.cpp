@@ -13,7 +13,7 @@ lang::VectorizableType* lang::VectorizableType::isVectorizable()
 void lang::VectorizableType::buildRequestedOverload(lang::Type const&,
                                                     lang::Type const&,
                                                     lang::PredefinedFunction&,
-                                                    CompileContext&) const
+                                                    Execution&) const
 {
     throw std::logic_error("No overloads available for this type");
 }

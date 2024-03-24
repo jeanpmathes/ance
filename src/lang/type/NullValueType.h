@@ -23,11 +23,11 @@ namespace lang
                                                        ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
                                                     Shared<lang::Value> value,
-                                                    CompileContext&     context) const override;
+                                                    Execution&          exec) const override;
 
       protected:
         std::string createMangledName() const override;
-        void        registerExecutionType(CompileContext& context) const override;
+        void        registerExecutionType(Execution& exec) const override;
 
         Optional<lang::ResolvingHandle<lang::Type>> getPointeeType() override;
         Type const*                                 getPointeeType() const override;

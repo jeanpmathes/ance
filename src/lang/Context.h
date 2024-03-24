@@ -34,8 +34,8 @@ namespace lang
          */
         void postResolve();
 
-        void buildDeclarations(CompileContext& context);
-        void buildDefinitions(CompileContext& context);
+        void buildDeclarations(Execution& exec);
+        void buildDefinitions(Execution& exec);
 
         /**
          * Get an array type instance.

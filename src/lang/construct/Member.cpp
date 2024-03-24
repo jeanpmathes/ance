@@ -1,6 +1,5 @@
 #include "Member.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Constant.h"
 #include "lang/construct/Value.h"
@@ -101,22 +100,22 @@ bool lang::Member::validate(ValidationLogger& validation_logger) const
     return true;
 }
 
-Shared<lang::Constant> lang::Member::getConstantInitializer(CompileContext& context)
+Shared<lang::Constant> lang::Member::getConstantInitializer(Execution& exec)
 {
-    if (constant_init_.hasValue()) { return constant_init_.value()->constant(context); }
-    else { return context.exec().getDefault(type()); }
+    if (constant_init_.hasValue()) { return constant_init_.value()->constant(exec); }
+    else { return exec.getDefault(type()); }
 }
 
-void lang::Member::buildInitialization(Shared<lang::Value> ptr, CompileContext& context)
+void lang::Member::buildInitialization(Shared<lang::Value> ptr, Execution& exec)
 {
     if (constant_init_.hasValue())
     {
-        Shared<lang::Value> value_ptr = context.exec().performStackAllocation(type());
-        context.exec().performStoreToAddress(value_ptr, constant_init_.value()->constant(context));
+        Shared<lang::Value> value_ptr = exec.performStackAllocation(type());
+        exec.performStoreToAddress(value_ptr, constant_init_.value()->constant(exec));
 
-        type()->performCopyInitializer(ptr, value_ptr, context);
+        type()->performCopyInitializer(ptr, value_ptr, exec);
     }
-    else { type()->performDefaultInitializer(ptr, context); }
+    else { type()->performDefaultInitializer(ptr, exec); }
 }
 
 Owned<lang::Member> lang::Member::expand(lang::Context& new_context) const

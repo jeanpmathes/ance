@@ -1,6 +1,5 @@
 #include "BasicBlock.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/scope/Scope.h"
 

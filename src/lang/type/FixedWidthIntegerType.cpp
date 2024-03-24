@@ -1,7 +1,7 @@
 #include "FixedWidthIntegerType.h"
 
 #include "compiler/Application.h"
-#include "compiler/CompileContext.h"
+
 #include "compiler/RoughlyCastedValue.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
@@ -60,19 +60,19 @@ bool lang::FixedWidthIntegerType::validateCast(lang::Type const& other,
 
 Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::Type const&   other,
                                                            Shared<lang::Value> value,
-                                                           CompileContext&     context) const
+                                                           Execution&          exec) const
 {
     if (other.isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
     {
-        return context.exec().performIntegerReinterpretation(value, other);
+        return exec.performIntegerReinterpretation(value, other);
     }
 
     if (other.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
     {
-        return context.exec().computeConversionI2FP(value, other);
+        return exec.computeConversionI2FP(value, other);
     }
 
-    return IntegerType::buildCast(other, value, context);
+    return IntegerType::buildCast(other, value, exec);
 }
 
 std::string lang::FixedWidthIntegerType::createMangledName() const

@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/ImportedFunction.h"
@@ -120,9 +119,9 @@ lang::InitializerFunction& lang::Function::defineAsInit(Statement& code, lang::S
 
 void lang::Function::defineAsRuntime(lang::ResolvingHandle<lang::Type>    return_type,
                                      std::vector<Shared<lang::Parameter>> parameters,
-                                     CompileContext&                      context)
+                                     Execution&                           exec)
 {
-    definition_ = makeOwned<lang::RuntimeFunction>(*this, return_type, parameters, context);
+    definition_ = makeOwned<lang::RuntimeFunction>(*this, return_type, parameters, exec);
     (**definition_).setup();
 }
 
@@ -220,9 +219,9 @@ void lang::Function::validateFlow(ValidationLogger& validation_logger) const
     definition_.value()->validateFlow(validation_logger);
 }
 
-void lang::Function::buildDeclaration(CompileContext& context) const
+void lang::Function::buildDeclaration(Execution& exec) const
 {
-    definition_.value()->buildDeclaration(context);
+    definition_.value()->buildDeclaration(exec);
 }
 
 bool lang::Function::validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
@@ -232,10 +231,9 @@ bool lang::Function::validateCall(std::vector<std::reference_wrapper<Expression 
     return definition_.value()->validateCall(arguments, location, validation_logger);
 }
 
-Shared<lang::Value> lang::Function::buildCall(std::vector<Shared<lang::Value>> const& arguments,
-                                              CompileContext&                         context) const
+Shared<lang::Value> lang::Function::buildCall(std::vector<Shared<lang::Value>> const& arguments, Execution& exec) const
 {
-    return definition_.value()->buildCall(arguments, context);
+    return definition_.value()->buildCall(arguments, exec);
 }
 
 lang::Scope& lang::Function::scope()
@@ -275,9 +273,9 @@ void lang::Function::postResolve()
     Scope::postResolve();
 }
 
-void lang::Function::buildEntityDeclarationsFollowingOrder(CompileContext& context) const
+void lang::Function::buildEntityDeclarationsFollowingOrder(Execution& exec) const
 {
-    definition_.value()->buildDeclarationsFollowingOrder(context);
+    definition_.value()->buildDeclarationsFollowingOrder(exec);
 }
 
 lang::ResolvingHandle<lang::Entity> lang::Function::getUndefinedClone(lang::Context&) const

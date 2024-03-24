@@ -51,10 +51,10 @@ namespace lang
 
         /**
          * Embed the constant in an execution context.
-         * @param context The context to embed the constant in.
+         * @param exec The context to embed the constant in.
          * @return The embedded constant.
          */
-        virtual Shared<lang::Constant> embed(CompileContext& context) const = 0;
+        virtual Shared<lang::Constant> embed(Execution& exec) const = 0;
 
       private:
         lang::ResolvingHandle<lang::Type> type_;

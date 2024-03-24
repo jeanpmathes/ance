@@ -2,7 +2,6 @@
 
 #include <stack>
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/construct/Parameter.h"
@@ -441,8 +440,7 @@ bool lang::TypeDefinition::validateIndirection(lang::Location, ValidationLogger&
 }
 
 Shared<lang::Value> lang::TypeDefinition::buildSubscript(Shared<lang::Value>,
-                                                         Shared<lang::Value>,
-                                                         CompileContext&) const
+                                                         Shared<lang::Value>, Execution&) const
 {
     throw std::logic_error("Subscript not defined");
 }
@@ -450,53 +448,53 @@ Shared<lang::Value> lang::TypeDefinition::buildSubscript(Shared<lang::Value>,
 Shared<lang::Value> lang::TypeDefinition::buildOperator(lang::BinaryOperator,
                                                         Shared<lang::Value>,
                                                         Shared<lang::Value>,
-                                                        CompileContext&) const
+                                                        Execution&) const
 {
     throw std::logic_error("Operator not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildOperator(lang::UnaryOperator, Shared<lang::Value>, CompileContext&) const
+Shared<lang::Value> lang::TypeDefinition::buildOperator(lang::UnaryOperator, Shared<lang::Value>, Execution&) const
 {
     throw std::logic_error("Operator not defined");
 }
 
 Shared<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang::Type const&,
                                                                   Shared<lang::Value>,
-                                                                  CompileContext&) const
+                                                                  Execution&) const
 {
     throw std::logic_error("Implicit conversion not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildCast(lang::Type const&, Shared<lang::Value>, CompileContext&) const
+Shared<lang::Value> lang::TypeDefinition::buildCast(lang::Type const&, Shared<lang::Value>, Execution&) const
 {
     throw std::logic_error("Cast not defined");
 }
 
 Shared<lang::Value> lang::TypeDefinition::buildMemberAccess(Shared<lang::Value>,
                                                             lang::Identifier const&,
-                                                            CompileContext&) const
+                                                            Execution&) const
 {
     throw std::logic_error("Member access not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildIndirection(Shared<lang::Value>, CompileContext&) const
+Shared<lang::Value> lang::TypeDefinition::buildIndirection(Shared<lang::Value>, Execution&) const
 {
     throw std::logic_error("Indirection not defined");
 }
 
-void lang::TypeDefinition::performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::TypeDefinition::performDefaultInitializer(Shared<lang::Value> ptr, Execution& exec) const
 {
-    performDefaultInitializer(ptr, context.exec().getSizeN(1), context);
+    performDefaultInitializer(ptr, exec.getSizeN(1), exec);
 }
 
 void lang::TypeDefinition::performDefaultInitializer(Shared<lang::Value> ptr,
                                                      Shared<lang::Value> count,
-                                                     CompileContext&     context) const
+                                                     Execution&          exec) const
 {
     if (isTriviallyDefaultConstructible())
     {
-        Shared<lang::Value> size = context.exec().computeAllocatedSize(self(), count);
-        context.exec().performMemoryClear(ptr, size);
+        Shared<lang::Value> size = exec.computeAllocatedSize(self(), count);
+        exec.performMemoryClear(ptr, size);
     }
     else
     {
@@ -505,18 +503,18 @@ void lang::TypeDefinition::performDefaultInitializer(Shared<lang::Value> ptr,
         std::vector<Shared<lang::Value>> args;
         args.emplace_back(ptr);
         args.emplace_back(count);
-        context.exec().performFunctionCall(*default_initializer_, args);
+        exec.performFunctionCall(*default_initializer_, args);
     }
 }
 
 void lang::TypeDefinition::performCopyInitializer(Shared<lang::Value> destination,
                                                   Shared<lang::Value> source,
-                                                  CompileContext&     context) const
+                                                  Execution&          exec) const
 {
     if (isTriviallyCopyConstructible())
     {
-        Shared<lang::Value> size = context.exec().computeAllocatedSize(self(), {});
-        context.exec().performMemoryCopy(destination, source, size);
+        Shared<lang::Value> size = exec.computeAllocatedSize(self(), {});
+        exec.performMemoryCopy(destination, source, size);
     }
     else
     {
@@ -525,18 +523,17 @@ void lang::TypeDefinition::performCopyInitializer(Shared<lang::Value> destinatio
         std::vector<Shared<lang::Value>> args;
         args.emplace_back(destination);
         args.emplace_back(source);
-        context.exec().performFunctionCall(*copy_initializer_, args);
+        exec.performFunctionCall(*copy_initializer_, args);
     }
 }
 
-void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr, CompileContext& context) const
+void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr, Execution& exec) const
 {
-    performFinalizer(ptr, context.exec().getSizeN(1), context);
+    performFinalizer(ptr, exec.getSizeN(1), exec);
 }
 
 void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr,
-                                            Shared<lang::Value> count,
-                                            CompileContext&     context) const
+                                            Shared<lang::Value> count, Execution& exec) const
 {
     if (isTriviallyDestructible()) return;
 
@@ -545,75 +542,75 @@ void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr,
     std::vector<Shared<lang::Value>> args;
     args.emplace_back(ptr);
     args.emplace_back(count);
-    context.exec().performFunctionCall(*default_finalizer_, args);
+    exec.performFunctionCall(*default_finalizer_, args);
 }
 
-void lang::TypeDefinition::buildDeclaration(CompileContext& context) const
+void lang::TypeDefinition::buildDeclaration(Execution& exec) const
 {
     if (!isTriviallyDefaultConstructible())
     {
         assert(default_initializer_.hasValue());
 
-        (**default_initializer_).buildDeclaration(context);
+        (**default_initializer_).buildDeclaration(exec);
     }
 
     if (!isTriviallyCopyConstructible())
     {
         assert(copy_initializer_.hasValue());
 
-        (**copy_initializer_).buildDeclaration(context);
+        (**copy_initializer_).buildDeclaration(exec);
     }
 
     if (!isTriviallyDestructible())
     {
         assert(default_finalizer_.hasValue());
 
-        (**default_finalizer_).buildDeclaration(context);
+        (**default_finalizer_).buildDeclaration(exec);
     }
 
-    defineConstructors(context);
+    defineConstructors(exec);
 }
 
-void lang::TypeDefinition::buildDefinition(CompileContext& context) const
+void lang::TypeDefinition::buildDefinition(Execution& exec) const
 {
     if (isImported()) return;
 
-    if (!isTriviallyDefaultConstructible()) defineDefaultInitializer(context);
-    if (!isTriviallyCopyConstructible()) defineCopyInitializer(context);
-    if (!isTriviallyDestructible()) defineDefaultFinalizer(context);
+    if (!isTriviallyDefaultConstructible()) defineDefaultInitializer(exec);
+    if (!isTriviallyCopyConstructible()) defineCopyInitializer(exec);
+    if (!isTriviallyDestructible()) defineDefaultFinalizer(exec);
 
-    buildConstructors(context);
+    buildConstructors(exec);
 }
 
-void lang::TypeDefinition::defineConstructors(CompileContext& context) const
+void lang::TypeDefinition::defineConstructors(Execution& exec) const
 {
-    for (auto& [parameters, constructor] : requested_constructors_) { constructor->buildDeclaration(context); }
+    for (auto& [parameters, constructor] : requested_constructors_) { constructor->buildDeclaration(exec); }
 
     if (!default_constructor_) return;
 
-    default_constructor_->buildDeclaration(context);
+    default_constructor_->buildDeclaration(exec);
 }
 
-void lang::TypeDefinition::buildConstructors(CompileContext& context) const
+void lang::TypeDefinition::buildConstructors(Execution& exec) const
 {
     for (auto& [parameters, constructor] : requested_constructors_)
     {
-        buildRequestedOverload(parameters, *constructor, context);
+        buildRequestedOverload(parameters, *constructor, exec);
     }
 
     if (!default_constructor_) return;
 
-    context.exec().defineFunctionBody(default_constructor_->function(), [this](CompileContext& cc) {
-        Shared<lang::Value> default_value = cc.exec().getDefault(self());
+    exec.defineFunctionBody(default_constructor_->function(), [this](Execution& e) {
+        Shared<lang::Value> default_value = e.getDefault(self());
 
-        if (getStateCount().isUnit()) cc.exec().performReturn(default_value);
+        if (getStateCount().isUnit()) e.performReturn(default_value);
         else
         {
-            Shared<lang::Value> ptr = cc.exec().performStackAllocation(self());
-            performDefaultInitializer(ptr, cc);
+            Shared<lang::Value> ptr = e.performStackAllocation(self());
+            performDefaultInitializer(ptr, e);
 
-            Shared<lang::Value> result = cc.exec().performLoadFromAddress(ptr);
-            cc.exec().performReturn(result);
+            Shared<lang::Value> result = e.performLoadFromAddress(ptr);
+            e.performReturn(result);
         }
     });
 }
@@ -633,63 +630,62 @@ bool lang::TypeDefinition::isTriviallyDestructible() const
     return false;
 }
 
-void lang::TypeDefinition::defineDefaultInitializer(CompileContext& context) const
+void lang::TypeDefinition::defineDefaultInitializer(Execution& exec) const
 {
-    context.exec().defineFunctionBody(*default_initializer_, [this](CompileContext& cc) {
-        Shared<lang::Value> ptr   = cc.exec().getParameterValue((**default_initializer_), 0);
-        Shared<lang::Value> count = cc.exec().getParameterValue((**default_initializer_), 1);
+    exec.defineFunctionBody(*default_initializer_, [this](Execution& e) {
+        Shared<lang::Value> ptr   = e.getParameterValue((**default_initializer_), 0);
+        Shared<lang::Value> count = e.getParameterValue((**default_initializer_), 1);
 
-        cc.exec().performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
-            this->performSingleDefaultInitializerDefinition(element_ptr, cc);
+        e.performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
+            this->performSingleDefaultInitializerDefinition(element_ptr, e);
         });
-        cc.exec().performReturn({});
+        e.performReturn({});
     });
 }
 
-void lang::TypeDefinition::defineCopyInitializer(CompileContext& context) const
+void lang::TypeDefinition::defineCopyInitializer(Execution& exec) const
 {
-    context.exec().defineFunctionBody(*copy_initializer_, [this](CompileContext& cc) {
-        Shared<lang::Value> dst_ptr = cc.exec().getParameterValue((**copy_initializer_), 0);
-        Shared<lang::Value> src_ptr = cc.exec().getParameterValue((**copy_initializer_), 1);
+    exec.defineFunctionBody(*copy_initializer_, [this](Execution& e) {
+        Shared<lang::Value> dst_ptr = e.getParameterValue((**copy_initializer_), 0);
+        Shared<lang::Value> src_ptr = e.getParameterValue((**copy_initializer_), 1);
 
-        performSingleCopyInitializerDefinition(dst_ptr, src_ptr, cc);
-        cc.exec().performReturn({});
+        performSingleCopyInitializerDefinition(dst_ptr, src_ptr, e);
+        e.performReturn({});
     });
 }
 
-void lang::TypeDefinition::defineDefaultFinalizer(CompileContext& context) const
+void lang::TypeDefinition::defineDefaultFinalizer(Execution& exec) const
 {
-    context.exec().defineFunctionBody(*default_finalizer_, [this](CompileContext& cc) {
-        Shared<lang::Value> ptr   = cc.exec().getParameterValue((**default_finalizer_), 0);
-        Shared<lang::Value> count = cc.exec().getParameterValue((**default_finalizer_), 1);
+    exec.defineFunctionBody(*default_finalizer_, [this](Execution& e) {
+        Shared<lang::Value> ptr   = e.getParameterValue((**default_finalizer_), 0);
+        Shared<lang::Value> count = e.getParameterValue((**default_finalizer_), 1);
 
-        cc.exec().performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
-            this->performSingleDefaultFinalizerDefinition(element_ptr, cc);
+        e.performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
+            this->performSingleDefaultFinalizerDefinition(element_ptr, e);
         });
-        cc.exec().performReturn({});
+        e.performReturn({});
     });
 }
 
-void lang::TypeDefinition::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr,
-                                                                     CompileContext&     context) const
+void lang::TypeDefinition::performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, Execution& exec) const
 {
     if (getStateCount().isUnit()) return;
 
-    Shared<lang::Value> initial = context.exec().getDefault(self());
-    context.exec().performStoreToAddress(ptr, initial);
+    Shared<lang::Value> initial = exec.getDefault(self());
+    exec.performStoreToAddress(ptr, initial);
 }
 
 void lang::TypeDefinition::performSingleCopyInitializerDefinition(Shared<lang::Value> dst_ptr,
                                                                   Shared<lang::Value> src_ptr,
-                                                                  CompileContext&     context) const
+                                                                  Execution&          exec) const
 {
     if (getStateCount().isUnit()) return;
 
-    Shared<lang::Value> value = context.exec().performLoadFromAddress(src_ptr);
-    context.exec().performStoreToAddress(dst_ptr, value);
+    Shared<lang::Value> value = exec.performLoadFromAddress(src_ptr);
+    exec.performStoreToAddress(dst_ptr, value);
 }
 
-void lang::TypeDefinition::performSingleDefaultFinalizerDefinition(Shared<lang::Value>, CompileContext&) const {}
+void lang::TypeDefinition::performSingleDefaultFinalizerDefinition(Shared<lang::Value>, Execution&) const {}
 
 std::vector<lang::ResolvingHandle<lang::Type>> lang::TypeDefinition::getDeclarationDependencies()
 {
@@ -755,7 +751,7 @@ bool lang::TypeDefinition::acceptOverloadRequest(std::vector<ResolvingHandle<lan
 
 void lang::TypeDefinition::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>>,
                                                   lang::PredefinedFunction&,
-                                                  CompileContext&) const
+                                                  Execution&) const
 {}
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::self()

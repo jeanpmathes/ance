@@ -30,7 +30,7 @@ namespace lang
         LocalScope(lang::Scope* parent, lang::CodeBlock& code_block);
 
         void resolveFollowingOrder() override;
-        void buildEntityDeclarationsFollowingOrder(CompileContext& context) const override;
+        void buildEntityDeclarationsFollowingOrder(Execution& exec) const override;
 
         [[nodiscard]] bool isPartOfFunction() const override;
 

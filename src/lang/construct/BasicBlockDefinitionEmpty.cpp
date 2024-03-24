@@ -1,6 +1,5 @@
 #include "BasicBlock.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 
 lang::BasicBlock const* lang::bb::def::Empty::next() const

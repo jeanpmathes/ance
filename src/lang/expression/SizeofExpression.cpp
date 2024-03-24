@@ -1,6 +1,5 @@
 #include "SizeofExpression.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/statement/Statement.h"
 #include "lang/type/SizeType.h"

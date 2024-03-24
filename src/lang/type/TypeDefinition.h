@@ -34,7 +34,7 @@ namespace lang
     class Context;
 }
 
-class CompileContext;
+class Execution;
 class ValidationLogger;
 
 namespace lang
@@ -157,41 +157,40 @@ namespace lang
 
         virtual Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
                                                    Shared<lang::Value> index,
-                                                   CompileContext&     context) const;
+                                                   Execution&          exec) const;
         virtual Shared<lang::Value> buildOperator(lang::BinaryOperator op,
                                                   Shared<lang::Value>  left,
                                                   Shared<lang::Value>  right,
-                                                  CompileContext&      context) const;
+                                                  Execution&           exec) const;
         virtual Shared<lang::Value> buildOperator(lang::UnaryOperator op,
                                                   Shared<lang::Value> value,
-                                                  CompileContext&     context) const;
+                                                  Execution&          exec) const;
         virtual Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
                                                             Shared<lang::Value> value,
-                                                            CompileContext&     context) const;
+                                                            Execution&          exec) const;
         virtual Shared<lang::Value> buildCast(lang::Type const&   other,
                                               Shared<lang::Value> value,
-                                              CompileContext&     context) const;
+                                              Execution&          exec) const;
         virtual Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
                                                       lang::Identifier const& name,
-                                                      CompileContext&         context) const;
-        virtual Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context) const;
+                                                      Execution&              exec) const;
+        virtual Shared<lang::Value> buildIndirection(Shared<lang::Value> value, Execution& exec) const;
 
-        void         performDefaultInitializer(Shared<lang::Value> ptr, CompileContext& context) const;
+        void         performDefaultInitializer(Shared<lang::Value> ptr, Execution& exec) const;
         virtual void performDefaultInitializer(Shared<lang::Value> ptr,
                                                Shared<lang::Value> count,
-                                               CompileContext&     context) const;
+                                               Execution&          exec) const;
         virtual void performCopyInitializer(Shared<lang::Value> destination,
                                             Shared<lang::Value> source,
-                                            CompileContext&     context) const;
-        void         performFinalizer(Shared<lang::Value> ptr, CompileContext& context) const;
+                                            Execution&          exec) const;
+        void         performFinalizer(Shared<lang::Value> ptr, Execution& exec) const;
         virtual void performFinalizer(Shared<lang::Value> ptr,
-                                      Shared<lang::Value> count,
-                                      CompileContext&     context) const;
+                                      Shared<lang::Value> count, Execution& exec) const;
 
-        virtual void registerExecutionType(CompileContext& context) const = 0;
+        virtual void registerExecutionType(Execution& exec) const = 0;
 
-        virtual void buildDeclaration(CompileContext& context) const;
-        virtual void buildDefinition(CompileContext& context) const;
+        virtual void buildDeclaration(Execution& exec) const;
+        virtual void buildDefinition(Execution& exec) const;
 
         virtual void createConstructors();
 
@@ -208,27 +207,27 @@ namespace lang
          */
         [[nodiscard]] virtual bool isTriviallyDestructible() const;
 
-        void defineDefaultInitializer(CompileContext& context) const;
-        void defineCopyInitializer(CompileContext& context) const;
-        void defineDefaultFinalizer(CompileContext& context) const;
+        void defineDefaultInitializer(Execution& exec) const;
+        void defineCopyInitializer(Execution& exec) const;
+        void defineDefaultFinalizer(Execution& exec) const;
 
-        void defineConstructors(CompileContext& context) const;
-        void buildConstructors(CompileContext& context) const;
+        void defineConstructors(Execution& exec) const;
+        void buildConstructors(Execution& exec) const;
 
         /**
          * Build the part of the definition that default-initializes a single element of this type.
          */
-        virtual void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, CompileContext& context) const;
+        virtual void performSingleDefaultInitializerDefinition(Shared<lang::Value> ptr, Execution& exec) const;
         /**
          * Build the part of the definition that copies a single element of this type.
          */
         virtual void performSingleCopyInitializerDefinition(Shared<lang::Value> dst_ptr,
                                                             Shared<lang::Value> src_ptr,
-                                                            CompileContext&     context) const;
+                                                            Execution&          exec) const;
         /**
          * Build the part of the definition that default-finalizes a single element of this type.
          */
-        virtual void performSingleDefaultFinalizerDefinition(Shared<lang::Value>, CompileContext&) const;
+        virtual void performSingleDefaultFinalizerDefinition(Shared<lang::Value>, Execution&) const;
 
         virtual std::string createMangledName() const = 0;
 
@@ -253,11 +252,11 @@ namespace lang
          * Build a function (constructor) overload that was accepted before.
          * @param parameters The parameters of the function overload.
          * @param function The already declared function which has to be built.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
         virtual void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                             lang::PredefinedFunction&                             function,
-                                            CompileContext&                                       context) const;
+                                            Execution&                                            exec) const;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self();
         [[nodiscard]] lang::Type const&                 self() const;

@@ -1,6 +1,5 @@
 #include "OpaquePointerType.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
 #include "lang/type/Type.h"
@@ -17,9 +16,9 @@ std::string lang::OpaquePointerType::createMangledName() const
     return "ptr";
 }
 
-void lang::OpaquePointerType::registerExecutionType(CompileContext& context) const
+void lang::OpaquePointerType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerOpaqueAddressType(self());
+    return exec.registerOpaqueAddressType(self());
 }
 
 Optional<lang::ResolvingHandle<lang::Type>> lang::OpaquePointerType::getPointeeType()

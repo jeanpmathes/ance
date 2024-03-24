@@ -13,7 +13,7 @@
 #include "lang/utility/ResolvingHandle.h"
 
 class ValidationLogger;
-class CompileContext;
+class Execution;
 
 namespace lang
 {

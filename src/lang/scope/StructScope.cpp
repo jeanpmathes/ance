@@ -2,7 +2,6 @@
 
 #include <utility>
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 
 lang::StructScope::StructScope(Scope& parent, lang::ResolvingHandle<lang::Type> self)

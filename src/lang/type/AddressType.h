@@ -20,7 +20,7 @@ namespace lang
                                          ValidationLogger& validation_logger) const override;
         Shared<lang::Value> buildCast(lang::Type const&   other,
                                       Shared<lang::Value> value,
-                                      CompileContext&     context) const override;
+                                      Execution&          exec) const override;
 
         bool                isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::Type const&   getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const override;
@@ -32,7 +32,7 @@ namespace lang
         Shared<lang::Value> buildOperator(lang::BinaryOperator op,
                                           Shared<lang::Value>  left,
                                           Shared<lang::Value>  right,
-                                          CompileContext&      context) const override;
+                                          Execution&           exec) const override;
 
       protected:
         [[nodiscard]] virtual Optional<lang::ResolvingHandle<lang::Type>> getPointeeType()       = 0;

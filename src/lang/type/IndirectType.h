@@ -21,7 +21,7 @@ namespace lang
         bool                definesIndirection() const override;
         lang::Type const& getIndirectionType() const override;
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, CompileContext& context) const override;
+        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, Execution& exec) const override;
 
       private:
         lang::ResolvingHandle<lang::Type> value_type_;

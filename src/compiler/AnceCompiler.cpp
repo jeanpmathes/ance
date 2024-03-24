@@ -23,13 +23,13 @@
 #include "lang/type/SizeType.h"
 
 AnceCompiler::AnceCompiler(SourceTree& tree, TargetDescriptor const& target_descriptor)
-    : unit_(tree.unit())
-    , target_descriptor_(target_descriptor)
-    , module_(tree.unit().getName(), llvm_context_)
+    : module_(tree.unit().getName(), llvm_context_)
     , ir_(llvm_context_)
     , di_(module_)
+    , unit_(tree.unit())
+    , target_descriptor_(target_descriptor)
     , runtime_()
-    , context_(unit_, runtime_, llvm_context_, module_, ir_, di_, tree, &native_build_)
+    , native_build_(tree, runtime_, llvm_context_, module_, ir_, di_)
 {
     module_.setSourceFileName(tree.unit().getProjectFile().filename().string());
 
@@ -58,12 +58,12 @@ void AnceCompiler::compile(std::filesystem::path const& ilr, std::filesystem::pa
 
     // Begin actual compilation.
 
-    NativeBuilder builder(*native_build_);
+    NativeBuilder builder(native_build_);
 
     Unit const& unit = unit_;
     builder.visit(unit);
 
-    assert(context_.allDebugLocationsPopped());// Every setDebugLocation must be ended with a resetDebugLocation!
+    assert(native_build_.allDebugLocationsPopped());// Every setDebugLocation must be ended with a resetDebugLocation!
 
     // Prepare entry and exit functions.
 
@@ -177,7 +177,7 @@ llvm::Function* AnceCompiler::buildInit()
 
     ir_.SetInsertPoint(start_block);
 
-    unit_.globalScope().buildEntityInitializations(context_);
+    unit_.globalScope().buildEntityInitializations(native_build_);
 
     ir_.CreateRetVoid();
     return init;
@@ -195,7 +195,7 @@ llvm::Function* AnceCompiler::buildFinit()
 
     ir_.SetInsertPoint(start_block);
 
-    unit_.globalScope().buildEntityFinalizations(context_);
+    unit_.globalScope().buildEntityFinalizations(native_build_);
 
     ir_.CreateRetVoid();
     return finit;
@@ -221,11 +221,11 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
 
     ir_.CreateCall(init);
 
-    Shared<lang::Value> exitcode = main->buildCall({}, context_);
+    Shared<lang::Value> exitcode = main->buildCall({}, native_build_);
 
     ir_.CreateCall(finit);
 
-    ir_.CreateRet(native_build_->llvmContentValue(exitcode));
+    ir_.CreateRet(native_build_.llvmContentValue(exitcode));
 }
 
 void AnceCompiler::buildLibStart(llvm::Function* init, llvm::Function* finit)

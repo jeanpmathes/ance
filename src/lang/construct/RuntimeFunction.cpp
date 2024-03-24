@@ -1,15 +1,14 @@
 #include "RuntimeFunction.h"
 
-#include "compiler/CompileContext.h"
 #include "compiler/Unit.h"
 #include "lang/ApplicationVisitor.h"
 
 lang::RuntimeFunction::RuntimeFunction(lang::Function&                      function,
                                        lang::ResolvingHandle<lang::Type>    return_type,
                                        std::vector<Shared<lang::Parameter>> parameters,
-                                       CompileContext&                      context)
+                                       Execution&                           exec)
     : lang::FunctionDefinition(function,
-                               context.unit().globalScope(),
+                               exec.unit().globalScope(),
                                return_type,
                                lang::Location::global(),
                                std::move(parameters),

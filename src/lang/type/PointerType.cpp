@@ -1,7 +1,7 @@
 #include "PointerType.h"
 
 #include "compiler/Application.h"
-#include "compiler/CompileContext.h"
+
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Value.h"
 #include "lang/scope/GlobalScope.h"
@@ -77,9 +77,9 @@ std::string lang::PointerType::createMangledName() const
     return std::string("p") + "(" + element_type_->getMangledName() + ")";
 }
 
-void lang::PointerType::registerExecutionType(CompileContext& context) const
+void lang::PointerType::registerExecutionType(Execution& exec) const
 {
-    return context.exec().registerAddressType(self());
+    return exec.registerAddressType(self());
 }
 
 Execution::IndexingMode lang::PointerType::getIndexingMode() const

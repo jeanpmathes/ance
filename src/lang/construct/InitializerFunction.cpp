@@ -1,6 +1,5 @@
 #include "InitializerFunction.h"
 
-#include "compiler/CompileContext.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/CodeBlock.h"
 #include "lang/expression/VariableAccess.h"

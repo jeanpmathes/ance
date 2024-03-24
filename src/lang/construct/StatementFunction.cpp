@@ -4,7 +4,6 @@
 
 #include <llvm/ADT/SmallVector.h>// critical, missing include will cause linking error
 
-#include "compiler/CompileContext.h"
 #include "lang/AccessModifier.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Function.h"
@@ -133,9 +132,9 @@ Optional<lang::Location> lang::StatementFunction::findUnreachableCode() const
     return unreachable;
 }
 
-void lang::StatementFunction::buildDeclarationsFollowingOrder(CompileContext& context) const
+void lang::StatementFunction::buildDeclarationsFollowingOrder(Execution& exec) const
 {
-    code_.getBlockScope()->buildEntityDeclarations(context);
+    code_.getBlockScope()->buildEntityDeclarations(exec);
 }
 
 lang::BasicBlock const* lang::StatementFunction::getEntryBlock() const

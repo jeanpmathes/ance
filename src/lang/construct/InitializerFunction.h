@@ -21,7 +21,7 @@ namespace lang
 }
 
 class Statement;
-class CompileContext;
+class Execution;
 
 namespace lang
 {

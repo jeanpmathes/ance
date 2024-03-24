@@ -3,7 +3,7 @@
 
 #include <llvm/IR/DebugLoc.h>
 
-class CompileContext;
+class Execution;
 
 namespace lang
 {
@@ -82,7 +82,7 @@ namespace lang
         /*
          * Format this location as a string, in the format "file:line:column".
          */
-        std::string toString(CompileContext& context);
+        std::string toString(Execution& exec);
 
         friend std::ostream& operator<<(std::ostream& os, lang::Location const& location);
 

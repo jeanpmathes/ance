@@ -28,7 +28,7 @@ namespace lang
 }
 
 class LiteralExpression;
-class CompileContext;
+class Execution;
 class ValidationLogger;
 
 namespace lang
@@ -132,21 +132,21 @@ namespace lang
 
         /**
          * Build the variable declaration which prepares the storage.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void buildDeclaration(CompileContext& context) const;
+        void buildDeclaration(Execution& exec) const;
 
         /**
          * Build the variable initialization which initializes the storage.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void buildInitialization(CompileContext& context) const;
+        void buildInitialization(Execution& exec) const;
 
         /**
          * Build the variable finalizer which cleans up the storage.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          */
-        void buildFinalization(CompileContext& context) const;
+        void buildFinalization(Execution& exec) const;
 
         /**
          * Validate getting a value.
@@ -170,17 +170,17 @@ namespace lang
 
         /**
          * Get a pointer to the current value of the variable.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return A pointer to the value.
          */
-        Shared<lang::Value> getValuePointer(CompileContext& context) const;
+        Shared<lang::Value> getValuePointer(Execution& exec) const;
 
         /**
          * Get the current value of the variable.
-         * @param context The current compile context.
+         * @param exec The current execution context.
          * @return The value.
          */
-        Shared<lang::Value> getValue(CompileContext& context) const;
+        Shared<lang::Value> getValue(Execution& exec) const;
 
         /**
          * Get an undefined variable with the same name.
