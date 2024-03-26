@@ -281,7 +281,7 @@ namespace lang
 
         /**
          * Get the basic blocks for this function.
-         * @return A vector containing all basic blocks.
+         * @return A vector containing all basic blocks, even if they are not reachable.
          */
         [[nodiscard]] std::vector<lang::BasicBlock*> const& getBasicBlocks() const;
 

@@ -40,20 +40,19 @@ std::any ControlFlowGraphPrinter::visit(lang::FunctionDescription const& functio
 
 std::any ControlFlowGraphPrinter::visit(lang::BasicBlock const& block)
 {
-    auto id = static_cast<int32_t>(block.getId());
+    auto id = static_cast<int32_t>(block.id());
 
     std::string label;
     BlockStyle  style;
 
     if (!block.isMeta())
     {
-        for (auto& statement : block.statements())
+        for (size_t child_index = 0; child_index < block.childCount(); child_index++)
         {
             std::stringstream code_stream;
             CodePrinter       code_printer(code_stream);
 
-            Statement const& stmt = statement;
-            code_printer.visitTree(stmt);
+            code_printer.visitTree(block.getChild(child_index));
 
             label += escape(code_stream.str());
             label += '\n';
@@ -78,9 +77,7 @@ std::any ControlFlowGraphPrinter::visit(lang::BasicBlock const& block)
     else
     {
         for (lang::BasicBlock const* successor : successors)
-        {
-            printLink(id, static_cast<int32_t>(successor->getId()));
-        }
+        { printLink(id, static_cast<int32_t>(successor->id())); }
     }
 
     return {};

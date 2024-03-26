@@ -134,7 +134,7 @@ namespace lang
          * Get the ID of this basic block.
          * @return The ID of this basic block.
          */
-        [[nodiscard]] size_t getId() const;
+        [[nodiscard]] size_t id() const;
 
         /**
          * Get all leaves of this basic block. A leaf is a basic block that is not followed by any other block.
@@ -190,20 +190,10 @@ namespace lang
          */
         [[nodiscard]] bool isMeta() const;
 
-        /**
-         * Get all statements in this basic block.
-         * @return References to all statements in this basic block.
-         */
-        [[nodiscard]] std::vector<std::reference_wrapper<Statement>> const& statements() const;
-
         void                 registerIncomingLink(BasicBlock& predecessor);
         void                 updateLink(BasicBlock* former, BasicBlock* updated);
         [[nodiscard]] size_t getIncomingLinkCount() const;
         void                 transferStatements(std::list<Statement*>& statements);
-
-        void addStatement(Statement& statement);
-
-        std::vector<std::reference_wrapper<Statement>> statements_;
 
       public:
         class Definition
@@ -505,7 +495,7 @@ namespace lang
             Match&                                       match_;
             std::vector<std::vector<LiteralExpression*>> cases_;
         };
-    };
+    }
 }
 
 #endif

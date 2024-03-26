@@ -22,7 +22,7 @@ std::list<Statement*> const& lang::bb::def::Simple::statements() const
 
 void lang::bb::def::Simple::complete(size_t& index)
 {
-    for (auto& statement : statements_) { self()->addStatement(*statement); }
+    for (auto& statement : statements_) { self()->addChild(*statement); }
 
     if (next_) next_->complete(index);
 }

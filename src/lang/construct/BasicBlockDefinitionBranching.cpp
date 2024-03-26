@@ -31,7 +31,7 @@ lang::BasicBlock const* lang::bb::def::Branching::falseNext() const
 
 void lang::bb::def::Branching::complete(size_t& index)
 {
-    for (auto& statement : statements_) { self()->addStatement(*statement); }
+    for (auto& statement : statements_) { self()->addChild(*statement); }
 
     true_next_->complete(index);
     false_next_->complete(index);

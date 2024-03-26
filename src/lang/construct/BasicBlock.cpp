@@ -210,7 +210,7 @@ bool lang::BasicBlock::isUsable() const
     return !unused_;
 }
 
-size_t lang::BasicBlock::getId() const
+size_t lang::BasicBlock::id() const
 {
     return definition_->index();
 }
@@ -329,17 +329,6 @@ size_t lang::BasicBlock::Definition::Base::index() const
 bool lang::BasicBlock::isMeta() const
 {
     return definition_->isMeta();
-}
-
-std::vector<std::reference_wrapper<Statement>> const& lang::BasicBlock::statements() const
-{
-    return statements_;
-}
-
-void lang::BasicBlock::addStatement(Statement& statement)
-{
-    statements_.emplace_back(statement);
-    addChild(statement);
 }
 
 lang::BasicBlock::BasicBlock(Owned<Definition::Base> definition) : definition_(std::move(definition))

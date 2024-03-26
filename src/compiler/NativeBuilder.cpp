@@ -27,7 +27,7 @@ std::any NativeBuilder::visit(lang::GlobalScope const& global_scope)
 {
     if (native_build_.unit().isUsingRuntime()) native_build_.runtime().init(native_build_);
 
-    g_phase_ = G_Phase::DECLARE;
+    g_phase_ = GlobalPhase::DECLARE;
 
     for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().registerDeclaration(native_build_); }
 
@@ -35,7 +35,7 @@ std::any NativeBuilder::visit(lang::GlobalScope const& global_scope)
 
     native_build_.ctx().registerDeclarations(native_build_);
 
-    g_phase_ = G_Phase::DEFINE;
+    g_phase_ = GlobalPhase::DEFINE;
 
     for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().registerDefinition(native_build_); }
 
@@ -43,7 +43,7 @@ std::any NativeBuilder::visit(lang::GlobalScope const& global_scope)
 
     native_build_.ctx().registerDefinitions(native_build_);
 
-    g_phase_ = G_Phase::INVALID;
+    g_phase_ = GlobalPhase::INVALID;
 
     return {};
 }
@@ -57,12 +57,12 @@ std::any NativeBuilder::visit(lang::VariableDescription const& variable_descript
 {
     switch (g_phase_)
     {
-        case G_Phase::DECLARE:
+        case GlobalPhase::DECLARE:
         {
             variable_description.variable()->registerDeclaration(native_build_);
         }
         break;
-        case G_Phase::DEFINE:
+        case GlobalPhase::DEFINE:
         {
         }
         break;
@@ -82,12 +82,12 @@ std::any NativeBuilder::visit(lang::StructDescription const& struct_description)
 {
     switch (g_phase_)
     {
-        case G_Phase::DECLARE:
+        case GlobalPhase::DECLARE:
         {
             struct_description.type().registerDeclaration(native_build_);
         }
         break;
-        case G_Phase::DEFINE:
+        case GlobalPhase::DEFINE:
         {
             struct_description.type().registerDefinition(native_build_);
         }
@@ -103,12 +103,12 @@ std::any NativeBuilder::visit(lang::AliasDescription const& alias_description)
 {
     switch (g_phase_)
     {
-        case G_Phase::DECLARE:
+        case GlobalPhase::DECLARE:
         {
             alias_description.type().registerDeclaration(native_build_);
         }
         break;
-        case G_Phase::DEFINE:
+        case GlobalPhase::DEFINE:
         {
             alias_description.type().registerDefinition(native_build_);
         }
@@ -129,12 +129,12 @@ std::any NativeBuilder::visit(lang::Function const& function)
 {
     switch (g_phase_)
     {
-        case G_Phase::DECLARE:
+        case GlobalPhase::DECLARE:
         {
             function.registerDeclaration(native_build_);
         }
         break;
-        case G_Phase::DEFINE:
+        case GlobalPhase::DEFINE:
         {
             if (function.getEntryBlock() == nullptr) return {};
 
@@ -157,19 +157,54 @@ std::any NativeBuilder::visit(lang::Function const& function)
                 parameter->argument().performInitialization(native_build_);
             }
 
-            bb_phase_ = BB_Phase::PREPARE;
-            bb_visited_.clear();
+            bb_map_                                      = {};
+            std::vector<lang::BasicBlock const*> bb_list = {};
 
-            visitTree(*function.getEntryBlock());
+            {
+                llvm::Function* current_function = native_build_.getCurrentFunction();
 
-            bb_phase_ = BB_Phase::BUILD;
-            bb_visited_.clear();
+                std::vector<lang::BasicBlock const*> bb_queue = {function.getEntryBlock()};
 
-            visitTree(*function.getEntryBlock());
+                while (!bb_queue.empty())
+                {
+                    lang::BasicBlock const* bb = bb_queue.back();
+                    bb_queue.pop_back();
 
-            bb_phase_ = BB_Phase::INVALID;
+                    lang::BasicBlock::Definition::Base const* ptr = &bb->definition();
+
+                    if (bb_map_.contains(ptr)) continue;
+
+                    std::string const name = "b" + std::to_string(bb->id());
+
+                    bb_list.emplace_back(bb);
+                    bb_map_[ptr] = llvm::BasicBlock::Create(native_build_.llvmContext(), name, current_function);
+
+                    for (lang::BasicBlock const* next : bb->getSuccessors()) { bb_queue.emplace_back(next); }
+                }
+            }
+
+            {
+                bool first = true;
+
+                for (lang::BasicBlock const* bb : bb_list)
+                {
+                    llvm::BasicBlock* llvm_bb = bb_map_[&bb->definition()];
+
+                    if (first)
+                    {
+                        first = false;
+
+                        // Create the branch from 'defs' to the first block.
+                        native_build_.ir().CreateBr(llvm_bb);
+                    }
+
+                    native_build_.ir().SetInsertPoint(llvm_bb);
+
+                    visitTree(bb->definition());
+                }
+            }
+
             bb_map_.clear();
-            bb_visited_.clear();
 
             native_build_.ir().SetCurrentDebugLocation(llvm::DebugLoc());
             native_build_.di().finalizeSubprogram(native_build_.getCurrentFunction()->getSubprogram());
@@ -186,9 +221,6 @@ std::any NativeBuilder::visit(lang::Function const& function)
 
 std::any NativeBuilder::visit(lang::BasicBlock const& basic_block)
 {
-    if (bb_visited_.contains(&basic_block)) return {};
-    bb_visited_.insert(&basic_block);
-
     visitTree(basic_block.definition());
 
     return {};
@@ -196,158 +228,50 @@ std::any NativeBuilder::visit(lang::BasicBlock const& basic_block)
 
 std::any NativeBuilder::visit(lang::bb::def::Empty const& empty_bb)
 {
-    lang::BasicBlock::Definition::Base const* this_ptr = &empty_bb;
-
-    switch (bb_phase_)
-    {
-        case BB_Phase::PREPARE:
-        {
-            std::string const name = "b" + std::to_string(empty_bb.index());
-            bb_map_[this_ptr] =
-                llvm::BasicBlock::Create(native_build_.llvmContext(), name, native_build_.getCurrentFunction());
-
-            if (empty_bb.next()) visitTree(*empty_bb.next());
-        }
-        break;
-        case BB_Phase::BUILD:
-        {
-            native_build_.ir().CreateBr(bb_map_[this_ptr]);// Branch from prelude in function to this block
-            native_build_.ir().SetInsertPoint(bb_map_[this_ptr]);
-
-            if (empty_bb.next() != nullptr)
-            {
-                lang::BasicBlock::Definition::Base const* next_ptr = &empty_bb.next()->definition();
-
-                native_build_.ir().CreateBr(bb_map_[next_ptr]);
-                visitTree(*empty_bb.next());
-            }
-            else { native_build_.ir().CreateRetVoid(); }
-        }
-        break;
-        default:
-            throw std::logic_error("Unknown basic block phase");
-    }
+    branchToNextOrReturnVoid(empty_bb.next());
 
     return {};
 }
 
 std::any NativeBuilder::visit(lang::bb::def::Finalizing const& finalizing_bb)
 {
-    lang::BasicBlock::Definition::Base const* this_ptr = &finalizing_bb;
+    finalizing_bb.scope().performEntityFinalizations(native_build_);
 
-    switch (bb_phase_)
-    {
-        case BB_Phase::PREPARE:
-        {
-            std::string const name = "b" + std::to_string(finalizing_bb.index());
-            bb_map_[this_ptr] =
-                llvm::BasicBlock::Create(native_build_.llvmContext(), name, native_build_.getCurrentFunction());
-
-            if (finalizing_bb.next()) visitTree(*finalizing_bb.next());
-        }
-        break;
-        case BB_Phase::BUILD:
-        {
-            native_build_.ir().SetInsertPoint(bb_map_[this_ptr]);
-
-            finalizing_bb.scope().performEntityFinalizations(native_build_);
-
-            if (finalizing_bb.next() != nullptr)
-            {
-                lang::BasicBlock::Definition::Base const* next_ptr = &finalizing_bb.next()->definition();
-
-                native_build_.ir().CreateBr(bb_map_[next_ptr]);
-                visitTree(*finalizing_bb.next());
-            }
-            else { native_build_.ir().CreateRetVoid(); }
-        }
-        break;
-        default:
-            throw std::logic_error("Unknown basic block phase");
-    }
+    branchToNextOrReturnVoid(finalizing_bb.next());
 
     return {};
 }
 
 std::any NativeBuilder::visit(lang::bb::def::Simple const& simple_bb)
 {
-    lang::BasicBlock::Definition::Base const* this_ptr = &simple_bb;
+    for (Statement const* statement : simple_bb.statements()) visitTree(*statement);
 
-    switch (bb_phase_)
-    {
-        case BB_Phase::PREPARE:
-        {
-            std::string const name = "b" + std::to_string(simple_bb.index());
-            bb_map_[this_ptr] =
-                llvm::BasicBlock::Create(native_build_.llvmContext(), name, native_build_.getCurrentFunction());
-
-            if (simple_bb.next()) visitTree(*simple_bb.next());
-        }
-        break;
-        case BB_Phase::BUILD:
-        {
-            native_build_.ir().SetInsertPoint(bb_map_[this_ptr]);
-
-            for (Statement const* statement : simple_bb.statements()) visitTree(*statement);
-
-            if (simple_bb.next() != nullptr)
-            {
-                lang::BasicBlock::Definition::Base const* next_ptr = &simple_bb.next()->definition();
-
-                native_build_.ir().CreateBr(bb_map_[next_ptr]);
-                visitTree(*simple_bb.next());
-            }
-            else { native_build_.ir().CreateRetVoid(); }
-        }
-        break;
-        default:
-            throw std::logic_error("Unknown basic block phase");
-    }
+    branchToNextOrReturnVoid(simple_bb.next());
 
     return {};
 }
 
 std::any NativeBuilder::visit(lang::bb::def::Returning const& returning_bb)
 {
-    lang::BasicBlock::Definition::Base const* this_ptr = &returning_bb;
+    for (Statement const* statement : returning_bb.statements()) visitTree(*statement);
 
-    switch (bb_phase_)
+    lang::Scope const* current = &returning_bb.scope();
+    while (current->isPartOfFunction())
     {
-        case BB_Phase::PREPARE:
-        {
-            std::string const name = "b" + std::to_string(returning_bb.index());
-            bb_map_[this_ptr] =
-                llvm::BasicBlock::Create(native_build_.llvmContext(), name, native_build_.getCurrentFunction());
-        }
-        break;
-        case BB_Phase::BUILD:
-        {
-            native_build_.ir().SetInsertPoint(bb_map_[this_ptr]);
+        current->performEntityFinalizations(native_build_);
+        current = &current->scope();
+    }
 
-            for (Statement const* statement : returning_bb.statements()) visitTree(*statement);
+    lang::Type const& return_type = returning_bb.self()->getContainingFunction()->returnType();
 
-            lang::Scope const* current = &returning_bb.scope();
-            while (current->isPartOfFunction())
-            {
-                current->performEntityFinalizations(native_build_);
-                current = &current->scope();
-            }
+    if (return_type.isUnitType()) { native_build_.performReturn(std::nullopt); }
+    else
+    {
+        Shared<lang::Value> return_value = getV(returning_bb.ret());
 
-            lang::Type const& return_type = returning_bb.self()->getContainingFunction()->returnType();
+        return_value = lang::Type::makeMatching(return_type, return_value, native_build_);
 
-            if (return_type.isUnitType()) { native_build_.performReturn(std::nullopt); }
-            else
-            {
-                Shared<lang::Value> return_value = getV(returning_bb.ret());
-
-                return_value = lang::Type::makeMatching(return_type, return_value, native_build_);
-
-                native_build_.performReturn(return_value);
-            }
-        }
-        break;
-        default:
-            throw std::logic_error("Unknown basic block phase");
+        native_build_.performReturn(return_value);
     }
 
     return {};
@@ -355,108 +279,58 @@ std::any NativeBuilder::visit(lang::bb::def::Returning const& returning_bb)
 
 std::any NativeBuilder::visit(lang::bb::def::Branching const& branching_bb)
 {
-    lang::BasicBlock::Definition::Base const* this_ptr = &branching_bb;
+    for (Statement const* statement : branching_bb.statements()) visitTree(*statement);
 
-    switch (bb_phase_)
-    {
-        case BB_Phase::PREPARE:
-        {
-            std::string const name = "b" + std::to_string(branching_bb.index());
-            bb_map_[this_ptr] =
-                llvm::BasicBlock::Create(native_build_.llvmContext(), name, native_build_.getCurrentFunction());
+    Shared<lang::Value> truth = getV(branching_bb.condition());
+    Shared<lang::Value> boolean_truth =
+        lang::Type::makeMatching(native_build_.ctx().getBooleanType(), truth, native_build_);
 
-            visitTree(*branching_bb.trueNext());
-            visitTree(*branching_bb.falseNext());
-        }
-        break;
-        case BB_Phase::BUILD:
-        {
-            native_build_.ir().SetInsertPoint(bb_map_[this_ptr]);
-
-            for (Statement const* statement : branching_bb.statements()) visitTree(*statement);
-
-            Shared<lang::Value> truth = getV(branching_bb.condition());
-            Shared<lang::Value> boolean_truth =
-                lang::Type::makeMatching(native_build_.ctx().getBooleanType(), truth, native_build_);
-
-            native_build_.ir().CreateCondBr(native_build_.llvmContentValue(boolean_truth),
-                                            bb_map_[&branching_bb.trueNext()->definition()],
-                                            bb_map_[&branching_bb.falseNext()->definition()]);
-
-            visitTree(*branching_bb.trueNext());
-            visitTree(*branching_bb.falseNext());
-        }
-        break;
-        default:
-            throw std::logic_error("Unknown basic block phase");
-    }
+    native_build_.ir().CreateCondBr(native_build_.llvmContentValue(boolean_truth),
+                                    bb_map_[&branching_bb.trueNext()->definition()],
+                                    bb_map_[&branching_bb.falseNext()->definition()]);
 
     return {};
 }
 
 std::any NativeBuilder::visit(lang::bb::def::Matching const& matching_bb)
 {
-    lang::BasicBlock::Definition::Base const* this_ptr = &matching_bb;
+    auto const& cases    = matching_bb.cases();
+    auto const& branches = matching_bb.branches();
 
-    switch (bb_phase_)
+    for (Statement const* statement : matching_bb.statements()) visitTree(*statement);
+
+    llvm::BasicBlock* default_block = nullptr;
+
+    for (auto const [case_values, branch_block] : llvm::zip(cases, branches))
     {
-        case BB_Phase::PREPARE:
+        if (case_values.empty())
         {
-            std::string const name = "b" + std::to_string(matching_bb.index());
-            bb_map_[this_ptr] =
-                llvm::BasicBlock::Create(native_build_.llvmContext(), name, native_build_.getCurrentFunction());
-
-            for (lang::BasicBlock const* branch : matching_bb.branches()) visitTree(*branch);
+            default_block = bb_map_[&branch_block->definition()];
+            break;
         }
-        break;
-        case BB_Phase::BUILD:
+    }
+
+    if (!default_block) { default_block = bb_map_[&branches.front()->definition()]; }
+
+    Shared<lang::Value> value = getV(matching_bb.matched());
+
+    auto switch_instance = native_build_.ir().CreateSwitch(native_build_.llvmContentValue(value),
+                                                           default_block,
+                                                           static_cast<unsigned>(cases.size()));
+
+    for (auto const [case_values, branch_block] : llvm::zip(cases, branches))
+    {
+        llvm::BasicBlock* branch_native_block = bb_map_[&branch_block->definition()];
+
+        if (case_values.empty() || branch_native_block == default_block) continue;
+
+        for (auto& case_value : case_values)
         {
-            auto const& cases    = matching_bb.cases();
-            auto const& branches = matching_bb.branches();
+            Shared<lang::Constant> constant = getC(*case_value);
 
-            native_build_.ir().SetInsertPoint(bb_map_[this_ptr]);
-
-            for (Statement const* statement : matching_bb.statements()) visitTree(*statement);
-
-            llvm::BasicBlock* default_block = nullptr;
-
-            for (auto const [case_values, branch_block] : llvm::zip(cases, branches))
-            {
-                if (case_values.empty())
-                {
-                    default_block = bb_map_[&branch_block->definition()];
-                    break;
-                }
-            }
-
-            if (!default_block) { default_block = bb_map_[&branches.front()->definition()]; }
-
-            Shared<lang::Value> value = getV(matching_bb.matched());
-
-            auto switch_instance = native_build_.ir().CreateSwitch(native_build_.llvmContentValue(value),
-                                                                   default_block,
-                                                                   static_cast<unsigned>(cases.size()));
-
-            for (auto const [case_values, branch_block] : llvm::zip(cases, branches))
-            {
-                llvm::BasicBlock* branch_native_block = bb_map_[&branch_block->definition()];
-
-                if (case_values.empty() || branch_native_block == default_block) continue;
-
-                for (auto& case_value : case_values)
-                {
-                    Shared<lang::Constant> constant = getC(*case_value);
-
-                    auto native_integer_constant = llvm::cast<llvm::ConstantInt>(native_build_.llvmConstant(constant));
-                    switch_instance->addCase(native_integer_constant, branch_native_block);
-                }
-            }
-
-            for (lang::BasicBlock const* branch : branches) visitTree(*branch);
+            auto native_integer_constant = llvm::cast<llvm::ConstantInt>(native_build_.llvmConstant(constant));
+            switch_instance->addCase(native_integer_constant, branch_native_block);
         }
-        break;
-        default:
-            throw std::logic_error("Unknown basic block phase");
     }
 
     return {};
@@ -854,4 +728,10 @@ Shared<lang::Value> NativeBuilder::getV(Expression const& expression)
 {
     std::any const value = visitTree(expression);
     return erasedCast<Shared<lang::Value>>(value);
+}
+
+void NativeBuilder::branchToNextOrReturnVoid(lang::BasicBlock const* next)
+{
+    if (next != nullptr) native_build_.ir().CreateBr(bb_map_[&next->definition()]);
+    else native_build_.ir().CreateRetVoid();
 }

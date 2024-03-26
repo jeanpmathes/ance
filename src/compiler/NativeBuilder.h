@@ -85,25 +85,19 @@ class NativeBuilder : public lang::ApplicationVisitorConst
     Shared<lang::Value>    getV(Expression const& expression);
 
   private:
+    void branchToNextOrReturnVoid(lang::BasicBlock const* next);
+
     NativeBuild& native_build_;
 
-    enum class G_Phase
+    enum class GlobalPhase
     {
         INVALID,
         DECLARE,
         DEFINE,
     };
-    G_Phase g_phase_ = G_Phase::INVALID;
+    GlobalPhase g_phase_ = GlobalPhase::INVALID;
 
-    enum class BB_Phase
-    {
-        INVALID,
-        PREPARE,
-        BUILD,
-    };
-    BB_Phase                                                               bb_phase_ = BB_Phase::INVALID;
     std::map<lang::BasicBlock::Definition::Base const*, llvm::BasicBlock*> bb_map_;
-    std::set<lang::BasicBlock const*>                                      bb_visited_;
 
     bool assign_ = false;
 };

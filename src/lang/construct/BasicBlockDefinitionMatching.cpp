@@ -31,7 +31,7 @@ std::vector<lang::BasicBlock*> const& lang::bb::def::Matching::branches() const
 
 void lang::bb::def::Matching::complete(size_t& index)
 {
-    for (auto& statement : statements_) { self()->addStatement(*statement); }
+    for (auto& statement : statements_) { self()->addChild(*statement); }
     for (auto& branch : branches_) { branch->complete(index); }
 }
 

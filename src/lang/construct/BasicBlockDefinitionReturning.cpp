@@ -30,7 +30,7 @@ Expression const& lang::bb::def::Returning::ret() const
 
 void lang::bb::def::Returning::complete(size_t& index)
 {
-    for (auto& statement : statements_) { self()->addStatement(*statement); }
+    for (auto& statement : statements_) { self()->addChild(*statement); }
 
     if (unreachable_next_) unreachable_next_->complete(index);
 }
