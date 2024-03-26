@@ -72,8 +72,8 @@ namespace lang
 
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
 
-        void buildInitialization(Execution& exec) override;
-        void buildFinalization(Execution& exec) override;
+        void performInitialization(Execution& exec) override;
+        void performFinalization(Execution& exec) override;
 
       protected:
         void performInitialization() override;

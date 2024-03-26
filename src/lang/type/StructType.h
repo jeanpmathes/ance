@@ -29,8 +29,8 @@ namespace lang
         Member const& getMember(lang::Identifier const& name) const override;
 
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
-                                              lang::Identifier const& name,
+        Shared<lang::Value> execMemberAccess(Shared<lang::Value>     value,
+                                             lang::Identifier const& name,
                                               Execution&              exec) const override;
 
       protected:

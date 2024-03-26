@@ -29,19 +29,19 @@ std::any NativeBuilder::visit(lang::GlobalScope const& global_scope)
 
     g_phase_ = G_Phase::DECLARE;
 
-    for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().buildDeclaration(native_build_); }
+    for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().registerDeclaration(native_build_); }
 
     for (auto& description : global_scope.getDescriptionsInDeclarationOrder()) { visitTree(description); }
 
-    native_build_.ctx().buildDeclarations(native_build_);
+    native_build_.ctx().registerDeclarations(native_build_);
 
     g_phase_ = G_Phase::DEFINE;
 
-    for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().buildDefinition(native_build_); }
+    for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().registerDefinition(native_build_); }
 
     for (auto& description : global_scope.getDescriptionsInDefinitionOrder()) { visitTree(description); }
 
-    native_build_.ctx().buildDefinitions(native_build_);
+    native_build_.ctx().registerDefinitions(native_build_);
 
     g_phase_ = G_Phase::INVALID;
 
@@ -59,7 +59,7 @@ std::any NativeBuilder::visit(lang::VariableDescription const& variable_descript
     {
         case G_Phase::DECLARE:
         {
-            variable_description.variable()->buildDeclaration(native_build_);
+            variable_description.variable()->registerDeclaration(native_build_);
         }
         break;
         case G_Phase::DEFINE:
@@ -84,12 +84,12 @@ std::any NativeBuilder::visit(lang::StructDescription const& struct_description)
     {
         case G_Phase::DECLARE:
         {
-            struct_description.type().buildDeclaration(native_build_);
+            struct_description.type().registerDeclaration(native_build_);
         }
         break;
         case G_Phase::DEFINE:
         {
-            struct_description.type().buildDefinition(native_build_);
+            struct_description.type().registerDefinition(native_build_);
         }
         break;
         default:
@@ -105,12 +105,12 @@ std::any NativeBuilder::visit(lang::AliasDescription const& alias_description)
     {
         case G_Phase::DECLARE:
         {
-            alias_description.type().buildDeclaration(native_build_);
+            alias_description.type().registerDeclaration(native_build_);
         }
         break;
         case G_Phase::DEFINE:
         {
-            alias_description.type().buildDefinition(native_build_);
+            alias_description.type().registerDefinition(native_build_);
         }
         break;
         default:
@@ -131,7 +131,7 @@ std::any NativeBuilder::visit(lang::Function const& function)
     {
         case G_Phase::DECLARE:
         {
-            function.buildDeclaration(native_build_);
+            function.registerDeclaration(native_build_);
         }
         break;
         case G_Phase::DEFINE:
@@ -145,7 +145,7 @@ std::any NativeBuilder::visit(lang::Function const& function)
                 llvm::BasicBlock::Create(native_build_.llvmContext(), "decl", native_build_.getCurrentFunction());
 
             native_build_.ir().SetInsertPoint(decl);
-            function.buildEntityDeclarations(native_build_);
+            function.registerEntityDeclarations(native_build_);
 
             llvm::BasicBlock* defs =
                 llvm::BasicBlock::Create(native_build_.llvmContext(), "defs", native_build_.getCurrentFunction());
@@ -153,7 +153,9 @@ std::any NativeBuilder::visit(lang::Function const& function)
             native_build_.ir().CreateBr(defs);
             native_build_.ir().SetInsertPoint(defs);
             for (auto& parameter : function.parameters())
-            { parameter->argument().buildInitialization(native_build_); }
+            {
+                parameter->argument().performInitialization(native_build_);
+            }
 
             bb_phase_ = BB_Phase::PREPARE;
             bb_visited_.clear();
@@ -248,7 +250,7 @@ std::any NativeBuilder::visit(lang::bb::def::Finalizing const& finalizing_bb)
         {
             native_build_.ir().SetInsertPoint(bb_map_[this_ptr]);
 
-            finalizing_bb.scope().buildEntityFinalizations(native_build_);
+            finalizing_bb.scope().performEntityFinalizations(native_build_);
 
             if (finalizing_bb.next() != nullptr)
             {
@@ -327,7 +329,7 @@ std::any NativeBuilder::visit(lang::bb::def::Returning const& returning_bb)
             lang::Scope const* current = &returning_bb.scope();
             while (current->isPartOfFunction())
             {
-                current->buildEntityFinalizations(native_build_);
+                current->performEntityFinalizations(native_build_);
                 current = &current->scope();
             }
 
@@ -523,10 +525,10 @@ std::any NativeBuilder::visit(BinaryOperation const& binary_operation)
 
     if (!lang::Type::areSame(right->type(), binary_operation.getRightType()))
     {
-        right = right->type().buildImplicitConversion(binary_operation.getRightType(), right, native_build_);
+        right = right->type().execImplicitConversion(binary_operation.getRightType(), right, native_build_);
     }
 
-    Shared<lang::Value> result = left->type().buildOperator(binary_operation.op(), left, right, native_build_);
+    Shared<lang::Value> result = left->type().execOperator(binary_operation.op(), left, right, native_build_);
 
     return erase(result);
 }
@@ -553,7 +555,7 @@ std::any NativeBuilder::visit(Cast const& cast)
     if (lang::Type::areSame(value->type(), target_type)) { return erase(value); }
     else
     {
-        Shared<lang::Value> casted_value = value->type().buildCast(target_type, value, native_build_);
+        Shared<lang::Value> casted_value = value->type().execCast(target_type, value, native_build_);
         return erase(casted_value);
     }
 }
@@ -579,7 +581,7 @@ std::any NativeBuilder::visit(FunctionCall const& function_call)
         arg_values.emplace_back(std::move(value));
     }
 
-    Shared<lang::Value> return_value = function_call.function().buildCall(arg_values, native_build_);
+    Shared<lang::Value> return_value = function_call.function().execCall(arg_values, native_build_);
 
     return erase(return_value);
 }
@@ -592,7 +594,7 @@ std::any NativeBuilder::visit(IfSelect const&)
 std::any NativeBuilder::visit(Indirection const& indirection)
 {
     Shared<lang::Value> value     = getV(indirection.value());
-    Shared<lang::Value> reference = value->type().buildIndirection(value, native_build_);
+    Shared<lang::Value> reference = value->type().execIndirection(value, native_build_);
 
     return erase(reference);
 }
@@ -607,7 +609,7 @@ std::any NativeBuilder::visit(MemberAccess const& member_access)
     Shared<lang::Value>     struct_value = getV(member_access.value());
     lang::Identifier const& member       = member_access.member();
 
-    Shared<lang::Value> value = struct_value->type().buildMemberAccess(struct_value, member, native_build_);
+    Shared<lang::Value> value = struct_value->type().execMemberAccess(struct_value, member, native_build_);
 
     return erase(value);
 }
@@ -648,7 +650,7 @@ std::any NativeBuilder::visit(Subscript const& subscript)
     Shared<lang::Value> indexed = getV(subscript.indexed());
     Shared<lang::Value> index   = getV(subscript.index());
 
-    Shared<lang::Value> value = indexed->type().buildSubscript(indexed, index, native_build_);
+    Shared<lang::Value> value = indexed->type().execSubscript(indexed, index, native_build_);
 
     return erase(value);
 }
@@ -656,7 +658,7 @@ std::any NativeBuilder::visit(Subscript const& subscript)
 std::any NativeBuilder::visit(UnaryOperation const& unary_operation)
 {
     Shared<lang::Value> operand = getV(unary_operation.operand());
-    Shared<lang::Value> result  = operand->type().buildOperator(unary_operation.op(), operand, native_build_);
+    Shared<lang::Value> result  = operand->type().execOperator(unary_operation.op(), operand, native_build_);
 
     return erase(result);
 }
@@ -721,7 +723,7 @@ std::any NativeBuilder::visit(Assertion const& assertion)
     Shared<lang::Value> condition = getV(assertion.condition());
     std::string const   message   = std::format("Assertion failed at [{}] {}", native_build_.unit().getName(), native_build_.getLocationString());
 
-    native_build_.runtime().buildAssert(condition, message, native_build_);
+    native_build_.runtime().execAssert(condition, message, native_build_);
 
     return {};
 }
@@ -787,7 +789,7 @@ std::any NativeBuilder::visit(Erase const& erase_statement)
 {
     auto const& variable = lang::Type::makeMatching<lang::Variable>(erase_statement.variable());
 
-    variable.buildFinalization(native_build_);
+    variable.performFinalization(native_build_);
 
     return {};
 }
@@ -808,7 +810,7 @@ std::any NativeBuilder::visit(LocalReferenceVariableDefinition const& local_refe
 {
     lang::Variable const& variable = local_reference_variable_definition.variable();
 
-    variable.buildInitialization(native_build_);
+    variable.performInitialization(native_build_);
 
     return {};
 }
@@ -817,7 +819,7 @@ std::any NativeBuilder::visit(LocalVariableDefinition const& local_variable_defi
 {
     lang::Variable const& variable = local_variable_definition.variable();
 
-    variable.buildInitialization(native_build_);
+    variable.performInitialization(native_build_);
 
     return {};
 }

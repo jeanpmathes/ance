@@ -69,7 +69,7 @@ namespace lang
          * @param ptr The pointer to the member.
          * @param exec The execution context.
          */
-        void buildInitialization(Shared<lang::Value> ptr, Execution& exec);
+        void performInitialization(Shared<lang::Value> ptr, Execution& exec);
 
         Owned<Member> expand(lang::Context& new_context) const;
 

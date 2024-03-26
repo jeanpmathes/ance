@@ -42,8 +42,8 @@ bool lang::FloatingPointType::validateImplicitConversion(lang::Type const&, lang
     return true;
 }
 
-Shared<lang::Value> lang::FloatingPointType::buildImplicitConversion(lang::Type const&   other,
-                                                                     Shared<lang::Value> value,
+Shared<lang::Value> lang::FloatingPointType::execImplicitConversion(lang::Type const&   other,
+                                                                    Shared<lang::Value> value,
                                                                      Execution&          exec) const
 {
     return exec.computeConversionOnFP(value, other);
@@ -59,8 +59,8 @@ bool lang::FloatingPointType::validateCast(lang::Type const&, lang::Location, Va
     return true;
 }
 
-Shared<lang::Value> lang::FloatingPointType::buildCast(lang::Type const&   other,
-                                                       Shared<lang::Value> value,
+Shared<lang::Value> lang::FloatingPointType::execCast(lang::Type const&   other,
+                                                      Shared<lang::Value> value,
                                                        Execution&          exec) const
 {
     if (other.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
@@ -91,8 +91,8 @@ bool lang::FloatingPointType::validateOperator(lang::UnaryOperator, lang::Locati
     return true;
 }
 
-Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::UnaryOperator op,
-                                                           Shared<lang::Value> value,
+Shared<lang::Value> lang::FloatingPointType::execOperator(lang::UnaryOperator op,
+                                                          Shared<lang::Value> value,
                                                            Execution&          exec) const
 {
     return exec.performOperator(op, value);
@@ -126,8 +126,8 @@ bool lang::FloatingPointType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-Shared<lang::Value> lang::FloatingPointType::buildOperator(lang::BinaryOperator op,
-                                                           Shared<lang::Value>  left,
+Shared<lang::Value> lang::FloatingPointType::execOperator(lang::BinaryOperator op,
+                                                          Shared<lang::Value>  left,
                                                            Shared<lang::Value>  right,
                                                            Execution&           exec) const
 {

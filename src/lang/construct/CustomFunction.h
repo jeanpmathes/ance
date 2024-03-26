@@ -53,7 +53,7 @@ namespace lang
         bool validateFlow(ValidationLogger& validation_logger) const override;
 
       protected:
-        using FunctionDefinition::buildCall;
+        using FunctionDefinition::execCall;
 
       private:
         void validateReturn(ValidationLogger& validation_logger) const;

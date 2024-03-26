@@ -63,9 +63,9 @@ namespace lang
          */
         [[nodiscard]] bool isFinal() const;
 
-        virtual void buildDeclaration(Execution& exec) const    = 0;
-        virtual void buildInitialization(Execution& exec) const = 0;
-        virtual void buildFinalization(Execution& exec) const   = 0;
+        virtual void registerDeclaration(Execution& exec) const   = 0;
+        virtual void performInitialization(Execution& exec) const = 0;
+        virtual void performFinalization(Execution& exec) const   = 0;
 
         virtual Shared<lang::Value> getValuePointer(Execution& exec) const = 0;
 

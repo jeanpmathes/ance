@@ -26,7 +26,7 @@ bool lang::IndirectType::validateIndirection(lang::Location, ValidationLogger&) 
     return true;
 }
 
-Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<lang::Value> value, Execution& exec) const
+Shared<lang::Value> lang::IndirectType::execIndirection(Shared<lang::Value> value, Execution& exec) const
 {
     auto const& value_reference = exec.ctx().getReferenceType(*value_type_);
 
@@ -35,7 +35,7 @@ Shared<lang::Value> lang::IndirectType::buildIndirection(Shared<lang::Value> val
     if (exec.ctx().isContainingRuntime())
     {
         Shared<lang::Value> not_null = exec.computeAddressIsNotNull(value);
-        exec.runtime().buildAssert(not_null, "Null pointer dereference at " + exec.getLocationString(), exec);
+        exec.runtime().execAssert(not_null, "Null pointer dereference at " + exec.getLocationString(), exec);
     }
 
     return exec.computeReferenceFromPointer(value);

@@ -537,78 +537,76 @@ namespace lang
         bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const;
 
         /**
-         * Build a subscript access.
+         * Execute a subscript access.
          * @param indexed The indexed value.
          * @param index The index to use.
          * @param exec The current execution context.
          * @return The return value.
          */
-        Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
-                                           Shared<lang::Value> index,
+        Shared<lang::Value> execSubscript(Shared<lang::Value> indexed,
+                                          Shared<lang::Value> index,
                                            Execution&          exec) const;
 
         /**
-         * Build a binary operation.
+         * Execute an binary operation.
          * @param op The operation.
          * @param left The left value, must be of this type.
          * @param right The right value.
          * @param exec The current execution context.
          * @return The result value.
          */
-        Shared<lang::Value> buildOperator(lang::BinaryOperator op,
-                                          Shared<lang::Value>  left,
+        Shared<lang::Value> execOperator(lang::BinaryOperator op,
+                                         Shared<lang::Value>  left,
                                           Shared<lang::Value>  right,
                                           Execution&           exec) const;
 
         /**
-         * Build a unary operation.
+         * Execute an unary operation.
          * @param op The operation.
          * @param value The value to operate on.
          * @param exec The current execution context.
          * @return The result value.
          */
-        Shared<lang::Value> buildOperator(lang::UnaryOperator op,
-                                          Shared<lang::Value> value, Execution& exec) const;
+        Shared<lang::Value> execOperator(lang::UnaryOperator op, Shared<lang::Value> value, Execution& exec) const;
 
         /**
-         * Build an implicit conversion.
+         * Execute an implicit conversion.
          * @param other The type to convert to.
          * @param value The value to convert.
          * @param exec The current execution context.
          * @return The converted value.
          */
-        Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
-                                                    Shared<lang::Value> value,
+        Shared<lang::Value> execImplicitConversion(lang::Type const&   other,
+                                                   Shared<lang::Value> value,
                                                     Execution&          exec) const;
 
         /**
-         * Build an explicit cast.
+         * Execute an explicit cast.
          * @param other The type to cast to.
          * @param value The value to cast.
          * @param exec The current execution context.
          * @return The casted value.
          */
-        Shared<lang::Value> buildCast(lang::Type const&   other,
-                                      Shared<lang::Value> value, Execution& exec) const;
+        Shared<lang::Value> execCast(lang::Type const& other, Shared<lang::Value> value, Execution& exec) const;
 
         /**
-         * Build a member access.
+         * Execute a member access.
          * @param value The value to access.
          * @param name The name of the member.
          * @param exec The current execution context.
          * @return The result value.
          */
-        Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
-                                              lang::Identifier const& name,
+        Shared<lang::Value> execMemberAccess(Shared<lang::Value>     value,
+                                             lang::Identifier const& name,
                                               Execution&              exec) const;
 
         /**
-         * Build indirection.
+         * Execute indirection.
          * @param value The value to indirect.
          * @param exec The current execution context.
          * @return The result value, which is a reference of indirection return type.
          */
-        Shared<lang::Value> buildIndirection(Shared<lang::Value> value, Execution& exec) const;
+        Shared<lang::Value> execIndirection(Shared<lang::Value> value, Execution& exec) const;
 
         /**
          * Build the default initializer for this type.
@@ -657,16 +655,16 @@ namespace lang
         void registerExecutionType(Execution& exec) const;
 
         /**
-         * Build the backing required for the declaration.
+         * Register the backing required for the declaration.
          * @param exec The current execution context.
          */
-        void buildDeclaration(Execution& exec) const;
+        void registerDeclaration(Execution& exec) const;
 
         /**
-         * Build the backing required for the definition of this type.
+         * Register the backing required for the definition of this type.
          * @param exec The current execution context.
          */
-        void buildDefinition(Execution& exec) const;
+        void registerDefinition(Execution& exec) const;
 
         [[nodiscard]] lang::TypeDefinition*       getDefinition();
         [[nodiscard]] lang::TypeDefinition const* getDefinition() const;

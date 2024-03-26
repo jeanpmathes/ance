@@ -94,21 +94,21 @@ void lang::TypeRegistry<OtherKey>::postResolve()
 }
 
 template<typename OtherKey>
-void lang::TypeRegistry<OtherKey>::buildDeclarations(Execution& exec)
+void lang::TypeRegistry<OtherKey>::registerDeclarations(Execution& exec)
 {
     for (size_t index = 0; index < types_.size(); ++index)// Allows adding types during iteration.
     {
         auto& [key, type] = types_[index];
-        type->buildDeclaration(exec);
+        type->registerDeclaration(exec);
     }
 }
 
 template<typename OtherKey>
-void lang::TypeRegistry<OtherKey>::buildDefinitions(Execution& exec)
+void lang::TypeRegistry<OtherKey>::registerDefinitions(Execution& exec)
 {
     for (size_t index = 0; index < types_.size(); ++index)// Allows adding types during iteration.
     {
         auto& [key, type] = types_[index];
-        type->buildDefinition(exec);
+        type->registerDefinition(exec);
     }
 }

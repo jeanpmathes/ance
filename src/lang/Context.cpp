@@ -69,14 +69,14 @@ void lang::Context::postResolve()
     for (auto& registry : type_registries_) registry->postResolve();
 }
 
-void lang::Context::buildDeclarations(Execution& exec)
+void lang::Context::registerDeclarations(Execution& exec)
 {
-    for (auto& registry : type_registries_) registry->buildDeclarations(exec);
+    for (auto& registry : type_registries_) registry->registerDeclarations(exec);
 }
 
-void lang::Context::buildDefinitions(Execution& exec)
+void lang::Context::registerDefinitions(Execution& exec)
 {
-    for (auto& registry : type_registries_) registry->buildDefinitions(exec);
+    for (auto& registry : type_registries_) registry->registerDefinitions(exec);
 }
 
 lang::ResolvingHandle<lang::Type> lang::Context::getArrayType(lang::ResolvingHandle<lang::Type> element_type,

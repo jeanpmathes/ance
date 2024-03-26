@@ -30,11 +30,11 @@ namespace lang
         bool isUnsignedIntegerPointerType() const override;
 
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
-        void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                    lang::PredefinedFunction&                             function,
+        void execRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
+                                   lang::PredefinedFunction&                             function,
                                     Execution&                                            exec) const override;
-        void buildRequestedOverload(lang::Type const&         parameter_element,
-                                    lang::Type const&         return_type,
+        void execRequestedOverload(lang::Type const&         parameter_element,
+                                   lang::Type const&         return_type,
                                     lang::PredefinedFunction& function,
                                     Execution&                exec) const override;
 

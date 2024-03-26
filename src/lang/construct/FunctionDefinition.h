@@ -161,7 +161,7 @@ namespace lang
          */
         virtual bool validateFlow(ValidationLogger& validation_logger) const = 0;
 
-        void buildDeclaration(Execution& exec) const;
+        void registerDeclaration(Execution& exec) const;
 
         /**
          * Validate a call to this function.
@@ -187,7 +187,7 @@ namespace lang
          * @param exec The current execution context.
          * @return The return value.
          */
-        Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> arguments, Execution& exec) const;
+        Shared<lang::Value> execCall(std::vector<Shared<lang::Value>> arguments, Execution& exec) const;
 
         /**
          * Get the function parameters.
@@ -204,7 +204,7 @@ namespace lang
         [[nodiscard]] virtual Optional<lang::Location> getDefinitionLocation() const = 0;
         [[nodiscard]] virtual bool                     preserveUnitReturn() const    = 0;
 
-        virtual void buildDeclarationsFollowingOrder(Execution& exec) const;
+        virtual void registerDeclarationsFollowingOrder(Execution& exec) const;
 
         [[nodiscard]] virtual lang::BasicBlock const*               getEntryBlock() const;
         [[nodiscard]] virtual std::vector<lang::BasicBlock*> const& getBasicBlocks() const = 0;

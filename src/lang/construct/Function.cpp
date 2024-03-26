@@ -219,9 +219,9 @@ void lang::Function::validateFlow(ValidationLogger& validation_logger) const
     definition_.value()->validateFlow(validation_logger);
 }
 
-void lang::Function::buildDeclaration(Execution& exec) const
+void lang::Function::registerDeclaration(Execution& exec) const
 {
-    definition_.value()->buildDeclaration(exec);
+    definition_.value()->registerDeclaration(exec);
 }
 
 bool lang::Function::validateCall(std::vector<std::reference_wrapper<Expression const>> const& arguments,
@@ -231,9 +231,9 @@ bool lang::Function::validateCall(std::vector<std::reference_wrapper<Expression 
     return definition_.value()->validateCall(arguments, location, validation_logger);
 }
 
-Shared<lang::Value> lang::Function::buildCall(std::vector<Shared<lang::Value>> const& arguments, Execution& exec) const
+Shared<lang::Value> lang::Function::execCall(std::vector<Shared<lang::Value>> const& arguments, Execution& exec) const
 {
-    return definition_.value()->buildCall(arguments, exec);
+    return definition_.value()->execCall(arguments, exec);
 }
 
 lang::Scope& lang::Function::scope()
@@ -273,9 +273,9 @@ void lang::Function::postResolve()
     Scope::postResolve();
 }
 
-void lang::Function::buildEntityDeclarationsFollowingOrder(Execution& exec) const
+void lang::Function::registerEntityDeclarationsFollowingOrder(Execution& exec) const
 {
-    definition_.value()->buildDeclarationsFollowingOrder(exec);
+    definition_.value()->registerDeclarationsFollowingOrder(exec);
 }
 
 lang::ResolvingHandle<lang::Entity> lang::Function::getUndefinedClone(lang::Context&) const

@@ -61,12 +61,12 @@ lang::OwningHandle<lang::Variable> lang::LocalVariable::makeParameterVariable(la
     return lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
-void lang::LocalVariable::buildDeclaration(Execution& exec) const
+void lang::LocalVariable::registerDeclaration(Execution& exec) const
 {
     exec.declareLocalVariable(*this);
 }
 
-void lang::LocalVariable::buildInitialization(Execution& exec) const
+void lang::LocalVariable::performInitialization(Execution& exec) const
 {
     exec.defineLocalVariable(*this, scope(), parameter_index_, location());
 
@@ -89,7 +89,7 @@ void lang::LocalVariable::buildInitialization(Execution& exec) const
     else { type().performDefaultInitializer(pointer, exec); }
 }
 
-void lang::LocalVariable::buildFinalization(Execution& exec) const
+void lang::LocalVariable::performFinalization(Execution& exec) const
 {
     if (!type().isReferenceType()) { type().performFinalizer(getValuePointer(exec), exec); }
 }

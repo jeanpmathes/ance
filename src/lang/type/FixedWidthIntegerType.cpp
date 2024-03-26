@@ -58,8 +58,8 @@ bool lang::FixedWidthIntegerType::validateCast(lang::Type const& other,
     return IntegerType::validateCast(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::Type const&   other,
-                                                           Shared<lang::Value> value,
+Shared<lang::Value> lang::FixedWidthIntegerType::execCast(lang::Type const&   other,
+                                                          Shared<lang::Value> value,
                                                            Execution&          exec) const
 {
     if (other.isCharType() && bit_size_ == lang::CharType::SIZE_IN_BITS && !is_signed_)
@@ -72,7 +72,7 @@ Shared<lang::Value> lang::FixedWidthIntegerType::buildCast(lang::Type const&   o
         return exec.computeConversionI2FP(value, other);
     }
 
-    return IntegerType::buildCast(other, value, exec);
+    return IntegerType::execCast(other, value, exec);
 }
 
 std::string lang::FixedWidthIntegerType::createMangledName() const

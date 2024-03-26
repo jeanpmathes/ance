@@ -89,8 +89,8 @@ namespace lang
          */
         [[nodiscard]] bool isImported() const;
 
-        virtual void buildInitialization(Execution& exec);
-        virtual void buildFinalization(Execution& exec);
+        virtual void performInitialization(Execution& exec);
+        virtual void performFinalization(Execution& exec);
 
       protected:
         /**

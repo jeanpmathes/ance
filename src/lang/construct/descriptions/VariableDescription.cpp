@@ -309,14 +309,14 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
     return descriptions;
 }
 
-void lang::VariableDescription::buildInitialization(Execution& exec)
+void lang::VariableDescription::performInitialization(Execution& exec)
 {
-    variable_handle_->buildInitialization(exec);
+    variable_handle_->performInitialization(exec);
 }
 
-void lang::VariableDescription::buildFinalization(Execution& exec)
+void lang::VariableDescription::performFinalization(Execution& exec)
 {
-    variable_handle_->buildFinalization(exec);
+    variable_handle_->performFinalization(exec);
 }
 
 void lang::VariableDescription::sync(Storage& storage)

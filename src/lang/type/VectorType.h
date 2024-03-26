@@ -42,16 +42,16 @@ namespace lang
         bool                validateImplicitConversion(lang::Type const& other,
                                                        lang::Location    location,
                                                        ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
-                                                    Shared<lang::Value> value,
+        Shared<lang::Value> execImplicitConversion(lang::Type const&   other,
+                                                   Shared<lang::Value> value,
                                                     Execution&          exec) const override;
 
         bool                isCastingPossibleTo(Type const& other) const override;
         bool                validateCast(Type const&       other,
                                          lang::Location    location,
                                          ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildCast(lang::Type const&   other,
-                                      Shared<lang::Value> value,
+        Shared<lang::Value> execCast(lang::Type const&   other,
+                                     Shared<lang::Value> value,
                                       Execution&          exec) const override;
 
         bool                isOperatorDefined(lang::UnaryOperator op) const override;
@@ -59,8 +59,8 @@ namespace lang
         bool                validateOperator(lang::UnaryOperator op,
                                              lang::Location      location,
                                              ValidationLogger&   validation_logger) const override;
-        Shared<lang::Value> buildOperator(lang::UnaryOperator op,
-                                          Shared<lang::Value> value,
+        Shared<lang::Value> execOperator(lang::UnaryOperator op,
+                                         Shared<lang::Value> value,
                                           Execution&          exec) const override;
 
         bool                isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
@@ -70,14 +70,14 @@ namespace lang
                                              lang::Location       left_location,
                                              lang::Location       right_location,
                                              ValidationLogger&    validation_logger) const override;
-        Shared<lang::Value> buildOperator(lang::BinaryOperator op,
-                                          Shared<lang::Value>  left,
+        Shared<lang::Value> execOperator(lang::BinaryOperator op,
+                                         Shared<lang::Value>  left,
                                           Shared<lang::Value>  right,
                                           Execution&           exec) const override;
 
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
-        void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> cc,
-                                    lang::PredefinedFunction&                             function,
+        void execRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> cc,
+                                   lang::PredefinedFunction&                             function,
                                     Execution&                                            exec) const override;
 
       public:

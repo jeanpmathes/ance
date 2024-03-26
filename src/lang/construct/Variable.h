@@ -134,19 +134,19 @@ namespace lang
          * Build the variable declaration which prepares the storage.
          * @param exec The current execution context.
          */
-        void buildDeclaration(Execution& exec) const;
+        void registerDeclaration(Execution& exec) const;
 
         /**
          * Build the variable initialization which initializes the storage.
          * @param exec The current execution context.
          */
-        void buildInitialization(Execution& exec) const;
+        void performInitialization(Execution& exec) const;
 
         /**
          * Build the variable finalizer which cleans up the storage.
          * @param exec The current execution context.
          */
-        void buildFinalization(Execution& exec) const;
+        void performFinalization(Execution& exec) const;
 
         /**
          * Validate getting a value.

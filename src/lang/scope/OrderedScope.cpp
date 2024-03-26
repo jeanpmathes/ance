@@ -122,7 +122,7 @@ bool lang::OrderedScope::resolveDefinition(lang::ResolvingHandle<lang::Entity> e
     return scope().resolveDefinition(entity);
 }
 
-void lang::OrderedScope::buildEntityDeclarations(Execution& exec) const
+void lang::OrderedScope::registerEntityDeclarations(Execution& exec) const
 {
     for (auto& [name, entities] : defined_entities_)
     {
@@ -130,18 +130,18 @@ void lang::OrderedScope::buildEntityDeclarations(Execution& exec) const
         {
             auto const* variable = dynamic_cast<lang::Variable const*>(&*entity);
 
-            if (variable != nullptr) { variable->buildDeclaration(exec); }
+            if (variable != nullptr) { variable->registerDeclaration(exec); }
         }
     }
 
-    buildEntityDeclarationsFollowingOrder(exec);
+    registerEntityDeclarationsFollowingOrder(exec);
 }
 
-void lang::OrderedScope::buildEntityFinalizations(Execution& exec) const
+void lang::OrderedScope::performEntityFinalizations(Execution& exec) const
 {
     for (auto& [name, entity] : active_entities_)
     {
         auto const* variable = entity.as<lang::Variable>();
-        if (variable != nullptr) { variable->buildFinalization(exec); }
+        if (variable != nullptr) { variable->performFinalization(exec); }
     }
 }

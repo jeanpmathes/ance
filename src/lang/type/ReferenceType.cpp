@@ -82,11 +82,11 @@ bool lang::ReferenceType::validateSubscript(lang::Location    indexed_location,
     return element_type_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
 
-Shared<lang::Value> lang::ReferenceType::buildSubscript(Shared<lang::Value> indexed,
-                                                        Shared<lang::Value> index,
+Shared<lang::Value> lang::ReferenceType::execSubscript(Shared<lang::Value> indexed,
+                                                       Shared<lang::Value> index,
                                                         Execution&          exec) const
 {
-    return element_type_->buildSubscript(exec.performDereference(indexed), index, exec);
+    return element_type_->execSubscript(exec.performDereference(indexed), index, exec);
 }
 
 bool lang::ReferenceType::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -108,12 +108,12 @@ bool lang::ReferenceType::validateOperator(lang::BinaryOperator op,
     return element_type_->validateOperator(op, other, left_location, right_location, validation_logger);
 }
 
-Shared<lang::Value> lang::ReferenceType::buildOperator(lang::BinaryOperator op,
-                                                       Shared<lang::Value>  left,
+Shared<lang::Value> lang::ReferenceType::execOperator(lang::BinaryOperator op,
+                                                      Shared<lang::Value>  left,
                                                        Shared<lang::Value>  right,
                                                        Execution&           exec) const
 {
-    return element_type_->buildOperator(op, exec.performDereference(left), right, exec);
+    return element_type_->execOperator(op, exec.performDereference(left), right, exec);
 }
 
 bool lang::ReferenceType::isOperatorDefined(lang::UnaryOperator op) const
@@ -133,11 +133,11 @@ bool lang::ReferenceType::validateOperator(lang::UnaryOperator op,
     return element_type_->validateOperator(op, location, validation_logger);
 }
 
-Shared<lang::Value> lang::ReferenceType::buildOperator(lang::UnaryOperator op,
-                                                       Shared<lang::Value> value,
+Shared<lang::Value> lang::ReferenceType::execOperator(lang::UnaryOperator op,
+                                                      Shared<lang::Value> value,
                                                        Execution&          exec) const
 {
-    return element_type_->buildOperator(op, exec.performDereference(value), exec);
+    return element_type_->execOperator(op, exec.performDereference(value), exec);
 }
 
 bool lang::ReferenceType::hasMember(lang::Identifier const& name) const
@@ -160,11 +160,11 @@ bool lang::ReferenceType::validateMemberAccess(lang::Identifier const& name, Val
     return element_type_->validateMemberAccess(name, validation_logger);
 }
 
-Shared<lang::Value> lang::ReferenceType::buildMemberAccess(Shared<lang::Value>     value,
-                                                           lang::Identifier const& name,
+Shared<lang::Value> lang::ReferenceType::execMemberAccess(Shared<lang::Value>     value,
+                                                          lang::Identifier const& name,
                                                            Execution&              exec) const
 {
-    return element_type_->buildMemberAccess(exec.performDereference(value), name, exec);
+    return element_type_->execMemberAccess(exec.performDereference(value), name, exec);
 }
 
 bool lang::ReferenceType::definesIndirection() const
@@ -182,9 +182,9 @@ bool lang::ReferenceType::validateIndirection(lang::Location location, Validatio
     return element_type_->validateIndirection(location, validation_logger);
 }
 
-Shared<lang::Value> lang::ReferenceType::buildIndirection(Shared<lang::Value> value, Execution& exec) const
+Shared<lang::Value> lang::ReferenceType::execIndirection(Shared<lang::Value> value, Execution& exec) const
 {
-    return element_type_->buildIndirection(exec.performDereference(value), exec);
+    return element_type_->execIndirection(exec.performDereference(value), exec);
 }
 
 bool lang::ReferenceType::isTriviallyDefaultConstructible() const
@@ -204,12 +204,12 @@ bool lang::ReferenceType::isTriviallyDestructible() const
 
 void lang::ReferenceType::createConstructors() {}
 
-void lang::ReferenceType::buildDeclaration(Execution& exec) const
+void lang::ReferenceType::registerDeclaration(Execution& exec) const
 {
     registerExecutionType(exec);
 }
 
-void lang::ReferenceType::buildDefinition(Execution&) const {}
+void lang::ReferenceType::registerDefinition(Execution&) const {}
 
 std::string lang::ReferenceType::createMangledName() const
 {

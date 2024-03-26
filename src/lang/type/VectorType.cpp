@@ -94,13 +94,13 @@ bool lang::VectorType::validateImplicitConversion(lang::Type const& other,
     return element_type_->validateImplicitConversion(other.getElementType(), location, validation_logger);
 }
 
-Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::Type const&   other,
-                                                              Shared<lang::Value> value,
+Shared<lang::Value> lang::VectorType::execImplicitConversion(lang::Type const&   other,
+                                                             Shared<lang::Value> value,
                                                               Execution&          exec) const
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
-        return element_vector->buildImplicitConversion(other, value, exec);
+        return element_vector->execImplicitConversion(other, value, exec);
     }
     else
     {
@@ -113,12 +113,12 @@ Shared<lang::Value> lang::VectorType::buildImplicitConversion(lang::Type const& 
         {
             Shared<lang::Constant> index_constant = exec.getSizeN(index);
 
-            Shared<lang::Value> current_element_ref = buildSubscriptInBounds(value, index_constant, exec);
+            Shared<lang::Value> current_element_ref = execSubscriptInBounds(value, index_constant, exec);
             Shared<lang::Value> current_element     = exec.performDereference(current_element_ref);
 
             Shared<lang::Value> result_element =
-                element_type_->buildImplicitConversion(other.getElementType(), current_element, exec);
-            Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, exec);
+                element_type_->execImplicitConversion(other.getElementType(), current_element, exec);
+            Shared<lang::Value> result_dst_ref = execSubscriptInBounds(result_ptr, index_constant, exec);
             Shared<lang::Value> result_dst_ptr = exec.computePointerFromReference(result_dst_ref);
 
             exec.performStoreToAddress(result_dst_ptr, result_element);
@@ -142,12 +142,11 @@ bool lang::VectorType::validateCast(lang::Type const& other,
     return element_type_->validateCast(other.getElementType(), location, validation_logger);
 }
 
-Shared<lang::Value> lang::VectorType::buildCast(lang::Type const&   other,
-                                                Shared<lang::Value> value,
+Shared<lang::Value> lang::VectorType::execCast(lang::Type const&   other,
+                                               Shared<lang::Value> value,
                                                 Execution&          exec) const
 {
-    if (auto element_vector = element_type_->isVectorizable())
-    { return element_vector->buildCast(other, value, exec); }
+    if (auto element_vector = element_type_->isVectorizable()) { return element_vector->execCast(other, value, exec); }
     else
     {
         VectorType const* other_as_vector = other.isVectorType();
@@ -159,12 +158,11 @@ Shared<lang::Value> lang::VectorType::buildCast(lang::Type const&   other,
         {
             Shared<lang::Constant> index_constant = exec.getSizeN(index);
 
-            Shared<lang::Value> current_element_ref = buildSubscriptInBounds(value, index_constant, exec);
+            Shared<lang::Value> current_element_ref = execSubscriptInBounds(value, index_constant, exec);
             Shared<lang::Value> current_element     = exec.performDereference(current_element_ref);
 
-            Shared<lang::Value> result_element =
-                element_type_->buildCast(other.getElementType(), current_element, exec);
-            Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, exec);
+            Shared<lang::Value> result_element = element_type_->execCast(other.getElementType(), current_element, exec);
+            Shared<lang::Value> result_dst_ref = execSubscriptInBounds(result_ptr, index_constant, exec);
             Shared<lang::Value> result_dst_ptr = exec.computePointerFromReference(result_dst_ref);
 
             exec.performStoreToAddress(result_dst_ptr, result_element);
@@ -193,14 +191,12 @@ bool lang::VectorType::validateOperator(lang::UnaryOperator op,
     return element_type_->validateOperator(op, location, validation_logger);
 }
 
-Shared<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator op,
-                                                    Shared<lang::Value> value,
+Shared<lang::Value> lang::VectorType::execOperator(lang::UnaryOperator op,
+                                                   Shared<lang::Value> value,
                                                     Execution&          exec) const
 {
     if (auto element_vector = element_type_->isVectorizable())
-    {
-        return element_vector->buildOperator(op, value, exec);
-    }
+    { return element_vector->execOperator(op, value, exec); }
     else
     {
         Shared<lang::Value> result_ptr = exec.performStackAllocation(getOperatorResultType(op));
@@ -209,11 +205,11 @@ Shared<lang::Value> lang::VectorType::buildOperator(lang::UnaryOperator op,
         {
             Shared<lang::Constant> index_constant = exec.getSizeN(index);
 
-            Shared<lang::Value> current_element_ref = buildSubscriptInBounds(value, index_constant, exec);
+            Shared<lang::Value> current_element_ref = execSubscriptInBounds(value, index_constant, exec);
             Shared<lang::Value> current_element     = exec.performDereference(current_element_ref);
 
-            Shared<lang::Value> result_element = element_type_->buildOperator(op, current_element, exec);
-            Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, exec);
+            Shared<lang::Value> result_element = element_type_->execOperator(op, current_element, exec);
+            Shared<lang::Value> result_dst_ref = execSubscriptInBounds(result_ptr, index_constant, exec);
             Shared<lang::Value> result_dst_ptr = exec.computePointerFromReference(result_dst_ref);
 
             exec.performStoreToAddress(result_dst_ptr, result_element);
@@ -251,14 +247,14 @@ bool lang::VectorType::validateOperator(lang::BinaryOperator op,
     return element_type_->validateOperator(op, other, left_location, right_location, validation_logger);
 }
 
-Shared<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperator op,
-                                                    Shared<lang::Value>  left,
+Shared<lang::Value> lang::VectorType::execOperator(lang::BinaryOperator op,
+                                                   Shared<lang::Value>  left,
                                                     Shared<lang::Value>  right,
                                                     Execution&           exec) const
 {
     if (auto element_vector = element_type_->isVectorizable())
     {
-        return element_vector->buildOperator(op, left, right, exec);
+        return element_vector->execOperator(op, left, right, exec);
     }
     else
     {
@@ -271,14 +267,14 @@ Shared<lang::Value> lang::VectorType::buildOperator(lang::BinaryOperator op,
         {
             Shared<lang::Constant> index_constant = exec.getSizeN(index);
 
-            Shared<lang::Value> left_element_ref = buildSubscriptInBounds(left, index_constant, exec);
+            Shared<lang::Value> left_element_ref = execSubscriptInBounds(left, index_constant, exec);
             Shared<lang::Value> left_element     = exec.performDereference(left_element_ref);
 
-            Shared<lang::Value> right_element_ref = buildSubscriptInBounds(right, index_constant, exec);
+            Shared<lang::Value> right_element_ref = execSubscriptInBounds(right, index_constant, exec);
             Shared<lang::Value> right_element     = exec.performDereference(right_element_ref);
 
-            Shared<lang::Value> result_element = element_type_->buildOperator(op, left_element, right_element, exec);
-            Shared<lang::Value> result_dst_ref = buildSubscriptInBounds(result_ptr, index_constant, exec);
+            Shared<lang::Value> result_element = element_type_->execOperator(op, left_element, right_element, exec);
+            Shared<lang::Value> result_dst_ref = execSubscriptInBounds(result_ptr, index_constant, exec);
             Shared<lang::Value> result_dst_ptr = exec.computePointerFromReference(result_dst_ref);
 
             exec.performStoreToAddress(result_dst_ptr, result_element);
@@ -309,8 +305,8 @@ bool lang::VectorType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::T
     return false;
 }
 
-void lang::VectorType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                              lang::PredefinedFunction&                             function,
+void lang::VectorType::execRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
+                                             lang::PredefinedFunction&                             function,
                                               Execution&                                            exec) const
 {
     lang::Type const& other_type         = parameters.front();
@@ -318,7 +314,7 @@ void lang::VectorType::buildRequestedOverload(std::vector<std::reference_wrapper
 
     if (auto element_vector = element_type_->isVectorizable())
     {
-        element_vector->buildRequestedOverload(other_element_type, self(), function, exec);
+        element_vector->execRequestedOverload(other_element_type, self(), function, exec);
     }
     else
     {
@@ -339,15 +335,15 @@ void lang::VectorType::buildRequestedOverload(std::vector<std::reference_wrapper
             {
                 Shared<lang::Constant> index_constant = e.getSizeN(index);
 
-                Shared<lang::Value> original_element_ref = buildSubscriptInBounds(original, index_constant, e);
+                Shared<lang::Value> original_element_ref = execSubscriptInBounds(original, index_constant, e);
                 Shared<lang::Value> original_element     = e.performDereference(original_element_ref);
 
                 std::vector<Shared<lang::Value>> ctor_parameters;
                 ctor_parameters.emplace_back(original_element);
 
-                Shared<lang::Value> converted_element = element_ctor->buildCall(ctor_parameters, e);
+                Shared<lang::Value> converted_element = element_ctor->execCall(ctor_parameters, e);
 
-                Shared<lang::Value> result_element_ref = buildSubscriptInBounds(result_ptr, index_constant, e);
+                Shared<lang::Value> result_element_ref = execSubscriptInBounds(result_ptr, index_constant, e);
                 Shared<lang::Value> result_element_ptr = e.computePointerFromReference(result_element_ref);
 
                 e.performStoreToAddress(result_element_ptr, converted_element);

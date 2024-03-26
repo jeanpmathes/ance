@@ -42,13 +42,13 @@ namespace lang
          * Build all native declarations.
          * @param exec The execution context.
          */
-        virtual void buildDeclarations(Execution& exec) = 0;
+        virtual void registerDeclarations(Execution& exec) = 0;
 
         /**
          * Build all native definitions.
          * @param exec The execution context.
          */
-        virtual void buildDefinitions(Execution& exec) = 0;
+        virtual void registerDefinitions(Execution& exec) = 0;
 
         /**
          * Clear all types in this registry.
@@ -84,8 +84,8 @@ namespace lang
         void resolve() override;
         void postResolve() override;
 
-        void buildDeclarations(Execution& exec) override;
-        void buildDefinitions(Execution& exec) override;
+        void registerDeclarations(Execution& exec) override;
+        void registerDefinitions(Execution& exec) override;
 
         void clear() override;
 

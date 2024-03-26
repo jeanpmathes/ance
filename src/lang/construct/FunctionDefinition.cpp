@@ -115,7 +115,7 @@ bool lang::FunctionDefinition::isImported() const
 void lang::FunctionDefinition::resolveFollowingOrder() {}
 void lang::FunctionDefinition::postResolve() {}
 
-void lang::FunctionDefinition::buildDeclaration(Execution& exec) const
+void lang::FunctionDefinition::registerDeclaration(Execution& exec) const
 {
     exec.registerFunction(function());
 }
@@ -154,8 +154,8 @@ bool lang::FunctionDefinition::doCallValidation(std::vector<std::reference_wrapp
     return true;
 }
 
-Shared<lang::Value> lang::FunctionDefinition::buildCall(std::vector<Shared<lang::Value>> arguments,
-                                                        Execution&                       exec) const
+Shared<lang::Value> lang::FunctionDefinition::execCall(std::vector<Shared<lang::Value>> arguments,
+                                                       Execution&                       exec) const
 {
     return exec.performFunctionCall(function(), std::move(arguments));
 }
@@ -170,7 +170,7 @@ std::vector<Shared<lang::Parameter>> lang::FunctionDefinition::parameters()
     return parameters_;
 }
 
-void lang::FunctionDefinition::buildDeclarationsFollowingOrder(Execution&) const {}
+void lang::FunctionDefinition::registerDeclarationsFollowingOrder(Execution&) const {}
 
 lang::BasicBlock const* lang::FunctionDefinition::getEntryBlock() const
 {

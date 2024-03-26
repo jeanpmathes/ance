@@ -16,16 +16,16 @@ bool lang::UnsignedIntegerPointerType::acceptOverloadRequest(std::vector<Resolvi
     return IntegerType::acceptOverloadRequest(parameters);
 }
 
-void lang::UnsignedIntegerPointerType::buildRequestedOverload(
+void lang::UnsignedIntegerPointerType::execRequestedOverload(
     std::vector<std::reference_wrapper<lang::Type const>> parameters,
     lang::PredefinedFunction&                             function,
     Execution&                                            exec) const
 {
-    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, exec); }
+    if (parameters.size() == 1) { execRequestedOverload(parameters[0], self(), function, exec); }
 }
 
-void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::Type const&         parameter_element,
-                                                              lang::Type const&         return_type,
+void lang::UnsignedIntegerPointerType::execRequestedOverload(lang::Type const&         parameter_element,
+                                                             lang::Type const&         return_type,
                                                               lang::PredefinedFunction& function,
                                                               Execution&                exec) const
 {
@@ -43,7 +43,7 @@ void lang::UnsignedIntegerPointerType::buildRequestedOverload(lang::Type const& 
         return;
     }
 
-    IntegerType::buildRequestedOverload(parameter_element, return_type, function, exec);
+    IntegerType::execRequestedOverload(parameter_element, return_type, function, exec);
 }
 
 std::string lang::UnsignedIntegerPointerType::createMangledName() const

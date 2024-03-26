@@ -56,22 +56,22 @@ bool lang::SequenceType::validateSubscript(lang::Location,
     return lang::Type::checkMismatch(scope().context().getSizeType(), index_type, index_location, validation_logger);
 }
 
-Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> indexed,
-                                                       Shared<lang::Value> index,
+Shared<lang::Value> lang::SequenceType::execSubscript(Shared<lang::Value> indexed,
+                                                      Shared<lang::Value> index,
                                                        Execution&          exec) const
 {
-    return buildSubscript(indexed, index, true, exec);
+    return execSubscript(indexed, index, true, exec);
 }
 
-Shared<lang::Value> lang::SequenceType::buildSubscriptInBounds(Shared<lang::Value> indexed,
-                                                               Shared<lang::Value> index,
+Shared<lang::Value> lang::SequenceType::execSubscriptInBounds(Shared<lang::Value> indexed,
+                                                              Shared<lang::Value> index,
                                                                Execution&          exec) const
 {
-    return buildSubscript(indexed, index, false, exec);
+    return execSubscript(indexed, index, false, exec);
 }
 
-Shared<lang::Value> lang::SequenceType::buildSubscript(Shared<lang::Value> indexed,
-                                                       Shared<lang::Value> index,
+Shared<lang::Value> lang::SequenceType::execSubscript(Shared<lang::Value> indexed,
+                                                      Shared<lang::Value> index,
                                                        bool                check_bounds,
                                                        Execution&          exec) const
 {

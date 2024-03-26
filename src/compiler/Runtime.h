@@ -101,7 +101,7 @@ class Runtime
      * @param description The description of the assertion.
      * @param exec The current execution context.
      */
-    void buildAssert(Shared<lang::Value> value, std::string const& description, Execution& exec);
+    void execAssert(Shared<lang::Value> value, std::string const& description, Execution& exec);
 
     /**
      * Build an abort.

@@ -46,8 +46,8 @@ bool lang::IntegerType::validateImplicitConversion(lang::Type const&, lang::Loca
     return true;
 }
 
-Shared<lang::Value> lang::IntegerType::buildImplicitConversion(lang::Type const&   other,
-                                                               Shared<lang::Value> value,
+Shared<lang::Value> lang::IntegerType::execImplicitConversion(lang::Type const&   other,
+                                                              Shared<lang::Value> value,
                                                                Execution&          exec) const
 {
     return exec.computeConversionOnI(value, other);
@@ -64,8 +64,8 @@ bool lang::IntegerType::validateCast(lang::Type const&, lang::Location, Validati
     return true;
 }
 
-Shared<lang::Value> lang::IntegerType::buildCast(lang::Type const&   other,
-                                                 Shared<lang::Value> value,
+Shared<lang::Value> lang::IntegerType::execCast(lang::Type const&   other,
+                                                Shared<lang::Value> value,
                                                  Execution&          exec) const
 {
     if (other.isXOrVectorOfX([](auto& t) { return t.isIntegerType(); }))
@@ -92,15 +92,15 @@ bool lang::IntegerType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::
     return false;
 }
 
-void lang::IntegerType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                               lang::PredefinedFunction&                             function,
+void lang::IntegerType::execRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
+                                              lang::PredefinedFunction&                             function,
                                                Execution&                                            exec) const
 {
-    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, exec); }
+    if (parameters.size() == 1) { execRequestedOverload(parameters[0], self(), function, exec); }
 }
 
-void lang::IntegerType::buildRequestedOverload(lang::Type const&         parameter_element,
-                                               lang::Type const&         return_type,
+void lang::IntegerType::execRequestedOverload(lang::Type const&         parameter_element,
+                                              lang::Type const&         return_type,
                                                lang::PredefinedFunction& function,
                                                Execution&                exec) const
 {
@@ -145,7 +145,7 @@ void lang::IntegerType::buildRequestedOverload(lang::Type const&         paramet
 
                             Shared<lang::Value> fits =
                                 e.performOperator(lang::BinaryOperator::BITWISE_AND, fits_min, fits_max);
-                            e.runtime().buildAssert(fits, error_message, e);
+                            e.runtime().execAssert(fits, error_message, e);
                         }
                         else
                         {
@@ -155,7 +155,7 @@ void lang::IntegerType::buildRequestedOverload(lang::Type const&         paramet
                             Shared<lang::Value> fits =
                                 e.performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL, original,
                                                                max_value);
-                            e.runtime().buildAssert(fits, error_message, e);
+                            e.runtime().execAssert(fits, error_message, e);
                         }
                     }
                 }
@@ -168,7 +168,7 @@ void lang::IntegerType::buildRequestedOverload(lang::Type const&         paramet
 
                         Shared<lang::Value> fits =
                             e.performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL, original, max_value);
-                        e.runtime().buildAssert(fits, error_message, e);
+                        e.runtime().execAssert(fits, error_message, e);
                     }
                 }
                 else// this is unsigned and original is signed.
@@ -189,7 +189,7 @@ void lang::IntegerType::buildRequestedOverload(lang::Type const&         paramet
                         fits = e.performOperator(lang::BinaryOperator::BITWISE_AND, fits, fits_max);
                     }
 
-                    e.runtime().buildAssert(fits, error_message, e);
+                    e.runtime().execAssert(fits, error_message, e);
                 }
             }
 
@@ -225,8 +225,8 @@ bool lang::IntegerType::validateOperator(lang::UnaryOperator, lang::Location, Va
     return true;
 }
 
-Shared<lang::Value> lang::IntegerType::buildOperator(lang::UnaryOperator op,
-                                                     Shared<lang::Value> value,
+Shared<lang::Value> lang::IntegerType::execOperator(lang::UnaryOperator op,
+                                                    Shared<lang::Value> value,
                                                      Execution&          exec) const
 {
     return exec.performOperator(op, value);
@@ -273,8 +273,8 @@ bool lang::IntegerType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-Shared<lang::Value> lang::IntegerType::buildOperator(lang::BinaryOperator op,
-                                                     Shared<lang::Value>  left,
+Shared<lang::Value> lang::IntegerType::execOperator(lang::BinaryOperator op,
+                                                    Shared<lang::Value>  left,
                                                      Shared<lang::Value>  right,
                                                      Execution&           exec) const
 {

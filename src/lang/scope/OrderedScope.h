@@ -55,9 +55,9 @@ namespace lang
 
         bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) override;
 
-        void         buildEntityDeclarations(Execution& exec) const override;
-        virtual void buildEntityDeclarationsFollowingOrder(Execution& exec) const = 0;
-        void         buildEntityFinalizations(Execution& exec) const override;
+        void         registerEntityDeclarations(Execution& exec) const override;
+        virtual void registerEntityDeclarationsFollowingOrder(Execution& exec) const = 0;
+        void         performEntityFinalizations(Execution& exec) const override;
 
       private:
         std::set<lang::Identifier> blockers_ {};

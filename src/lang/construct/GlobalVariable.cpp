@@ -50,23 +50,23 @@ lang::Assigner lang::GlobalVariable::assigner() const
     return assigner_;
 }
 
-void lang::GlobalVariable::buildDeclaration(Execution& exec) const
+void lang::GlobalVariable::registerDeclaration(Execution& exec) const
 {
     exec.registerGlobalVariable(*this, is_import_, init_);
 }
 
-void lang::GlobalVariable::buildInitialization(Execution& exec) const
+void lang::GlobalVariable::performInitialization(Execution& exec) const
 {
     if (init_.hasValue())
     {
         if (auto* function_init = std::get_if<std::reference_wrapper<lang::Function>>(&init_.value()))
         {
-            function_init->get().buildCall({}, exec);
+            function_init->get().execCall({}, exec);
         }
     }
 }
 
-void lang::GlobalVariable::buildFinalization(Execution& exec) const
+void lang::GlobalVariable::performFinalization(Execution& exec) const
 {
     type().performFinalizer(exec.computeAddressOfVariable(self()), exec);
 }

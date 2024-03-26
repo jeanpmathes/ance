@@ -177,7 +177,7 @@ llvm::Function* AnceCompiler::buildInit()
 
     ir_.SetInsertPoint(start_block);
 
-    unit_.globalScope().buildEntityInitializations(native_build_);
+    unit_.globalScope().registerEntityInitializations(native_build_);
 
     ir_.CreateRetVoid();
     return init;
@@ -195,7 +195,7 @@ llvm::Function* AnceCompiler::buildFinit()
 
     ir_.SetInsertPoint(start_block);
 
-    unit_.globalScope().buildEntityFinalizations(native_build_);
+    unit_.globalScope().performEntityFinalizations(native_build_);
 
     ir_.CreateRetVoid();
     return finit;
@@ -221,7 +221,7 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
 
     ir_.CreateCall(init);
 
-    Shared<lang::Value> exitcode = main->buildCall({}, native_build_);
+    Shared<lang::Value> exitcode = main->execCall({}, native_build_);
 
     ir_.CreateCall(finit);
 

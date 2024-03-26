@@ -495,57 +495,55 @@ bool lang::Type::validateIndirection(lang::Location location, ValidationLogger& 
     return definition_.value()->validateIndirection(location, validation_logger);
 }
 
-Shared<lang::Value> lang::Type::buildSubscript(Shared<lang::Value> indexed,
-                                               Shared<lang::Value> index,
+Shared<lang::Value> lang::Type::execSubscript(Shared<lang::Value> indexed,
+                                              Shared<lang::Value> index,
                                                Execution&          exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildSubscript(std::move(indexed), std::move(index), exec);
+    return definition_.value()->execSubscript(std::move(indexed), std::move(index), exec);
 }
 
-Shared<lang::Value> lang::Type::buildOperator(lang::BinaryOperator op,
-                                              Shared<lang::Value>  left,
+Shared<lang::Value> lang::Type::execOperator(lang::BinaryOperator op,
+                                             Shared<lang::Value>  left,
                                               Shared<lang::Value>  right,
                                               Execution&           exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildOperator(op, std::move(left), std::move(right), exec);
+    return definition_.value()->execOperator(op, std::move(left), std::move(right), exec);
 }
 
-Shared<lang::Value> lang::Type::buildOperator(lang::UnaryOperator op,
-                                              Shared<lang::Value> value, Execution& exec) const
+Shared<lang::Value> lang::Type::execOperator(lang::UnaryOperator op, Shared<lang::Value> value, Execution& exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildOperator(op, std::move(value), exec);
+    return definition_.value()->execOperator(op, std::move(value), exec);
 }
 
-Shared<lang::Value> lang::Type::buildImplicitConversion(lang::Type const&   other,
-                                                        Shared<lang::Value> value,
+Shared<lang::Value> lang::Type::execImplicitConversion(lang::Type const&   other,
+                                                       Shared<lang::Value> value,
                                                         Execution&          exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildImplicitConversion(other, std::move(value), exec);
+    return definition_.value()->execImplicitConversion(other, std::move(value), exec);
 }
 
-Shared<lang::Value> lang::Type::buildCast(lang::Type const&   other,
-                                          Shared<lang::Value> value, Execution& exec) const
+Shared<lang::Value> lang::Type::execCast(lang::Type const& other, Shared<lang::Value> value, Execution& exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildCast(other, std::move(value), exec);
+    return definition_.value()->execCast(other, std::move(value), exec);
 }
 
-Shared<lang::Value> lang::Type::buildMemberAccess(Shared<lang::Value>     value,
-                                                  lang::Identifier const& name,
+Shared<lang::Value> lang::Type::execMemberAccess(Shared<lang::Value>     value,
+                                                 lang::Identifier const& name,
                                                   Execution&              exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildMemberAccess(std::move(value), name, exec);
+    return definition_.value()->execMemberAccess(std::move(value), name, exec);
 }
 
-Shared<lang::Value> lang::Type::buildIndirection(Shared<lang::Value> value, Execution& exec) const
+Shared<lang::Value> lang::Type::execIndirection(Shared<lang::Value> value, Execution& exec) const
 {
     assert(isDefined());
-    return definition_.value()->buildIndirection(std::move(value), exec);
+    return definition_.value()->execIndirection(std::move(value), exec);
 }
 
 void lang::Type::performDefaultInitializer(Shared<lang::Value> ptr, Execution& exec) const
@@ -587,16 +585,16 @@ void lang::Type::registerExecutionType(Execution& exec) const
     definition_.value()->registerExecutionType(exec);
 }
 
-void lang::Type::buildDeclaration(Execution& exec) const
+void lang::Type::registerDeclaration(Execution& exec) const
 {
     assert(isDefined());
-    definition_.value()->buildDeclaration(exec);
+    definition_.value()->registerDeclaration(exec);
 }
 
-void lang::Type::buildDefinition(Execution& exec) const
+void lang::Type::registerDefinition(Execution& exec) const
 {
     assert(isDefined());
-    definition_.value()->buildDefinition(exec);
+    definition_.value()->registerDefinition(exec);
 }
 
 lang::TypeDefinition* lang::Type::getDefinition()
@@ -655,7 +653,7 @@ Shared<lang::Value> lang::Type::makeMatching(lang::Type const&   expected,
     if (areSame(expected, value->type())) return exec.computeAsActualType(value);
 
     if (value->type().isImplicitlyConvertibleTo(expected))
-        return value->type().buildImplicitConversion(expected, value, exec);
+        return value->type().execImplicitConversion(expected, value, exec);
 
     if (value->type().isReferenceType())
     {

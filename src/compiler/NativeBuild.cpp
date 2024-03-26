@@ -950,7 +950,7 @@ Shared<lang::Value> NativeBuild::computeElementPointer(Shared<lang::Value> seque
 
         Shared<lang::Value> truth = makeShared<WrappedContentValue>(ctx().getBooleanType(), in_bounds, *this);
 
-        runtime().buildAssert(truth, "Index out of bounds at " + getLocationString(), *this);
+        runtime().execAssert(truth, "Index out of bounds at " + getLocationString(), *this);
     }
 
     lang::Type const& ptr_type    = ctx().getPointerType(element_type.value());

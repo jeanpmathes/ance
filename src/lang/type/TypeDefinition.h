@@ -155,26 +155,25 @@ namespace lang
         virtual bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const;
         virtual bool validateIndirection(lang::Location location, ValidationLogger& validation_logger) const;
 
-        virtual Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
-                                                   Shared<lang::Value> index,
+        virtual Shared<lang::Value> execSubscript(Shared<lang::Value> indexed,
+                                                  Shared<lang::Value> index,
                                                    Execution&          exec) const;
-        virtual Shared<lang::Value> buildOperator(lang::BinaryOperator op,
-                                                  Shared<lang::Value>  left,
+        virtual Shared<lang::Value> execOperator(lang::BinaryOperator op,
+                                                 Shared<lang::Value>  left,
                                                   Shared<lang::Value>  right,
                                                   Execution&           exec) const;
-        virtual Shared<lang::Value> buildOperator(lang::UnaryOperator op,
-                                                  Shared<lang::Value> value,
+        virtual Shared<lang::Value> execOperator(lang::UnaryOperator op,
+                                                 Shared<lang::Value> value,
                                                   Execution&          exec) const;
-        virtual Shared<lang::Value> buildImplicitConversion(lang::Type const&   other,
-                                                            Shared<lang::Value> value,
+        virtual Shared<lang::Value> execImplicitConversion(lang::Type const&   other,
+                                                           Shared<lang::Value> value,
                                                             Execution&          exec) const;
-        virtual Shared<lang::Value> buildCast(lang::Type const&   other,
-                                              Shared<lang::Value> value,
+        virtual Shared<lang::Value> execCast(lang::Type const& other, Shared<lang::Value> value,
                                               Execution&          exec) const;
-        virtual Shared<lang::Value> buildMemberAccess(Shared<lang::Value>     value,
-                                                      lang::Identifier const& name,
+        virtual Shared<lang::Value> execMemberAccess(Shared<lang::Value>     value,
+                                                     lang::Identifier const& name,
                                                       Execution&              exec) const;
-        virtual Shared<lang::Value> buildIndirection(Shared<lang::Value> value, Execution& exec) const;
+        virtual Shared<lang::Value> execIndirection(Shared<lang::Value> value, Execution& exec) const;
 
         void         performDefaultInitializer(Shared<lang::Value> ptr, Execution& exec) const;
         virtual void performDefaultInitializer(Shared<lang::Value> ptr,
@@ -189,8 +188,8 @@ namespace lang
 
         virtual void registerExecutionType(Execution& exec) const = 0;
 
-        virtual void buildDeclaration(Execution& exec) const;
-        virtual void buildDefinition(Execution& exec) const;
+        virtual void registerDeclaration(Execution& exec) const;
+        virtual void registerDefinition(Execution& exec) const;
 
         virtual void createConstructors();
 
@@ -212,7 +211,7 @@ namespace lang
         void defineDefaultFinalizer(Execution& exec) const;
 
         void defineConstructors(Execution& exec) const;
-        void buildConstructors(Execution& exec) const;
+        void registerConstructors(Execution& exec) const;
 
         /**
          * Build the part of the definition that default-initializes a single element of this type.
@@ -254,8 +253,8 @@ namespace lang
          * @param function The already declared function which has to be built.
          * @param exec The current execution context.
          */
-        virtual void buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                            lang::PredefinedFunction&                             function,
+        virtual void execRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
+                                           lang::PredefinedFunction&                             function,
                                             Execution&                                            exec) const;
 
         [[nodiscard]] lang::ResolvingHandle<lang::Type> self();

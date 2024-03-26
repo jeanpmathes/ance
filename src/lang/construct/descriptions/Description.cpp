@@ -48,8 +48,8 @@ bool lang::Description::isImported() const
     return accessibility_.isImported();
 }
 
-void lang::Description::buildInitialization(Execution&) {}
-void lang::Description::buildFinalization(Execution&) {}
+void lang::Description::performInitialization(Execution&) {}
+void lang::Description::performFinalization(Execution&) {}
 
 enum DescriptionType : uint8_t
 {

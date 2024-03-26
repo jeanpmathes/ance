@@ -59,8 +59,8 @@ bool lang::BooleanType::validateOperator(lang::UnaryOperator, lang::Location, Va
     return true;
 }
 
-Shared<lang::Value> lang::BooleanType::buildOperator(lang::UnaryOperator op,
-                                                     Shared<lang::Value> value,
+Shared<lang::Value> lang::BooleanType::execOperator(lang::UnaryOperator op,
+                                                    Shared<lang::Value> value,
                                                      Execution&          exec) const
 {
     return exec.performOperator(op, value);
@@ -89,8 +89,8 @@ bool lang::BooleanType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-Shared<lang::Value> lang::BooleanType::buildOperator(lang::BinaryOperator op,
-                                                     Shared<lang::Value>  left,
+Shared<lang::Value> lang::BooleanType::execOperator(lang::BinaryOperator op,
+                                                    Shared<lang::Value>  left,
                                                      Shared<lang::Value>  right,
                                                      Execution&           exec) const
 {
@@ -109,15 +109,15 @@ bool lang::BooleanType::acceptOverloadRequest(std::vector<ResolvingHandle<lang::
     return false;
 }
 
-void lang::BooleanType::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
-                                               lang::PredefinedFunction&                             function,
+void lang::BooleanType::execRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
+                                              lang::PredefinedFunction&                             function,
                                                Execution&                                            exec) const
 {
-    if (parameters.size() == 1) { buildRequestedOverload(parameters[0], self(), function, exec); }
+    if (parameters.size() == 1) { execRequestedOverload(parameters[0], self(), function, exec); }
 }
 
-void lang::BooleanType::buildRequestedOverload(lang::Type const&         parameter_element,
-                                               lang::Type const&         return_type,
+void lang::BooleanType::execRequestedOverload(lang::Type const&         parameter_element,
+                                              lang::Type const&         return_type,
                                                lang::PredefinedFunction& function,
                                                Execution&                exec) const
 {

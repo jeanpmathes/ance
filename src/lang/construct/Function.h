@@ -247,7 +247,7 @@ namespace lang
          * Create the declaration of this function, allowing building function code and calling this function.
          * @param exec The current execution context.
          */
-        void buildDeclaration(Execution& exec) const;
+        void registerDeclaration(Execution& exec) const;
 
         /**
          * Validate a call to this function.
@@ -266,7 +266,7 @@ namespace lang
          * @param exec The current execution context.
          * @return The return value.
          */
-        Shared<lang::Value> buildCall(std::vector<Shared<lang::Value>> const& arguments, Execution& exec) const;
+        Shared<lang::Value> execCall(std::vector<Shared<lang::Value>> const& arguments, Execution& exec) const;
 
         lang::Scope&                     scope() override;
         [[nodiscard]] lang::Scope const& scope() const override;
@@ -288,7 +288,7 @@ namespace lang
         void resolveFollowingOrder() override;
         void postResolve() override;
 
-        void buildEntityDeclarationsFollowingOrder(Execution& exec) const override;
+        void registerEntityDeclarationsFollowingOrder(Execution& exec) const override;
 
         ResolvingHandle<lang::Entity> getUndefinedClone(Context& new_context) const override;
 

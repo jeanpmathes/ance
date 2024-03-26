@@ -41,8 +41,8 @@ bool lang::CharType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-Shared<lang::Value> lang::CharType::buildOperator(lang::BinaryOperator op,
-                                                  Shared<lang::Value>  left,
+Shared<lang::Value> lang::CharType::execOperator(lang::BinaryOperator op,
+                                                 Shared<lang::Value>  left,
                                                   Shared<lang::Value>  right,
                                                   Execution&           exec) const
 {
@@ -70,15 +70,14 @@ bool lang::CharType::validateCast(lang::Type const& other,
     return TypeDefinition::validateCast(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::CharType::buildCast(lang::Type const&   other,
-                                              Shared<lang::Value> value, Execution& exec) const
+Shared<lang::Value> lang::CharType::execCast(lang::Type const& other, Shared<lang::Value> value, Execution& exec) const
 {
     if (other.isFixedWidthIntegerType(SIZE_IN_BITS, false))
     {
         return exec.performIntegerReinterpretation(value, other);
     }
 
-    return TypeDefinition::buildCast(other, value, exec);
+    return TypeDefinition::execCast(other, value, exec);
 }
 
 bool lang::CharType::isTriviallyDefaultConstructible() const

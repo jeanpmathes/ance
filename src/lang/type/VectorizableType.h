@@ -17,7 +17,7 @@ namespace lang
         VectorizableType const* isVectorizable() const override;
         VectorizableType*       isVectorizable() override;
 
-        using TypeDefinition::buildRequestedOverload;
+        using TypeDefinition::execRequestedOverload;
 
         /**
          * Build a requested overload for a value of this type or a vector of values of this type.
@@ -26,8 +26,8 @@ namespace lang
          * @param function The function to build.
          * @param exec The current execution context.
          */
-        virtual void buildRequestedOverload(lang::Type const&         parameter_element,
-                                            lang::Type const&         return_type,
+        virtual void execRequestedOverload(lang::Type const&         parameter_element,
+                                           lang::Type const&         return_type,
                                             lang::PredefinedFunction& function,
                                             Execution&                exec) const;
     };

@@ -33,14 +33,14 @@ namespace lang
                                               lang::Type const& index_type,
                                               lang::Location    index_location,
                                               ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
-                                           Shared<lang::Value> index,
+        Shared<lang::Value> execSubscript(Shared<lang::Value> indexed,
+                                          Shared<lang::Value> index,
                                            Execution&          exec) const override;
-        Shared<lang::Value> buildSubscriptInBounds(Shared<lang::Value> indexed,
-                                                   Shared<lang::Value> index,
+        Shared<lang::Value> execSubscriptInBounds(Shared<lang::Value> indexed,
+                                                  Shared<lang::Value> index,
                                                    Execution&          exec) const;
-        Shared<lang::Value> buildSubscript(Shared<lang::Value> indexed,
-                                           Shared<lang::Value> index,
+        Shared<lang::Value> execSubscript(Shared<lang::Value> indexed,
+                                          Shared<lang::Value> index,
                                            bool                check_bounds,
                                            Execution&          exec) const;
 

@@ -10,8 +10,8 @@ lang::VectorizableType* lang::VectorizableType::isVectorizable()
     return this;
 }
 
-void lang::VectorizableType::buildRequestedOverload(lang::Type const&,
-                                                    lang::Type const&,
+void lang::VectorizableType::execRequestedOverload(lang::Type const&,
+                                                   lang::Type const&,
                                                     lang::PredefinedFunction&,
                                                     Execution&) const
 {

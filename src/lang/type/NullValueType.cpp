@@ -26,8 +26,8 @@ bool lang::NullValueType::validateImplicitConversion(lang::Type const&, lang::Lo
     return true;
 }
 
-Shared<lang::Value> lang::NullValueType::buildImplicitConversion(lang::Type const& other,
-                                                                 Shared<lang::Value>,
+Shared<lang::Value> lang::NullValueType::execImplicitConversion(lang::Type const& other,
+                                                                Shared<lang::Value>,
                                                                  Execution& exec) const
 {
     return exec.getNull(other);

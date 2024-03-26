@@ -66,8 +66,8 @@ bool lang::UnitType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-Shared<lang::Value> lang::UnitType::buildOperator(lang::BinaryOperator op,
-                                                  Shared<lang::Value>,
+Shared<lang::Value> lang::UnitType::execOperator(lang::BinaryOperator op,
+                                                 Shared<lang::Value>,
                                                   Shared<lang::Value>,
                                                   Execution& exec) const
 {

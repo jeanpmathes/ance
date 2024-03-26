@@ -59,7 +59,7 @@ void Runtime::init(Execution& exec)
         abort_ = create_function(ABORT_NAME, exec.ctx().getUnitType(), parameters);
     }
 
-    for (lang::Function* function : functions_) { function->buildDeclaration(exec); }
+    for (lang::Function* function : functions_) { function->registerDeclaration(exec); }
 
     is_initialized_ = true;
 }
@@ -133,10 +133,10 @@ void Runtime::deleteDynamic(Shared<lang::Value> address, bool delete_buffer, Exe
 
     std::vector<Shared<lang::Value>> parameters;
     parameters.emplace_back(opaque_ptr);
-    delete_dynamic_->buildCall(parameters, exec);
+    delete_dynamic_->execCall(parameters, exec);
 }
 
-void Runtime::buildAssert(Shared<lang::Value> value, std::string const& description, Execution& exec)
+void Runtime::execAssert(Shared<lang::Value> value, std::string const& description, Execution& exec)
 {
     assert(is_initialized_);
 
@@ -148,7 +148,7 @@ void Runtime::buildAssert(Shared<lang::Value> value, std::string const& descript
     std::vector<Shared<lang::Value>> parameters;
     parameters.emplace_back(truth_value);
     parameters.emplace_back(description_ptr);
-    assertion_->buildCall(parameters, exec);
+    assertion_->execCall(parameters, exec);
 }
 
 void Runtime::buildAbort(std::string const& reason, Execution& exec)
@@ -159,7 +159,7 @@ void Runtime::buildAbort(std::string const& reason, Execution& exec)
 
     std::vector<Shared<lang::Value>> parameters;
     parameters.emplace_back(reason_ptr);
-    abort_->buildCall(parameters, exec);
+    abort_->execCall(parameters, exec);
 }
 
 Shared<lang::Value> Runtime::allocateAutomatic(lang::Type const&   type,
@@ -183,7 +183,7 @@ Shared<lang::Value> Runtime::allocateDynamic(lang::Type const&   type,
 
     std::vector<Shared<lang::Value>> parameters;
     parameters.emplace_back(size_to_allocate);
-    Shared<lang::Value> opaque_memory_ptr = allocate_dynamic_->buildCall(parameters, exec);
+    Shared<lang::Value> opaque_memory_ptr = allocate_dynamic_->execCall(parameters, exec);
 
     if (is_buffer)
     {

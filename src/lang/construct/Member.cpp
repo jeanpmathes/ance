@@ -106,7 +106,7 @@ Shared<lang::Constant> lang::Member::getConstantInitializer(Execution& exec)
     else { return exec.getDefault(type()); }
 }
 
-void lang::Member::buildInitialization(Shared<lang::Value> ptr, Execution& exec)
+void lang::Member::performInitialization(Shared<lang::Value> ptr, Execution& exec)
 {
     if (constant_init_.hasValue())
     {

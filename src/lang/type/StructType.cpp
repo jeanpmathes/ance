@@ -101,8 +101,8 @@ bool lang::StructType::validateMemberAccess(lang::Identifier const& name, Valida
     return true;
 }
 
-Shared<lang::Value> lang::StructType::buildMemberAccess(Shared<lang::Value>     value,
-                                                        lang::Identifier const& name,
+Shared<lang::Value> lang::StructType::execMemberAccess(Shared<lang::Value>     value,
+                                                       lang::Identifier const& name,
                                                         Execution&              exec) const
 {
     Shared<lang::Value> struct_ptr = exec.computeAddressOf(value);
@@ -116,7 +116,7 @@ void lang::StructType::performSingleDefaultInitializerDefinition(Shared<lang::Va
     for (auto member : members_)
     {
         Shared<lang::Value> member_ptr = exec.computeMemberPointer(ptr, member.get().name());
-        member.get().buildInitialization(member_ptr, exec);
+        member.get().performInitialization(member_ptr, exec);
     }
 }
 

@@ -132,9 +132,9 @@ Optional<lang::Location> lang::StatementFunction::findUnreachableCode() const
     return unreachable;
 }
 
-void lang::StatementFunction::buildDeclarationsFollowingOrder(Execution& exec) const
+void lang::StatementFunction::registerDeclarationsFollowingOrder(Execution& exec) const
 {
-    code_.getBlockScope()->buildEntityDeclarations(exec);
+    code_.getBlockScope()->registerEntityDeclarations(exec);
 }
 
 lang::BasicBlock const* lang::StatementFunction::getEntryBlock() const

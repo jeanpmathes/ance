@@ -36,8 +36,8 @@ namespace lang
         bool                validateCast(Type const&       other,
                                          lang::Location    location,
                                          ValidationLogger& validation_logger) const override;
-        Shared<lang::Value> buildCast(lang::Type const&   other,
-                                      Shared<lang::Value> value,
+        Shared<lang::Value> execCast(lang::Type const&   other,
+                                     Shared<lang::Value> value,
                                       Execution&          exec) const override;
 
       private:

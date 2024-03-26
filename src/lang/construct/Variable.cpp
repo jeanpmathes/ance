@@ -105,19 +105,19 @@ bool lang::Variable::isFinal() const
     return definition_.value()->isFinal();
 }
 
-void lang::Variable::buildDeclaration(Execution& exec) const
+void lang::Variable::registerDeclaration(Execution& exec) const
 {
-    definition_.value()->buildDeclaration(exec);
+    definition_.value()->registerDeclaration(exec);
 }
 
-void lang::Variable::buildInitialization(Execution& exec) const
+void lang::Variable::performInitialization(Execution& exec) const
 {
-    definition_.value()->buildInitialization(exec);
+    definition_.value()->performInitialization(exec);
 }
 
-void lang::Variable::buildFinalization(Execution& exec) const
+void lang::Variable::performFinalization(Execution& exec) const
 {
-    definition_.value()->buildFinalization(exec);
+    definition_.value()->performFinalization(exec);
 }
 
 bool lang::Variable::validateGetValue(ValidationLogger&, lang::Location) const

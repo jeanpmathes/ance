@@ -198,11 +198,11 @@ bool lang::TypeAlias::validateSubscript(lang::Location    indexed_location,
     return actual_->validateSubscript(indexed_location, index_type, index_location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildSubscript(Shared<lang::Value> indexed,
-                                                    Shared<lang::Value> index,
+Shared<lang::Value> lang::TypeAlias::execSubscript(Shared<lang::Value> indexed,
+                                                   Shared<lang::Value> index,
                                                     Execution&          exec) const
 {
-    return actual_->buildSubscript(indexed, index, exec);
+    return actual_->execSubscript(indexed, index, exec);
 }
 
 bool lang::TypeAlias::isImplicitlyConvertibleTo(lang::Type const& other) const
@@ -217,11 +217,11 @@ bool lang::TypeAlias::validateImplicitConversion(lang::Type const& other,
     return actual_->validateImplicitConversion(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildImplicitConversion(lang::Type const&   other,
-                                                             Shared<lang::Value> value,
+Shared<lang::Value> lang::TypeAlias::execImplicitConversion(lang::Type const&   other,
+                                                            Shared<lang::Value> value,
                                                              Execution&          exec) const
 {
-    return actual_->buildImplicitConversion(other, value, exec);
+    return actual_->execImplicitConversion(other, value, exec);
 }
 
 bool lang::TypeAlias::isCastingPossibleTo(lang::Type const& other) const
@@ -236,11 +236,10 @@ bool lang::TypeAlias::validateCast(lang::Type const& other,
     return actual_->validateCast(other, location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildCast(lang::Type const&   other,
-                                               Shared<lang::Value> value,
+Shared<lang::Value> lang::TypeAlias::execCast(lang::Type const& other, Shared<lang::Value> value,
                                                Execution&          exec) const
 {
-    return actual_->buildCast(other, value, exec);
+    return actual_->execCast(other, value, exec);
 }
 
 bool lang::TypeAlias::isOperatorDefined(lang::UnaryOperator op) const
@@ -260,11 +259,11 @@ bool lang::TypeAlias::validateOperator(lang::UnaryOperator op,
     return actual_->validateOperator(op, location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildOperator(lang::UnaryOperator op,
-                                                   Shared<lang::Value> value,
+Shared<lang::Value> lang::TypeAlias::execOperator(lang::UnaryOperator op,
+                                                  Shared<lang::Value> value,
                                                    Execution&          exec) const
 {
-    return actual_->buildOperator(op, value, exec);
+    return actual_->execOperator(op, value, exec);
 }
 
 bool lang::TypeAlias::isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const
@@ -286,12 +285,12 @@ bool lang::TypeAlias::validateOperator(lang::BinaryOperator op,
     return actual_->validateOperator(op, other, left_location, right_location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildOperator(lang::BinaryOperator op,
-                                                   Shared<lang::Value>  left,
+Shared<lang::Value> lang::TypeAlias::execOperator(lang::BinaryOperator op,
+                                                  Shared<lang::Value>  left,
                                                    Shared<lang::Value>  right,
                                                    Execution&           exec) const
 {
-    return actual_->buildOperator(op, left, right, exec);
+    return actual_->execOperator(op, left, right, exec);
 }
 
 bool lang::TypeAlias::hasMember(lang::Identifier const& name) const
@@ -314,11 +313,11 @@ bool lang::TypeAlias::validateMemberAccess(lang::Identifier const& name, Validat
     return actual_->validateMemberAccess(name, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildMemberAccess(Shared<lang::Value>     value,
-                                                       lang::Identifier const& name,
+Shared<lang::Value> lang::TypeAlias::execMemberAccess(Shared<lang::Value>     value,
+                                                      lang::Identifier const& name,
                                                        Execution&              exec) const
 {
-    return actual_->buildMemberAccess(value, name, exec);
+    return actual_->execMemberAccess(value, name, exec);
 }
 
 bool lang::TypeAlias::definesIndirection() const
@@ -336,9 +335,9 @@ bool lang::TypeAlias::validateIndirection(lang::Location location, ValidationLog
     return actual_->validateIndirection(location, validation_logger);
 }
 
-Shared<lang::Value> lang::TypeAlias::buildIndirection(Shared<lang::Value> value, Execution& exec) const
+Shared<lang::Value> lang::TypeAlias::execIndirection(Shared<lang::Value> value, Execution& exec) const
 {
-    return actual_->buildIndirection(value, exec);
+    return actual_->execIndirection(value, exec);
 }
 
 void lang::TypeAlias::performDefaultInitializer(Shared<lang::Value> ptr,
@@ -383,19 +382,19 @@ bool lang::TypeAlias::acceptOverloadRequest(std::vector<ResolvingHandle<lang::Ty
     return false;// Overloads are rerouted to the actual type by base class.
 }
 
-void lang::TypeAlias::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>>,
-                                             lang::PredefinedFunction&,
+void lang::TypeAlias::execRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>>,
+                                            lang::PredefinedFunction&,
                                              Execution&) const
 {
     assert(false);// Overloads are rerouted to the actual type by base class.
 }
 
-void lang::TypeAlias::buildDeclaration(Execution& exec) const
+void lang::TypeAlias::registerDeclaration(Execution& exec) const
 {
     registerExecutionType(exec);
 }
 
-void lang::TypeAlias::buildDefinition(Execution&) const {}
+void lang::TypeAlias::registerDefinition(Execution&) const {}
 
 std::string lang::TypeAlias::createMangledName() const
 {

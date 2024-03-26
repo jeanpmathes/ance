@@ -439,45 +439,44 @@ bool lang::TypeDefinition::validateIndirection(lang::Location, ValidationLogger&
     return true;
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildSubscript(Shared<lang::Value>,
-                                                         Shared<lang::Value>, Execution&) const
+Shared<lang::Value> lang::TypeDefinition::execSubscript(Shared<lang::Value>, Shared<lang::Value>, Execution&) const
 {
     throw std::logic_error("Subscript not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildOperator(lang::BinaryOperator,
-                                                        Shared<lang::Value>,
+Shared<lang::Value> lang::TypeDefinition::execOperator(lang::BinaryOperator,
+                                                       Shared<lang::Value>,
                                                         Shared<lang::Value>,
                                                         Execution&) const
 {
     throw std::logic_error("Operator not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildOperator(lang::UnaryOperator, Shared<lang::Value>, Execution&) const
+Shared<lang::Value> lang::TypeDefinition::execOperator(lang::UnaryOperator, Shared<lang::Value>, Execution&) const
 {
     throw std::logic_error("Operator not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildImplicitConversion(lang::Type const&,
-                                                                  Shared<lang::Value>,
+Shared<lang::Value> lang::TypeDefinition::execImplicitConversion(lang::Type const&,
+                                                                 Shared<lang::Value>,
                                                                   Execution&) const
 {
     throw std::logic_error("Implicit conversion not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildCast(lang::Type const&, Shared<lang::Value>, Execution&) const
+Shared<lang::Value> lang::TypeDefinition::execCast(lang::Type const&, Shared<lang::Value>, Execution&) const
 {
     throw std::logic_error("Cast not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildMemberAccess(Shared<lang::Value>,
-                                                            lang::Identifier const&,
+Shared<lang::Value> lang::TypeDefinition::execMemberAccess(Shared<lang::Value>,
+                                                           lang::Identifier const&,
                                                             Execution&) const
 {
     throw std::logic_error("Member access not defined");
 }
 
-Shared<lang::Value> lang::TypeDefinition::buildIndirection(Shared<lang::Value>, Execution&) const
+Shared<lang::Value> lang::TypeDefinition::execIndirection(Shared<lang::Value>, Execution&) const
 {
     throw std::logic_error("Indirection not defined");
 }
@@ -545,33 +544,33 @@ void lang::TypeDefinition::performFinalizer(Shared<lang::Value> ptr,
     exec.performFunctionCall(*default_finalizer_, args);
 }
 
-void lang::TypeDefinition::buildDeclaration(Execution& exec) const
+void lang::TypeDefinition::registerDeclaration(Execution& exec) const
 {
     if (!isTriviallyDefaultConstructible())
     {
         assert(default_initializer_.hasValue());
 
-        (**default_initializer_).buildDeclaration(exec);
+        (**default_initializer_).registerDeclaration(exec);
     }
 
     if (!isTriviallyCopyConstructible())
     {
         assert(copy_initializer_.hasValue());
 
-        (**copy_initializer_).buildDeclaration(exec);
+        (**copy_initializer_).registerDeclaration(exec);
     }
 
     if (!isTriviallyDestructible())
     {
         assert(default_finalizer_.hasValue());
 
-        (**default_finalizer_).buildDeclaration(exec);
+        (**default_finalizer_).registerDeclaration(exec);
     }
 
     defineConstructors(exec);
 }
 
-void lang::TypeDefinition::buildDefinition(Execution& exec) const
+void lang::TypeDefinition::registerDefinition(Execution& exec) const
 {
     if (isImported()) return;
 
@@ -579,23 +578,23 @@ void lang::TypeDefinition::buildDefinition(Execution& exec) const
     if (!isTriviallyCopyConstructible()) defineCopyInitializer(exec);
     if (!isTriviallyDestructible()) defineDefaultFinalizer(exec);
 
-    buildConstructors(exec);
+    registerConstructors(exec);
 }
 
 void lang::TypeDefinition::defineConstructors(Execution& exec) const
 {
-    for (auto& [parameters, constructor] : requested_constructors_) { constructor->buildDeclaration(exec); }
+    for (auto& [parameters, constructor] : requested_constructors_) { constructor->registerDeclaration(exec); }
 
     if (!default_constructor_) return;
 
-    default_constructor_->buildDeclaration(exec);
+    default_constructor_->registerDeclaration(exec);
 }
 
-void lang::TypeDefinition::buildConstructors(Execution& exec) const
+void lang::TypeDefinition::registerConstructors(Execution& exec) const
 {
     for (auto& [parameters, constructor] : requested_constructors_)
     {
-        buildRequestedOverload(parameters, *constructor, exec);
+        execRequestedOverload(parameters, *constructor, exec);
     }
 
     if (!default_constructor_) return;
@@ -749,8 +748,8 @@ bool lang::TypeDefinition::acceptOverloadRequest(std::vector<ResolvingHandle<lan
     return false;
 }
 
-void lang::TypeDefinition::buildRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>>,
-                                                  lang::PredefinedFunction&,
+void lang::TypeDefinition::execRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>>,
+                                                 lang::PredefinedFunction&,
                                                   Execution&) const
 {}
 

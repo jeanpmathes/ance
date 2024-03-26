@@ -48,9 +48,9 @@ namespace lang
                                                                         size_t           parameter_index,
                                                                         lang::Function&  containing_function);
 
-        void buildDeclaration(Execution& exec) const override;
-        void buildInitialization(Execution& exec) const override;
-        void buildFinalization(Execution& exec) const override;
+        void registerDeclaration(Execution& exec) const override;
+        void performInitialization(Execution& exec) const override;
+        void performFinalization(Execution& exec) const override;
 
         Shared<lang::Value> getValuePointer(Execution& exec) const override;
 

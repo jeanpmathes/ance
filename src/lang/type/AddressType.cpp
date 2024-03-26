@@ -34,8 +34,8 @@ bool lang::AddressType::validateCast(lang::Type const&, lang::Location, Validati
     return true;
 }
 
-Shared<lang::Value> lang::AddressType::buildCast(lang::Type const&   other,
-                                                 Shared<lang::Value> value,
+Shared<lang::Value> lang::AddressType::execCast(lang::Type const&   other,
+                                                Shared<lang::Value> value,
                                                  Execution&          exec) const
 {
     if (other.isAddressType()) { return exec.computeCastedAddress(value, other); }
@@ -83,8 +83,8 @@ bool lang::AddressType::validateOperator(lang::BinaryOperator,
     return true;
 }
 
-Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
-                                                     Shared<lang::Value>  left,
+Shared<lang::Value> lang::AddressType::execOperator(lang::BinaryOperator op,
+                                                    Shared<lang::Value>  left,
                                                      Shared<lang::Value>  right,
                                                      Execution&           exec) const
 {
@@ -105,7 +105,7 @@ Shared<lang::Value> lang::AddressType::buildOperator(lang::BinaryOperator op,
         else
         {
             if (right->type().isSizeType())
-                right = right->type().buildImplicitConversion(exec.ctx().getDiffType(), right, exec);
+                right = right->type().execImplicitConversion(exec.ctx().getDiffType(), right, exec);
             Shared<lang::Value> pointer =
                 exec.computeElementPointer(left, right, Execution::IndexingMode::POINTER, std::nullopt);
             return exec.computeCastedAddress(pointer, self());
