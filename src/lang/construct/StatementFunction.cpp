@@ -101,6 +101,8 @@ void lang::StatementFunction::determineFlow()
         block->complete(running_index);
         if (block->isUsable()) { used_blocks_.push_back(block.get()); }
     }
+
+    initial_block_->reach();
 }
 
 bool lang::StatementFunction::validateFlow(ValidationLogger&) const
@@ -115,8 +117,6 @@ lang::BasicBlock const& lang::StatementFunction::getInitialBlock() const
 
 Optional<lang::Location> lang::StatementFunction::findUnreachableCode() const
 {
-    initial_block_->reach();
-
     Optional<lang::Location> unreachable;
 
     for (auto& block : blocks_)

@@ -170,7 +170,7 @@ namespace lang
         /**
          * Reach this block and all that follow it.
          */
-        void reach() const;
+        void reach();
 
         /**
          * Get whether this block is unreached. Call reach() first.
@@ -213,36 +213,48 @@ namespace lang
 
                 void                 index(size_t& index);
                 [[nodiscard]] size_t index() const;
-                virtual void         complete(size_t& index) = 0;
+                void                 complete(size_t& index);
 
                 virtual void setLink(BasicBlock& next)                             = 0;
                 virtual void updateLink(BasicBlock* former, BasicBlock* updated)   = 0;
-                virtual void transferStatements(std::list<Statement*>& statements) = 0;
-                virtual void simplify()                                            = 0;
+
+                void transferStatements(std::list<Statement*>& statements);
+
+                void                       simplify();
+                [[nodiscard]] virtual bool isSimplificationCandidate() const;
+
+                [[nodiscard]] std::list<Statement*> const& statements() const;
 
                 void                 registerIncomingLink(BasicBlock& block);
                 [[nodiscard]] size_t getIncomingLinkCount() const;
                 void                 updateIncomingLinks(BasicBlock* updated);
 
-                [[nodiscard]] virtual std::list<lang::BasicBlock const*>   getLeaves() const     = 0;
+                [[nodiscard]] std::list<lang::BasicBlock const*>           getLeaves() const;
                 [[nodiscard]] virtual std::vector<lang::BasicBlock const*> getSuccessors() const = 0;
 
                 [[nodiscard]] virtual Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>>
                 getReturnType() const;
 
-                [[nodiscard]] virtual lang::Location getStartLocation() const = 0;
-                [[nodiscard]] virtual lang::Location getEndLocation() const   = 0;
+                [[nodiscard]] lang::Location getStartLocation() const;
+                [[nodiscard]] lang::Location getEndLocation() const;
 
-                virtual void reach() const = 0;
+                void reach();
 
                 [[nodiscard]] virtual std::string getExitRepresentation() const = 0;
 
               protected:
-                size_t index_ {};
+                void pushStatement(Statement& statement);
+
+                [[nodiscard]] virtual std::vector<lang::BasicBlock*> getReachableNext() = 0;
+                [[nodiscard]] virtual std::vector<lang::BasicBlock*> getUnreachableNext();
 
               private:
                 BasicBlock*              self_ {};
                 std::vector<BasicBlock*> incoming_links_ {};
+
+                size_t index_ {};
+
+                std::list<Statement*> statements_ {};
             };
         };
 
@@ -262,7 +274,7 @@ namespace lang
         bool         simplified_ {false};
         bool         unused_ {false};
         bool         finalized_ {false};
-        mutable bool reached_ {false};
+        bool         reached_ {false};
     };
 
     namespace bb::def
@@ -280,22 +292,14 @@ namespace lang
           public:
             [[nodiscard]] bool isMeta() const override;
 
-            void complete(size_t& index) override;
-
             void setLink(BasicBlock& next) override;
             void updateLink(BasicBlock* former, BasicBlock* updated) override;
-            void simplify() override;
 
-            void transferStatements(std::list<Statement*>& statements) override;
-
-            [[nodiscard]] std::list<lang::BasicBlock const*>   getLeaves() const override;
             [[nodiscard]] std::vector<lang::BasicBlock const*> getSuccessors() const override;
-            [[nodiscard]] lang::Location                       getStartLocation() const override;
-            [[nodiscard]] lang::Location                       getEndLocation() const override;
-
-            void reach() const override;
-
             [[nodiscard]] std::string getExitRepresentation() const override;
+
+          protected:
+            std::vector<lang::BasicBlock*> getReachableNext() override;
 
           private:
             lang::BasicBlock* next_ {nullptr};
@@ -315,22 +319,14 @@ namespace lang
           public:
             [[nodiscard]] bool isMeta() const override;
 
-            void complete(size_t& index) override;
-
             void setLink(BasicBlock& next) override;
             void updateLink(BasicBlock* former, BasicBlock* updated) override;
-            void simplify() override;
 
-            void transferStatements(std::list<Statement*>& statements) override;
-
-            [[nodiscard]] std::list<lang::BasicBlock const*>   getLeaves() const override;
             [[nodiscard]] std::vector<lang::BasicBlock const*> getSuccessors() const override;
-            [[nodiscard]] lang::Location                       getStartLocation() const override;
-            [[nodiscard]] lang::Location                       getEndLocation() const override;
-
-            void reach() const override;
-
             [[nodiscard]] std::string getExitRepresentation() const override;
+
+          protected:
+            std::vector<lang::BasicBlock*> getReachableNext() override;
 
           private:
             lang::BasicBlock* next_ {nullptr};
@@ -348,28 +344,19 @@ namespace lang
             ~Simple() override = default;
 
             [[nodiscard]] lang::BasicBlock const*      next() const;
-            [[nodiscard]] std::list<Statement*> const& statements() const;
 
           public:
-            void complete(size_t& index) override;
-
             void setLink(BasicBlock& next) override;
             void updateLink(BasicBlock* former, BasicBlock* updated) override;
-            void simplify() override;
+            [[nodiscard]] bool isSimplificationCandidate() const override;
 
-            void transferStatements(std::list<Statement*>& statements) override;
-
-            [[nodiscard]] std::list<lang::BasicBlock const*>   getLeaves() const override;
             [[nodiscard]] std::vector<lang::BasicBlock const*> getSuccessors() const override;
-            [[nodiscard]] lang::Location                       getStartLocation() const override;
-            [[nodiscard]] lang::Location                       getEndLocation() const override;
-
-            void reach() const override;
-
             [[nodiscard]] std::string getExitRepresentation() const override;
 
+          protected:
+            std::vector<lang::BasicBlock*> getReachableNext() override;
+
           private:
-            std::list<Statement*> statements_ {};
             lang::BasicBlock*     next_ {nullptr};
         };
 
@@ -381,34 +368,24 @@ namespace lang
             explicit Returning(lang::Scope& scope, Expression& return_value);
             ~Returning() override = default;
 
-            [[nodiscard]] std::list<Statement*> const& statements() const;
             [[nodiscard]] lang::Scope const&           scope() const;
             [[nodiscard]] Expression const&            ret() const;
 
           public:
-            void complete(size_t& index) override;
-
             void setLink(BasicBlock& next) override;
             void updateLink(BasicBlock* former, BasicBlock* updated) override;
-            void simplify() override;
-
-            void transferStatements(std::list<Statement*>& statements) override;
-
-            [[nodiscard]] std::list<lang::BasicBlock const*>   getLeaves() const override;
             [[nodiscard]] std::vector<lang::BasicBlock const*> getSuccessors() const override;
 
             [[nodiscard]] Optional<std::pair<std::reference_wrapper<lang::Type const>, Location>> getReturnType()
                 const override;
 
-            [[nodiscard]] lang::Location getStartLocation() const override;
-            [[nodiscard]] lang::Location getEndLocation() const override;
-
-            void reach() const override;
-
             [[nodiscard]] std::string getExitRepresentation() const override;
 
+          protected:
+            std::vector<lang::BasicBlock*> getReachableNext() override;
+            std::vector<lang::BasicBlock*> getUnreachableNext() override;
+
           private:
-            std::list<Statement*> statements_ {};
             lang::BasicBlock*     unreachable_next_ {nullptr};
             Expression&           return_value_;
             lang::Scope&          scope_;
@@ -422,33 +399,22 @@ namespace lang
             explicit Branching(Expression& condition);
             ~Branching() override = default;
 
-            [[nodiscard]] std::list<Statement*> const& statements() const;
             [[nodiscard]] Expression const&            condition() const;
 
             [[nodiscard]] lang::BasicBlock const* trueNext() const;
             [[nodiscard]] lang::BasicBlock const* falseNext() const;
 
           public:
-            void complete(size_t& index) override;
-
             void setLink(BasicBlock& next) override;
             void updateLink(BasicBlock* former, BasicBlock* updated) override;
-            void simplify() override;
 
-            void transferStatements(std::list<Statement*>& statements) override;
-
-            [[nodiscard]] std::list<lang::BasicBlock const*>   getLeaves() const override;
             [[nodiscard]] std::vector<lang::BasicBlock const*> getSuccessors() const override;
-            [[nodiscard]] lang::Location                       getStartLocation() const override;
-            [[nodiscard]] lang::Location                       getEndLocation() const override;
-
-            void reach() const override;
-
             [[nodiscard]] std::string getExitRepresentation() const override;
 
-          private:
-            std::list<Statement*> statements_ {};
+          protected:
+            std::vector<lang::BasicBlock*> getReachableNext() override;
 
+          private:
             lang::BasicBlock* true_next_ {nullptr};
             lang::BasicBlock* false_next_ {nullptr};
 
@@ -463,33 +429,22 @@ namespace lang
             explicit Matching(Match& match, std::vector<std::vector<LiteralExpression*>> cases);
             ~Matching() override = default;
 
-            [[nodiscard]] std::list<Statement*> const& statements() const;
             [[nodiscard]] Expression const&            matched() const;
 
             [[nodiscard]] std::vector<std::vector<LiteralExpression*>> const& cases() const;
             [[nodiscard]] std::vector<lang::BasicBlock*> const&               branches() const;
 
           public:
-            void complete(size_t& index) override;
-
             void setLink(BasicBlock& next) override;
             void updateLink(BasicBlock* former, BasicBlock* updated) override;
-            void simplify() override;
 
-            void transferStatements(std::list<Statement*>& statements) override;
-
-            [[nodiscard]] std::list<lang::BasicBlock const*>   getLeaves() const override;
             [[nodiscard]] std::vector<lang::BasicBlock const*> getSuccessors() const override;
-            [[nodiscard]] lang::Location                       getStartLocation() const override;
-            [[nodiscard]] lang::Location                       getEndLocation() const override;
-
-            void reach() const override;
-
             [[nodiscard]] std::string getExitRepresentation() const override;
 
-          private:
-            std::list<Statement*> statements_ {};
+          protected:
+            std::vector<lang::BasicBlock*> getReachableNext() override;
 
+          private:
             std::vector<lang::BasicBlock*> branches_ {};
 
             Match&                                       match_;

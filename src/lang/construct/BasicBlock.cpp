@@ -277,7 +277,7 @@ void lang::BasicBlock::transferStatements(std::list<Statement*>& statements)
     definition_->transferStatements(statements);
 }
 
-void lang::BasicBlock::reach() const
+void lang::BasicBlock::reach()
 {
     if (reached_) return;
     reached_ = true;
@@ -326,6 +326,49 @@ size_t lang::BasicBlock::Definition::Base::index() const
     return index_;
 }
 
+void lang::BasicBlock::Definition::Base::complete(size_t& index)
+{
+    for (auto& statement : statements_) { self()->addChild(*statement); }
+
+    for (auto& reachable_next : getReachableNext()) { reachable_next->complete(index); }
+    for (auto& unreachable_next : getUnreachableNext()) { unreachable_next->complete(index); }
+}
+
+void lang::BasicBlock::Definition::Base::transferStatements(std::list<Statement*>& statements)
+{
+    statements_.splice(statements_.begin(), statements);
+}
+
+void lang::BasicBlock::Definition::Base::simplify()
+{
+    std::vector<lang::BasicBlock*> reachable_next   = getReachableNext();
+    std::vector<lang::BasicBlock*> unreachable_next = getUnreachableNext();
+
+    if (isSimplificationCandidate() && reachable_next.size() == 1)
+    {
+        lang::BasicBlock* next = reachable_next.front();
+
+        // This block is the only block entering the next (real) block, or this block is unnecessary.
+        bool const can_simplify = (next->getIncomingLinkCount() == 1 && !next->isMeta()) || statements_.empty();
+
+        if (can_simplify)
+        {
+            next->transferStatements(statements_);
+            this->updateIncomingLinks(next);
+
+            self()->markAsUnused();
+        }
+    }
+
+    for (auto& next : reachable_next) { next->simplify(); }
+    for (auto& next : unreachable_next) { next->simplify(); }
+}
+
+bool lang::BasicBlock::Definition::Base::isSimplificationCandidate() const
+{
+    return false;
+}
+
 bool lang::BasicBlock::isMeta() const
 {
     return definition_->isMeta();
@@ -334,6 +377,11 @@ bool lang::BasicBlock::isMeta() const
 lang::BasicBlock::BasicBlock(Owned<Definition::Base> definition) : definition_(std::move(definition))
 {
     definition_->setSelf(this);
+}
+
+std::list<Statement*> const& lang::BasicBlock::Definition::Base::statements() const
+{
+    return statements_;
 }
 
 void lang::BasicBlock::Definition::Base::registerIncomingLink(lang::BasicBlock& block)
@@ -353,10 +401,52 @@ void lang::BasicBlock::Definition::Base::updateIncomingLinks(lang::BasicBlock* u
     incoming_links_.clear();
 }
 
+std::list<lang::BasicBlock const*> lang::BasicBlock::Definition::Base::getLeaves() const
+{
+    std::vector<lang::BasicBlock const*> successors = getSuccessors();
+
+    if (successors.empty()) { return {self()}; }
+
+    std::list<lang::BasicBlock const*> leaves;
+
+    for (auto& successor : successors) { leaves.splice(leaves.end(), successor->getLeaves()); }
+
+    return leaves;
+}
+
 Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>> lang::BasicBlock::Definition::Base::
     getReturnType() const
 {
     return std::nullopt;
+}
+
+lang::Location lang::BasicBlock::Definition::Base::getStartLocation() const
+{
+    if (statements_.empty()) { return lang::Location::global(); }
+
+    return statements_.front()->location();
+}
+
+lang::Location lang::BasicBlock::Definition::Base::getEndLocation() const
+{
+    if (statements_.empty()) { return lang::Location::global(); }
+
+    return statements_.back()->location();
+}
+
+void lang::BasicBlock::Definition::Base::reach()
+{
+    for (auto& next : getReachableNext()) { next->reach(); }
+}
+
+void lang::BasicBlock::Definition::Base::pushStatement(Statement& statement)
+{
+    statements_.push_back(&statement);
+}
+
+std::vector<lang::BasicBlock*> lang::BasicBlock::Definition::Base::getUnreachableNext()
+{
+    return {};
 }
 
 lang::BasicBlock::Definition::Base& lang::BasicBlock::definition()

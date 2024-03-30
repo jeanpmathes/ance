@@ -9,11 +9,6 @@
 
 lang::bb::def::Branching::Branching(Expression& condition) : condition_(condition) {}
 
-std::list<Statement*> const& lang::bb::def::Branching::statements() const
-{
-    return statements_;
-}
-
 Expression const& lang::bb::def::Branching::condition() const
 {
     return condition_;
@@ -27,14 +22,6 @@ lang::BasicBlock const* lang::bb::def::Branching::trueNext() const
 lang::BasicBlock const* lang::bb::def::Branching::falseNext() const
 {
     return false_next_;
-}
-
-void lang::bb::def::Branching::complete(size_t& index)
-{
-    for (auto& statement : statements_) { self()->addChild(*statement); }
-
-    true_next_->complete(index);
-    false_next_->complete(index);
 }
 
 void lang::bb::def::Branching::setLink(lang::BasicBlock& next)
@@ -75,51 +62,14 @@ void lang::bb::def::Branching::updateLink(lang::BasicBlock* former, lang::BasicB
     if (false_next_ == former) { update(false_next_); }
 }
 
-void lang::bb::def::Branching::simplify()
-{
-    true_next_->simplify();
-    false_next_->simplify();
-}
-
-void lang::bb::def::Branching::transferStatements(std::list<Statement*>& statements)
-{
-    statements_.splice(statements_.begin(), statements);
-}
-
-std::list<lang::BasicBlock const*> lang::bb::def::Branching::getLeaves() const
-{
-    std::set<lang::BasicBlock const*> leaves;
-
-    for (auto leaf : true_next_->getLeaves()) { leaves.insert(leaf); }
-
-    for (auto leaf : false_next_->getLeaves()) { leaves.insert(leaf); }
-
-    return {leaves.begin(), leaves.end()};
-}
-
 std::vector<lang::BasicBlock const*> lang::bb::def::Branching::getSuccessors() const
 {
     return {true_next_, false_next_};
 }
 
-lang::Location lang::bb::def::Branching::getStartLocation() const
+std::vector<lang::BasicBlock*> lang::bb::def::Branching::getReachableNext()
 {
-    if (statements_.empty()) { return lang::Location::global(); }
-
-    return statements_.front()->location();
-}
-
-lang::Location lang::bb::def::Branching::getEndLocation() const
-{
-    if (statements_.empty()) { return lang::Location::global(); }
-
-    return statements_.back()->location();
-}
-
-void lang::bb::def::Branching::reach() const
-{
-    true_next_->reach();
-    false_next_->reach();
+    return {true_next_, false_next_};
 }
 
 std::string lang::bb::def::Branching::getExitRepresentation() const

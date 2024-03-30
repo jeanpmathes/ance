@@ -13,11 +13,6 @@ lang::bb::def::Returning::Returning(lang::Scope& scope, Expression& return_value
     , scope_(scope)
 {}
 
-std::list<Statement*> const& lang::bb::def::Returning::statements() const
-{
-    return statements_;
-}
-
 lang::Scope const& lang::bb::def::Returning::scope() const
 {
     return scope_;
@@ -26,13 +21,6 @@ lang::Scope const& lang::bb::def::Returning::scope() const
 Expression const& lang::bb::def::Returning::ret() const
 {
     return return_value_;
-}
-
-void lang::bb::def::Returning::complete(size_t& index)
-{
-    for (auto& statement : statements_) { self()->addChild(*statement); }
-
-    if (unreachable_next_) unreachable_next_->complete(index);
 }
 
 void lang::bb::def::Returning::setLink(lang::BasicBlock& next)
@@ -55,28 +43,23 @@ void lang::bb::def::Returning::updateLink(lang::BasicBlock* former, lang::BasicB
     unreachable_next_->registerIncomingLink(*self());
 }
 
-void lang::bb::def::Returning::simplify()
-{
-    if (unreachable_next_) unreachable_next_->simplify();
-}
-
-void lang::bb::def::Returning::transferStatements(std::list<Statement*>& statements)
-{
-    statements_.splice(statements_.begin(), statements);
-}
-
-std::list<lang::BasicBlock const*> lang::bb::def::Returning::getLeaves() const
-{
-    std::list<lang::BasicBlock const*> leaves;
-
-    leaves.push_back(self());
-
-    return leaves;
-}
-
 std::vector<lang::BasicBlock const*> lang::bb::def::Returning::getSuccessors() const
 {
     return {};
+}
+
+std::vector<lang::BasicBlock*> lang::bb::def::Returning::getReachableNext()
+{
+    return {};
+}
+
+std::vector<lang::BasicBlock*> lang::bb::def::Returning::getUnreachableNext()
+{
+    std::vector<lang::BasicBlock*> n;
+
+    if (unreachable_next_) { n.push_back(unreachable_next_); }
+
+    return n;
 }
 
 Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>> lang::bb::def::Returning::getReturnType()
@@ -90,22 +73,6 @@ Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>> la
 
     return pair;
 }
-
-lang::Location lang::bb::def::Returning::getStartLocation() const
-{
-    if (statements_.empty()) { return lang::Location::global(); }
-
-    return statements_.front()->location();
-}
-
-lang::Location lang::bb::def::Returning::getEndLocation() const
-{
-    if (statements_.empty()) { return lang::Location::global(); }
-
-    return statements_.back()->location();
-}
-
-void lang::bb::def::Returning::reach() const {}
 
 std::string lang::bb::def::Returning::getExitRepresentation() const
 {

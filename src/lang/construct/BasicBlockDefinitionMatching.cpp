@@ -9,11 +9,6 @@ lang::bb::def::Matching::Matching(Match& match, std::vector<std::vector<LiteralE
     , cases_(std::move(cases))
 {}
 
-std::list<Statement*> const& lang::bb::def::Matching::statements() const
-{
-    return statements_;
-}
-
 Expression const& lang::bb::def::Matching::matched() const
 {
     return match_.expression();
@@ -27,12 +22,6 @@ std::vector<std::vector<LiteralExpression*>> const& lang::bb::def::Matching::cas
 std::vector<lang::BasicBlock*> const& lang::bb::def::Matching::branches() const
 {
     return branches_;
-}
-
-void lang::bb::def::Matching::complete(size_t& index)
-{
-    for (auto& statement : statements_) { self()->addChild(*statement); }
-    for (auto& branch : branches_) { branch->complete(index); }
 }
 
 void lang::bb::def::Matching::setLink(lang::BasicBlock& next)
@@ -55,27 +44,6 @@ void lang::bb::def::Matching::updateLink(lang::BasicBlock* former, lang::BasicBl
     }
 }
 
-void lang::bb::def::Matching::simplify()
-{
-    for (auto& branch : branches_) { branch->simplify(); }
-}
-
-void lang::bb::def::Matching::transferStatements(std::list<Statement*>& statements)
-{
-    statements_.splice(statements_.begin(), statements);
-}
-
-std::list<lang::BasicBlock const*> lang::bb::def::Matching::getLeaves() const
-{
-    std::list<lang::BasicBlock const*> leaves;
-
-    for (auto& branch : branches_)
-    {
-        for (auto& leaf : branch->getLeaves()) { leaves.push_back(leaf); }
-    }
-
-    return leaves;
-}
 std::vector<lang::BasicBlock const*> lang::bb::def::Matching::getSuccessors() const
 {
     std::vector<lang::BasicBlock const*> successors;
@@ -86,23 +54,14 @@ std::vector<lang::BasicBlock const*> lang::bb::def::Matching::getSuccessors() co
     return successors;
 }
 
-lang::Location lang::bb::def::Matching::getStartLocation() const
+std::vector<lang::BasicBlock*> lang::bb::def::Matching::getReachableNext()
 {
-    if (statements_.empty()) { return lang::Location::global(); }
+    std::vector<lang::BasicBlock*> n;
 
-    return statements_.front()->location();
-}
+    n.reserve(branches_.size());
+    for (auto& branch : branches_) { n.push_back(branch); }
 
-lang::Location lang::bb::def::Matching::getEndLocation() const
-{
-    if (statements_.empty()) { return lang::Location::global(); }
-
-    return statements_.back()->location();
-}
-
-void lang::bb::def::Matching::reach() const
-{
-    for (auto& branch : branches_) { branch->reach(); }
+    return n;
 }
 
 std::string lang::bb::def::Matching::getExitRepresentation() const

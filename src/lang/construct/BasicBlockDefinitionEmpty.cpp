@@ -12,11 +12,6 @@ bool lang::bb::def::Empty::isMeta() const
     return true;
 }
 
-void lang::bb::def::Empty::complete(size_t& index)
-{
-    if (next_) next_->complete(index);
-}
-
 void lang::bb::def::Empty::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
@@ -37,26 +32,6 @@ void lang::bb::def::Empty::updateLink(lang::BasicBlock* former, lang::BasicBlock
     next_->registerIncomingLink(*self());
 }
 
-void lang::bb::def::Empty::transferStatements(std::list<Statement*>&)
-{
-    assert(false);
-}
-
-void lang::bb::def::Empty::simplify()
-{
-    if (next_) next_->simplify();
-}
-
-std::list<lang::BasicBlock const*> lang::bb::def::Empty::getLeaves() const
-{
-    std::list<lang::BasicBlock const*> leaves;
-
-    if (next_) { leaves.splice(leaves.end(), next_->getLeaves()); }
-    else { leaves.push_back(self()); }
-
-    return leaves;
-}
-
 std::vector<lang::BasicBlock const*> lang::bb::def::Empty::getSuccessors() const
 {
     std::vector<lang::BasicBlock const*> successors;
@@ -66,22 +41,17 @@ std::vector<lang::BasicBlock const*> lang::bb::def::Empty::getSuccessors() const
     return successors;
 }
 
-lang::Location lang::bb::def::Empty::getStartLocation() const
+std::vector<lang::BasicBlock*> lang::bb::def::Empty::getReachableNext()
 {
-    return lang::Location::global();
-}
+    std::vector<lang::BasicBlock*> n;
 
-lang::Location lang::bb::def::Empty::getEndLocation() const
-{
-    return lang::Location::global();
-}
+    if (next_) { n.push_back(next_); }
 
-void lang::bb::def::Empty::reach() const
-{
-    if (next_) next_->reach();
+    return n;
 }
 
 std::string lang::bb::def::Empty::getExitRepresentation() const
 {
     return "// meta ";
 }
+
