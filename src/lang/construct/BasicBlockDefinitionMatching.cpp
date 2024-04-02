@@ -27,7 +27,7 @@ std::vector<lang::BasicBlock*> const& lang::bb::def::Matching::branches() const
 void lang::bb::def::Matching::setLink(lang::BasicBlock& next)
 {
     branches_.push_back(&next);
-    next.registerIncomingLink(*self());
+    next.registerIncomingLink(*this);
 }
 
 void lang::bb::def::Matching::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
@@ -37,7 +37,7 @@ void lang::bb::def::Matching::updateLink(lang::BasicBlock* former, lang::BasicBl
         if (branch == former)
         {
             branch = updated;
-            updated->registerIncomingLink(*self());
+            updated->registerIncomingLink(*this);
 
             return;
         }

@@ -24,11 +24,11 @@ void lang::bb::def::Finalizing::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
 
-    assert(&next_ptr->definition() != this);
+    assert(next_ptr != this);
     assert(next_ == nullptr);
 
     next_ = next_ptr;
-    next_->registerIncomingLink(*self());
+    next_->registerIncomingLink(*this);
 }
 
 void lang::bb::def::Finalizing::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
@@ -37,7 +37,7 @@ void lang::bb::def::Finalizing::updateLink(lang::BasicBlock* former, lang::Basic
     assert(next_ != updated);
 
     next_ = updated;
-    next_->registerIncomingLink(*self());
+    next_->registerIncomingLink(*this);
 }
 
 std::vector<lang::BasicBlock const*> lang::bb::def::Finalizing::getSuccessors() const

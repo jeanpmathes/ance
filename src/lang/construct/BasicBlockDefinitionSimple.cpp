@@ -19,11 +19,11 @@ void lang::bb::def::Simple::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
 
-    assert(&next_ptr->definition() != this);
+    assert(next_ptr != this);
     assert(next_ == nullptr);
 
     next_ = next_ptr;
-    next_->registerIncomingLink(*self());
+    next_->registerIncomingLink(*this);
 }
 
 void lang::bb::def::Simple::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
@@ -32,7 +32,7 @@ void lang::bb::def::Simple::updateLink(lang::BasicBlock* former, lang::BasicBloc
     assert(next_ != updated);
 
     next_ = updated;
-    next_->registerIncomingLink(*self());
+    next_->registerIncomingLink(*this);
 }
 
 bool lang::bb::def::Simple::isSimplificationCandidate() const

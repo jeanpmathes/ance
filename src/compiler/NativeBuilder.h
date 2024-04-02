@@ -33,7 +33,6 @@ class NativeBuilder : public lang::ApplicationVisitorConst
 
     std::any visit(lang::Function const& function) override;
 
-    std::any visit(lang::BasicBlock const& block) override;
     std::any visit(lang::bb::def::Empty const& emtpy_bb) override;
     std::any visit(lang::bb::def::Finalizing const& finalizing_bb) override;
     std::any visit(lang::bb::def::Simple const& simple_bb) override;
@@ -97,7 +96,7 @@ class NativeBuilder : public lang::ApplicationVisitorConst
     };
     GlobalPhase g_phase_ = GlobalPhase::INVALID;
 
-    std::map<lang::BasicBlock::Definition::Base const*, llvm::BasicBlock*> bb_map_;
+    std::map<lang::BasicBlock const*, llvm::BasicBlock*> bb_map_;
 
     bool assign_ = false;
 };

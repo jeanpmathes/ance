@@ -22,9 +22,10 @@ class ControlFlowGraphPrinter : public lang::ApplicationVisitorConst
 
     std::any visit(Unit const& unit) override;
     std::any visit(lang::FunctionDescription const& function) override;
-    std::any visit(lang::BasicBlock const& block) override;
 
   private:
+    std::any visitBB(lang::BasicBlock const& block);
+
     void printBlock(std::string const& label, int32_t id, BlockStyle style);
     void printLink(int32_t from, int32_t to);
     void printGroup(std::string const& label);

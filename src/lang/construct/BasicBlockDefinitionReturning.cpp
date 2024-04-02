@@ -27,11 +27,11 @@ void lang::bb::def::Returning::setLink(lang::BasicBlock& next)
 {
     lang::BasicBlock* next_ptr = &next;
 
-    assert(&next_ptr->definition() != this);
+    assert(next_ptr != this);
     assert(unreachable_next_ == nullptr);
 
     unreachable_next_ = next_ptr;
-    unreachable_next_->registerIncomingLink(*self());
+    unreachable_next_->registerIncomingLink(*this);
 }
 
 void lang::bb::def::Returning::updateLink(lang::BasicBlock* former, lang::BasicBlock* updated)
@@ -40,7 +40,7 @@ void lang::bb::def::Returning::updateLink(lang::BasicBlock* former, lang::BasicB
     assert(unreachable_next_ != updated);
 
     unreachable_next_ = updated;
-    unreachable_next_->registerIncomingLink(*self());
+    unreachable_next_->registerIncomingLink(*this);
 }
 
 std::vector<lang::BasicBlock const*> lang::bb::def::Returning::getSuccessors() const

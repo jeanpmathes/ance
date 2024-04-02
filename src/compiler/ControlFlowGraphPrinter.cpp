@@ -22,7 +22,7 @@ std::any ControlFlowGraphPrinter::visit(lang::FunctionDescription const& functio
     for (auto& basic_block : current_function_->getBasicBlocks())
     {
         lang::BasicBlock const& block = *basic_block;
-        visit(block);
+        visitBB(block);
     }
 
     printBlock("exit", NODE_EXIT, BlockStyle::META);
@@ -38,7 +38,7 @@ std::any ControlFlowGraphPrinter::visit(lang::FunctionDescription const& functio
     return {};
 }
 
-std::any ControlFlowGraphPrinter::visit(lang::BasicBlock const& block)
+std::any ControlFlowGraphPrinter::visitBB(lang::BasicBlock const& block)
 {
     auto id = static_cast<int32_t>(block.id());
 

@@ -170,14 +170,12 @@ std::any NativeBuilder::visit(lang::Function const& function)
                     lang::BasicBlock const* bb = bb_queue.back();
                     bb_queue.pop_back();
 
-                    lang::BasicBlock::Definition::Base const* ptr = &bb->definition();
-
-                    if (bb_map_.contains(ptr)) continue;
+                    if (bb_map_.contains(bb)) continue;
 
                     std::string const name = "b" + std::to_string(bb->id());
 
                     bb_list.emplace_back(bb);
-                    bb_map_[ptr] = llvm::BasicBlock::Create(native_build_.llvmContext(), name, current_function);
+                    bb_map_[bb] = llvm::BasicBlock::Create(native_build_.llvmContext(), name, current_function);
 
                     for (lang::BasicBlock const* next : bb->getSuccessors()) { bb_queue.emplace_back(next); }
                 }
@@ -188,7 +186,7 @@ std::any NativeBuilder::visit(lang::Function const& function)
 
                 for (lang::BasicBlock const* bb : bb_list)
                 {
-                    llvm::BasicBlock* llvm_bb = bb_map_[&bb->definition()];
+                    llvm::BasicBlock* llvm_bb = bb_map_[bb];
 
                     if (first)
                     {
@@ -200,7 +198,7 @@ std::any NativeBuilder::visit(lang::Function const& function)
 
                     native_build_.ir().SetInsertPoint(llvm_bb);
 
-                    visitTree(bb->definition());
+                    visitTree(*bb);
                 }
             }
 
@@ -215,13 +213,6 @@ std::any NativeBuilder::visit(lang::Function const& function)
         default:
             throw std::logic_error("Invalid global scope phase");
     }
-
-    return {};
-}
-
-std::any NativeBuilder::visit(lang::BasicBlock const& basic_block)
-{
-    visitTree(basic_block.definition());
 
     return {};
 }
@@ -262,7 +253,7 @@ std::any NativeBuilder::visit(lang::bb::def::Returning const& returning_bb)
         current = &current->scope();
     }
 
-    lang::Type const& return_type = returning_bb.self()->getContainingFunction()->returnType();
+    lang::Type const& return_type = returning_bb.getContainingFunction()->returnType();
 
     if (return_type.isUnitType()) { native_build_.performReturn(std::nullopt); }
     else
@@ -286,8 +277,8 @@ std::any NativeBuilder::visit(lang::bb::def::Branching const& branching_bb)
         lang::Type::makeMatching(native_build_.ctx().getBooleanType(), truth, native_build_);
 
     native_build_.ir().CreateCondBr(native_build_.llvmContentValue(boolean_truth),
-                                    bb_map_[&branching_bb.trueNext()->definition()],
-                                    bb_map_[&branching_bb.falseNext()->definition()]);
+                                    bb_map_[branching_bb.trueNext()],
+                                    bb_map_[branching_bb.falseNext()]);
 
     return {};
 }
@@ -305,12 +296,12 @@ std::any NativeBuilder::visit(lang::bb::def::Matching const& matching_bb)
     {
         if (case_values.empty())
         {
-            default_block = bb_map_[&branch_block->definition()];
+            default_block = bb_map_[branch_block];
             break;
         }
     }
 
-    if (!default_block) { default_block = bb_map_[&branches.front()->definition()]; }
+    if (!default_block) { default_block = bb_map_[branches.front()]; }
 
     Shared<lang::Value> value = getV(matching_bb.matched());
 
@@ -320,7 +311,7 @@ std::any NativeBuilder::visit(lang::bb::def::Matching const& matching_bb)
 
     for (auto const [case_values, branch_block] : llvm::zip(cases, branches))
     {
-        llvm::BasicBlock* branch_native_block = bb_map_[&branch_block->definition()];
+        llvm::BasicBlock* branch_native_block = bb_map_[branch_block];
 
         if (case_values.empty() || branch_native_block == default_block) continue;
 
@@ -732,6 +723,6 @@ Shared<lang::Value> NativeBuilder::getV(Expression const& expression)
 
 void NativeBuilder::branchToNextOrReturnVoid(lang::BasicBlock const* next)
 {
-    if (next != nullptr) native_build_.ir().CreateBr(bb_map_[&next->definition()]);
+    if (next != nullptr) native_build_.ir().CreateBr(bb_map_[next]);
     else native_build_.ir().CreateRetVoid();
 }

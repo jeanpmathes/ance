@@ -33,7 +33,7 @@ void lang::bb::def::Branching::setLink(lang::BasicBlock& next)
     if (!true_next_)
     {
         true_next_ = next_ptr;
-        next.registerIncomingLink(*self());
+        next.registerIncomingLink(*this);
 
         return;
     }
@@ -41,7 +41,7 @@ void lang::bb::def::Branching::setLink(lang::BasicBlock& next)
     if (!false_next_)
     {
         false_next_ = next_ptr;
-        next.registerIncomingLink(*self());
+        next.registerIncomingLink(*this);
 
         return;
     }
@@ -55,7 +55,7 @@ void lang::bb::def::Branching::updateLink(lang::BasicBlock* former, lang::BasicB
         assert(target != updated);
 
         target = updated;
-        updated->registerIncomingLink(*self());
+        updated->registerIncomingLink(*this);
     };
 
     if (true_next_ == former) { update(true_next_); }

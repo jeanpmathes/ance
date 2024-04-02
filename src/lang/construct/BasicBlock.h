@@ -11,7 +11,7 @@ namespace lang
      * A basic block is a sequence of instructions that are executed sequentially.
      * No branching is possible in a basic block, only on exit.
      */
-    class BasicBlock : public lang::Element<lang::BasicBlock, ANCE_CONSTRUCTS>
+    class BasicBlock : public virtual lang::Visitable<ANCE_CONSTRUCTS>
     {
       public:
         /**
@@ -146,14 +146,14 @@ namespace lang
          * Get the blocks that directly follow this block.
          * @return The blocks that directly follow this block.
          */
-        std::vector<lang::BasicBlock const*> getSuccessors() const;
+        virtual std::vector<lang::BasicBlock const*> getSuccessors() const = 0;
 
         /**
          * Get the return type of this basic block.
          * If this is not a return block, or a return block without return statement, an empty optional is returned.
          * @return The return type of this basic block.
          */
-        Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>> getReturnType() const;
+        virtual Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>> getReturnType() const;
 
         /**
          * Get the location of the first statement in this basic block.
@@ -182,92 +182,35 @@ namespace lang
          * Get the exit type of this basic block represented as a string.
          * @return The exit representation.
          */
-        std::string getExitRepresentation() const;
+        [[nodiscard]] virtual std::string getExitRepresentation() const = 0;
 
         /**
          * Check if this is a meta-block. A meta-block is not part of actual code.
          * @return True if this is a meta-block, false otherwise.
          */
-        [[nodiscard]] bool isMeta() const;
+        [[nodiscard]] virtual bool isMeta() const;
 
         void                 registerIncomingLink(BasicBlock& predecessor);
-        void                 updateLink(BasicBlock* former, BasicBlock* updated);
+        virtual void         updateLink(BasicBlock* former, BasicBlock* updated) = 0;
         [[nodiscard]] size_t getIncomingLinkCount() const;
         void                 transferStatements(std::list<Statement*>& statements);
 
-      public:
-        class Definition
-        {
-          public:
-            class Base : public virtual Visitable<ANCE_CONSTRUCTS>
-            {
-              public:
-                ~Base() override = default;
+        void markAsUnused();
 
-              public:
-                void                            setSelf(BasicBlock* self);
-                BasicBlock*                     self();
-                [[nodiscard]] BasicBlock const* self() const;
+        std::vector<Statement const*> statements() const;
 
-                [[nodiscard]] virtual bool isMeta() const;
+      protected:
+        void pushStatement(Statement& statement);
 
-                void                 index(size_t& index);
-                [[nodiscard]] size_t index() const;
-                void                 complete(size_t& index);
+        virtual void setLink(BasicBlock& next) = 0;
+        void         updateIncomingLinks(BasicBlock* updated);
 
-                virtual void setLink(BasicBlock& next)                             = 0;
-                virtual void updateLink(BasicBlock* former, BasicBlock* updated)   = 0;
+        [[nodiscard]] virtual bool isSimplificationCandidate() const;
 
-                void transferStatements(std::list<Statement*>& statements);
-
-                void                       simplify();
-                [[nodiscard]] virtual bool isSimplificationCandidate() const;
-
-                [[nodiscard]] std::list<Statement*> const& statements() const;
-
-                void                 registerIncomingLink(BasicBlock& block);
-                [[nodiscard]] size_t getIncomingLinkCount() const;
-                void                 updateIncomingLinks(BasicBlock* updated);
-
-                [[nodiscard]] std::list<lang::BasicBlock const*>           getLeaves() const;
-                [[nodiscard]] virtual std::vector<lang::BasicBlock const*> getSuccessors() const = 0;
-
-                [[nodiscard]] virtual Optional<std::pair<std::reference_wrapper<lang::Type const>, lang::Location>>
-                getReturnType() const;
-
-                [[nodiscard]] lang::Location getStartLocation() const;
-                [[nodiscard]] lang::Location getEndLocation() const;
-
-                void reach();
-
-                [[nodiscard]] virtual std::string getExitRepresentation() const = 0;
-
-              protected:
-                void pushStatement(Statement& statement);
-
-                [[nodiscard]] virtual std::vector<lang::BasicBlock*> getReachableNext() = 0;
-                [[nodiscard]] virtual std::vector<lang::BasicBlock*> getUnreachableNext();
-
-              private:
-                BasicBlock*              self_ {};
-                std::vector<BasicBlock*> incoming_links_ {};
-
-                size_t index_ {};
-
-                std::list<Statement*> statements_ {};
-            };
-        };
-
-        explicit BasicBlock(Owned<Definition::Base> definition);
-
-        Definition::Base&       definition();
-        Definition::Base const& definition() const;
-
-        void               markAsUnused();
-        [[nodiscard]] bool isUnused() const;
+        [[nodiscard]] virtual std::vector<lang::BasicBlock*> getReachableNext() = 0;
+        [[nodiscard]] virtual std::vector<lang::BasicBlock*> getUnreachableNext();
 
       private:
-        Owned<Definition::Base>                              definition_;
         lang::Function*                                      containing_function_ {nullptr};
         mutable Optional<std::list<lang::BasicBlock const*>> leaves_ {};
 
@@ -275,12 +218,16 @@ namespace lang
         bool         unused_ {false};
         bool         finalized_ {false};
         bool         reached_ {false};
+
+        std::vector<BasicBlock*> incoming_links_ {};
+        size_t                   index_ {};
+        std::list<Statement*>    statements_ {};
     };
 
     namespace bb::def
     {
         class Empty
-            : public virtual BasicBlock::Definition::Base
+            : public BasicBlock
             , public lang::Element<Empty, ANCE_CONSTRUCTS>
         {
           public:
@@ -306,7 +253,7 @@ namespace lang
         };
 
         class Finalizing
-            : public virtual BasicBlock::Definition::Base
+            : public BasicBlock
             , public lang::Element<Finalizing, ANCE_CONSTRUCTS>
         {
           public:
@@ -335,7 +282,7 @@ namespace lang
         };
 
         class Simple
-            : public virtual BasicBlock::Definition::Base
+            : public BasicBlock
             , public lang::Element<Simple, ANCE_CONSTRUCTS>
         {
           public:
@@ -361,7 +308,7 @@ namespace lang
         };
 
         class Returning
-            : public virtual BasicBlock::Definition::Base
+            : public BasicBlock
             , public lang::Element<Returning, ANCE_CONSTRUCTS>
         {
           public:
@@ -392,7 +339,7 @@ namespace lang
         };
 
         class Branching
-            : public virtual BasicBlock::Definition::Base
+            : public BasicBlock
             , public lang::Element<Branching, ANCE_CONSTRUCTS>
         {
           public:
@@ -422,7 +369,7 @@ namespace lang
         };
 
         class Matching
-            : public virtual BasicBlock::Definition::Base
+            : public BasicBlock
             , public lang::Element<Matching, ANCE_CONSTRUCTS>
         {
           public:
