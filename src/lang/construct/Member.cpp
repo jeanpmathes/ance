@@ -53,6 +53,11 @@ lang::Location lang::Member::location() const
     return location_;
 }
 
+bool lang::Member::isDefaultInitialized() const
+{
+    return !constant_init_.hasValue();
+}
+
 void lang::Member::setIndex(size_t index)
 {
     assert(index_ == std::numeric_limits<size_t>::max());

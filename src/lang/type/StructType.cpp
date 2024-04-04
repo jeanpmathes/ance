@@ -143,7 +143,8 @@ void lang::StructType::performSingleDefaultFinalizerDefinition(Shared<lang::Valu
 bool lang::StructType::isTriviallyDefaultConstructible() const
 {
     return std::all_of(members_.begin(), members_.end(), [](auto& member) {
-        return member.get().type()->getDefinition()->isTriviallyDefaultConstructible();
+        lang::Member const& m = member.get();
+        return m.isDefaultInitialized() && m.type().getDefinition()->isTriviallyDefaultConstructible();
     });
 }
 

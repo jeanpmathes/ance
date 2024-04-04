@@ -43,6 +43,12 @@ namespace lang
         [[nodiscard]] lang::Assigner assigner() const;
         [[nodiscard]] lang::Location location() const;
 
+        /**
+         * Whether this member is initialized with a default value, meaning no initializer is present.
+         * @return True if no initializer is present, false if an initializer is present.
+         */
+        [[nodiscard]] bool isDefaultInitialized() const;
+
         void                 setIndex(size_t index);
         [[nodiscard]] size_t index() const;
 
