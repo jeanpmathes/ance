@@ -63,8 +63,8 @@ namespace lang
 
         std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, Function& function) override;
 
-        Scope*                           getBlockScope() override;
-        [[nodiscard]] lang::Scope const* getBlockScope() const override;
+        OrderedScope*                           getBlockScope() override;
+        [[nodiscard]] lang::OrderedScope const* getBlockScope() const override;
 
         [[nodiscard]] bool isCompound() const override;
 

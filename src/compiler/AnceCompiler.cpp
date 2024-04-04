@@ -177,7 +177,7 @@ llvm::Function* AnceCompiler::buildInit()
 
     ir_.SetInsertPoint(start_block);
 
-    unit_.globalScope().registerEntityInitializations(native_build_);
+    unit_.globalScope().performEntityInitializations(native_build_);
 
     ir_.CreateRetVoid();
     return init;

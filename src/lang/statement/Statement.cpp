@@ -57,7 +57,7 @@ lang::Scope const& Statement::scope() const
     return *containing_scope_;
 }
 
-lang::Scope* Statement::getBlockScope()
+lang::OrderedScope* Statement::getBlockScope()
 {
     return nullptr;
 }
@@ -67,9 +67,9 @@ lang::Scope const* Statement::getBlockScope() const
     return nullptr;
 }
 
-std::vector<std::reference_wrapper<lang::Scope>> Statement::getSubScopesInOrder()
+std::vector<std::reference_wrapper<lang::OrderedScope>> Statement::getSubScopesInOrder()
 {
-    std::vector<std::reference_wrapper<lang::Scope>> sub_scopes;
+    std::vector<std::reference_wrapper<lang::OrderedScope>> sub_scopes;
 
     for (auto& substatement : substatements_)
     {

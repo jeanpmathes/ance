@@ -130,12 +130,12 @@ std::vector<Owned<lang::BasicBlock>> lang::CodeBlock::createBasicBlocks(lang::Ba
     return blocks;
 }
 
-lang::Scope* lang::CodeBlock::getBlockScope()
+lang::OrderedScope* lang::CodeBlock::getBlockScope()
 {
     return getPtr(scope_);
 }
 
-lang::Scope const* lang::CodeBlock::getBlockScope() const
+lang::OrderedScope const* lang::CodeBlock::getBlockScope() const
 {
     return getPtr(scope_);
 }

@@ -89,7 +89,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
      */
     [[nodiscard]] Owned<Case> expand(lang::ResolvingHandle<lang::Variable> target, lang::Context& new_context) const;
 
-    std::vector<std::reference_wrapper<lang::Scope>> getSubScopesInOrder();
+    std::vector<std::reference_wrapper<lang::OrderedScope>> getSubScopesInOrder();
 
   private:
     std::vector<Owned<LiteralExpression>>             conditions_;
@@ -122,7 +122,7 @@ class Match
     void walkDefinitions() override;
     void postResolve() override;
 
-    std::vector<std::reference_wrapper<lang::Scope>> getSubScopesInOrder() override;
+    std::vector<std::reference_wrapper<lang::OrderedScope>> getSubScopesInOrder() override;
 
     void validate(ValidationLogger& validation_logger) const override;
 

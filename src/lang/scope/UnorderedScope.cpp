@@ -488,12 +488,7 @@ std::vector<std::reference_wrapper<lang::Description const>> lang::UnorderedScop
     return descriptions;
 }
 
-void lang::UnorderedScope::registerEntityDeclarations(Execution&) const
-{
-    throw std::logic_error("Must be handled by visitor");
-}
-
-void lang::UnorderedScope::registerEntityInitializations(Execution& exec) const
+void lang::UnorderedScope::performEntityInitializations(Execution& exec) const
 {
     for (auto& group : description_order_.value())
     {

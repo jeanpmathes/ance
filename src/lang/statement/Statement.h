@@ -13,7 +13,7 @@
 namespace lang
 {
     class Function;
-    class Scope;
+    class OrderedScope;
     class BasicBlock;
 }
 
@@ -83,7 +83,7 @@ class Statement
      * For compound statements the block scope is the scope that contains all the statements.
      * @return The block scope, or nullptr.
      */
-    [[nodiscard]] virtual lang::Scope* getBlockScope();
+    [[nodiscard]] virtual lang::OrderedScope* getBlockScope();
 
     /**
      * Get the block scope of the statement, if any.
@@ -96,7 +96,7 @@ class Statement
      * Get the sub scopes of this statement, if any.
      * @return The ordered sub scopes.
      */
-    [[nodiscard]] virtual std::vector<std::reference_wrapper<lang::Scope>> getSubScopesInOrder();
+    [[nodiscard]] virtual std::vector<std::reference_wrapper<lang::OrderedScope>> getSubScopesInOrder();
 
     /**
      * Get whether this statement is a compound statement.

@@ -55,8 +55,9 @@ namespace lang
 
         bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) override;
 
-        void         registerEntityDeclarations(Execution& exec) const override;
+        void         registerEntityDeclarations(Execution& exec) const;
         virtual void registerEntityDeclarationsFollowingOrder(Execution& exec) const = 0;
+
         void         performEntityFinalizations(Execution& exec) const override;
 
       private:

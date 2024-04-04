@@ -296,7 +296,7 @@ Owned<Case> Case::expand(lang::ResolvingHandle<lang::Variable> target, lang::Con
     return Owned<Case>(*(new Case(std::move(expanded_conditions), std::move(new_block))));
 }
 
-std::vector<std::reference_wrapper<lang::Scope>> Case::getSubScopesInOrder()
+std::vector<std::reference_wrapper<lang::OrderedScope>> Case::getSubScopesInOrder()
 {
     if (std::holds_alternative<Owned<Statement>>(code_))
     {
@@ -377,9 +377,9 @@ void Match::postResolve()
     for (auto& case_ptr : cases_) { case_ptr->postResolve(); }
 }
 
-std::vector<std::reference_wrapper<lang::Scope>> Match::getSubScopesInOrder()
+std::vector<std::reference_wrapper<lang::OrderedScope>> Match::getSubScopesInOrder()
 {
-    std::vector<std::reference_wrapper<lang::Scope>> sub_scopes;
+    std::vector<std::reference_wrapper<lang::OrderedScope>> sub_scopes;
 
     for (auto& case_ptr : cases_)
     {

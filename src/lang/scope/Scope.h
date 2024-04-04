@@ -178,11 +178,6 @@ namespace lang
         virtual bool resolveDefinition(lang::ResolvingHandle<lang::Entity> entity) = 0;
 
         /**
-         * Build the declarations for all entities in this scope.
-         * @param exec The current execution context.
-         */
-        virtual void registerEntityDeclarations(Execution& exec) const = 0;
-        /**
          * Build the finalization for all entities in this scope.
          * @param exec The current execution context.
          */

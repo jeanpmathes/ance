@@ -134,7 +134,10 @@ Optional<lang::Location> lang::StatementFunction::findUnreachableCode() const
 
 void lang::StatementFunction::registerDeclarationsFollowingOrder(Execution& exec) const
 {
-    code_.getBlockScope()->registerEntityDeclarations(exec);
+    lang::OrderedScope* ordered_scope = code_.getBlockScope();
+    if (ordered_scope == nullptr) return;
+
+    ordered_scope->registerEntityDeclarations(exec);
 }
 
 lang::BasicBlock const* lang::StatementFunction::getEntryBlock() const
