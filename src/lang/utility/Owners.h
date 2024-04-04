@@ -169,50 +169,6 @@ Shared<T> makeShared(Args&&... args)
     return Shared<T>(std::make_shared<T>(std::forward<Args>(args)...));
 }
 
-/**
- * A passed reference to a value. A use-case is when a class passes itself to an owned value.
- * @tparam T The type of the value.
- */
-template<typename T>
-class Passed
-{
-  public:
-    explicit Passed(T& value);
-    Passed(Passed<T>&& value) noexcept;
-    Passed(Passed<T>& value) noexcept;
-
-    template<typename OtherT>
-        requires std::is_base_of_v<T, OtherT>
-    explicit(false) Passed(Passed<OtherT>&& value) noexcept;// NOLINT(google-explicit-constructor)
-
-    template<typename OtherT>
-        requires std::is_base_of_v<T, OtherT>
-    explicit(false) Passed(Passed<OtherT>& value) noexcept;// NOLINT(google-explicit-constructor)
-
-    Passed<T>& operator=(Passed<T> value) noexcept;
-
-    T*       get();
-    T const* get() const;
-
-    T& operator*();
-    T* operator->();
-
-    T const& operator*() const;
-    T const* operator->() const;
-
-    template<typename OtherT>
-    friend class Passed;
-
-  private:
-    T& reference_;
-};
-
-template<typename T>
-Passed<T> pass(T& value)
-{
-    return Passed<T>(value);
-}
-
 #include "Owners.tpp"
 
 #endif
