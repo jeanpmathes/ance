@@ -605,12 +605,12 @@ std::any SourceVisitor::visitIfExpression(anceParser::IfExpressionContext* ctx)
 {
     Expression& condition = *std::any_cast<Expression*>(visit(ctx->condition));
 
-    Expression& then_expression = *std::any_cast<Expression*>(visit(ctx->thenBlock));
-    Expression& else_expression = *std::any_cast<Expression*>(visit(ctx->elseBlock));
+    Expression* then_expression = std::any_cast<Expression*>(visit(ctx->thenBlock));
+    Expression* else_expression = ctx->elseBlock != nullptr ? std::any_cast<Expression*>(visit(ctx->elseBlock)) : nullptr;
 
     return static_cast<Expression*>(new IfSelect(Owned<Expression>(condition),
-                                                 Owned<Expression>(then_expression),
-                                                 Owned<Expression>(else_expression),
+                                                 Owned<Expression>(*then_expression),
+                                                 wrap(else_expression),
                                                  location(ctx)));
 }
 
