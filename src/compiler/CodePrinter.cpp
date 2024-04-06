@@ -220,8 +220,10 @@ std::any CodePrinter::visit(FunctionCall const& function_call)
 std::any CodePrinter::visit(IfSelect const& if_select)
 {
     out_ << "if " << visitTree(if_select.condition()) << " ";
-    out_ << "then " << visitTree(if_select.thenExpression()) << " ";
-    out_ << "else " << visitTree(if_select.elseExpression()) << " ";
+    out_ << "then " << visitTree(if_select.thenExpression());
+
+    if (if_select.elseExpression() != nullptr)
+        out_ << " else " << visitTree(*if_select.elseExpression());
 
     return {};
 }

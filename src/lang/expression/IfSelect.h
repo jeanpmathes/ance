@@ -19,17 +19,17 @@ class IfSelect
      * Creates a new if-expression.
      * @param condition The condition to evaluate.
      * @param then_expression The expression to evaluate if the condition is true.
-     * @param else_expression The expression to evaluate if the condition is false.
+     * @param else_expression The expression to evaluate if the condition is false, or nullopt if there is no else expression.
      * @param location The location of the expression.
      */
     IfSelect(Owned<Expression> condition,
              Owned<Expression> then_expression,
-             Owned<Expression> else_expression,
+             Optional<Owned<Expression>> else_expression,
              lang::Location    location);
 
     [[nodiscard]] Expression const& condition() const;
     [[nodiscard]] Expression const& thenExpression() const;
-    [[nodiscard]] Expression const& elseExpression() const;
+    [[nodiscard]] Expression const* elseExpression() const;
 
   public:
     bool validate(ValidationLogger& validation_logger) const override;
@@ -45,7 +45,7 @@ class IfSelect
   private:
     Owned<Expression> condition_;
     Owned<Expression> then_expression_;
-    Owned<Expression> else_expression_;
+    Optional<Owned<Expression>> else_expression_;
 };
 
 #endif

@@ -177,7 +177,7 @@ expression
     | left=expression binaryOperatorEquality right=expression # BinaryOperation
     | left=expression ( NOT )? 'and' right=expression # LogicalAnd
     | left=expression ( NOT )? 'or' right=expression # LogicalOr
-    | 'if' condition=expression 'then' thenBlock=expression 'else' elseBlock=expression # IfExpression
+    | 'if' condition=expression 'then' thenBlock=expression ('else' elseBlock=expression)? # IfExpression
     | matchExpression # Match
     | '<' ( type '|' )? expression ( ',' expression )* '>' # VectorDefinition
     | '[' ( type '|' )? expression ( ',' expression )* ']' # ArrayDefinition

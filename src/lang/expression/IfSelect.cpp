@@ -10,10 +10,12 @@
 #include "lang/statement/Erase.h"
 #include "lang/statement/If.h"
 #include "lang/statement/LocalVariableDefinition.h"
+#include "lang/expression/LiteralExpression.h"
+#include "lang/construct/constant/BooleanConstant.h"
 
 IfSelect::IfSelect(Owned<Expression> condition,
                    Owned<Expression> then_expression,
-                   Owned<Expression> else_expression,
+                   Optional<Owned<Expression>> else_expression,
                    lang::Location    location)
     : Expression(location)
     , condition_(std::move(condition))
@@ -22,7 +24,9 @@ IfSelect::IfSelect(Owned<Expression> condition,
 {
     addSubexpression(*condition_);
     addSubexpression(*then_expression_);
-    addSubexpression(*else_expression_);
+
+    if (else_expression_.hasValue())
+        addSubexpression(**else_expression_);
 }
 
 Expression const& IfSelect::condition() const
@@ -35,15 +39,15 @@ Expression const& IfSelect::thenExpression() const
     return *then_expression_;
 }
 
-Expression const& IfSelect::elseExpression() const
+Expression const* IfSelect::elseExpression() const
 {
-    return *else_expression_;
+    return getPtr(else_expression_);
 }
 
 void IfSelect::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     auto then_type = then_expression_->type();
-    auto else_type = else_expression_->type();
+    auto else_type = else_expression_.hasValue() ? else_expression_.value()->type() : scope().context().getBooleanType();
 
     if (then_type->isDefined() && else_type->isDefined())
     {
@@ -64,7 +68,9 @@ bool IfSelect::validate(ValidationLogger& validation_logger) const
 
     valid &= condition_->validate(validation_logger);
     valid &= then_expression_->validate(validation_logger);
-    valid &= else_expression_->validate(validation_logger);
+
+    if (else_expression_.hasValue())
+        valid &= else_expression_.value()->validate(validation_logger);
 
     if (!valid) return false;
 
@@ -73,7 +79,10 @@ bool IfSelect::validate(ValidationLogger& validation_logger) const
                                        condition_->location(),
                                        validation_logger);
 
-    auto common_types = lang::Type::getCommonType({then_expression_->type(), else_expression_->type()});
+    auto common_types = lang::Type::getCommonType({
+        then_expression_->type(),
+        else_expression_.hasValue() ? else_expression_.value()->type() : scope().context().getBooleanType()
+    });
 
     if (common_types.empty() || common_types.size() > 1)
     {
@@ -88,9 +97,15 @@ Expression::Expansion IfSelect::expandWith(Expressions subexpressions, lang::Con
 {
     auto temp_name          = lang::Identifier::like(scope().getTemporaryName(), location());
     auto make_temp_variable = [&temp_name]() { return lang::makeHandled<lang::Variable>(temp_name); };
+
     auto condition          = std::move(subexpressions[0]);
     auto then_expression    = std::move(subexpressions[1]);
-    auto else_expression    = std::move(subexpressions[2]);
+
+    Owned<Expression> else_expression
+        = else_expression_.hasValue()
+          ? std::move(subexpressions[2])
+          : makeOwned<LiteralExpression>(lang::BooleanConstant::createTrue(new_context), location());
+
 
     Statements before;
 

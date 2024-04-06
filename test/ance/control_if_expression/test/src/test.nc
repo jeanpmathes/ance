@@ -12,6 +12,14 @@ public main () : u32
     b <: if true then get_true() else get_false();
     b <: if false then get_true() else get_false();
 
+    // The if-expression can be used to formulate implications.
+    // This works because the for the boolean type, the else-branch is set to true if not provided.
+
+    assert (if false then false) == true;
+    assert (if false then true) == true;
+    assert (if true then false) == false;
+    assert (if true then true) == true;
+
     return 0:32;
 }
 
