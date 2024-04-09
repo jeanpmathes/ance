@@ -4,7 +4,7 @@
 
 private struct Values
 {
-    public a: i32 <: +15:32;
+    public a: s32 <: +15:32;
     public b: *u8 <: c"A";
     public c: bool;
 }

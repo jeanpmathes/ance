@@ -27,7 +27,7 @@ public main () : u32
     let a12 <: a7 as uiptr;
 
     // Pointers can not be directly converted to each other.
-    let a13 <: a1 as ptr as *i32;
+    let a13 <: a1 as ptr as *s32;
     let a14 <: a13 as ptr as *u32;
 
     // Buffer-pointers work just like pointers in respect to the above.

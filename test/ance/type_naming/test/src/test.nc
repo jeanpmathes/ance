@@ -3,10 +3,10 @@
 // In the global scope and other unordered scopes, every name can be used at most once.
 
 public nameA () {}
-public nameA: i32;
+public nameA: s32;
 
-public nameB: i32;
-public define nameB alias i32;
+public nameB: s32;
+public define nameB alias s32;
 
 public struct nameC {}
 public nameC () {}

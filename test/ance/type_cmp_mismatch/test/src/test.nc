@@ -3,9 +3,9 @@
 // All syntactic structures expect specific types to be provided.
 
 private struct DefinedStruct { }
-private variable: i32 := DefinedStruct; // This requires a value, not a type.
+private variable: s32 := DefinedStruct; // This requires a value, not a type.
 
-private defined_variable: i32 := 0;
+private defined_variable: s32 := 0;
 private defined_function ()
 {
     let x := new dynamic defined_variable; // This requires a type, not a value.

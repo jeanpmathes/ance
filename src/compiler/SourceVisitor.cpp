@@ -862,7 +862,7 @@ std::any SourceVisitor::visitIntegerType(anceParser::IntegerTypeContext* ctx)
 {
     std::string integer_type_str = ctx->NATIVE_INTEGER_TYPE()->getText();
 
-    bool const     is_signed = integer_type_str[0] == 'i';
+    bool const     is_signed = integer_type_str[0] == 's';
     uint64_t const size      = parseIntegerTypeSize(integer_type_str.substr(1));
 
     lang::ResolvingHandle<lang::Type> type = context().getFixedWidthIntegerType(size, is_signed);

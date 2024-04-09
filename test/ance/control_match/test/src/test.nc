@@ -23,7 +23,7 @@ public main () : u32
         default => print(console, c"E");
     }
 
-    let value: i32 <: 3;
+    let value: s32 <: 3;
 
     match value with
     {

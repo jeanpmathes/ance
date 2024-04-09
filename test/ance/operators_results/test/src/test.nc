@@ -14,8 +14,8 @@ public main () : u32
 
 private test_fw_integer_math ()
 {
-    let x1: i32 <: -1:32;
-    let x2: i32 <: +1:32;
+    let x1: s32 <: -1:32;
+    let x2: s32 <: +1:32;
 
     assert x1 == -1:32;
     assert x2 == +1:32;

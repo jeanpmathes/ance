@@ -6,14 +6,14 @@ public main () : u32
 {
     // All mathematical operators are supported for all fixed-width integer types.
 
-    let a1: i32 <: +5:32;
-    let b1: i32 <: -5:32;
+    let a1: s32 <: +5:32;
+    let b1: s32 <: -5:32;
 
-    let x1: i32 <: a1 + b1;
-    let x2: i32 <: a1 - b1;
-    let x3: i32 <: a1 * b1;
-    let x4: i32 <: a1 / b1;
-    let x5: i32 <: a1 % b1;
+    let x1: s32 <: a1 + b1;
+    let x2: s32 <: a1 - b1;
+    let x3: s32 <: a1 * b1;
+    let x4: s32 <: a1 / b1;
+    let x5: s32 <: a1 % b1;
 
     // All mathematical operators are supported for all floating-point types.
 
@@ -64,7 +64,7 @@ public main () : u32
 
     // Signed values can be negated.
 
-    let x30: i32 <: -a1;
+    let x30: s32 <: -a1;
 
     return 0:32;
 }

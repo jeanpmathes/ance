@@ -8,7 +8,7 @@ private fn (a: *Alias) {}
 
 public main () : u32
 {
-    let a: i8;
+    let a: s8;
     let b: Alias := Alias(a);
 
     return 0:32;

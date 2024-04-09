@@ -2,12 +2,12 @@
 
 // Integer and float types allow implicit conversion of their values to larger types.
 
-public define int alias i64;
+public define int alias s64;
 
 public main () : u32
 {
-    let x1: i32 <: +1:16;
-    let x2: i64 <: -1:32;
+    let x1: s32 <: +1:16;
+    let x2: s64 <: -1:32;
 
     assert x2 == -1:64;
 
@@ -16,8 +16,8 @@ public main () : u32
 
     // Unsigned values can be implicitly converted to signed values of larger size.
 
-    let x5: i32 <: 1:31;
-    let x6: i64 <: 1:63;
+    let x5: s32 <: 1:31;
+    let x6: s64 <: 1:63;
 
     assert x6 == +1:64;
 
@@ -33,7 +33,7 @@ public main () : u32
 
     // Type aliasing has no effect on implicit conversion.
     let x13: int <: x4;
-    let x14: i64 <: x13;
+    let x14: s64 <: x13;
 
     return 0:32;
 }

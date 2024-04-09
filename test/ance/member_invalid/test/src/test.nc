@@ -4,7 +4,7 @@
 
 public struct Data
 {
-    private x: i32;
+    private x: s32;
 }
 
 public main () : u32

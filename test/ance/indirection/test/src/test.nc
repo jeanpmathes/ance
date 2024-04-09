@@ -4,8 +4,8 @@
 
 public struct Point
 {
-    public x: i64;
-    public y: i64;
+    public x: s64;
+    public y: s64;
 }
 
 public main () : u32

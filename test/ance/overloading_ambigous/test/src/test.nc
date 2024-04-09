@@ -10,5 +10,5 @@ public main () : u32
     return 0:32;
 }
 
-private ambiguous (x: i64) {}
-private ambiguous (x: i128) {}
+private ambiguous (x: s64) {}
+private ambiguous (x: s128) {}

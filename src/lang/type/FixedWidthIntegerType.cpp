@@ -10,7 +10,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::FixedWidthIntegerType::FixedWidthIntegerType(uint64_t bit_size, bool is_signed)
-    : TypeDefinition(lang::Identifier::like((is_signed ? "i" : "u") + std::to_string(bit_size)))
+    : TypeDefinition(lang::Identifier::like((is_signed ? "s" : "u") + std::to_string(bit_size)))
     , bit_size_(bit_size)
     , is_signed_(is_signed)
 {}

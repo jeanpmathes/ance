@@ -5,7 +5,7 @@
 public main () : u32
 {
     // Dynamic memory is allocated using new.
-    let ptr_to_int: *i32 <: new dynamic i32;
+    let ptr_to_int: *s32 <: new dynamic s32;
 
     // Dynamically allocated memory must be freed using delete.
     delete ptr_to_int;

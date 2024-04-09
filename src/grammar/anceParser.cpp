@@ -202,12 +202,11 @@ void anceParserInitialize() {
   	264,1,0,0,0,267,265,1,0,0,0,267,266,1,0,0,0,268,27,1,0,0,0,269,272,3,
   	32,16,0,270,272,3,30,15,0,271,269,1,0,0,0,271,270,1,0,0,0,272,29,1,0,
   	0,0,273,277,5,4,0,0,274,276,3,28,14,0,275,274,1,0,0,0,276,279,1,0,0,0,
-  	277,275,1,0,0,0,277,278,1,0,0,0,278,280,1,0,0,0,279,277,1,0,0,0,280,281,
-  	5,5,0,0,281,31,1,0,0,0,282,297,3,34,17,0,283,297,3,36,18,0,284,297,3,
-  	38,19,0,285,297,3,40,20,0,286,297,3,42,21,0,287,297,3,46,23,0,288,297,
-  	3,48,24,0,289,297,3,50,25,0,290,297,3,52,26,0,291,297,3,54,27,0,292,297,
-  	3,56,28,0,293,297,3,58,29,0,294,297,3,60,30,0,295,297,3,62,31,0,296,282,
-  	1,0,0,0,296,283,1,0,0,0,296,284,1,0,0,0,296,285,1,0,0,0,296,286,1,0,0,
+  	277,275,1,0,0,0,277,278,1,0,0,0,278,280,1,0,0,0,279,277,1,0,0,0,280,281, 5,   5,   0,   0,   281, 31,  1,   0,   0,   0,
+      282, 297, 3,   34,  17,  0,   283, 297, 3,   56,  28,  0,   284, 297, 3,   36,  18,  0,   285, 297, 3,   38,  19,
+      0,   286, 297, 3,   40,  20,  0,   287, 297, 3,   42,  21,  0,   288, 297, 3,   46,  23,  0,   289, 297, 3,   48,
+      24,  0,   290, 297, 3,   50,  25,  0,   291, 297, 3,   52,  26,  0,   292, 297, 3,   54,  27,  0,   293, 297, 3,
+      58,  29,  0,   294, 297, 3,   60,  30,  0,   295, 297, 3,   62,  31,  0,   296, 282, 1,0,0,0,296,283,1,0,0,0,296,284,1,0,0,0,296,285,1,0,0,0,296,286,1,0,0,
   	0,296,287,1,0,0,0,296,288,1,0,0,0,296,289,1,0,0,0,296,290,1,0,0,0,296,
   	291,1,0,0,0,296,292,1,0,0,0,296,293,1,0,0,0,296,294,1,0,0,0,296,295,1,
   	0,0,0,297,33,1,0,0,0,298,299,3,82,41,0,299,300,5,96,0,0,300,35,1,0,0,
@@ -1840,6 +1839,11 @@ anceParser::ExpressionStatementContext* anceParser::StatementContext::expression
   return getRuleContext<anceParser::ExpressionStatementContext>(0);
 }
 
+anceParser::IfStatementContext* anceParser::StatementContext::ifStatement()
+{
+    return getRuleContext<anceParser::IfStatementContext>(0);
+}
+
 anceParser::LocalVariableDefinitionContext* anceParser::StatementContext::localVariableDefinition() {
   return getRuleContext<anceParser::LocalVariableDefinitionContext>(0);
 }
@@ -1874,10 +1878,6 @@ anceParser::ReturnStatementContext* anceParser::StatementContext::returnStatemen
 
 anceParser::AssertStatementContext* anceParser::StatementContext::assertStatement() {
   return getRuleContext<anceParser::AssertStatementContext>(0);
-}
-
-anceParser::IfStatementContext* anceParser::StatementContext::ifStatement() {
-  return getRuleContext<anceParser::IfStatementContext>(0);
 }
 
 anceParser::WhileStatementContext* anceParser::StatementContext::whileStatement() {
@@ -1930,70 +1930,70 @@ anceParser::StatementContext* anceParser::statement() {
     case 2: {
       enterOuterAlt(_localctx, 2);
       setState(283);
-      localVariableDefinition();
+      ifStatement();
       break;
     }
 
     case 3: {
       enterOuterAlt(_localctx, 3);
       setState(284);
-      localReferenceDefinition();
+      localVariableDefinition();
       break;
     }
 
     case 4: {
       enterOuterAlt(_localctx, 4);
       setState(285);
-      eraseStatement();
+      localReferenceDefinition();
       break;
     }
 
     case 5: {
       enterOuterAlt(_localctx, 5);
       setState(286);
-      assignment();
+      eraseStatement();
       break;
     }
 
     case 6: {
       enterOuterAlt(_localctx, 6);
       setState(287);
-      deleteStatement();
+      assignment();
       break;
     }
 
     case 7: {
       enterOuterAlt(_localctx, 7);
       setState(288);
-      breakStatement();
+      deleteStatement();
       break;
     }
 
     case 8: {
       enterOuterAlt(_localctx, 8);
       setState(289);
-      continueStatement();
+      breakStatement();
       break;
     }
 
     case 9: {
       enterOuterAlt(_localctx, 9);
       setState(290);
-      returnStatement();
+      continueStatement();
       break;
     }
 
     case 10: {
       enterOuterAlt(_localctx, 10);
       setState(291);
-      assertStatement();
+      returnStatement();
       break;
     }
 
     case 11: {
       enterOuterAlt(_localctx, 11);
       setState(292);
-      ifStatement();
+      assertStatement();
       break;
     }
 

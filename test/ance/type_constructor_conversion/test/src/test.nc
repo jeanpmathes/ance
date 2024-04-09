@@ -10,7 +10,7 @@ public main () : u32
     let l: u64 <: u64(k);
 
     let b1: bool <: true;
-    let b2: i1 <: i1(b1);
+    let b2: s1 <: s1(b1);
     let b3: bool <: bool(b2);
 
     return 0:32;

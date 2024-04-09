@@ -4,20 +4,20 @@
 
 public struct Data
 {
-    public value: i32;
+    public value: s32;
 }
 
 public main () : u32
 {
-    let v1: i32 <: +5:32;
-    let c1: i32 <: v1;
+    let v1: s32 <: +5:32;
+    let c1: s32 <: v1;
     assert c1 == v1;
 
-    let v2: [i32; 3];
+    let v2: [s32; 3];
     v2[0] <: +5:32;
     v2[1] <: +5:32;
     v2[2] <: +5:32;
-    let c2: [i32; 3] <: v2;
+    let c2: [s32; 3] <: v2;
     assert c2[0] == v2[0];
     assert c2[1] == v2[1];
     assert c2[2] == v2[2];

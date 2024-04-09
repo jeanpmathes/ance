@@ -428,6 +428,7 @@ public:
     StatementContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     ExpressionStatementContext *expressionStatement();
+    IfStatementContext*              ifStatement();
     LocalVariableDefinitionContext *localVariableDefinition();
     LocalReferenceDefinitionContext *localReferenceDefinition();
     EraseStatementContext *eraseStatement();
@@ -437,7 +438,6 @@ public:
     ContinueStatementContext *continueStatement();
     ReturnStatementContext *returnStatement();
     AssertStatementContext *assertStatement();
-    IfStatementContext *ifStatement();
     WhileStatementContext *whileStatement();
     LoopStatementContext *loopStatement();
     MatchStatementContext *matchStatement();

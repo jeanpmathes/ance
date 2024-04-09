@@ -11,14 +11,14 @@ public main () : u32
     assert v3 == v2;
     assert v3 as ptr == v2 as ptr;
 
-    let v: i32 := 500;
+    let v: s32 := 500;
 
-    let p1: *i32 <: addressof v;
+    let p1: *s32 <: addressof v;
     let offset: diff <: 15;
 
     // Adding a diff value to a pointer will offset the pointer.
     let p2 <: p1 + offset;
-    assert uiptr(p2) == uiptr(p1) + uiptr(offset * sizeof i32);
+    assert uiptr(p2) == uiptr(p1) + uiptr(offset * sizeof s32);
 
     // Subtracting two pointers will return the difference between them.
     let difference <: p2 - p1;

@@ -6,7 +6,7 @@ public define DataAlias alias Data;
 
 public struct Data
 {
-    public x1: i32;
+    public x1: s32;
     private x2: [Vector3s; 3];
     private x3: Vector3s;
     private x4: *Data;

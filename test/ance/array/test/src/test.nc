@@ -2,13 +2,13 @@
 
 // Array types can be created for most types and have a fixed length.
 
-private arr1: [i32; 1];
-private arr2: [i64; 2];
+private arr1: [s32; 1];
+private arr2: [s64; 2];
 private arr3: [single; 4];
 private arr4: [size; 16];
 private arr5: [*u8; 32];
-private arr6: [[i1; 2]; 64];
-private arr7: [[[i1; 2]; 2]; 128];
+private arr6: [[s1; 2]; 64];
+private arr7: [[[s1; 2]; 2]; 128];
 
 // String arrays have special literals, that allow to declare array contents in a readable form.
 
@@ -18,7 +18,7 @@ public main () : u32
 {
     // Arrays provide subscript operators.
 
-    let e: i32 <: arr1[0];
+    let e: s32 <: arr1[0];
     arr1[0] <: e;
 
     // The return types of subscript operators are references to the element type.

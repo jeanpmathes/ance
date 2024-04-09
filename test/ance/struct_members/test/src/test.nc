@@ -4,8 +4,8 @@
 
 public struct Data
 {
-    public x: i32;
-    public x: i32;
+    public x: s32;
+    public x: s32;
 }
 
 public main () : u32

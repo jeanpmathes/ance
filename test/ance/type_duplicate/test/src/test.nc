@@ -3,7 +3,7 @@
 // Type names must be unique.
 
 public struct Duplicate {}
-public define Duplicate alias i32;
+public define Duplicate alias s32;
 
 public main () : u32
 {

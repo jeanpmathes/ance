@@ -5,7 +5,7 @@
 public struct Data
 {
     public x: uiptr;
-    public y: [*i8; 3];
+    public y: [*s8; 3];
     public z: single;
 }
 
@@ -14,8 +14,8 @@ public main () : u32
     // A vector type consists of element type and element count.
     // A vector literal is a list of elements and optionally the vector type.
 
-    let x <: <i32 | 1, 2, 3, 4>;
-    let y: <i32; 4> <: <+1:32, +2:32, +3:32, +4:32>;
+    let x <: <s32 | 1, 2, 3, 4>;
+    let y: <s32; 4> <: <+1:32, +2:32, +3:32, +4:32>;
 
     // Operations are performed component-wise.
 

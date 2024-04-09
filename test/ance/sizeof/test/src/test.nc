@@ -13,7 +13,7 @@ public main () : u32
     assert s1 == 1;
 
     // The variant for expressions:
-    let x: i32;
+    let x: s32;
     let s2: size <: sizeof(x);
     assert s2 == 4;
 
