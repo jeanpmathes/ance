@@ -19,9 +19,9 @@ private g6 <: 100:32;
 // If no initial value is given, the default value of the variable type is used.
 private gt: u32;
 
-// Global variables can be declared as constant, in which case the initial value is not optional.
-// The initial value of a constant must be available at compile time.
-private const gc: u32 := 100:32;
+// Global variables can be declared as compile-time, in which case the initial value is not optional.
+// The initial value of such a variable / constant must be defined on declaration.
+private cmp gc: u32 := 100:32;
 
 public main () : u32
 {
