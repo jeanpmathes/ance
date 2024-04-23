@@ -1,6 +1,5 @@
 #include "Variable.h"
 
-#include <iostream>
 #include <utility>
 
 #include "lang/AccessModifier.h"
@@ -27,7 +26,7 @@ lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang:
                                                      bool                              is_import,
                                                      lang::GlobalInitializer           init,
                                                      lang::Assigner                    assigner,
-                                                     bool                              is_constant,
+                                                     bool                              is_cmp,
                                                      lang::Location                    location)
 {
     Owned<lang::GlobalVariable> global_variable     = makeOwned<lang::GlobalVariable>(self(),
@@ -38,7 +37,7 @@ lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang:
                                                                                   is_import,
                                                                                   std::move(init),
                                                                                   assigner,
-                                                                                  is_constant,
+                                                                                  is_cmp,
                                                                                   location);
     auto*                       global_variable_ptr = &*global_variable;
 

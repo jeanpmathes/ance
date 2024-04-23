@@ -17,12 +17,12 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
                                      bool                                  is_import,
                                      GlobalInitializer                     init,
                                      Assigner                              assigner,
-                                     bool                                  is_constant,
+                                     bool                                  is_cmp,
                                      lang::Location                        location)
     : VariableDefinition(self, type, type_location, containing_scope, assigner.isFinal(), location)
     , access_(access)
     , is_import_(is_import)
-    , is_constant_(is_constant)
+    , is_cmp_(is_cmp)
     , init_(std::move(init))
     , assigner_(assigner)
 {
@@ -40,9 +40,9 @@ lang::AccessModifier lang::GlobalVariable::access() const
     return access_;
 }
 
-bool lang::GlobalVariable::isConstant() const
+bool lang::GlobalVariable::isCMP() const
 {
-    return is_constant_;
+    return is_cmp_;
 }
 
 lang::Assigner lang::GlobalVariable::assigner() const

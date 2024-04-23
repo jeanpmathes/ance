@@ -62,7 +62,7 @@ namespace lang
          * @param is_import Whether the variable is imported.
          * @param init The expression or function used for initialization.
          * @param assigner The assigner used for initialization.
-         * @param is_constant Whether the variable is constant.
+         * @param is_cmp Whether the variable is a compile-time variable.
          * @param location The source location.
          * @return The global variable.
          */
@@ -73,7 +73,7 @@ namespace lang
                                              bool                              is_import,
                                              lang::GlobalInitializer           init,
                                              lang::Assigner                    assigner,
-                                             bool                              is_constant,
+                                             bool                              is_cmp,
                                              lang::Location                    location);
 
         /**

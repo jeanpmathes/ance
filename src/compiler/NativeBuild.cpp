@@ -752,7 +752,7 @@ void NativeBuild::registerGlobalVariable(lang::GlobalVariable const& global_vari
 
     auto* native_variable = new llvm::GlobalVariable(llvm_module_,
                                                      native_type,
-                                                     global_variable.isConstant(),
+                                                     global_variable.isCMP(),
                                                      getLinkage(global_variable.access()),
                                                      native_initializer,
                                                      linkage_name,

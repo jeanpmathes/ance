@@ -11,17 +11,17 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
                                                lang::Accessibility                         accessibility,
                                                Optional<Owned<Expression>>                 init,
                                                Assigner                                    assigner,
-                                               bool                                        is_constant,
+                                               bool                                        is_cmp,
                                                lang::Location                              location)
     : Description(accessibility)
     , name_(name)
     , type_(std::move(type))
     , type_location_(type_location)
     , assigner_(assigner)
-    , is_constant_(is_constant)
+    , is_cmp_(is_cmp)
     , location_(location)
     , type_handle_(type_.valueOr(init.hasValue() ? init.value()->type() : lang::Type::getUndefined()))
-    , constant_init_(is_constant ? dynamic_cast<LiteralExpression*>(getPtr(init)) : nullptr)
+    , cmp_init_(is_cmp ? dynamic_cast<LiteralExpression*>(getPtr(init)) : nullptr)
     , init_expression_ptr_(getPtr(init))
     , init_expression_(std::move(init))
     , init_block_(std::nullopt)
@@ -36,18 +36,18 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
                                                Optional<Owned<Expression>>                 init_expression,
                                                Expression*                                 init_expression_ptr,
                                                Assigner                                    assigner,
-                                               bool                                        is_constant,
+                                               bool                                        is_cmp,
                                                lang::Location                              location)
     : Description(accessibility)
     , name_(name)
     , type_(std::move(type))
     , type_location_(type_location)
     , assigner_(assigner)
-    , is_constant_(is_constant)
+    , is_cmp_(is_cmp)
     , location_(location)
     , type_handle_(
           type_.valueOr(init_expression_ptr != nullptr ? init_expression_ptr->type() : lang::Type::getUndefined()))
-    , constant_init_(is_constant_ ? dynamic_cast<LiteralExpression*>(init_expression_ptr) : nullptr)
+    , cmp_init_(is_cmp_ ? dynamic_cast<LiteralExpression*>(init_expression_ptr) : nullptr)
     , init_expression_ptr_(init_expression_ptr)
     , init_expression_(std::move(init_expression))
     , init_block_(std::move(init_block))
@@ -60,10 +60,10 @@ lang::VariableDescription::VariableDescription(bool from_public_import)
     , type_(lang::Type::getUndefined())
     , type_location_(lang::Location::global())
     , assigner_(Assigner::UNSPECIFIED)
-    , is_constant_(false)
+    , is_cmp_(false)
     , location_(lang::Location::global())
     , type_handle_(type_.value())
-    , constant_init_(nullptr)
+    , cmp_init_(nullptr)
     , init_expression_ptr_(nullptr)
     , init_expression_(std::nullopt)
     , init_block_(std::nullopt)
@@ -138,7 +138,7 @@ void lang::VariableDescription::performInitialization()
     if (type_.hasValue()) { scope().registerUsage(type_.value()); }
     else if (init_expression_ptr_ != nullptr) { type_handle_.reroute(init_expression_ptr_->type()); }
 
-    if (constant_init_ != nullptr) { variable_init = std::ref(*constant_init_); }
+    if (cmp_init_ != nullptr) { variable_init = std::ref(*cmp_init_); }
     else
     {
         if (init_block_.hasValue())
@@ -172,7 +172,7 @@ void lang::VariableDescription::performInitialization()
                                                         access().isImported(),
                                                         variable_init,
                                                         assigner_,
-                                                        is_constant_,
+                                                        is_cmp_,
                                                         location_);
 
     scope().addEntity(OwningHandle<lang::Variable>::takeOwnership(variable_handle_));
@@ -221,15 +221,15 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
         }
     }
 
-    if (!constant_init_ && is_constant_)
+    if (!cmp_init_ && is_cmp_)
     {
-        validation_logger.logError("Constants require an explicit constant initializer", location_);
+        validation_logger.logError("Compile-time variables require an explicit initializer", location_);
         return;
     }
 
-    if (is_constant_ && !assigner_.isFinal())
+    if (is_cmp_ && !assigner_.isFinal())
     {
-        validation_logger.logError("Assignment to constants must be final", location_);
+        validation_logger.logError("Assignment to compile-time variables must be final", location_);
         return;
     }
 
@@ -237,13 +237,13 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
     {
         if (!init_expression_ptr_->validate(validation_logger)) return;
 
-        if (constant_init_ != nullptr)
+        if (cmp_init_ != nullptr)
         {
-            if (!lang::Type::areSame(type_handle_, constant_init_->type()))
+            if (!lang::Type::areSame(type_handle_, cmp_init_->type()))
             {
-                validation_logger.logError("Constant initializer must be of variable type "
+                validation_logger.logError("Compile-time initializer must be of variable type "
                                                + type_handle_->getAnnotatedName(),
-                                           constant_init_->location());
+                                           cmp_init_->location());
                 return;
             }
         }
@@ -289,7 +289,7 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
         expanded_init_expression_ptr = new_expression.get();
         expanded_init_expression     = std::move(new_expression);
 
-        if (constant_init_ != nullptr) { assert(dynamic_cast<LiteralExpression*>(expanded_init_expression_ptr)); }
+        if (cmp_init_ != nullptr) { assert(dynamic_cast<LiteralExpression*>(expanded_init_expression_ptr)); }
     }
 
     auto expanded = makeOwned<lang::VariableDescription>(name_,
@@ -300,7 +300,7 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
                                                          std::move(expanded_init_expression),
                                                          expanded_init_expression_ptr,
                                                          assigner_,
-                                                         is_constant_,
+                                                         is_cmp_,
                                                          location_);
 
     Descriptions descriptions;
@@ -323,7 +323,7 @@ void lang::VariableDescription::sync(Storage& storage)
 {
     storage.sync(name_);
     storage.sync(type_handle_);
-    storage.sync(is_constant_);
+    storage.sync(is_cmp_);
     storage.sync(assigner_);
 
     if (storage.isReading()) { variable_handle_ = lang::makeHandled<lang::Variable>(name_); }

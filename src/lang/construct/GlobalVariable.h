@@ -43,11 +43,11 @@ namespace lang
                        bool                                  is_import,
                        lang::GlobalInitializer               init,
                        Assigner                              assigner,
-                       bool                                  is_constant,
+                       bool                                  is_cmp,
                        lang::Location                        location);
 
         [[nodiscard]] lang::AccessModifier access() const;
-        [[nodiscard]] bool                 isConstant() const;
+        [[nodiscard]] bool                 isCMP() const;
         [[nodiscard]] lang::Assigner       assigner() const;
 
         void registerDeclaration(Execution& exec) const override;
@@ -59,7 +59,7 @@ namespace lang
       private:
         lang::AccessModifier access_;
         bool                 is_import_;
-        bool                 is_constant_;
+        bool                 is_cmp_;
         GlobalInitializer    init_;
         Assigner             assigner_;
     };

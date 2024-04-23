@@ -93,7 +93,7 @@ std::any SourceVisitor::visitGlobal(anceParser::GlobalContext* ctx)
 std::any SourceVisitor::visitVariableDescription(anceParser::VariableDescriptionContext* ctx)
 {
     auto       access      = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
-    bool const is_constant = ctx->CONST();
+    bool const is_cmp = ctx->COMPILETIME();
 
     Optional<lang::ResolvingHandle<lang::Type>> type;
     lang::Location                              type_location = lang::Location::global();
@@ -121,7 +121,7 @@ std::any SourceVisitor::visitVariableDescription(anceParser::VariableDescription
                                                                          lang::Accessibility::local(access),
                                                                          wrap(initial_value),
                                                                          assigner,
-                                                                         is_constant,
+                                                                         is_cmp,
                                                                          location(ctx)));
 }
 

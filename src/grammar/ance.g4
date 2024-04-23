@@ -19,11 +19,11 @@ description
     ;
 
 variableDescription
-    : accessModifier ( CONST )? IDENTIFIER ( ':' type )? ( assigner expression )? ';'
+    : accessModifier ( COMPILETIME )? IDENTIFIER ( ':' type )? ( assigner expression )? ';'
     ;
 
 functionDescription
-    : accessModifier IDENTIFIER '(' parameters ')' (':' type)? ( functionBlock | ';' )
+    : accessModifier ( COMPILETIME )? IDENTIFIER '(' parameters ')' (':' type)? ( functionBlock | ';' )
     ;
 
 functionBlock
@@ -428,8 +428,8 @@ CHAR : '\'' ( '\\' ~[\r\n] | ~[\r\n] )*? '\'' ;
 INTEGER : [0-9]+ ;
 
 BUFFER : '[]' ;
-CONST : 'const' ;
 NOT : 'not' ;
+COMPILETIME : 'cmp' ;
 
 IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )
            | [\p{Emoji}] ;

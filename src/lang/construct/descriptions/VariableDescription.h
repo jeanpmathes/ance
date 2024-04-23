@@ -37,7 +37,7 @@ namespace lang
                             lang::Accessibility                         accessibility,
                             Optional<Owned<Expression>>                 init,
                             lang::Assigner                              assigner,
-                            bool                                        is_constant,
+                            bool                                        is_cmp,
                             lang::Location                              location);
 
         VariableDescription(lang::Identifier                            name,
@@ -48,7 +48,7 @@ namespace lang
                             Optional<Owned<Expression>>                 init_expression,
                             Expression*                                 init_expression_ptr,
                             lang::Assigner                              assigner,
-                            bool                                        is_constant,
+                            bool                                        is_cmp,
                             lang::Location                              location);
 
         explicit VariableDescription(bool from_public_import);
@@ -84,11 +84,11 @@ namespace lang
         Optional<lang::ResolvingHandle<lang::Type>> type_;
         lang::Location                              type_location_;
         Assigner                                    assigner_;
-        bool                                        is_constant_;
+        bool                                        is_cmp_;
         lang::Location                              location_;
 
         lang::ResolvingHandle<lang::Type> type_handle_;
-        LiteralExpression*                constant_init_;
+        LiteralExpression*                cmp_init_;
         Expression*                       init_expression_ptr_;
 
         Optional<Owned<Expression>> init_expression_;

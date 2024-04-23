@@ -25,11 +25,24 @@ public:
     T__62 = 63, T__63 = 64, T__64 = 65, T__65 = 66, T__66 = 67, T__67 = 68, 
     T__68 = 69, T__69 = 70, T__70 = 71, T__71 = 72, T__72 = 73, T__73 = 74, 
     T__74 = 75, T__75 = 76, T__76 = 77, T__77 = 78, NATIVE_INTEGER_TYPE = 79, 
-    SIGNED_INTEGER = 80, HEX_INTEGER = 81, BIN_INTEGER = 82, OCT_INTEGER = 83, 
-    HALF = 84, SINGLE = 85, DOUBLE = 86, QUAD = 87, DECIMAL = 88, STRING = 89, 
-    CHAR = 90, INTEGER = 91, BUFFER = 92, CONST = 93, NOT = 94, IDENTIFIER = 95, 
-    SEMICOLON = 96, WHITESPACE = 97, BLOCK_COMMENT = 98, LINE_COMMENT = 99, 
-    ERROR_CHAR = 100
+    SIGNED_INTEGER = 80, HEX_INTEGER = 81, BIN_INTEGER = 82, OCT_INTEGER = 83,
+      HALF                = 84,
+      SINGLE              = 85,
+      DOUBLE              = 86,
+      QUAD                = 87,
+      DECIMAL             = 88,
+      STRING              = 89,
+      CHAR                = 90,
+      INTEGER             = 91,
+      BUFFER              = 92,
+      NOT                 = 93,
+      COMPILETIME         = 94,
+      IDENTIFIER          = 95,
+      SEMICOLON           = 96,
+      WHITESPACE          = 97,
+      BLOCK_COMMENT       = 98,
+      LINE_COMMENT        = 99,
+      ERROR_CHAR = 100
   };
 
   explicit anceLexer(antlr4::CharStream *input);
