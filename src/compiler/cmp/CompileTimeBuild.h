@@ -1,39 +1,24 @@
-#ifndef ANCE_SRC_COMPILER_NATIVEBUILD_H_
-#define ANCE_SRC_COMPILER_NATIVEBUILD_H_
+#ifndef ANCE_SRC_COMPILER_CMP_COMPILETIMEBUILD_H_
+#define ANCE_SRC_COMPILER_CMP_COMPILETIMEBUILD_H_
 
-#include "Execution.h"
+#include "compiler/Execution.h"
 
-#include <map>
-#include <stack>
+#include <variant>
 
-#include <llvm/IR/DIBuilder.h>
-#include <llvm/IR/IRBuilder.h>
+#include "lang/utility/ResolvingHandle.h"
 
-class Execution;
-class NativeBuilder;
-class SourceTree;
+class CompileTimeBuilder;
+class CompileTimeValue;
 
-/**
- * A class to build operations as native LLVM IR.
- */
-class NativeBuild : public Execution
+class NativeBuild;
+
+class CompileTimeBuild : public Execution
 {
   public:
-    NativeBuild(SourceTree&        tree,
-                Runtime&           runtime,
-                llvm::LLVMContext&   c,
-                llvm::Module&        m,
-                llvm::IRBuilder<>&   ir,
-                llvm::DIBuilder&   di);
-    ~NativeBuild() override = default;
+    CompileTimeBuild(Unit& unit, Runtime& runtime, NativeBuild& native);
+    ~CompileTimeBuild() override = default;
 
-    static void initialize();
-    static void terminate();
-
-    static llvm::GlobalValue::LinkageTypes getLinkage(lang::AccessModifier access);
-    llvm::DILocation*                      getLocation(lang::Location location, llvm::DIScope* scope);
-
-    void setActiveVisitor(NativeBuilder* visitor);
+    void setActiveVisitor(CompileTimeBuilder* visitor);
 
     Shared<lang::Constant> getDefault(lang::Type const& type) override;
     Shared<lang::Constant> getCodepointString(std::u32string const& string) override;
@@ -43,30 +28,29 @@ class NativeBuild : public Execution
     Shared<lang::Constant> getDiffN(std::ptrdiff_t diff) override;
     Shared<lang::Constant> getSizeOf(lang::Type const& type) override;
     Shared<lang::Constant> getN(std::variant<uint64_t, double> n, lang::Type const& type) override;
-    Shared<lang::Constant> getZero(lang::Type const& type) override;
-    Shared<lang::Constant> getOne(lang::Type const& type) override;
     Shared<lang::Constant> getNull(lang::Type const& type) override;
     Shared<lang::Constant> getBoolean(bool boolean, lang::Type const& type) override;
     Shared<lang::Constant> getInteger(llvm::APInt int_value, lang::Type const& type) override;
     Shared<lang::Constant> getFloatingPoint(llvm::APFloat float_value, lang::Type const& type) override;
     Shared<lang::Constant> getCodepoint(char32_t codepoint) override;
-    Shared<lang::Constant> getByte(uint8_t byte) override;
+    Shared<lang::Constant> getArray(std::vector<Shared<lang::Constant>> values, lang::Type const& type) override;
+    Shared<lang::Constant> getVector(std::vector<Shared<lang::Constant>> values, lang::Type const& type) override;
+    Shared<lang::Constant> getStruct(std::vector<Shared<lang::Constant>> values, lang::Type const& type) override;
 
-    void                registerFunction(lang::Function const& function) override;
-    Shared<lang::Value> getParameterValue(lang::Function const& function, size_t index) override;
-    void                defineFunctionBody(lang::Function const&                       function, std::function<void(Execution&)> const& builder) override;
+    void registerFunction(lang::Function const& function) override;
+    void defineFunctionBody(lang::Function const& function, std::function<void(FnCtx&)> const& builder) override;
     Shared<lang::Value> performFunctionCall(lang::Function const&            function,
                                             std::vector<Shared<lang::Value>> arguments) override;
 
     void registerStruct(lang::Type const&                                 type,
                         std::vector<std::reference_wrapper<lang::Member>> members,
-                      lang::Location                                    definition_location) override;
+                        lang::Location                                    definition_location) override;
 
     void registerAlias(lang::Type const& type, lang::Location definition_location) override;
 
     void registerReferenceType(lang::Type const& reference_type) override;
     void registerAddressType(lang::Type const& address_type) override;
-    void registerOpaqueAddressType(lang::Type const& opaque_pointer_type) override;
+    void registerOpaqueAddressType(lang::Type const& opaque_address_type) override;
     void registerVectorType(lang::Type const& vector_type) override;
     void registerIntegerType(lang::Type const& integer_type) override;
     void registerFloatingPointType(lang::Type const& floating_point_type) override;
@@ -77,7 +61,7 @@ class NativeBuild : public Execution
 
     void                registerGlobalVariable(lang::GlobalVariable const& global_variable,
                                                bool                        is_imported,
-                                             lang::GlobalInitializer     init) override;
+                                               lang::GlobalInitializer     init) override;
     void                declareLocalVariable(lang::LocalVariable const& local_variable) override;
     void                defineLocalVariable(lang::LocalVariable const& local_variable,
                                             lang::Scope const&         scope,
@@ -88,7 +72,6 @@ class NativeBuild : public Execution
 
     Shared<lang::Value> computeAsActualType(Shared<lang::Value> value) override;
 
-    Shared<lang::Value> computeAllocatedSize(lang::Type const& type, Optional<Shared<lang::Value>> count) override;
     Shared<lang::Value> computeElementPointer(Shared<lang::Value> sequence,
                                               Shared<lang::Value> index,
                                               IndexingMode        mode,
@@ -114,10 +97,10 @@ class NativeBuild : public Execution
                                                 Shared<lang::Value>                      count,
                                                 std::function<void(Shared<lang::Value>)> body) override;
     void                performReturn(Optional<Shared<lang::Value>> value) override;
-    void                performMemoryClear(Shared<lang::Value> address, Shared<lang::Value> size) override;
+    void                performMemoryClear(Shared<lang::Value> address, Shared<lang::Value> count) override;
     void                performMemoryCopy(Shared<lang::Value> destination,
                                           Shared<lang::Value> source,
-                                          Shared<lang::Value> size) override;
+                                          Shared<lang::Value> count) override;
     Shared<lang::Value> performStackAllocation(lang::Type const& type, Shared<lang::Value> count) override;
     Shared<lang::Value> performOperator(lang::UnaryOperator op, Shared<lang::Value> value) override;
     Shared<lang::Value> performOperator(lang::BinaryOperator op,
@@ -131,114 +114,125 @@ class NativeBuild : public Execution
     Shared<lang::Value> performIntegerReinterpretation(Shared<lang::Value> value,
                                                        lang::Type const&   target_type) override;
 
-    Execution::Handle<false> allocateNativeValue(llvm::Value* value);
-    Execution::Handle<false> allocateContentValue(llvm::Value* value);
-    Execution::Handle<true>  allocateConstant(llvm::Constant* constant);
-
-    void releaseValue(std::any handle) override;
-    void releaseConstant(std::any handle) override;
-
-    llvm::IRBuilder<>& ir();
-    llvm::DIBuilder&   di();
-    llvm::LLVMContext& llvmContext();
-    llvm::DIScope*     llvmScope(lang::Scope const& scope);
-    llvm::Type*        llvmType(lang::Type const& type);
-
-    llvm::DIType*   llvmDiType(lang::Type const& type);
-    llvm::Constant* llvmDefault(lang::Type const& type);
-
-    llvm::Value*    llvmNativeValue(Shared<lang::Value> value);
-    llvm::Value*    llvmContentValue(Shared<lang::Value> value);
-    llvm::Constant* llvmConstant(Shared<lang::Constant> constant);
-
-    llvm::Function* getCurrentFunction();
-    void            setCurrentFunction(lang::Function const* function);
-
     /**
-     * Get the debug information for a source file that contains the given location.
-     * @param location The location.
-     * @return The debug information for the source file.
+     * Evaluate an expression at compile time.
+     * @param expression The expression to evaluate. It is evaluated in this context.
+     * @param exec The context in which to embed the expression.
+     * @return The result of the evaluation.
      */
-    llvm::DIFile* getSourceFile(lang::Location location);
+    Shared<lang::Constant> evaluate(CompileTimeExpression const& expression, Execution& exec);
 
     std::filesystem::path getSourceFilePath(lang::Location location) override;
+    void                  setDebugLocation(lang::Location location, lang::Scope const& scope) override;
+    void                  resetDebugLocation() override;
+    bool                  allDebugLocationsPopped() override;
+    std::string           getLocationString() override;
 
-    void        setDebugLocation(lang::Location location, lang::Scope const& scope) override;
-    void        resetDebugLocation() override;
-    bool        allDebugLocationsPopped() override;
-    std::string getLocationString() override;
+    struct Address {
+        friend class CompileTimeBuild;
+
+        static Address const NULL_ADDRESS;
+
+        Address() = default;
+
+        enum class Location
+        {
+            Local,
+            Global,
+            Null
+        };
+
+      private:
+        size_t              memory_index_  = 0;
+        size_t              array_index_   = 0;
+        std::vector<size_t> inner_indices_ = {};
+
+        Location location_ = Location::Null;
+
+      public:
+        Address(Location location, size_t memory_index);
+
+        bool operator==(Address const& other) const;
+        bool operator!=(Address const& other) const;
+
+        Address operator+(ptrdiff_t offset) const;
+        Address operator+(size_t offset) const;
+
+        [[nodiscard]] Address inner(ptrdiff_t index) const;
+        [[nodiscard]] Address inner(size_t index) const;
+
+        [[nodiscard]] size_t              memory() const;
+        [[nodiscard]] size_t              array() const;
+        [[nodiscard]] std::vector<size_t> inners() const;
+        [[nodiscard]] Location            location() const;
+    };
+
+    Address allocateLocal(lang::Type const& type, size_t count = 1);
+    Address allocateGlobal(lang::Type const& type, size_t count = 1);
+
+    Shared<CompileTimeValue> load(Address const& address);
+    void                     store(Address address, Shared<CompileTimeValue> value);
+
+    Shared<CompileTimeValue> cmpContentOf(Shared<lang::Value> value);
+    Address                  cmpAddressOf(Shared<lang::Value> value);
+    Shared<CompileTimeValue> cmpAddressValueOf(Shared<lang::Value> value);
+
+    Shared<CompileTimeValue> cmpHandledValueOf(Shared<lang::Value> value);// todo: remove
+    Shared<CompileTimeValue> cmpHandledValueOf(Address address, lang::Type const& type);
+
+    using Memory    = std::vector<std::vector<Shared<CompileTimeValue>>>;
+    using Variables = std::map<lang::Variable const*, Address>;
+    Memory& memory(Address::Location location);
 
   private:
-    NativeBuilder*  visitor_ = nullptr;
+    lang::Context& context_;
+    NativeBuild&   native_;
 
-    llvm::LLVMContext&   llvm_context_;
-    llvm::Module&        llvm_module_;
-    llvm::IRBuilder<>&   ir_builder_;
-    llvm::DIBuilder&     di_builder_;
-    llvm::DICompileUnit* llvm_di_unit_ = nullptr;
+    CompileTimeBuilder* visitor_ = nullptr;
 
-    std::map<std::string, llvm::Constant*>    byte_strings_      = {};
-    std::map<std::u32string, llvm::Constant*> codepoint_strings_ = {};
-    std::map<std::string, llvm::Constant*>    c_strings_         = {};
-
-    struct NativeFunction {
-        llvm::Function*                                       llvm_function;
-        bool                                                  preserve_unit_return;
-        lang::Type const&                                     return_type;
-        std::vector<std::reference_wrapper<lang::Type const>> parameter_types;
+    struct TypeInformation {
+        Shared<lang::Constant> default_value;
     };
 
-    struct NativeType {
-        llvm::Type*     llvm_type;
-        llvm::DIType*   llvm_di_type;
-        llvm::Constant* llvm_default;
+    std::map<lang::Type const*, TypeInformation> type_information_;
+
+    TypeInformation& getTypeInformation(lang::Type const& type);
+
+    struct FunctionInformation {
+        std::function<void(FnCtx&)> body;
     };
 
-    struct NativeGlobalVariable {
-        llvm::GlobalVariable* llvm_variable;
-        lang::Type const&     type;
+    std::map<lang::Function const*, FunctionInformation> function_information_;
+
+    FunctionInformation& getFunctionInformation(lang::Function const& function);
+
+    std::map<std::u32string, Shared<CompileTimeValue>> codepoint_strings_;
+    std::map<std::string, Shared<CompileTimeValue>>    byte_strings_;
+    std::map<std::string, Shared<CompileTimeValue>>    c_strings_;
+
+    Memory    global_memory_;
+    Variables global_variables_;
+
+    class CmpFnCtx : public FnCtx
+    {
+      public:
+        ~CmpFnCtx() override = default;
+
+        CmpFnCtx(CompileTimeBuild& build, std::vector<Shared<lang::Value>> arguments);
+
+        Shared<lang::Value> getParameterValue(size_t index) override;
+        Execution&          exec() override;
+
+        Memory                             memory;
+        Variables                          variables;
+        Optional<Shared<CompileTimeValue>> return_value;
+
+      private:
+        CompileTimeBuild&                build_;
+        std::vector<Shared<lang::Value>> arguments_;
     };
 
-    struct NativeLocalVariable {
-        llvm::Value*      llvm_variable;
-        lang::Type const& type;
-        lang::Identifier  name;
-    };
-
-    std::map<lang::Function const*, NativeFunction>       functions_;
-    std::map<lang::Type const*, NativeType>               types_;
-    std::map<lang::Variable const*, NativeGlobalVariable> global_variables_;
-    std::map<lang::Variable const*, NativeLocalVariable>  local_variables_;
-
-    NativeType& getNativeType(lang::Type const& type);
-
-    NativeFunction* current_function_ = nullptr;
-
-    lang::Type const* current_recursive_type_        = nullptr;
-    NativeType        current_recursive_native_type_ = {nullptr, nullptr, nullptr};
-
-    struct Value {
-        llvm::Value* native;
-        llvm::Value* content;
-    };
-
-    std::list<Value>           values_;
-    std::list<llvm::Constant*> constants_;
-
-    struct DebugLocation {
-        llvm::DebugLoc di_location;
-        lang::Location location;
-    };
-
-    DebugLocation current_debug_location_ {.di_location = {}, .location = lang::Location::global()};
-    std::stack<DebugLocation, std::vector<DebugLocation>> debug_loc_stack_;
-
-    struct SourceFile {
-        std::filesystem::path path;
-        llvm::DIFile*         debug_info;
-    };
-
-    std::vector<SourceFile> source_files_ {};
+    CmpFnCtx* current_fn_ctx_ = nullptr;
 };
 
 #endif

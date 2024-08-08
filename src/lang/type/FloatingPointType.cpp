@@ -68,9 +68,9 @@ Shared<lang::Value> lang::FloatingPointType::execCast(lang::Type const&   other,
         return exec.computeConversionOnFP(value, other);
     }
 
-    if (other.isXOrVectorOfX([](auto& t) { return t.isFloatingPointType(); }))
+    if (other.isXOrVectorOfX([](auto& t) { return t.isFixedWidthIntegerType(); }))
     {
-        return exec.computeConversionOnFP(value, other);
+        return exec.computeConversionFP2I(value, other);
     }
 
     throw std::logic_error("Invalid cast");

@@ -108,11 +108,12 @@ void lang::IntegerType::execRequestedOverload(lang::Type const&         paramete
     {
         lang::Type const* parameter_element_ptr = &parameter_element;
         lang::Type const* return_type_ptr       = &return_type;
-        lang::Function*   fn                    = &function.function();
 
-        exec.defineFunctionBody(function.function(), [this, parameter_element_ptr, return_type_ptr, fn](Execution& e) {
-            Shared<lang::Value> original   = e.getParameterValue(*fn, 0);
-            auto const&         other_type = original->type();
+        exec.defineFunctionBody(
+            function.function(),
+            [this, parameter_element_ptr, return_type_ptr](Execution::FnCtx& ctx) {
+                Shared<lang::Value> original   = ctx.getParameterValue(0);
+                auto const&         other_type = original->type();
 
             // Determine whether the value fits into the return type without loss of information.
             // Abort if it doesn't.
@@ -132,30 +133,33 @@ void lang::IntegerType::execRequestedOverload(lang::Type const&         paramete
                         if (isSigned())
                         {
                             llvm::APInt const   min = llvm::APInt::getSignedMinValue(this_size).sext(other_capacity);
-                            Shared<lang::Value> min_value = e.getInteger(min, other_type);
+                            Shared<lang::Value> min_value = ctx.exec().getInteger(min, other_type);
                             Shared<lang::Value> fits_min =
-                                e.performOperator(lang::BinaryOperator::GREATER_THAN_OR_EQUAL, original,
-                                                               min_value);
+                                ctx.exec().performOperator(lang::BinaryOperator::GREATER_THAN_OR_EQUAL,
+                                                           original,
+                                                           min_value);
 
                             llvm::APInt const   max = llvm::APInt::getSignedMaxValue(this_size).sext(other_capacity);
-                            Shared<lang::Value> max_value = e.getInteger(max, other_type);
+                            Shared<lang::Value> max_value = ctx.exec().getInteger(max, other_type);
                             Shared<lang::Value> fits_max =
-                                e.performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL, original,
-                                                               max_value);
+                                ctx.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL,
+                                                           original,
+                                                           max_value);
 
                             Shared<lang::Value> fits =
-                                e.performOperator(lang::BinaryOperator::BITWISE_AND, fits_min, fits_max);
-                            e.runtime().execAssert(fits, error_message, e);
+                                ctx.exec().performOperator(lang::BinaryOperator::BITWISE_AND, fits_min, fits_max);
+                            ctx.exec().runtime().execAssert(fits, error_message, ctx.exec());
                         }
                         else
                         {
                             llvm::APInt const   max       = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
-                            Shared<lang::Value> max_value = e.getInteger(max, other_type);
+                            Shared<lang::Value> max_value = ctx.exec().getInteger(max, other_type);
 
                             Shared<lang::Value> fits =
-                                e.performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL, original,
-                                                               max_value);
-                            e.runtime().execAssert(fits, error_message, e);
+                                ctx.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL,
+                                                           original,
+                                                           max_value);
+                            ctx.exec().runtime().execAssert(fits, error_message, ctx.exec());
                         }
                     }
                 }
@@ -163,48 +167,48 @@ void lang::IntegerType::execRequestedOverload(lang::Type const&         paramete
                 {
                     if (this_size <= other_size)
                     {
-                        llvm::APInt const   max = llvm::APInt::getSignedMaxValue(this_size).zextOrSelf(other_capacity);
-                        Shared<lang::Value> max_value = e.getInteger(max, other_type);
+                        llvm::APInt const   max       = llvm::APInt::getSignedMaxValue(this_size).zext(other_capacity);
+                        Shared<lang::Value> max_value = ctx.exec().getInteger(max, other_type);
 
                         Shared<lang::Value> fits =
-                            e.performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL, original, max_value);
-                        e.runtime().execAssert(fits, error_message, e);
+                            ctx.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL, original, max_value);
+                        ctx.exec().runtime().execAssert(fits, error_message, ctx.exec());
                     }
                 }
                 else// this is unsigned and original is signed.
                 {
-                    llvm::APInt const   zero       = llvm::APInt::getNullValue(other_capacity);
-                    Shared<lang::Value> zero_value = e.getInteger(zero, other_type);
+                    llvm::APInt const   zero       = llvm::APInt::getZero(other_capacity);
+                    Shared<lang::Value> zero_value = ctx.exec().getInteger(zero, other_type);
 
                     Shared<lang::Value> fits =
-                        e.performOperator(lang::BinaryOperator::GREATER_THAN_OR_EQUAL, original, zero_value);
+                        ctx.exec().performOperator(lang::BinaryOperator::GREATER_THAN_OR_EQUAL, original, zero_value);
 
                     if (this_size < other_size)
                     {
                         llvm::APInt const   max       = llvm::APInt::getMaxValue(this_size).zext(other_capacity);
-                        Shared<lang::Value> max_value = e.getInteger(max, other_type);
+                        Shared<lang::Value> max_value = ctx.exec().getInteger(max, other_type);
 
                         Shared<lang::Value> fits_max =
-                            e.performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL, original, max_value);
-                        fits = e.performOperator(lang::BinaryOperator::BITWISE_AND, fits, fits_max);
+                            ctx.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL, original, max_value);
+                        fits = ctx.exec().performOperator(lang::BinaryOperator::BITWISE_AND, fits, fits_max);
                     }
 
-                    e.runtime().execAssert(fits, error_message, e);
+                    ctx.exec().runtime().execAssert(fits, error_message, ctx.exec());
                 }
             }
 
                 if (parameter_element_ptr->isIntegerType())
                 {
-                    Shared<lang::Value> result = e.computeConversionOnI(original, *return_type_ptr);
-                    e.performReturn(result);
+                    Shared<lang::Value> result = ctx.exec().computeConversionOnI(original, *return_type_ptr);
+                    ctx.exec().performReturn(result);
                 }
                 else if (parameter_element_ptr->isBooleanType())
                 {
-                    Shared<lang::Constant> zero = e.getZero(*return_type_ptr);
-                    Shared<lang::Constant> one  = e.getOne(*return_type_ptr);
+                    Shared<lang::Constant> zero = ctx.exec().getZero(*return_type_ptr);
+                    Shared<lang::Constant> one  = ctx.exec().getOne(*return_type_ptr);
 
-                    Shared<lang::Value> result = e.performSelect(original, one, zero);
-                    e.performReturn(result);
+                    Shared<lang::Value> result = ctx.exec().performSelect(original, one, zero);
+                    ctx.exec().performReturn(result);
                 }
             });
     }

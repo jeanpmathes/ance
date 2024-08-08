@@ -186,3 +186,14 @@ Shared<OtherT> Shared<T>::cast()
 
     return Shared<OtherT>(std::move(casted));
 }
+
+template<typename T>
+template<typename OtherT>
+OtherT const& Shared<T>::cast() const
+{
+    auto const* casted = dynamic_cast<OtherT const*>(value_.get());
+
+    assert(casted);
+
+    return *casted;
+}

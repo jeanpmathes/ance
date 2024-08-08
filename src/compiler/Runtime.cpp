@@ -173,11 +173,13 @@ Shared<lang::Value> Runtime::allocateDynamic(lang::Type const&   type,
                                              bool                is_buffer,
                                              Execution&          exec)
 {
-    Shared<lang::Value> size_to_allocate = exec.computeAllocatedSize(type, count);
+    Shared<lang::Value> size_of_element = exec.getSizeOf(type);
+    Shared<lang::Value> size_to_allocate =
+        exec.performOperator(lang::BinaryOperator::MULTIPLICATION, count, size_of_element);
 
     if (is_buffer)// Prepend a header to store the count.
     {
-        Shared<lang::Value> header_size = exec.computeAllocatedSize(exec.ctx().getSizeType(), std::nullopt);
+        Shared<lang::Value> header_size = exec.getSizeOf(exec.ctx().getSizeType());
         size_to_allocate = exec.performOperator(lang::BinaryOperator::ADDITION, size_to_allocate, header_size);
     }
 

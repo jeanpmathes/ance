@@ -25,7 +25,7 @@ class OptLevel
     operator Value() const;// NOLINT(google-explicit-constructor)
     explicit operator bool() = delete;
 
-    [[nodiscard]] llvm::CodeGenOpt::Level                getCodeGenerationOptimizationLevel() const;
+    [[nodiscard]] llvm::CodeGenOptLevel                  getCodeGenerationOptimizationLevel() const;
     [[nodiscard]] llvm::OptimizationLevel                getOptimizationLevel() const;
     [[nodiscard]] bool                                   isOptimized() const;
     [[nodiscard]] llvm::DICompileUnit::DebugEmissionKind getDebugEmissionKind() const;

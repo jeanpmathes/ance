@@ -22,11 +22,14 @@ namespace lang
                    lang::Location                                    location);
 
         [[nodiscard]] StateCount getStateCount() const override;
-        bool                     isStructType() const override;
+        StructType*              isStructType() override;
+        StructType const*        isStructType() const override;
 
         bool          hasMember(lang::Identifier const& name) const override;
         Member&       getMember(lang::Identifier const& name) override;
         Member const& getMember(lang::Identifier const& name) const override;
+
+        [[nodiscard]] size_t getMemberCount() const;
 
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> execMemberAccess(Shared<lang::Value>     value,

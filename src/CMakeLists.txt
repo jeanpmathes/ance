@@ -25,7 +25,7 @@ set(ERROR_OPTIONS
     -Wno-unsafe-buffer-usage
     -Wno-switch-enum)
 
-target_compile_options(ance PRIVATE /EHa -MDd ${ERROR_OPTIONS})
+target_compile_options(ance PRIVATE /EHsc -MDd ${ERROR_OPTIONS})
 
 set_source_files_properties(grammar/anceBaseVisitor.cpp
                             grammar/anceLexer.cpp

@@ -6,6 +6,7 @@ target_sources(ance PRIVATE Expression.cpp
                SizeofExpression.cpp
                SizeofType.cpp
                VariableAccess.cpp
+               CompileTimeExpression.cpp
                Allocation.cpp
                Subscript.cpp
                Addressof.cpp

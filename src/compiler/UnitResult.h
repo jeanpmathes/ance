@@ -4,8 +4,9 @@
 #include <string>
 #include <vector>
 
+#include <llvm/TargetParser/Triple.h>
+
 #include "TargetDescriptor.h"
-#include <llvm/ADT/Triple.h>
 
 /**
  * The resulting build artifact type of a project.

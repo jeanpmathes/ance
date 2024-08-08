@@ -21,7 +21,7 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , is_cmp_(is_cmp)
     , location_(location)
     , type_handle_(type_.valueOr(init.hasValue() ? init.value()->type() : lang::Type::getUndefined()))
-    , cmp_init_(is_cmp ? dynamic_cast<LiteralExpression*>(getPtr(init)) : nullptr)
+    , cmp_init_(is_cmp ? dynamic_cast<CompileTimeExpression*>(getPtr(init)) : nullptr)
     , init_expression_ptr_(getPtr(init))
     , init_expression_(std::move(init))
     , init_block_(std::nullopt)
@@ -47,7 +47,7 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
     , location_(location)
     , type_handle_(
           type_.valueOr(init_expression_ptr != nullptr ? init_expression_ptr->type() : lang::Type::getUndefined()))
-    , cmp_init_(is_cmp_ ? dynamic_cast<LiteralExpression*>(init_expression_ptr) : nullptr)
+    , cmp_init_(is_cmp_ ? dynamic_cast<CompileTimeExpression*>(init_expression_ptr) : nullptr)
     , init_expression_ptr_(init_expression_ptr)
     , init_expression_(std::move(init_expression))
     , init_block_(std::move(init_block))
@@ -221,16 +221,19 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
         }
     }
 
-    if (!cmp_init_ && is_cmp_)
+    if (is_cmp_)
     {
-        validation_logger.logError("Compile-time variables require an explicit initializer", location_);
-        return;
-    }
+        if (cmp_init_ == nullptr)
+        {
+            validation_logger.logError("Compile-time variables require an explicit initializer", location_);
+            return;
+        }
 
-    if (is_cmp_ && !assigner_.isFinal())
-    {
-        validation_logger.logError("Assignment to compile-time variables must be final", location_);
-        return;
+        if (!assigner_.isFinal())
+        {
+            validation_logger.logError("Assignment to compile-time variables must be final", location_);
+            return;
+        }
     }
 
     if (init_expression_ptr_ != nullptr)
@@ -239,6 +242,13 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
 
         if (cmp_init_ != nullptr)
         {
+            if (!cmp_init_->isCMP())
+            {
+                validation_logger.logError("Compile-time expression must contain only compile-time parts",
+                                           cmp_init_->location());
+                return;
+            }
+
             if (!lang::Type::areSame(type_handle_, cmp_init_->type()))
             {
                 validation_logger.logError("Compile-time initializer must be of variable type "
@@ -289,7 +299,7 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
         expanded_init_expression_ptr = new_expression.get();
         expanded_init_expression     = std::move(new_expression);
 
-        if (cmp_init_ != nullptr) { assert(dynamic_cast<LiteralExpression*>(expanded_init_expression_ptr)); }
+        if (cmp_init_ != nullptr) { assert(dynamic_cast<CompileTimeExpression*>(expanded_init_expression_ptr)); }
     }
 
     auto expanded = makeOwned<lang::VariableDescription>(name_,

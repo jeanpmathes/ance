@@ -28,7 +28,7 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
 {
     if (init_.hasValue())
     {
-        if (auto* constant_init = std::get_if<std::reference_wrapper<LiteralExpression>>(&init_.value()))
+        if (auto* constant_init = std::get_if<std::reference_wrapper<CompileTimeExpression>>(&init_.value()))
         {
             constant_init->get().setContainingScope(containing_scope);
         }

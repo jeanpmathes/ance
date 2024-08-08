@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_BINARYOPERATION_H_
 #define ANCE_SRC_LANG_EXPRESSION_BINARYOPERATION_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * A binary operation, taking two operands and returning a result.
  */
 class BinaryOperation
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<BinaryOperation, ANCE_CONSTRUCTS>
 {
   public:
@@ -28,6 +28,8 @@ class BinaryOperation
 
   public:
     bool validate(ValidationLogger& validation_logger) const override;
+
+    [[nodiscard]] bool isRootCMP() const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 

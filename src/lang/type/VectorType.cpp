@@ -324,33 +324,32 @@ void lang::VectorType::execRequestedOverload(std::vector<std::reference_wrapper<
         assert(overloads.size() == 1);
 
         lang::Function const* element_ctor = &overloads.front().get();
-        lang::Function*       fn           = &function.function();
 
-        exec.defineFunctionBody(function.function(), [this, element_ctor, fn](Execution& e) {
-            Shared<lang::Value> original = e.getParameterValue(*fn, 0);
+        exec.defineFunctionBody(function.function(), [this, element_ctor](Execution::FnCtx& ctx) {
+            Shared<lang::Value> original = ctx.getParameterValue(0);
 
-            Shared<lang::Value> result_ptr = e.performStackAllocation(self());
+            Shared<lang::Value> result_ptr = ctx.exec().performStackAllocation(self());
 
             for (uint64_t index = 0; index < size_.value(); index++)
             {
-                Shared<lang::Constant> index_constant = e.getSizeN(index);
+                Shared<lang::Constant> index_constant = ctx.exec().getSizeN(index);
 
-                Shared<lang::Value> original_element_ref = execSubscriptInBounds(original, index_constant, e);
-                Shared<lang::Value> original_element     = e.performDereference(original_element_ref);
+                Shared<lang::Value> original_element_ref = execSubscriptInBounds(original, index_constant, ctx.exec());
+                Shared<lang::Value> original_element     = ctx.exec().performDereference(original_element_ref);
 
                 std::vector<Shared<lang::Value>> ctor_parameters;
                 ctor_parameters.emplace_back(original_element);
 
-                Shared<lang::Value> converted_element = element_ctor->execCall(ctor_parameters, e);
+                Shared<lang::Value> converted_element = element_ctor->execCall(ctor_parameters, ctx.exec());
 
-                Shared<lang::Value> result_element_ref = execSubscriptInBounds(result_ptr, index_constant, e);
-                Shared<lang::Value> result_element_ptr = e.computePointerFromReference(result_element_ref);
+                Shared<lang::Value> result_element_ref = execSubscriptInBounds(result_ptr, index_constant, ctx.exec());
+                Shared<lang::Value> result_element_ptr = ctx.exec().computePointerFromReference(result_element_ref);
 
-                e.performStoreToAddress(result_element_ptr, converted_element);
+                ctx.exec().performStoreToAddress(result_element_ptr, converted_element);
             }
 
-            Shared<lang::Value> result = e.performLoadFromAddress(result_ptr);
-            e.performReturn(result);
+            Shared<lang::Value> result = ctx.exec().performLoadFromAddress(result_ptr);
+            ctx.exec().performReturn(result);
         });
     }
 }

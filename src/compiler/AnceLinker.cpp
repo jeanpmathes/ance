@@ -3,51 +3,10 @@
 #include <lld/Common/Driver.h>
 #include <llvm/Support/CrashRecoveryContext.h>
 
+LLD_HAS_DRIVER(coff)
+
 #include "compiler/Unit.h"
 #include "lang/ApplicationVisitor.h"
-
-/**
- * Based on lld/tools/lld/lld.cpp (lld::lldMain)
- */
-static bool lldRun(llvm::Triple::OSType os_type, std::vector<char const*>& args, std::ostream& stream)
-{
-    std::string              output;
-    llvm::raw_string_ostream llvm_stream(output);
-
-    switch (os_type)
-    {
-        case llvm::Triple::OSType::Win32:
-        {
-            bool const ok = lld::coff::link(args, llvm_stream, llvm_stream, false, false);
-            stream << output;// Newline added by lld.
-            return ok;
-        }
-        default:
-            stream << "ance: build: unsupported target OS" << std::endl;
-            return false;
-    }
-}
-
-/**
- * Based on lld/tools/lld/lld.cpp (lld::safeLldMain)
- */
-static bool lldRunSafely(llvm::Triple::OSType os_type, std::vector<char const*>& args, std::ostream& stream)
-{
-    bool ok = true;
-
-    {
-        llvm::CrashRecoveryContext crc;
-        if (!crc.RunSafely([&]() { ok = lldRun(os_type, args, stream); })) { lld::exitLld(crc.RetCode); }
-    }
-
-    llvm::CrashRecoveryContext crc;
-    if (!crc.RunSafely([&]() { lld::CommonLinkerContext::destroy(); }))
-    {
-        lld::exitLld(ok ? crc.RetCode : EXIT_FAILURE);
-    }
-
-    return ok;
-}
 
 AnceLinker::AnceLinker(Unit& unit) : unit_(unit) {}
 
@@ -150,7 +109,29 @@ bool AnceLinker::link(std::filesystem::path const& obj, std::filesystem::path co
     std::string const in = obj.string();
     args.push_back(in.c_str());
 
-    return lldRunSafely(unit_.getTarget().triple().getOS(), args, stream);
+    lld::DriverDef linker;
+
+    switch (unit_.getTarget().triple().getOS())
+    {
+        case llvm::Triple::OSType::Win32:
+        {
+            linker.f = lld::WinLink;
+            linker.d = lld::coff::link;
+            args[0]  = "lld-link";
+            break;
+        }
+        default:
+            stream << "ance: build: unsupported target OS" << std::endl;
+            return false;
+    }
+
+    std::string              output;
+    llvm::raw_string_ostream output_stream(output);
+    lld::Result              result = lld::lldMain(args, output_stream, output_stream, linker);
+
+    stream << output;// Newline added by lld.
+
+    return result.retCode == 0;
 }
 
 bool AnceLinker::getTargetRequirements(std::vector<std::string>& libs,

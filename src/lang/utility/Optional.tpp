@@ -220,3 +220,10 @@ T const& Optional<T>::valueOr(T const& default_value) const
 {
     return hasValue() ? value() : default_value;
 }
+
+template<Moveable T>
+Optional<T>::operator std::optional<T>()
+    requires Copyable<T>
+{
+    return hasValue() ? std::optional<T>(value()) : std::nullopt;
+}

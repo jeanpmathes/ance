@@ -19,7 +19,7 @@ namespace lang
     class InitializerFunction;
 }
 
-class LiteralExpression;
+class CompileTimeExpression;
 
 namespace lang
 {
@@ -88,7 +88,7 @@ namespace lang
         lang::Location                              location_;
 
         lang::ResolvingHandle<lang::Type> type_handle_;
-        LiteralExpression*                cmp_init_;
+        CompileTimeExpression*            cmp_init_;
         Expression*                       init_expression_ptr_;
 
         Optional<Owned<Expression>> init_expression_;

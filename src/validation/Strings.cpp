@@ -1,6 +1,7 @@
 #include "Strings.h"
 
 #include <boost/locale/boundary.hpp>
+#include <boost/locale/generator.hpp>
 #include <boost/regex/v5/unicode_iterator.hpp>
 #include <icu.h>
 
@@ -42,5 +43,6 @@ size_t estimateWidth(std::string_view const& str)
         int width_type = u_getIntPropertyValue(static_cast<UChar32>(code_point), UCHAR_EAST_ASIAN_WIDTH);
         if ((width_type == U_EA_FULLWIDTH) || (width_type == U_EA_WIDE)) { width++; }
     }
+
     return width;
 }

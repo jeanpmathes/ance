@@ -1,26 +1,15 @@
-#ifndef ANCE_SRC_COMPILER_NATIVEBUILDER_H_
-#define ANCE_SRC_COMPILER_NATIVEBUILDER_H_
+#ifndef ANCE_SRC_COMPILER_BUILDER_H_
+#define ANCE_SRC_COMPILER_BUILDER_H_
 
 #include "lang/ApplicationVisitor.h"
 
-class NativeBuild;
-
 /**
- * Visitor to build the native IR representation.
+ * Base class for the building visitor.
  */
-class NativeBuilder : public lang::ApplicationVisitorConst
+class Builder : public lang::ApplicationVisitorConst
 {
   public:
     using lang::ApplicationVisitorConst::visit;
-
-    /**
-     * Create a new native builder.
-     * @param native_build The build context.
-     */
-    explicit NativeBuilder(NativeBuild& native_build);
-
-    void preVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable) override;
-    void postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable) override;
 
     std::any visit(lang::GlobalScope const& global_scope) override;
 
@@ -32,13 +21,6 @@ class NativeBuilder : public lang::ApplicationVisitorConst
     std::any visit(lang::Member const& member) override;
 
     std::any visit(lang::Function const& function) override;
-
-    std::any visit(lang::bb::def::Empty const& emtpy_bb) override;
-    std::any visit(lang::bb::def::Finalizing const& finalizing_bb) override;
-    std::any visit(lang::bb::def::Simple const& simple_bb) override;
-    std::any visit(lang::bb::def::Returning const& returning_bb) override;
-    std::any visit(lang::bb::def::Branching const& branching_bb) override;
-    std::any visit(lang::bb::def::Matching const& matching_bb) override;
 
     std::any visit(Addressof const& addressof) override;
     std::any visit(Allocation const& allocation) override;
@@ -83,11 +65,12 @@ class NativeBuilder : public lang::ApplicationVisitorConst
     Shared<lang::Constant> getC(Expression const& expression);
     Shared<lang::Value>    getV(Expression const& expression);
 
+  protected:
+    virtual Execution& exec() = 0;
+
+    virtual void visitFunctionDefinition(lang::Function const& function) = 0;
+
   private:
-    void branchToNextOrReturnVoid(lang::BasicBlock const* next);
-
-    NativeBuild& native_build_;
-
     enum class GlobalPhase
     {
         INVALID,
@@ -95,8 +78,6 @@ class NativeBuilder : public lang::ApplicationVisitorConst
         DEFINE,
     };
     GlobalPhase g_phase_ = GlobalPhase::INVALID;
-
-    std::map<lang::BasicBlock const*, llvm::BasicBlock*> bb_map_;
 
     bool assign_ = false;
 };

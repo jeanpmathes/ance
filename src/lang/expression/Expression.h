@@ -43,6 +43,12 @@ class Expression
     [[nodiscard]] bool isInitialized() const;
 
     /**
+     * Whether this expression can be evaluated at compile-time.
+     * @return True if this expression can be evaluated at compile-time.
+     */
+    [[nodiscard]] bool isCMP() const;
+
+    /**
      * Set the scope containing this expression.
      * @param scope The containing scope.
      */
@@ -148,6 +154,13 @@ class Expression
      */
     static std::vector<std::reference_wrapper<lang::Type const>> getTypes(
         std::vector<Owned<Expression>> const& expressions);
+
+  protected:
+    /**
+     * Whether this expression, without considering subexpressions, can be evaluated at compile-time.
+     * @return True if the root if the expression tree can be evaluated at compile-time.
+     */
+    [[nodiscard]] virtual bool isRootCMP() const;
 
   private:
     lang::Location location_;

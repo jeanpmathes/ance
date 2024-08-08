@@ -1,10 +1,10 @@
+add_subdirectory(native)
+add_subdirectory(cmp)
+
 target_sources(ance PRIVATE AnceCompiler.cpp
                AnceLinker.cpp
                Application.cpp
-               RoughlyCastedValue.cpp
-               WrappedContentValue.cpp
-               WrappedNativeValue.cpp
-               WrappedConstant.cpp
+               Builder.cpp
                SourceTree.cpp
                TargetDescriptor.cpp
                FileContext.cpp
@@ -12,11 +12,9 @@ target_sources(ance PRIVATE AnceCompiler.cpp
                Runtime.cpp
                SourceVisitor.cpp
                ControlFlowGraphPrinter.cpp
-               NativeBuilder.cpp
                UnitResult.cpp
                Project.cpp
                Execution.cpp
-               NativeBuild.cpp
                Unit.cpp
                ProjectDescription.cpp
                OptLevel.cpp

@@ -1,6 +1,8 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_CONSTANT_STRINGCONSTANT_H_
 #define ANCE_SRC_LANG_CONSTRUCT_CONSTANT_STRINGCONSTANT_H_
 
+#include <variant>
+
 #include "LiteralConstant.h"
 
 #include "lang/type/Type.h"

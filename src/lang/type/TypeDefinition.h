@@ -89,7 +89,8 @@ namespace lang
         [[nodiscard]] virtual bool                         isBufferType() const;
         [[nodiscard]] virtual bool                     isOpaquePointerType() const;
         [[nodiscard]] virtual bool                     isReferenceType() const;
-        [[nodiscard]] virtual bool                     isStructType() const;
+        [[nodiscard]] virtual StructType*                  isStructType();
+        [[nodiscard]] virtual StructType const*            isStructType() const;
         [[nodiscard]] virtual VectorizableType const*  isVectorizable() const;
         [[nodiscard]] virtual VectorizableType*        isVectorizable();
         [[nodiscard]] virtual VectorType const*        isVectorType() const;

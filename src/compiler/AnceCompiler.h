@@ -9,8 +9,8 @@
 
 #include "TargetDescriptor.h"
 
-#include "compiler/NativeBuild.h"
 #include "compiler/Runtime.h"
+#include "compiler/native/NativeBuild.h"
 #include "lang/construct/Function.h"
 #include "lang/utility/Owners.h"
 

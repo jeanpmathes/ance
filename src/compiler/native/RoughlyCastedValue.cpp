@@ -5,13 +5,23 @@
 RoughlyCastedValue::RoughlyCastedValue(lang::Type const&   target_type,
                                        Shared<lang::Value> original,
                                        NativeBuild&        native_build)
-    : Value(target_type)
+    : lang::Value(target_type)
     , original_(std::move(original))
 {
     assert(native_build.llvmType(target_type) == native_build.llvmType(original_->type()));
 }
 
-Execution::Handle<false> RoughlyCastedValue::getExecutionValue()
+llvm::Value* RoughlyCastedValue::getNativeValue() const
 {
-    return original_->getExecutionValue();
+    return original_.cast<Wrapped>().getNativeValue();
+}
+
+llvm::Value* RoughlyCastedValue::getContentValue() const
+{
+    return original_.cast<Wrapped>().getContentValue();
+}
+
+llvm::Constant* RoughlyCastedValue::getConstant() const
+{
+    return original_.cast<Wrapped>().getConstant();
 }

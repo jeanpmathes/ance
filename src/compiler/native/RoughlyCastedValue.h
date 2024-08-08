@@ -3,6 +3,8 @@
 
 #include "lang/construct/Value.h"
 
+#include "Wrapped.h"
+
 #include "lang/type/Type.h"
 #include "lang/utility/ResolvingHandle.h"
 
@@ -11,7 +13,9 @@ class NativeBuild;
 /**
  * Create a value that is result of a rough as.
  */
-class RoughlyCastedValue : public lang::Value
+class RoughlyCastedValue
+    : public lang::Value
+    , public Wrapped
 {
   public:
     /**
@@ -22,7 +26,9 @@ class RoughlyCastedValue : public lang::Value
      */
     RoughlyCastedValue(lang::Type const& target_type, Shared<lang::Value> original, NativeBuild& native_build);
 
-    Execution::Handle<false> getExecutionValue() override;
+    llvm::Value*    getNativeValue() const override;
+    llvm::Value*    getContentValue() const override;
+    llvm::Constant* getConstant() const override;
 
   private:
     Shared<lang::Value> original_;

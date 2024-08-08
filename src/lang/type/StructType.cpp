@@ -32,9 +32,14 @@ StateCount lang::StructType::getStateCount() const
     return state_count;
 }
 
-bool lang::StructType::isStructType() const
+lang::StructType* lang::StructType::isStructType()
 {
-    return true;
+    return this;
+}
+
+lang::StructType const* lang::StructType::isStructType() const
+{
+    return this;
 }
 
 std::string lang::StructType::createMangledName() const
@@ -88,6 +93,11 @@ lang::Member const& lang::StructType::getMember(lang::Identifier const& name) co
     if (member_map_.contains(name)) { return member_map_.at(name); }
 
     return TypeDefinition::getMember(name);
+}
+
+size_t lang::StructType::getMemberCount() const
+{
+    return members_.size();
 }
 
 bool lang::StructType::validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const

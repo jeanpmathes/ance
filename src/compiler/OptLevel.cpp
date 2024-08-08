@@ -5,21 +5,21 @@ OptLevel::operator Value() const
     return value_;
 }
 
-llvm::CodeGenOpt::Level OptLevel::getCodeGenerationOptimizationLevel() const
+llvm::CodeGenOptLevel OptLevel::getCodeGenerationOptimizationLevel() const
 {
     switch (value_)
     {
         case O_0:
-            return llvm::CodeGenOpt::None;
+            return llvm::CodeGenOptLevel::None;
 
         case O_1:
-            return llvm::CodeGenOpt::Less;
+            return llvm::CodeGenOptLevel::Less;
 
         case O_2:
-            return llvm::CodeGenOpt::Default;
+            return llvm::CodeGenOptLevel::Default;
 
         case O_3:
-            return llvm::CodeGenOpt::Aggressive;
+            return llvm::CodeGenOptLevel::Aggressive;
     }
 }
 

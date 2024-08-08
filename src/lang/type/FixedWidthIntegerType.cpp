@@ -2,7 +2,6 @@
 
 #include "compiler/Application.h"
 
-#include "compiler/RoughlyCastedValue.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/PredefinedFunction.h"
 #include "lang/scope/GlobalScope.h"

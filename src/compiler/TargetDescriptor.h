@@ -1,9 +1,9 @@
 #ifndef ANCE_SRC_COMPILER_TARGETDESCRIPTOR_H_
 #define ANCE_SRC_COMPILER_TARGETDESCRIPTOR_H_
 
-#include <llvm/ADT/Triple.h>
 #include <llvm/IR/DataLayout.h>
 #include <llvm/Support/CodeGen.h>
+#include <llvm/TargetParser/Triple.h>
 
 #include "lang/utility/Optional.h"
 
@@ -56,7 +56,7 @@ class TargetDescriptor
     /**
      * Create the llvm target machine. Should only be called once.
      */
-    void createTargetMachine(llvm::CodeGenOpt::Level opt_level);
+    void createTargetMachine(llvm::CodeGenOptLevel opt_level);
 
     /**
      * Configure an llvm module for this target.

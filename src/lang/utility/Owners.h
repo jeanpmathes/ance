@@ -159,6 +159,9 @@ class Shared
     template<typename OtherT>
     Shared<OtherT> cast();
 
+    template<typename OtherT>
+    OtherT const& cast() const;
+
   private:
     std::shared_ptr<T> value_;
 };

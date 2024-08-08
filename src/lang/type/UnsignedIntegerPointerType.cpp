@@ -31,13 +31,11 @@ void lang::UnsignedIntegerPointerType::execRequestedOverload(lang::Type const&  
 {
     if (parameter_element.isAddressType())
     {
-        lang::Function* fn = &function.function();
+        exec.defineFunctionBody(function.function(), [](Execution::FnCtx& ctx) {
+            Shared<lang::Value> argument = ctx.getParameterValue(0);
+            Shared<lang::Value> result   = ctx.exec().computePointerToInteger(argument);
 
-        exec.defineFunctionBody(function.function(), [fn](Execution& e) {
-            Shared<lang::Value> argument = e.getParameterValue(*fn, 0);
-            Shared<lang::Value> result   = e.computePointerToInteger(argument);
-
-            e.performReturn(result);
+            ctx.exec().performReturn(result);
         });
 
         return;

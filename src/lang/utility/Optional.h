@@ -111,6 +111,9 @@ class Optional
     template<Moveable>
     friend class Optional;
 
+    operator std::optional<T>()
+        requires Copyable<T>;
+
   private:
     alignas(T) std::array<std::byte, sizeof(T)> storage_ {};
     bool has_value_ {false};

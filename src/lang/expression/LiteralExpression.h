@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_LITERALEXPRESSION_H_
 #define ANCE_SRC_LANG_EXPRESSION_LITERALEXPRESSION_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 #include "lang/construct/constant/LiteralConstant.h"
@@ -10,7 +10,7 @@
  * An expression that contains a constant value, provided by a literal.
  */
 class LiteralExpression
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<LiteralExpression, ANCE_CONSTRUCTS>
 {
   public:

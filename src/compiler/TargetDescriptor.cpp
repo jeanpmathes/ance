@@ -1,9 +1,9 @@
 #include "TargetDescriptor.h"
 
 #include <llvm/MC/TargetRegistry.h>
-#include <llvm/Support/Host.h>
 #include <llvm/Target/TargetMachine.h>
 #include <llvm/Target/TargetOptions.h>
+#include <llvm/TargetParser/Host.h>
 
 TargetDescriptor TargetDescriptor::system()
 {
@@ -42,17 +42,17 @@ std::string TargetDescriptor::toString() const
     return triple_.getTriple();
 }
 
-void TargetDescriptor::createTargetMachine(llvm::CodeGenOpt::Level opt_level)
+void TargetDescriptor::createTargetMachine(llvm::CodeGenOptLevel opt_level)
 {
     assert(target_machine_ == nullptr);
 
     std::string         error;
     llvm::Target const* target = llvm::TargetRegistry::lookupTarget(triple_.str(), error);
 
-    llvm::Optional<llvm::Reloc::Model> relocation_model;
+    Optional<llvm::Reloc::Model> relocation_model;
     relocation_model = llvm::Reloc::Static;
 
-    llvm::Optional<llvm::CodeModel::Model> code_model;
+    Optional<llvm::CodeModel::Model> code_model;
     code_model = llvm::CodeModel::Large;
 
     llvm::TargetOptions const target_options;

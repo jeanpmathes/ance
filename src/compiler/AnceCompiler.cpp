@@ -14,13 +14,12 @@
 #include <llvm/Support/FileSystem.h>
 
 #include "compiler/ControlFlowGraphPrinter.h"
-#include "compiler/NativeBuild.h"
-#include "compiler/NativeBuilder.h"
 #include "compiler/SourceTree.h"
 #include "compiler/Unit.h"
-#include "compiler/WrappedNativeValue.h"
+#include "compiler/native/NativeBuild.h"
+#include "compiler/native/NativeBuilder.h"
+#include "compiler/native/WrappedNativeValue.h"
 #include "lang/type/FixedWidthIntegerType.h"
-#include "lang/type/SizeType.h"
 
 AnceCompiler::AnceCompiler(SourceTree& tree, TargetDescriptor const& target_descriptor)
     : module_(tree.unit().getName(), llvm_context_)
@@ -205,14 +204,13 @@ void AnceCompiler::buildStart(lang::ResolvingHandle<lang::Function> main, llvm::
 {
     llvm::FunctionType* start_type = llvm::FunctionType::get(
         llvm::Type::getInt32Ty(llvm_context_),
-        {llvm::Type::getInt32Ty(llvm_context_), llvm::Type::getInt8PtrTy(llvm_context_)->getPointerTo()},
+        {llvm::Type::getInt32Ty(llvm_context_), llvm::Type::getInt8Ty(llvm_context_)->getPointerTo()->getPointerTo()},
         false);
     llvm::Function* start = llvm::Function::Create(start_type,
                                                    llvm::GlobalValue::LinkageTypes::ExternalLinkage,
                                                    WIN_EXE_MAIN_NAME,
                                                    module_);
 
-    start->addFnAttr(llvm::Attribute::AttrKind::UWTable);
     start->setDSOLocal(true);
 
     llvm::BasicBlock* start_block = llvm::BasicBlock::Create(llvm_context_, "entry", start);
@@ -234,7 +232,7 @@ void AnceCompiler::buildLibStart(llvm::Function* init, llvm::Function* finit)
     assert(fn_type == init->getFunctionType());
     assert(fn_type == finit->getFunctionType());
 
-    auto* byte_ptr_type = llvm::Type::getInt8PtrTy(llvm_context_);
+    auto* byte_ptr_type = llvm::Type::getInt8Ty(llvm_context_)->getPointerTo();
     auto* entry_type =
         llvm::StructType::get(llvm_context_,
                               {llvm::Type::getInt32Ty(llvm_context_), fn_type->getPointerTo(), byte_ptr_type});

@@ -27,6 +27,7 @@ namespace lang
     class Function;
     class Member;
     class TypeDefinition;
+    class StructType;
     class VectorizableType;
     class FloatingPointType;
     class AddressType;
@@ -239,9 +240,15 @@ namespace lang
 
         /**
          * Get whether this type is a struct type.
-         * @return True if this type is a struct type.
+         * @return The struct type if this type is a struct type, null otherwise.
          */
-        [[nodiscard]] bool isStructType() const;
+        [[nodiscard]] lang::StructType* isStructType();
+
+        /**
+         * Get whether this type is a struct type.
+         * @return The struct type if this type is a struct type, null otherwise.
+         */
+        [[nodiscard]] lang::StructType const* isStructType() const;
 
         /**
          * Get whether this type is vectorizable.

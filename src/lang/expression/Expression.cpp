@@ -31,6 +31,18 @@ bool Expression::isInitialized() const
     return containing_scope_ != nullptr;
 }
 
+bool Expression::isCMP() const
+{
+    if (!isRootCMP()) return false;
+
+    return std::ranges::all_of(subexpressions_, [](auto& subexpression) { return subexpression.get().isCMP(); });
+}
+
+bool Expression::isRootCMP() const
+{
+    return false;
+}
+
 lang::ResolvingHandle<lang::Type> Expression::type()
 {
     if (not type_->isDefined()) defineType(type_);

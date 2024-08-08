@@ -120,7 +120,12 @@ bool lang::TypeAlias::isOpaquePointerType() const
     return actual_->isOpaquePointerType();
 }
 
-bool lang::TypeAlias::isStructType() const
+lang::StructType* lang::TypeAlias::isStructType()
+{
+    return actual_->isStructType();
+}
+
+lang::StructType const* lang::TypeAlias::isStructType() const
 {
     return actual_->isStructType();
 }

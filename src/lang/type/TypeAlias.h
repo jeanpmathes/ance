@@ -42,7 +42,8 @@ namespace lang
         [[nodiscard]] bool                         isBufferType() const override;
         [[nodiscard]] bool                         isOpaquePointerType() const override;
         [[nodiscard]] bool                         isReferenceType() const override;
-        [[nodiscard]] bool                         isStructType() const override;
+        [[nodiscard]] StructType*                  isStructType() override;
+        [[nodiscard]] StructType const*            isStructType() const override;
         [[nodiscard]] VectorizableType const*      isVectorizable() const override;
         [[nodiscard]] VectorizableType*            isVectorizable() override;
         [[nodiscard]] VectorType const*            isVectorType() const override;
@@ -66,7 +67,7 @@ namespace lang
                                               ValidationLogger& validation_logger) const override;
         Shared<lang::Value> execSubscript(Shared<lang::Value> indexed,
                                           Shared<lang::Value> index,
-                                           Execution&          exec) const override;
+                                          Execution&          exec) const override;
 
         bool                isImplicitlyConvertibleTo(lang::Type const& other) const override;
         bool                validateImplicitConversion(lang::Type const& other,
@@ -74,7 +75,7 @@ namespace lang
                                                        ValidationLogger& validation_logger) const override;
         Shared<lang::Value> execImplicitConversion(lang::Type const&   other,
                                                    Shared<lang::Value> value,
-                                                    Execution&          exec) const override;
+                                                   Execution&          exec) const override;
 
         bool                isCastingPossibleTo(Type const& other) const override;
         bool                validateCast(Type const&       other,
@@ -82,7 +83,7 @@ namespace lang
                                          ValidationLogger& validation_logger) const override;
         Shared<lang::Value> execCast(lang::Type const&   other,
                                      Shared<lang::Value> value,
-                                      Execution&          exec) const override;
+                                     Execution&          exec) const override;
 
         bool                isOperatorDefined(lang::UnaryOperator op) const override;
         lang::Type const&   getOperatorResultType(lang::UnaryOperator op) const override;
@@ -91,7 +92,7 @@ namespace lang
                                              ValidationLogger&   validation_logger) const override;
         Shared<lang::Value> execOperator(lang::UnaryOperator op,
                                          Shared<lang::Value> value,
-                                          Execution&          exec) const override;
+                                         Execution&          exec) const override;
 
         bool                isOperatorDefined(lang::BinaryOperator op, lang::Type const& other) const override;
         lang::Type const&   getOperatorResultType(lang::BinaryOperator op, lang::Type const& other) const override;
@@ -102,8 +103,8 @@ namespace lang
                                              ValidationLogger&    validation_logger) const override;
         Shared<lang::Value> execOperator(lang::BinaryOperator op,
                                          Shared<lang::Value>  left,
-                                          Shared<lang::Value>  right,
-                                          Execution&           exec) const override;
+                                         Shared<lang::Value>  right,
+                                         Execution&           exec) const override;
 
         bool                        hasMember(lang::Identifier const& name) const override;
         Member&                     getMember(lang::Identifier const& name) override;
@@ -111,7 +112,7 @@ namespace lang
         bool validateMemberAccess(lang::Identifier const& name, ValidationLogger& validation_logger) const override;
         Shared<lang::Value> execMemberAccess(Shared<lang::Value>     value,
                                              lang::Identifier const& name,
-                                              Execution&              exec) const override;
+                                             Execution&              exec) const override;
 
         bool                definesIndirection() const override;
         lang::Type const& getIndirectionType() const override;
@@ -124,8 +125,7 @@ namespace lang
         void performCopyInitializer(Shared<lang::Value> destination,
                                     Shared<lang::Value> source,
                                     Execution&          exec) const override;
-        void performFinalizer(Shared<lang::Value> ptr,
-                              Shared<lang::Value> count, Execution& exec) const override;
+        void performFinalizer(Shared<lang::Value> ptr, Shared<lang::Value> count, Execution& exec) const override;
 
         bool isTriviallyDefaultConstructible() const override;
         bool isTriviallyCopyConstructible() const override;
@@ -135,7 +135,7 @@ namespace lang
         bool acceptOverloadRequest(std::vector<ResolvingHandle<lang::Type>> parameters) override;
         void execRequestedOverload(std::vector<std::reference_wrapper<lang::Type const>> parameters,
                                    lang::PredefinedFunction&                             function,
-                                    Execution&                                            exec) const override;
+                                   Execution&                                            exec) const override;
         void registerDeclaration(Execution& exec) const override;
         void registerDefinition(Execution& exec) const override;
 

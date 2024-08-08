@@ -29,13 +29,6 @@ namespace lang
          */
         [[nodiscard]] virtual lang::Type const& type() const;
 
-        /**
-         * Get a value handle for the execution context associated with this value.
-         * If the value is not associated with an execution context, this should not be called.
-         * @return A value handle. Can be different for each call.
-         */
-        virtual Execution::Handle<false> getExecutionValue() = 0;
-
       private:
         lang::Type const& type_;
     };

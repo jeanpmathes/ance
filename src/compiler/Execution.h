@@ -18,7 +18,7 @@
 #include "lang/utility/Owners.h"
 
 class Expression;
-class LiteralExpression;
+class CompileTimeExpression;
 class Unit;
 class Runtime;
 
@@ -38,7 +38,7 @@ namespace lang
     class Value;
 
     using GlobalInitializer =
-        Optional<std::variant<std::reference_wrapper<lang::Function>, std::reference_wrapper<LiteralExpression>>>;
+        Optional<std::variant<std::reference_wrapper<lang::Function>, std::reference_wrapper<CompileTimeExpression>>>;
 
     using LocalParameterInitializer = std::pair<std::reference_wrapper<lang::Function const>, size_t>;
 
@@ -117,14 +117,14 @@ class Execution
      * @param type The type to get the zero value for, must be a numeric type or a vector of numeric types.
      * @return The zero value.
      */
-    virtual Shared<lang::Constant> getZero(lang::Type const& type) = 0;
+    virtual Shared<lang::Constant> getZero(lang::Type const& type);
 
     /**
      * Get the one value for the given type.
      * @param type The type to get the one value for, must be a numeric type or a vector of numeric types.
      * @return The one value.
      */
-    virtual Shared<lang::Constant> getOne(lang::Type const& type) = 0;
+    virtual Shared<lang::Constant> getOne(lang::Type const& type);
 
     /**
      * Get the null value for the given type.
@@ -169,7 +169,39 @@ class Execution
      * @param byte The byte to get as a constant.
      * @return The constant.
      */
-    virtual Shared<lang::Constant> getByte(uint8_t byte) = 0;
+    virtual Shared<lang::Constant> getByte(uint8_t byte);
+
+    /**
+     * Create a new array constant.
+     * @param values The values of the array. Length must match the length of the array type.
+     * @param type The type of the array.
+     * @return The array constant.
+     */
+    virtual Shared<lang::Constant> getArray(std::vector<Shared<lang::Constant>> values, lang::Type const& type) = 0;
+
+    /**
+     * Create a new vector constant.
+     * @param values The values of the vector. Length must match the length of the vector type.
+     * @param type The type of the vector.
+     * @return The vector constant.
+     */
+    virtual Shared<lang::Constant> getVector(std::vector<Shared<lang::Constant>> values, lang::Type const& type) = 0;
+
+    /**
+     * Create a new splat vector constant.
+     * @param value The value to splat.
+     * @param type The type of the vector.
+     * @return The splat vector constant.
+     */
+    virtual Shared<lang::Constant> getSplatVector(Shared<lang::Constant> value, lang::Type const& type);
+
+    /**
+     * Create a new struct constant.
+     * @param values The values of the struct. Length must match the number of members of the struct type.
+     * @param type The type of the struct.
+     * @return The struct constant.
+     */
+    virtual Shared<lang::Constant> getStruct(std::vector<Shared<lang::Constant>> values, lang::Type const& type) = 0;
 
     /**
      * Register a function.
@@ -178,13 +210,24 @@ class Execution
      */
     virtual void registerFunction(lang::Function const& function) = 0;
 
-    /**
-     * Get the value of a parameter of a function.
-     * @param function The function to get the parameter value from.
-     * @param index The index of the parameter.
-     * @return The value of the parameter.
-     */
-    virtual Shared<lang::Value> getParameterValue(lang::Function const& function, size_t index) = 0;
+    class FnCtx
+    {
+      public:
+        virtual ~FnCtx() = default;
+
+        /**
+         * Get the value of a parameter the current function.
+         * @param index The index of the parameter.
+         * @return The value of the parameter.
+         */
+        virtual Shared<lang::Value> getParameterValue(size_t index) = 0;
+
+        /**
+         * Get the owning execution context.
+         * @return The owning execution context.
+         */
+        virtual Execution& exec() = 0;
+    };
 
     /**
      * Indicate that the following commands are part of the body of the given function.
@@ -194,7 +237,7 @@ class Execution
      * @param function The function of which the body is defined.
      * @param builder A function that is called to build the body of the function.
      */
-    virtual void defineFunctionBody(lang::Function const&                       function, std::function<void(Execution&)> const& builder) = 0;
+    virtual void defineFunctionBody(lang::Function const& function, std::function<void(FnCtx&)> const& builder) = 0;
 
     /**
      * Call a function.
@@ -236,9 +279,9 @@ class Execution
 
     /**
      * Register an opaque address type for execution.
-     * @param opaque_pointer_type The type to register.
+     * @param opaque_address_type The type to register.
      */
-    virtual void registerOpaqueAddressType(lang::Type const& opaque_pointer_type) = 0;
+    virtual void registerOpaqueAddressType(lang::Type const& opaque_address_type) = 0;
 
     /**
      * Register a vector type for execution.
@@ -332,14 +375,6 @@ class Execution
      * @return The value with the actual type.
      */
     virtual Shared<lang::Value> computeAsActualType(Shared<lang::Value> value) = 0;
-
-    /**
-     * Compute the size in bytes of an allocation of the given type.
-     * @param type The type to compute the size of.
-     * @param count The number of elements that are allocated. If no count is given, the size of a single element is returned.
-     * @return The size of the allocation, as a value with type 'size'.
-     */
-    virtual Shared<lang::Value> computeAllocatedSize(lang::Type const& type, Optional<Shared<lang::Value>> count) = 0;
 
     enum class IndexingMode
     {
@@ -507,19 +542,19 @@ class Execution
     /**
      * Clear a memory region.
      * @param address The address of the memory region to clear.
-     * @param size The size of the region, in bytes, given as a value with type 'size'.
+     * @param count The number of elements in the region, given as a value with type 'size'.
      */
-    virtual void performMemoryClear(Shared<lang::Value> address, Shared<lang::Value> size) = 0;
+    virtual void performMemoryClear(Shared<lang::Value> address, Shared<lang::Value> count) = 0;
 
     /**
      * Copy a memory region.
      * @param destination The address of the destination memory region.
      * @param source The address of the source memory region.
-     * @param size The size of the region, in bytes, given as a value with type 'size'.
+     * @param count The number of elements in the region, given as a value with type 'size'.
      */
     virtual void performMemoryCopy(Shared<lang::Value> destination,
                                    Shared<lang::Value> source,
-                                   Shared<lang::Value> size) = 0;
+                                   Shared<lang::Value> count) = 0;
 
     /**
      * Perform a stack allocation.
@@ -581,40 +616,6 @@ class Execution
      */
     virtual Shared<lang::Value> performIntegerReinterpretation(Shared<lang::Value> value,
                                                                lang::Type const&   target_type) = 0;
-
-    /**
-     * A handle that allows to refer to values and constants in the representation used by the concrete execution implementation.
-     */
-    template<bool IsConstant>
-    struct Handle {
-        Execution* execution;
-        std::any   handle;
-
-        Handle(Execution* exec, std::any h) : execution(exec), handle(std::move(h)) {}
-
-        Handle(Handle const& other)            = delete;
-        Handle& operator=(Handle const& other) = delete;
-
-        Handle(Handle&& other) noexcept : execution(other.execution), handle(other.handle) { other.handle = nullptr; }
-        Handle& operator=(Handle&& other) noexcept
-        {
-            execution    = other.execution;
-            handle       = other.handle;
-            other.handle = nullptr;
-            return *this;
-        }
-
-        ~Handle()
-        {
-            if (not handle.has_value()) return;
-
-            if constexpr (IsConstant) execution->releaseConstant(handle);
-            else execution->releaseValue(handle);
-        }
-    };
-
-    virtual void releaseValue(std::any handle)    = 0;
-    virtual void releaseConstant(std::any handle) = 0;
 
     Unit&          unit();
     Runtime&       runtime();

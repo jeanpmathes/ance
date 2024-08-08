@@ -47,6 +47,14 @@ namespace lang
                                                        uint64_t                          size) const;
 
         /**
+         * Get an array type instance.
+         * @param element_type The element type of the array.
+         * @param size The size of the array. Must be greater than zero.
+         * @return The array type instance.
+         */
+        lang::Type const& getArrayType(lang::Type const& element_type, uint64_t size) const;
+
+        /**
          * Get the boolean type.
          * @return The boolean type.
          */

@@ -124,19 +124,19 @@ void lang::BooleanType::execRequestedOverload(lang::Type const&         paramete
     if (parameter_element.isFixedWidthIntegerType() || parameter_element.isSizeType() || parameter_element.isDiffType())
     {
         lang::Type const* return_type_ptr = &return_type;
-        lang::Function*   fn              = &function.function();
 
-        exec.defineFunctionBody(function.function(), [return_type_ptr, fn](Execution& e) {
-            Shared<lang::Value> original = e.getParameterValue(*fn, 0);
+        exec.defineFunctionBody(function.function(), [return_type_ptr](Execution::FnCtx& ctx) {
+            Shared<lang::Value> original = ctx.getParameterValue(0);
 
-            Shared<lang::Constant> zero       = e.getZero(original->type());
-            Shared<lang::Value>    is_nonzero = e.performOperator(lang::BinaryOperator::NOT_EQUAL, original, zero);
+            Shared<lang::Constant> zero = ctx.exec().getZero(original->type());
+            Shared<lang::Value>    is_nonzero =
+                ctx.exec().performOperator(lang::BinaryOperator::NOT_EQUAL, original, zero);
 
-            Shared<lang::Constant> true_const  = e.getBoolean(true, *return_type_ptr);
-            Shared<lang::Constant> false_const = e.getBoolean(false, *return_type_ptr);
-            Shared<lang::Value>    converted   = e.performSelect(is_nonzero, true_const, false_const);
+            Shared<lang::Constant> true_const  = ctx.exec().getBoolean(true, *return_type_ptr);
+            Shared<lang::Constant> false_const = ctx.exec().getBoolean(false, *return_type_ptr);
+            Shared<lang::Value>    converted   = ctx.exec().performSelect(is_nonzero, true_const, false_const);
 
-            e.performReturn(converted);
+            ctx.exec().performReturn(converted);
         });
     }
 }

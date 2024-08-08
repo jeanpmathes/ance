@@ -3,7 +3,6 @@
 #include <queue>
 #include <utility>
 
-#include "compiler/WrappedConstant.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/type/ArrayType.h"
 #include "lang/type/FixedWidthIntegerType.h"
@@ -199,7 +198,13 @@ bool lang::Type::isReferenceType() const
     return definition_.value()->isReferenceType();
 }
 
-bool lang::Type::isStructType() const
+lang::StructType* lang::Type::isStructType()
+{
+    assert(isDefined());
+    return definition_.value()->isStructType();
+}
+
+lang::StructType const* lang::Type::isStructType() const
 {
     assert(isDefined());
     return definition_.value()->isStructType();

@@ -100,6 +100,16 @@ lang::ResolvingHandle<lang::Type> lang::Context::getArrayType(lang::ResolvingHan
     }
 }
 
+lang::Type const& lang::Context::getArrayType(lang::Type const& element_type, uint64_t size) const
+{
+    assert(element_type.isDefined());
+
+    lang::ResolvingHandle<lang::Type> element_type_handle =
+        const_cast<lang::Type&>(element_type).getDetachedIfUndefined();
+
+    return getArrayType(element_type_handle, size);
+}
+
 lang::ResolvingHandle<lang::Type> lang::Context::getBooleanType() const
 {
     if (!boolean_type_.hasValue())

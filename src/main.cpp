@@ -8,12 +8,12 @@
 #include "compiler/AnceCompiler.h"
 #include "compiler/AnceLinker.h"
 #include "compiler/Application.h"
-#include "compiler/NativeBuild.h"
 #include "compiler/Packages.h"
 #include "compiler/Project.h"
 #include "compiler/ProjectDescription.h"
 #include "compiler/SourceTree.h"
 #include "compiler/TargetDescriptor.h"
+#include "compiler/native/NativeBuild.h"
 #include "lang/ApplicationVisitor.h"
 #include "validation/ValidationLogger.h"
 
@@ -286,7 +286,7 @@ static bool run(std::ostream&                          out,
     return false;
 }
 
-int main(int argc, char** argv)
+static int anceMain(int argc, char** argv)
 {
     if (argc != 2)
     {
@@ -296,7 +296,8 @@ int main(int argc, char** argv)
     }
 
     boost::locale::generator const gen;
-    std::locale::global(gen(""));
+    std::locale                    loc = gen("");
+    std::locale::global(loc);
 
     char const* package_directory = std::getenv("ANCE_PACKAGE_DIRECTORY");
     if (package_directory == nullptr)
@@ -322,4 +323,17 @@ int main(int argc, char** argv)
     NativeBuild::terminate();
 
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+
+int main(int argc, char** argv)
+{
+    try
+    {
+        return anceMain(argc, argv);
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "ance: internal error: " << e.what() << std::endl;
+        return EXIT_FAILURE;
+    }
 }

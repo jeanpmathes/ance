@@ -154,9 +154,14 @@ bool lang::TypeDefinition::isReferenceType() const
     return false;
 }
 
-bool lang::TypeDefinition::isStructType() const
+lang::StructType* lang::TypeDefinition::isStructType()
 {
-    return false;
+    return nullptr;
+}
+
+lang::StructType const* lang::TypeDefinition::isStructType() const
+{
+    return nullptr;
 }
 
 lang::VectorizableType const* lang::TypeDefinition::isVectorizable() const
@@ -491,10 +496,7 @@ void lang::TypeDefinition::performDefaultInitializer(Shared<lang::Value> ptr,
                                                      Execution&          exec) const
 {
     if (isTriviallyDefaultConstructible())
-    {
-        Shared<lang::Value> size = exec.computeAllocatedSize(self(), count);
-        exec.performMemoryClear(ptr, size);
-    }
+    { exec.performMemoryClear(ptr, count); }
     else
     {
         assert(default_initializer_.hasValue());
@@ -511,10 +513,7 @@ void lang::TypeDefinition::performCopyInitializer(Shared<lang::Value> destinatio
                                                   Execution&          exec) const
 {
     if (isTriviallyCopyConstructible())
-    {
-        Shared<lang::Value> size = exec.computeAllocatedSize(self(), {});
-        exec.performMemoryCopy(destination, source, size);
-    }
+    { exec.performMemoryCopy(destination, source, exec.getSizeN(1)); }
     else
     {
         assert(copy_initializer_.hasValue());
@@ -599,17 +598,17 @@ void lang::TypeDefinition::registerConstructors(Execution& exec) const
 
     if (!default_constructor_) return;
 
-    exec.defineFunctionBody(default_constructor_->function(), [this](Execution& e) {
-        Shared<lang::Value> default_value = e.getDefault(self());
+    exec.defineFunctionBody(default_constructor_->function(), [this](Execution::FnCtx& ctx) {
+        Shared<lang::Value> default_value = ctx.exec().getDefault(self());
 
-        if (getStateCount().isUnit()) e.performReturn(default_value);
+        if (getStateCount().isUnit()) ctx.exec().performReturn(default_value);
         else
         {
-            Shared<lang::Value> ptr = e.performStackAllocation(self());
-            performDefaultInitializer(ptr, e);
+            Shared<lang::Value> ptr = ctx.exec().performStackAllocation(self());
+            performDefaultInitializer(ptr, ctx.exec());
 
-            Shared<lang::Value> result = e.performLoadFromAddress(ptr);
-            e.performReturn(result);
+            Shared<lang::Value> result = ctx.exec().performLoadFromAddress(ptr);
+            ctx.exec().performReturn(result);
         }
     });
 }
@@ -631,38 +630,38 @@ bool lang::TypeDefinition::isTriviallyDestructible() const
 
 void lang::TypeDefinition::defineDefaultInitializer(Execution& exec) const
 {
-    exec.defineFunctionBody(*default_initializer_, [this](Execution& e) {
-        Shared<lang::Value> ptr   = e.getParameterValue((**default_initializer_), 0);
-        Shared<lang::Value> count = e.getParameterValue((**default_initializer_), 1);
+    exec.defineFunctionBody(*default_initializer_, [this](Execution::FnCtx& ctx) {
+        Shared<lang::Value> ptr   = ctx.getParameterValue(0);
+        Shared<lang::Value> count = ctx.getParameterValue(1);
 
-        e.performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
-            this->performSingleDefaultInitializerDefinition(element_ptr, e);
+        ctx.exec().performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
+            this->performSingleDefaultInitializerDefinition(element_ptr, ctx.exec());
         });
-        e.performReturn({});
+        ctx.exec().performReturn({});
     });
 }
 
 void lang::TypeDefinition::defineCopyInitializer(Execution& exec) const
 {
-    exec.defineFunctionBody(*copy_initializer_, [this](Execution& e) {
-        Shared<lang::Value> dst_ptr = e.getParameterValue((**copy_initializer_), 0);
-        Shared<lang::Value> src_ptr = e.getParameterValue((**copy_initializer_), 1);
+    exec.defineFunctionBody(*copy_initializer_, [this](Execution::FnCtx& ctx) {
+        Shared<lang::Value> dst_ptr = ctx.getParameterValue(0);
+        Shared<lang::Value> src_ptr = ctx.getParameterValue(1);
 
-        performSingleCopyInitializerDefinition(dst_ptr, src_ptr, e);
-        e.performReturn({});
+        performSingleCopyInitializerDefinition(dst_ptr, src_ptr, ctx.exec());
+        ctx.exec().performReturn({});
     });
 }
 
 void lang::TypeDefinition::defineDefaultFinalizer(Execution& exec) const
 {
-    exec.defineFunctionBody(*default_finalizer_, [this](Execution& e) {
-        Shared<lang::Value> ptr   = e.getParameterValue((**default_finalizer_), 0);
-        Shared<lang::Value> count = e.getParameterValue((**default_finalizer_), 1);
+    exec.defineFunctionBody(*default_finalizer_, [this](Execution::FnCtx& ctx) {
+        Shared<lang::Value> ptr   = ctx.getParameterValue(0);
+        Shared<lang::Value> count = ctx.getParameterValue(1);
 
-        e.performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
-            this->performSingleDefaultFinalizerDefinition(element_ptr, e);
+        ctx.exec().performPointerIteration(ptr, count, [&](Shared<lang::Value> element_ptr) {
+            this->performSingleDefaultFinalizerDefinition(element_ptr, ctx.exec());
         });
-        e.performReturn({});
+        ctx.exec().performReturn({});
     });
 }
 
