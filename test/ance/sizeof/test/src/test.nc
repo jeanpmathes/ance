@@ -9,13 +9,13 @@ public main () : u32
 
     // The variant for types:
 
-    let s1: size <: sizeof u8;
-    assert s1 == 1;
+    let v1: size <: sizeof u8;
+    assert v1 == 1;
 
     // The variant for expressions:
     let x: s32;
-    let s2: size <: sizeof(x);
-    assert s2 == 4;
+    let v2: size <: sizeof(x);
+    assert v2 == 4;
 
     // The size of unit is zero.
     assert sizeof () == 0;
