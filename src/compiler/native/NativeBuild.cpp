@@ -792,6 +792,8 @@ void NativeBuild::registerGlobalVariable(lang::GlobalVariable const& global_vari
         {
             Shared<lang::Constant> initial_constant = cmp_build.evaluate(*constant_init, *this);
             native_initializer                      = llvmConstant(initial_constant);
+
+            assert(lang::Type::areSame(initial_constant->type(), global_variable.type()));
         }
         else
         {

@@ -29,8 +29,6 @@ class BinaryOperation
   public:
     bool validate(ValidationLogger& validation_logger) const override;
 
-    [[nodiscard]] bool isRootCMP() const override;
-
     [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 
   protected:

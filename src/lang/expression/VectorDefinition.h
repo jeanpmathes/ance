@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_VECTORDEFINITION_H_
 #define ANCE_SRC_LANG_EXPRESSION_VECTORDEFINITION_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include <set>
 
@@ -18,7 +18,7 @@ namespace lang
  * A vector value definition.
  */
 class VectorDefinition
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<VectorDefinition, ANCE_CONSTRUCTS>
 {
   public:

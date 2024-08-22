@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_SIZEOFTYPE_H_
 #define ANCE_SRC_LANG_EXPRESSION_SIZEOFTYPE_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 
@@ -11,7 +11,7 @@ class Application;
  * Provides the size of a type.
  */
 class SizeofType
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<SizeofType, ANCE_CONSTRUCTS>
 {
   public:

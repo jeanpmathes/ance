@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_ARRAYDEFINITION_H_
 #define ANCE_SRC_LANG_EXPRESSION_ARRAYDEFINITION_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include <set>
 
@@ -18,7 +18,7 @@ namespace lang
  * An expression that defines an array value.
  */
 class ArrayDefinition
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<ArrayDefinition, ANCE_CONSTRUCTS>
 {
   public:

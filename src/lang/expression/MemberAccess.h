@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_MEMBERACCESS_H_
 #define ANCE_SRC_LANG_EXPRESSION_MEMBERACCESS_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 #include "lang/construct/Variable.h"
@@ -16,7 +16,7 @@ namespace lang
  * Access a member of a type.
  */
 class MemberAccess
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<MemberAccess, ANCE_CONSTRUCTS>
 {
   public:
@@ -37,6 +37,7 @@ class MemberAccess
     [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 
   protected:
+    void walkDefinitions() override;
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
 
   public:

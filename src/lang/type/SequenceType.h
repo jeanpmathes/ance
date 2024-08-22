@@ -67,7 +67,7 @@ namespace lang
          * @param exec The current execution context.
          * @return The value.
          */
-        Shared<lang::Value> createValue(std::vector<Shared<lang::Value>> values, Execution& exec) const;
+        Shared<lang::Value> createValue(std::vector<Shared<lang::Value>>& values, Execution& exec) const;
 
       protected:
         lang::ResolvingHandle<lang::Type> element_type_;

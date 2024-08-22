@@ -23,6 +23,8 @@ lang::Entity const& SizeofType::target() const
 void SizeofType::walkDefinitions()
 {
     scope().registerUsage(type_);
+
+    type();
 }
 
 void SizeofType::defineType(lang::ResolvingHandle<lang::Type> type)

@@ -24,6 +24,16 @@ Expression const& Subscript::index() const
     return *index_;
 }
 
+void Subscript::walkDefinitions()
+{
+    Expression::walkDefinitions();
+
+    type();
+
+    indexed_->type();
+    index_->type();
+}
+
 void Subscript::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     auto indexed_type = indexed_->type();

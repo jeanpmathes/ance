@@ -24,6 +24,13 @@ void SizeofExpression::defineType(lang::ResolvingHandle<lang::Type> type)
     type.reroute(scope().context().getSizeType());
 }
 
+void SizeofExpression::walkDefinitions()
+{
+    Expression::walkDefinitions();
+
+    expression_->type();
+}
+
 bool SizeofExpression::validate(ValidationLogger& validation_logger) const
 {
     return expression_->validate(validation_logger);

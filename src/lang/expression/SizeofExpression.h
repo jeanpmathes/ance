@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_SIZEOFEXPRESSION_H_
 #define ANCE_SRC_LANG_EXPRESSION_SIZEOFEXPRESSION_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 
@@ -11,7 +11,7 @@ class Application;
  * Gives the size of a value returned by an expression.
  */
 class SizeofExpression
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<SizeofExpression, ANCE_CONSTRUCTS>
 {
   public:
@@ -24,6 +24,10 @@ class SizeofExpression
 
     [[nodiscard]] Expression const& expression() const;
 
+  protected:
+    void walkDefinitions() override;
+
+  public:
     bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;

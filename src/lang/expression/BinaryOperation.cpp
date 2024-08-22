@@ -78,11 +78,6 @@ bool BinaryOperation::validate(ValidationLogger& validation_logger) const
     return left_type.validateOperator(op_, right_type, left_->location(), right_->location(), validation_logger);
 }
 
-bool BinaryOperation::isRootCMP() const
-{
-    return true;// Currently, all operators are cmp.
-}
-
 Expression::Expansion BinaryOperation::expandWith(Expressions subexpressions, lang::Context&) const
 {
     return {Statements(),

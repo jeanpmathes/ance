@@ -444,9 +444,7 @@ bool lang::Type::validateSubscript(lang::Location    indexed_location,
                                    ValidationLogger& validation_logger) const
 {
     assert(isDefined());
-    return definition_.value()->validateSubscript(indexed_location,
-                                                  std::move(index_type),
-                                                  index_location,
+    return definition_.value()->validateSubscript(indexed_location, index_type, index_location,
                                                   validation_logger);
 }
 
@@ -457,9 +455,7 @@ bool lang::Type::validateOperator(lang::BinaryOperator op,
                                   ValidationLogger&    validation_logger) const
 {
     assert(isDefined());
-    return definition_.value()->validateOperator(op,
-                                                 std::move(other),
-                                                 left_location,
+    return definition_.value()->validateOperator(op, other, left_location,
                                                  right_location,
                                                  validation_logger);
 }

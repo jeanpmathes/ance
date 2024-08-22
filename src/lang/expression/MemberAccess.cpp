@@ -23,6 +23,13 @@ lang::Identifier const& MemberAccess::member() const
     return member_;
 }
 
+void MemberAccess::walkDefinitions()
+{
+    Expression::walkDefinitions();
+
+    type();
+}
+
 void MemberAccess::defineType(lang::ResolvingHandle<lang::Type> type)
 {
     if (!isInitialized()) return;

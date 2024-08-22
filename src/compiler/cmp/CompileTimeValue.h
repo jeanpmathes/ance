@@ -39,7 +39,7 @@ class CompileTimeValue : public lang::Constant
      * Access a value using an index, either loading the value or creating a value where the index is replaced.
      * @param index The index to access.
      * @param ok Whether the access was successful, i.e. the index is valid.
-     * @param op Null to load the value, or a pointer to store the value at the index.
+     * @param op Null to load the value, or a pointer to the value to be stored.
      * @param exec The execution context.
      * @return If loading, the loaded value. If storing, the new value.
      */
@@ -88,6 +88,8 @@ namespace cmp
                    lang::Context&                          context);
         Shared<lang::Constant>   embed(Execution& exec) const override;
         Shared<CompileTimeValue> withType(lang::Type const& type, lang::Context& new_context) const override;
+
+        Shared<CompileTimeValue> access(size_t index, Shared<CompileTimeValue>* op, bool* ok, Execution& exec) override;
 
       private:
         std::vector<Shared<CompileTimeValue>> values_;
@@ -173,6 +175,8 @@ namespace cmp
 
         [[nodiscard]] Shared<CompileTimeValue> get(size_t index);
         [[nodiscard]] size_t                   size() const;
+
+        Shared<CompileTimeValue> access(size_t index, Shared<CompileTimeValue>* op, bool* ok, Execution& exec) override;
 
       private:
         std::vector<Shared<CompileTimeValue>> values_;

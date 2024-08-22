@@ -167,7 +167,7 @@ std::vector<lang::ResolvingHandle<lang::Type>> lang::SequenceType::getDefinition
     return {};
 }
 
-Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>> values, Execution& exec) const
+Shared<lang::Value> lang::SequenceType::createValue(std::vector<Shared<lang::Value>>& values, Execution& exec) const
 {
     assert(size_.hasValue());
     assert(values.size() == size_.value());

@@ -1,13 +1,13 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_PARENTHESIS_H_
 #define ANCE_SRC_LANG_EXPRESSION_PARENTHESIS_H_
 
-#include "lang/expression/Expression.h"
+#include "CompileTimeExpression.h"
 
 /**
  * A parenthesis expression, which wraps an expression.
  */
 class Parenthesis
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<Parenthesis, ANCE_CONSTRUCTS>
 {
   public:
@@ -23,7 +23,7 @@ class Parenthesis
   public:
     [[nodiscard]] bool isNamed() const override;
 
-    lang::Type const& assignableType() const override;
+    [[nodiscard]] lang::Type const& assignableType() const override;
 
     bool validate(ValidationLogger& validation_logger) const override;
     bool validateAssignment(lang::Type const& value_type,

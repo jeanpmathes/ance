@@ -45,7 +45,7 @@ bool Expression::isRootCMP() const
 
 lang::ResolvingHandle<lang::Type> Expression::type()
 {
-    if (not type_->isDefined()) defineType(type_);
+    if (!type_->isDefined()) defineType(type_);
 
     return type_;
 }

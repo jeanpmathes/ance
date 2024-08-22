@@ -1455,10 +1455,19 @@ Shared<lang::Value> CompileTimeBuild::performIntegerReinterpretation(Shared<lang
 
 Shared<lang::Constant> CompileTimeBuild::evaluate(CompileTimeExpression const& expression, Execution& exec)
 {
+    assert(current_fn_ctx_ == nullptr);
+
+    CmpFnCtx fn_ctx(*this, {});
+    current_fn_ctx_ = &fn_ctx;
+
     std::any result = visitor_->visitTree(expression);
     auto     value  = erasedCast<Shared<lang::Value>>(result);
 
-    return cmpContentOf(value)->embed(exec);
+    Shared<lang::Constant> constant = cmpContentOf(value)->embed(exec);
+
+    current_fn_ctx_ = nullptr;
+
+    return constant;
 }
 
 CompileTimeBuild::TypeInformation& CompileTimeBuild::getTypeInformation(lang::Type const& type)
@@ -1569,6 +1578,18 @@ CompileTimeBuild::Address::Location CompileTimeBuild::Address::location() const
     return location_;
 }
 
+std::string CompileTimeBuild::Address::toString() const
+{
+    if (location_ == Location::Null) return "null";
+
+    std::string result = location_ == Location::Global ? "global" : "local";
+    result += "[" + std::to_string(memory_index_) + "][" + std::to_string(array_index_) + "]";
+
+    for (size_t index : inner_indices_) { result += "[" + std::to_string(index) + "]"; }
+
+    return result;
+}
+
 Shared<CompileTimeValue> CompileTimeBuild::cmpContentOf(Shared<lang::Value> value)
 {
     Shared<CompileTimeValue> cmp_value = value.cast<CompileTimeValue>();
@@ -1619,6 +1640,8 @@ CompileTimeBuild::Address CompileTimeBuild::allocateGlobal(lang::Type const& typ
 
 CompileTimeBuild::Address CompileTimeBuild::allocateLocal(lang::Type const& type, size_t count)
 {
+    assert(current_fn_ctx_ != nullptr);
+
     return allocate(Address::Location::Local, current_fn_ctx_->memory, type, count, *this);
 }
 
@@ -1631,8 +1654,9 @@ Shared<CompileTimeValue> CompileTimeBuild::load(CompileTimeBuild::Address const&
 
     for (size_t index : address.inners())
     {
-        bool ok = true;// todo: use
+        bool ok = true;
         value   = value->access(index, nullptr, &ok, *this);
+        assert(ok);// todo: use for compiler error
     }
 
     return value;
@@ -1653,17 +1677,26 @@ void CompileTimeBuild::store(CompileTimeBuild::Address address, Shared<CompileTi
 
     std::function<void(Shared<CompileTimeValue>&, size_t)> replace = [&](Shared<CompileTimeValue>& target,
                                                                          size_t                    index) -> void {
-        Shared<CompileTimeValue> current = value;
+        bool ok;
 
-        if (index < address.inners().size())
+        if (index == address.inners().size() - 1)
         {
-            bool ok = true;// todo: use
-            current = target->access(address.inners()[index], nullptr, &ok, *this);
-            replace(current, index + 1);
+            ok     = true;
+            target = target->access(address.inners()[index], &value, &ok, *this);
+            assert(ok);// todo: use for compiler error
         }
+        else
+        {
+            ok                               = true;
+            Shared<CompileTimeValue> current = target->access(address.inners()[index], nullptr, &ok, *this);
+            assert(ok);// todo: use for compiler error
 
-        bool ok = true;// todo: use
-        target  = target->access(address.inners()[index], &value, &ok, *this);
+            replace(current, index + 1);
+
+            ok     = true;
+            target = target->access(address.inners()[index], &current, &ok, *this);
+            assert(ok);// todo: use for compiler error
+        }
     };
 
     replace(*slot, 0);

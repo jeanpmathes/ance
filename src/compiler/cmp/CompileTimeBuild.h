@@ -165,6 +165,8 @@ class CompileTimeBuild : public Execution
         [[nodiscard]] size_t              array() const;
         [[nodiscard]] std::vector<size_t> inners() const;
         [[nodiscard]] Location            location() const;
+
+        [[nodiscard]] std::string toString() const;
     };
 
     Address allocateLocal(lang::Type const& type, size_t count = 1);

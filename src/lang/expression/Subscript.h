@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_SUBSCRIPT_H_
 #define ANCE_SRC_LANG_EXPRESSION_SUBSCRIPT_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * A subscript operation.
  */
 class Subscript
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<Subscript, ANCE_CONSTRUCTS>
 {
   public:
@@ -29,6 +29,7 @@ class Subscript
     [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 
   protected:
+    void walkDefinitions() override;
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
 
   public:

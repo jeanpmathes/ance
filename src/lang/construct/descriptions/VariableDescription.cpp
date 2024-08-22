@@ -138,7 +138,13 @@ void lang::VariableDescription::performInitialization()
     if (type_.hasValue()) { scope().registerUsage(type_.value()); }
     else if (init_expression_ptr_ != nullptr) { type_handle_.reroute(init_expression_ptr_->type()); }
 
-    if (cmp_init_ != nullptr) { variable_init = std::ref(*cmp_init_); }
+    if (cmp_init_ != nullptr)
+    {
+        variable_init = std::ref(*cmp_init_);
+
+        cmp_init_->setContainingScope(scope());
+        cmp_init_->walkDefinitions();
+    }
     else
     {
         if (init_block_.hasValue())
@@ -225,6 +231,13 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
     {
         if (cmp_init_ == nullptr)
         {
+            if (init_expression_ptr_ != nullptr)
+            {
+                validation_logger.logError("Compile-time variable initializer must be compile-time expression",
+                                           init_expression_ptr_->location());
+                return;
+            }
+
             validation_logger.logError("Compile-time variables require an explicit initializer", location_);
             return;
         }

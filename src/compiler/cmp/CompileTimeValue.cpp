@@ -87,6 +87,33 @@ Shared<CompileTimeValue> cmp::ArrayValue::withType(lang::Type const& type, lang:
     return makeShared<ArrayValue>(type.getElementType(), std::move(values), new_context);
 }
 
+Shared<CompileTimeValue> cmp::ArrayValue::access(size_t index, Shared<CompileTimeValue>* op, bool* ok, Execution& exec)
+{
+    *ok = values_.size() > index;
+
+    if (op == nullptr)
+    {
+        if (*ok) return values_.at(index);
+        else return makeShared<UnitValue>(exec.ctx().getUnitType(), exec.ctx());
+    }
+    else
+    {
+        if (*ok)
+        {
+            std::vector<Shared<CompileTimeValue>> new_values;
+
+            for (size_t i = 0; i < values_.size(); ++i)
+            {
+                if (i == index) new_values.emplace_back(*op);
+                else new_values.emplace_back(values_.at(i));
+            }
+
+            return makeShared<ArrayValue>(type().getElementType(), std::move(new_values), exec.ctx());
+        }
+        else return makeShared<UnitValue>(exec.ctx().getUnitType(), exec.ctx());
+    }
+}
+
 cmp::BooleanValue::BooleanValue(bool value, lang::Context& context)
     : CompileTimeValue(context.getBooleanType())
     , value_(value)
@@ -234,4 +261,31 @@ Shared<CompileTimeValue> cmp::VectorValue::get(size_t index)
 size_t cmp::VectorValue::size() const
 {
     return values_.size();
+}
+
+Shared<CompileTimeValue> cmp::VectorValue::access(size_t index, Shared<CompileTimeValue>* op, bool* ok, Execution& exec)
+{
+    *ok = values_.size() > index;
+
+    if (op == nullptr)
+    {
+        if (*ok) return values_.at(index);
+        else return makeShared<UnitValue>(exec.ctx().getUnitType(), exec.ctx());
+    }
+    else
+    {
+        if (*ok)
+        {
+            std::vector<Shared<CompileTimeValue>> new_values;
+
+            for (size_t i = 0; i < values_.size(); ++i)
+            {
+                if (i == index) new_values.emplace_back(*op);
+                else new_values.emplace_back(values_.at(i));
+            }
+
+            return makeShared<VectorValue>(type().getElementType(), std::move(new_values), exec.ctx());
+        }
+        else return makeShared<UnitValue>(exec.ctx().getUnitType(), exec.ctx());
+    }
 }

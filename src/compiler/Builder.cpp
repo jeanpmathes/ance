@@ -177,7 +177,7 @@ std::any Builder::visit(ArrayDefinition const& array_definition)
     lang::ArrayType const* array_type = array_definition.type().isArrayType();
     assert(array_type);
 
-    auto value = array_type->createValue(std::move(values), exec());
+    auto value = array_type->createValue(values, exec());
 
     return erase(value);
 }
@@ -372,7 +372,7 @@ std::any Builder::visit(VectorDefinition const& vector_definition)
     lang::VectorType const* vector_type = vector_definition.type().isVectorType();
     assert(vector_type);
 
-    Shared<lang::Value> value = vector_type->createValue(std::move(values), exec());
+    Shared<lang::Value> value = vector_type->createValue(values, exec());
 
     return erase(value);
 }

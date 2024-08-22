@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_UNARYOPERATION_H_
 #define ANCE_SRC_LANG_EXPRESSION_UNARYOPERATION_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * A unary operation, which is a single operand expression.
  */
 class UnaryOperation
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<UnaryOperation, ANCE_CONSTRUCTS>
 {
   public:

@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_CAST_H_
 #define ANCE_SRC_LANG_EXPRESSION_CAST_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -15,7 +15,7 @@ namespace lang
  * A cast of a value to another value in a given type.
  */
 class Cast
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<Cast, ANCE_CONSTRUCTS>
 {
   public:

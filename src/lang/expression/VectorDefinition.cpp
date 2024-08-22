@@ -38,6 +38,8 @@ void VectorDefinition::walkDefinitions()
     Expression::walkDefinitions();
 
     if (declared_type_.hasValue()) scope().registerUsage(declared_type_.value());
+
+    type();
 }
 
 void VectorDefinition::defineType(lang::ResolvingHandle<lang::Type> type)
