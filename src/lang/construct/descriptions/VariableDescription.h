@@ -60,6 +60,7 @@ namespace lang
         [[nodiscard]] lang::GlobalVariable const* variable() const;
         [[nodiscard]] Expression const*           initializer() const;
         [[nodiscard]] InitializerFunction const*  initializerFunction() const;
+        [[nodiscard]] bool                        isCMP() const override;
 
         [[nodiscard]] std::vector<std::reference_wrapper<Entity const>> getProvidedEntities() const override;
         [[nodiscard]] std::vector<Dependency>                           getDeclarationDependencies() const override;

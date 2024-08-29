@@ -6,13 +6,16 @@
 
 std::any Builder::visit(lang::GlobalScope const& global_scope)
 {
-    if (exec().unit().isUsingRuntime()) exec().runtime().init(exec());
-
     g_phase_ = GlobalPhase::DECLARE;
 
     for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().registerDeclaration(exec()); }
 
-    for (auto& description : global_scope.getDescriptionsInDeclarationOrder()) { visitTree(description); }
+    for (auto& description : global_scope.getDescriptionsInDeclarationOrder())
+    {
+        if (!isDescriptionAccepted(description)) continue;
+
+        visitTree(description);
+    }
 
     exec().ctx().registerDeclarations(exec());
 
@@ -20,13 +23,23 @@ std::any Builder::visit(lang::GlobalScope const& global_scope)
 
     for (auto& used_type : global_scope.getUsedBuiltInTypes()) { used_type.get().registerDefinition(exec()); }
 
-    for (auto& description : global_scope.getDescriptionsInDefinitionOrder()) { visitTree(description); }
+    for (auto& description : global_scope.getDescriptionsInDefinitionOrder())
+    {
+        if (!isDescriptionAccepted(description)) continue;
+
+        visitTree(description);
+    }
 
     exec().ctx().registerDefinitions(exec());
 
     g_phase_ = GlobalPhase::INVALID;
 
     return {};
+}
+
+bool Builder::isDescriptionAccepted(lang::Description const&) const
+{
+    return true;
 }
 
 std::any Builder::visit(lang::FunctionDescription const& function_description)

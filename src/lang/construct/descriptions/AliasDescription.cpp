@@ -43,6 +43,11 @@ bool lang::AliasDescription::isOverloadAllowed() const
     return false;
 }
 
+bool lang::AliasDescription::isCMP() const
+{
+    return true;
+}
+
 lang::Type const& lang::AliasDescription::type() const
 {
     return self_;

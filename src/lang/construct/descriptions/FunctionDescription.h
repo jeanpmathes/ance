@@ -53,6 +53,7 @@ namespace lang
 
         [[nodiscard]] Identifier const& name() const override;
         [[nodiscard]] bool              isOverloadAllowed() const override;
+        [[nodiscard]] bool              isCMP() const override;
 
         [[nodiscard]] lang::Function const* function() const;
         [[nodiscard]] Statement const*      code() const;

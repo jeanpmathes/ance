@@ -7,6 +7,11 @@ CompileTimeBuilder::CompileTimeBuilder(CompileTimeBuild& compile_time_build) : c
     compile_time_build_.setActiveVisitor(this);
 }
 
+bool CompileTimeBuilder::isDescriptionAccepted(lang::Description const& description) const
+{
+    return description.isCMP();
+}
+
 Execution& CompileTimeBuilder::exec()
 {
     return compile_time_build_;
@@ -14,36 +19,41 @@ Execution& CompileTimeBuilder::exec()
 
 void CompileTimeBuilder::visitFunctionDefinition(lang::Function const&)
 {
-    assert(false);// todo: implement
+    // todo: implement
 }
 
 std::any CompileTimeBuilder::visit(lang::bb::def::Empty const&)
 {
-    assert(false);// todo: implement
+    // todo: implement
+
     return {};
 }
 
 std::any CompileTimeBuilder::visit(lang::bb::def::Finalizing const&)
 {
-    assert(false);// todo: implement
+    // todo: implement
+
     return {};
 }
 
 std::any CompileTimeBuilder::visit(lang::bb::def::Simple const&)
 {
-    assert(false);// todo: implement
+    // todo: implement
+
     return {};
 }
 
 std::any CompileTimeBuilder::visit(lang::bb::def::Returning const&)
 {
-    assert(false);// todo: implement
+    // todo: implement
+
     return {};
 }
 
 std::any CompileTimeBuilder::visit(lang::bb::def::Branching const&)
 {
-    assert(false);// todo: implement
+    // todo: implement
+
     return {};
 }
 

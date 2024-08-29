@@ -13,6 +13,8 @@ class Builder : public lang::ApplicationVisitorConst
 
     std::any visit(lang::GlobalScope const& global_scope) override;
 
+    [[nodiscard]] virtual bool isDescriptionAccepted(lang::Description const& description) const;
+
     std::any visit(lang::FunctionDescription const& function) override;
     std::any visit(lang::VariableDescription const& variable_description) override;
     std::any visit(lang::StructDescription const& struct_description) override;

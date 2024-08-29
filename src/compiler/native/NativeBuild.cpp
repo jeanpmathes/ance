@@ -89,6 +89,11 @@ void NativeBuild::setActiveVisitor(NativeBuilder* visitor)
     visitor_ = visitor;
 }
 
+void NativeBuild::setCMP(CompileTimeBuild* cmp)
+{
+    cmp_build_ = cmp;
+}
+
 llvm::GlobalValue::LinkageTypes NativeBuild::getLinkage(lang::AccessModifier access)
 {
     llvm::GlobalValue::LinkageTypes linkage;
@@ -781,16 +786,13 @@ void NativeBuild::registerGlobalVariable(lang::GlobalVariable const& global_vari
                                          bool                        is_imported,
                                          lang::GlobalInitializer     init)
 {
-    CompileTimeBuild   cmp_build(unit(), runtime(), *this);
-    CompileTimeBuilder cmp_builder(cmp_build);
-
     llvm::Constant* native_initializer = nullptr;
 
     if (init.hasValue())
     {
-        if (auto* constant_init = std::get_if<std::reference_wrapper<CompileTimeExpression>>(&init.value()))
+        if (std::holds_alternative<std::reference_wrapper<CompileTimeExpression>>(init.value()))
         {
-            Shared<lang::Constant> initial_constant = cmp_build.evaluate(*constant_init, *this);
+            Shared<lang::Constant> initial_constant = cmp_build_->getGlobalVariableValue(global_variable, *this);
             native_initializer                      = llvmConstant(initial_constant);
 
             assert(lang::Type::areSame(initial_constant->type(), global_variable.type()));

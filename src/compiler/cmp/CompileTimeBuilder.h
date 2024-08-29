@@ -17,6 +17,8 @@ class CompileTimeBuilder : public Builder
      */
     explicit CompileTimeBuilder(CompileTimeBuild& compile_time_build);
 
+    [[nodiscard]] bool isDescriptionAccepted(lang::Description const& description) const override;
+
     std::any visit(lang::bb::def::Empty const& emtpy_bb) override;
     std::any visit(lang::bb::def::Finalizing const& finalizing_bb) override;
     std::any visit(lang::bb::def::Simple const& simple_bb) override;

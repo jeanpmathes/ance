@@ -46,6 +46,11 @@ bool lang::FunctionDescription::isOverloadAllowed() const
     return true;
 }
 
+bool lang::FunctionDescription::isCMP() const
+{
+    return false;
+}
+
 void lang::FunctionDescription::performInitialization()
 {
     function_ = lang::makeHandled<lang::Function>(name_);

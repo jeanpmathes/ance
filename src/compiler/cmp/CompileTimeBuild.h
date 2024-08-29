@@ -122,6 +122,14 @@ class CompileTimeBuild : public Execution
      */
     Shared<lang::Constant> evaluate(CompileTimeExpression const& expression, Execution& exec);
 
+    /**
+     * Get the value of a global variable.
+     * @param variable The global variable.
+     * @param exec The execution context in which to embed the value.
+     * @return The value of the global variable.
+     */
+    Shared<lang::Constant> getGlobalVariableValue(lang::GlobalVariable const& variable, Execution& exec);
+
     std::filesystem::path getSourceFilePath(lang::Location location) override;
     void                  setDebugLocation(lang::Location location, lang::Scope const& scope) override;
     void                  resetDebugLocation() override;
@@ -181,6 +189,8 @@ class CompileTimeBuild : public Execution
 
     Shared<CompileTimeValue> cmpHandledValueOf(Shared<lang::Value> value);// todo: remove
     Shared<CompileTimeValue> cmpHandledValueOf(Address address, lang::Type const& type);
+
+    Shared<CompileTimeValue> evaluate(CompileTimeExpression const& expression);
 
     using Memory    = std::vector<std::vector<Shared<CompileTimeValue>>>;
     using Variables = std::map<lang::Variable const*, Address>;

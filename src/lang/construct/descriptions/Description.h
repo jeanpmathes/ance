@@ -32,6 +32,7 @@ namespace lang
         [[nodiscard]] virtual lang::Identifier const& name() const              = 0;
         [[nodiscard]] virtual bool                    isOverloadAllowed() const = 0;
         [[nodiscard]] lang::Accessibility             access() const;
+        [[nodiscard]] virtual bool                    isCMP() const = 0;
 
         struct Dependency {
             std::reference_wrapper<lang::Entity const> entity;

@@ -37,6 +37,7 @@ namespace lang
         [[nodiscard]] Identifier const& name() const override;
         [[nodiscard]] lang::Type const& actual() const;
         [[nodiscard]] bool              isOverloadAllowed() const override;
+        [[nodiscard]] bool              isCMP() const override;
 
         [[nodiscard]] lang::Type const& type() const;
 

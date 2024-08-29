@@ -107,7 +107,9 @@ CompileTimeBuild::CompileTimeBuild(Unit& unit, Runtime& runtime, NativeBuild& na
     : Execution(unit, runtime)
     , context_(unit.globalScope().context())
     , native_(native)
-{}
+{
+    native_.setCMP(this);
+}
 
 void CompileTimeBuild::setActiveVisitor(CompileTimeBuilder* visitor)
 {
@@ -466,14 +468,23 @@ void CompileTimeBuild::registerGlobalVariable(lang::GlobalVariable const& global
                                               bool                        is_imported,
                                               lang::GlobalInitializer     init)
 {
-    if (is_imported) { assert(false); }
-
     Address address = allocateGlobal(global_variable.type());
     global_variables_.emplace(&global_variable.self(), address);
 
-    if (init.hasValue())
+    if (is_imported)
     {
-        // todo: do this, also rework global initializer as that no longer has to be restricted to LiteralExpression
+        // todo: store the serialized value of the exported variable in the .apkg file and put it into init to use here
+    }
+    else if (init.hasValue())
+    {
+        if (auto* constant_init = std::get_if<std::reference_wrapper<CompileTimeExpression>>(&init.value()))
+        {
+            store(address, evaluate(*constant_init));
+        }
+        else if (auto* function_init = std::get_if<std::reference_wrapper<lang::Function>>(&init.value()))
+        {
+            performFunctionCall(*function_init, {});
+        }
     }
 }
 
@@ -1455,19 +1466,14 @@ Shared<lang::Value> CompileTimeBuild::performIntegerReinterpretation(Shared<lang
 
 Shared<lang::Constant> CompileTimeBuild::evaluate(CompileTimeExpression const& expression, Execution& exec)
 {
-    assert(current_fn_ctx_ == nullptr);
+    return evaluate(expression)->embed(exec);
+}
 
-    CmpFnCtx fn_ctx(*this, {});
-    current_fn_ctx_ = &fn_ctx;
+Shared<lang::Constant> CompileTimeBuild::getGlobalVariableValue(lang::GlobalVariable const& variable, Execution& exec)
+{
+    Address address = computeAddressOfVariable(variable.self()).cast<cmp::AddressValue>()->address();
 
-    std::any result = visitor_->visitTree(expression);
-    auto     value  = erasedCast<Shared<lang::Value>>(result);
-
-    Shared<lang::Constant> constant = cmpContentOf(value)->embed(exec);
-
-    current_fn_ctx_ = nullptr;
-
-    return constant;
+    return load(address)->embed(exec);
 }
 
 CompileTimeBuild::TypeInformation& CompileTimeBuild::getTypeInformation(lang::Type const& type)
@@ -1631,6 +1637,20 @@ Shared<CompileTimeValue> CompileTimeBuild::cmpHandledValueOf(Shared<lang::Value>
 Shared<CompileTimeValue> CompileTimeBuild::cmpHandledValueOf(Address address, lang::Type const& type)
 {
     return makeShared<cmp::HandledValue>(address, type, *this);
+}
+
+Shared<CompileTimeValue> CompileTimeBuild::evaluate(CompileTimeExpression const& expression)
+{
+    assert(current_fn_ctx_ == nullptr);
+
+    CmpFnCtx fn_ctx(*this, {});
+    current_fn_ctx_ = &fn_ctx;
+
+    Shared<CompileTimeValue> value = cmpContentOf(visitor_->getV(expression));
+
+    current_fn_ctx_ = nullptr;
+
+    return value;
 }
 
 CompileTimeBuild::Address CompileTimeBuild::allocateGlobal(lang::Type const& type, size_t count)

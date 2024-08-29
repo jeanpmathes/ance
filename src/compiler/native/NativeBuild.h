@@ -12,6 +12,7 @@
 class Execution;
 class NativeBuilder;
 class SourceTree;
+class CompileTimeBuild;
 
 /**
  * A class to build operations as native LLVM IR.
@@ -34,6 +35,7 @@ class NativeBuild : public Execution
     llvm::DILocation*                      getLocation(lang::Location location, llvm::DIScope* scope);
 
     void setActiveVisitor(NativeBuilder* visitor);
+    void setCMP(CompileTimeBuild* cmp);
 
     Shared<lang::Constant> getDefault(lang::Type const& type) override;
     Shared<lang::Constant> getCodepointString(std::u32string const& string) override;
@@ -162,6 +164,7 @@ class NativeBuild : public Execution
 
   private:
     NativeBuilder*  visitor_ = nullptr;
+    CompileTimeBuild* cmp_build_ = nullptr;
 
     llvm::LLVMContext&   llvm_context_;
     llvm::Module&        llvm_module_;

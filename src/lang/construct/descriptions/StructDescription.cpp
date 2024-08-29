@@ -44,6 +44,11 @@ bool lang::StructDescription::isOverloadAllowed() const
     return false;
 }
 
+bool lang::StructDescription::isCMP() const
+{
+    return true;
+}
+
 lang::Type const& lang::StructDescription::type() const
 {
     return self_;

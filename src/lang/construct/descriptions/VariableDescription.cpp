@@ -95,6 +95,11 @@ lang::InitializerFunction const* lang::VariableDescription::initializerFunction(
     return init_function_;
 }
 
+bool lang::VariableDescription::isCMP() const
+{
+    return is_cmp_;
+}
+
 std::vector<std::reference_wrapper<lang::Entity const>> lang::VariableDescription::getProvidedEntities() const
 {
     return {std::cref(variable_handle_.base())};

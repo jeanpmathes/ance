@@ -16,6 +16,8 @@
 #include "compiler/ControlFlowGraphPrinter.h"
 #include "compiler/SourceTree.h"
 #include "compiler/Unit.h"
+#include "compiler/cmp/CompileTimeBuild.h"
+#include "compiler/cmp/CompileTimeBuilder.h"
 #include "compiler/native/NativeBuild.h"
 #include "compiler/native/NativeBuilder.h"
 #include "compiler/native/WrappedNativeValue.h"
@@ -59,7 +61,13 @@ void AnceCompiler::compile(std::filesystem::path const& ilr, std::filesystem::pa
 
     NativeBuilder builder(native_build_);
 
+    CompileTimeBuild   cmp_build(unit_, runtime_, native_build_);
+    CompileTimeBuilder cmp_builder(cmp_build);
+
+    if (unit_.isUsingRuntime()) runtime_.init(native_build_);
+
     Unit const& unit = unit_;
+    cmp_builder.visit(unit);
     builder.visit(unit);
 
     assert(native_build_.allDebugLocationsPopped());// Every setDebugLocation must be ended with a resetDebugLocation!
