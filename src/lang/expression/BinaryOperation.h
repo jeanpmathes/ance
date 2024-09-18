@@ -32,6 +32,11 @@ class BinaryOperation
     [[nodiscard]] Expansion expandWith(Expressions subexpressions, lang::Context& new_context) const override;
 
   protected:
+
+  public:
+    void walkDefinitions() override;
+
+  protected:
     void defineType(lang::ResolvingHandle<lang::Type> type) override;
 
   public:

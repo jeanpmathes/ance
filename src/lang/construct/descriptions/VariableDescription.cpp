@@ -204,7 +204,11 @@ void lang::VariableDescription::resolveDefinition()
 
 void lang::VariableDescription::postResolve()
 {
-    if (init_expression_ptr_ != nullptr && init_block_.hasValue()) { init_block_.value()->postResolve(); }
+    if (init_expression_ptr_ != nullptr)
+    {
+        if (init_block_.hasValue()) { init_block_.value()->postResolve(); }
+        else init_expression_ptr_->postResolve();
+    }
 
     if (init_function_ != nullptr) { init_function_->function().postResolve(); }
 }

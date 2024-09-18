@@ -43,6 +43,14 @@ void BinaryOperation::defineType(lang::ResolvingHandle<lang::Type> type)
     }
 }
 
+void BinaryOperation::walkDefinitions()
+{
+    Expression::walkDefinitions();
+
+    left_->type();
+    right_->type();
+}
+
 bool BinaryOperation::validate(ValidationLogger& validation_logger) const
 {
     bool const valid_operands = left_->validate(validation_logger) && right_->validate(validation_logger);

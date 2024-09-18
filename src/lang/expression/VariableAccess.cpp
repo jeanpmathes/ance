@@ -21,6 +21,8 @@ lang::Entity const& VariableAccess::variable() const
 void VariableAccess::walkDefinitions()
 {
     scope().registerUsage(variable_, !is_defined_);
+
+    type();
 }
 
 void VariableAccess::defineType(lang::ResolvingHandle<lang::Type> type)
