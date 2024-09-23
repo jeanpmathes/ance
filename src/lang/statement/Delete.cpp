@@ -24,15 +24,19 @@ bool Delete::isBufferDelete() const
     return delete_buffer_;
 }
 
-void Delete::validate(ValidationLogger& validation_logger) const
+bool Delete::validate(ValidationLogger& validation_logger) const
 {
-    if (!to_delete_->validate(validation_logger)) return;
+    if (!to_delete_->validate(validation_logger)) return false;
+
+    bool valid = true;
 
     if (delete_buffer_ && !to_delete_->type().isBufferType())
     {
         validation_logger.logError("Value of type " + to_delete_->type().getAnnotatedName()
                                        + " given to 'delete[]' must be a buffer pointer",
                                    to_delete_->location());
+
+        valid = false;
     }
 
     if (!delete_buffer_ && !to_delete_->type().isPointerType())
@@ -40,9 +44,13 @@ void Delete::validate(ValidationLogger& validation_logger) const
         validation_logger.logError("Value of type " + to_delete_->type().getAnnotatedName()
                                        + " given to 'delete' must be a pointer",
                                    to_delete_->location());
+
+        valid = false;
     }
 
-    scope().context().validateRuntimeDependency(location(), validation_logger);
+    valid &= scope().context().validateRuntimeDependency(location(), validation_logger);
+
+    return valid;
 }
 
 Statements Delete::expandWith(Expressions subexpressions, Statements, lang::Context&) const

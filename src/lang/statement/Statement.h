@@ -79,6 +79,12 @@ class Statement
     [[nodiscard]] lang::Scope const& scope() const final;
 
     /**
+     * Whether this statement can be evaluated at compile-time.
+     * @return True if this statement can be evaluated at compile-time.
+     */
+    [[nodiscard]] bool isCMP() const;
+
+    /**
      * Get the block scope of the statement, if any.
      * For compound statements the block scope is the scope that contains all the statements.
      * @return The block scope, or nullptr.
@@ -124,6 +130,12 @@ class Statement
      */
     virtual void setScope(lang::Scope& scope);
 
+    /**
+     * Whether this statement, without considering substatement and subexpressions, can be evaluated at compile-time.
+     * @return True if the root if the statement tree can be evaluated at compile-time.
+     */
+    [[nodiscard]] virtual bool isRootCMP() const;
+
   public:
     /**
      * Get the source location of this statement.
@@ -133,8 +145,9 @@ class Statement
     /**
      * Validate this statement.
      * @param validation_logger A logger to log validation messages.
+     * @return True if the statement is valid.
      */
-    virtual void validate(ValidationLogger& validation_logger) const = 0;
+    virtual bool validate(ValidationLogger& validation_logger) const = 0;
 
     /**
      * Expand this statement into new statements that do not use syntactic sugar.

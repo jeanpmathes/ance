@@ -8,6 +8,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::FunctionDescription::FunctionDescription(lang::Accessibility                  accessibility,
+                                               bool                                 is_cmp,
                                                lang::Identifier                     name,
                                                lang::ResolvingHandle<lang::Type>    return_type,
                                                lang::Location                       return_type_location,
@@ -16,6 +17,7 @@ lang::FunctionDescription::FunctionDescription(lang::Accessibility              
                                                lang::Location                       declaration_location,
                                                lang::Location                       definition_location)
     : Description(accessibility)
+    , is_cmp_(is_cmp)
     , name_(name)
     , return_type_(std::move(return_type))
     , return_type_location_(return_type_location)
@@ -27,6 +29,7 @@ lang::FunctionDescription::FunctionDescription(lang::Accessibility              
 
 lang::FunctionDescription::FunctionDescription(bool from_public_import)
     : Description(lang::Accessibility::imported(from_public_import))
+    , is_cmp_(false)
     , name_(lang::Identifier::empty())
     , return_type_(lang::Type::getUndefined())
     , return_type_location_(lang::Location::global())
@@ -58,6 +61,7 @@ void lang::FunctionDescription::performInitialization()
     if (code_.hasValue())
     {
         function_.value()->defineAsCustom(access().modifier(),
+                                          is_cmp_,
                                           return_type_,
                                           return_type_location_,
                                           parameters_,
@@ -217,7 +221,23 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
         parameter->type().validate(validation_logger, parameter->typeLocation());
     }
 
-    if (code_.hasValue()) { (**code_).validate(validation_logger); }
+    if (code_.hasValue())
+    {
+        Statement const& code = **code_;
+
+        if (code.validate(validation_logger))
+        {
+            if (is_cmp_ && !code.isCMP())
+            {
+                validation_logger.logError("Only compile-time-evaluable code is allowed in a compile-time function",
+                                           code.location());
+
+                // todo: think how to get better error message - mark the offending statement or expression
+                // todo: for classes with conditional cmp like FunctionCall the error should be caused there
+                // todo: so maybe pass a context to validate and in the necessary classes check the context
+            }
+        }
+    }
     else if (access().modifier() != lang::AccessModifier::EXTERN_ACCESS && !isImported())
     {
         validation_logger.logError("Functions without a body must be declared as 'extern'", declaration_location_);
@@ -241,6 +261,7 @@ lang::Description::Descriptions lang::FunctionDescription::expand(lang::Context&
     for (auto& parameter : parameters_) { expanded_parameters.emplace_back(parameter->expand(new_context)); }
 
     auto expanded = makeOwned<lang::FunctionDescription>(access(),
+                                                         is_cmp_,
                                                          name_,
                                                          return_type_->getUndefinedTypeClone(new_context),
                                                          return_type_location_,

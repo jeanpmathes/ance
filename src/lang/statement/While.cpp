@@ -29,16 +29,18 @@ std::vector<Owned<lang::BasicBlock>> While::createBasicBlocks(lang::BasicBlock&,
     return {};// Handled by the loop statement.
 }
 
-void While::validate(ValidationLogger& validation_logger) const
+bool While::validate(ValidationLogger& validation_logger) const
 {
-    if (!condition_->validate(validation_logger)) return;
+    if (!condition_->validate(validation_logger)) return false;
 
-    block_->validate(validation_logger);
+    bool valid = block_->validate(validation_logger);
 
-    lang::Type::checkMismatch(scope().context().getBooleanType(),
-                              condition_->type(),
+    valid &= lang::Type::checkMismatch(scope().context().getBooleanType(),
+                                       condition_->type(),
                               condition_->location(),
                               validation_logger);
+
+    return valid;
 }
 
 Statements While::expandWith(Expressions subexpressions, Statements substatements, lang::Context& new_context) const

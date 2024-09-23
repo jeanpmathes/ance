@@ -5,9 +5,15 @@
 
 Break::Break(lang::Location location) : Statement(location) {}
 
-void Break::validate(ValidationLogger& validation_logger) const
+bool Break::validate(ValidationLogger& validation_logger) const
 {
-    if (getLoopParent() == nullptr) { validation_logger.logError("No loop to break", location()); }
+    if (getLoopParent() == nullptr)
+    {
+        validation_logger.logError("No loop to break", location());
+        return false;
+    }
+
+    return true;
 }
 
 std::vector<Owned<lang::BasicBlock>> Break::createBasicBlocks(lang::BasicBlock& entry, lang::Function&)

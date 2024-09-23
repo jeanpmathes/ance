@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_FUNCTIONCALL_H_
 #define ANCE_SRC_LANG_EXPRESSION_FUNCTIONCALL_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include <set>
 
@@ -18,7 +18,7 @@ namespace lang
  * A call to a function.
  */
 class FunctionCall
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<FunctionCall, ANCE_CONSTRUCTS>
 {
   public:
@@ -44,6 +44,8 @@ class FunctionCall
   protected:
     void walkDefinitions() override;
     void postResolve() override;
+
+    bool isRootCMP() const override;
 
   public:
     bool validate(ValidationLogger& validation_logger) const override;

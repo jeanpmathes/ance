@@ -30,7 +30,7 @@ class While
 
     std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, lang::Function& function) override;
 
-    void validate(ValidationLogger& validation_logger) const override;
+    bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                         Statements     substatements,

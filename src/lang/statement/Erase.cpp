@@ -28,16 +28,18 @@ void Erase::walkDefinitions()
     erased_ = scope().asOrderedScope()->erase(variable_);
 }
 
-void Erase::validate(ValidationLogger& validation_logger) const
+bool Erase::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return;
+    if (lang::Type::checkMismatch<lang::Variable>(variable_, "value", location(), validation_logger)) return false;
 
     if (!erased_)
     {
         validation_logger.logError("Cannot erase variable '" + variable_->name() + "' which is declared in outer scope",
                                    location());
-        return;
+        return false;
     }
+
+    return true;
 }
 
 Statements Erase::expandWith(Expressions, Statements, lang::Context& new_context) const

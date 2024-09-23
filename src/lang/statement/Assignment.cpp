@@ -36,18 +36,20 @@ Expression const& Assignment::assigned() const
     return *assigned_;
 }
 
-void Assignment::validate(ValidationLogger& validation_logger) const
+bool Assignment::validate(ValidationLogger& validation_logger) const
 {
     if (assigner_.isFinal())
     {
         validation_logger.logError("Assignment to declared variable cannot be final", location());
-        return;
+        return false;
     }
 
     if (assigned_->validate(validation_logger))
     {
-        assignable_->validateAssignment(assigned_->type(), assigned_->location(), validation_logger);
+        return assignable_->validateAssignment(assigned_->type(), assigned_->location(), validation_logger);
     }
+
+    return false;
 }
 
 Statements Assignment::expandWith(Expressions subexpressions, Statements, lang::Context&) const

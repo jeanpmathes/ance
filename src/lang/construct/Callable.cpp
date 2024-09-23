@@ -4,6 +4,11 @@
 #include "lang/construct/Function.h"
 #include "validation/ValidationLogger.h"
 
+bool lang::Callable::isCMP() const
+{
+    return false;
+}
+
 std::string lang::Callable::getAnnotatedName(bool) const
 {
     return std::string(name().text());

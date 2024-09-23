@@ -112,6 +112,11 @@ bool lang::FunctionDefinition::isImported() const
     return false;
 }
 
+bool lang::FunctionDefinition::isCMP() const
+{
+    return false;
+}
+
 void lang::FunctionDefinition::resolveFollowingOrder() {}
 void lang::FunctionDefinition::postResolve() {}
 

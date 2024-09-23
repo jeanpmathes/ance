@@ -12,8 +12,10 @@
 
 lang::StatementFunction::StatementFunction(Function&                            function,
                                            lang::AccessModifier                 access,
+                                           bool                              is_cmp,
                                            lang::ResolvingHandle<lang::Type>    return_type,
                                            lang::Location                       return_type_location,
+
                                            std::vector<Shared<lang::Parameter>> parameters,
                                            Statement&                           code,
                                            Scope&                               containing_scope,
@@ -26,6 +28,7 @@ lang::StatementFunction::StatementFunction(Function&                            
                                declaration_location)
     , code_(code)
     , access_(access)
+    , is_cmp_(is_cmp)
     , initial_block_(lang::BasicBlock::createEmpty())
 {}
 
@@ -54,6 +57,11 @@ void lang::StatementFunction::setup()
     }
 
     code_.walkDefinitions();
+}
+
+bool lang::StatementFunction::isCMP() const
+{
+    return is_cmp_;
 }
 
 lang::AccessModifier lang::StatementFunction::access() const

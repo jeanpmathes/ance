@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_CODEBLOCK_H_
 #define ANCE_SRC_LANG_CONSTRUCT_CODEBLOCK_H_
 
-#include "lang/statement/Statement.h"
+#include "lang/statement/CompileTimeStatement.h"
 
 #include "lang/Element.h"
 #include "lang/construct/BasicBlock.h"
@@ -15,7 +15,7 @@ namespace lang
      * In contrast to basic blocks, code blocks can be nested and contain branching statements.
      */
     class CodeBlock
-        : public Statement
+        : public CompileTimeStatement
         , public lang::Element<CodeBlock, ANCE_CONSTRUCTS>
     {
       private:
@@ -68,7 +68,7 @@ namespace lang
 
         [[nodiscard]] bool isCompound() const override;
 
-        void validate(ValidationLogger& validation_logger) const override;
+        bool validate(ValidationLogger& validation_logger) const override;
 
         [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                             Statements     substatements,

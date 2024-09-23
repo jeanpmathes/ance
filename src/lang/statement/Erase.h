@@ -29,7 +29,7 @@ class Erase
 
     void walkDefinitions() override;
 
-    void validate(ValidationLogger& validation_logger) const override;
+    bool validate(ValidationLogger& validation_logger) const override;
 
     Statements expandWith(Expressions    subexpressions,
                           Statements     substatements,

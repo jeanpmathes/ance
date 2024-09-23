@@ -24,7 +24,7 @@ class Assertion
 
     [[nodiscard]] Expression const& condition() const;
 
-    void validate(ValidationLogger& validation_logger) const override;
+    bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                         Statements     substatements,

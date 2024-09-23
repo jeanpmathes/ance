@@ -27,6 +27,7 @@ namespace lang
         /**
          * Create a new function description.
          * @param accessibility The access modifier.
+         * @param is_cmp Whether the function can be evaluated at compile time.
          * @param name The name.
          * @param return_type The return type.
          * @param return_type_location The location of the return type.
@@ -36,6 +37,7 @@ namespace lang
          * @param definition_location The location of the definition. Use the declaration location if there is no definition.
          */
         FunctionDescription(lang::Accessibility                  accessibility,
+                            bool                                 is_cmp,
                             lang::Identifier                     name,
                             lang::ResolvingHandle<lang::Type>    return_type,
                             lang::Location                       return_type_location,
@@ -75,6 +77,7 @@ namespace lang
         void sync(Storage& storage) override;
 
       private:
+        bool                                 is_cmp_;
         lang::Identifier                     name_;
         lang::ResolvingHandle<lang::Type>    return_type_;
         lang::Location                       return_type_location_;

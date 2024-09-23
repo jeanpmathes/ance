@@ -75,9 +75,9 @@ void LocalReferenceVariableDefinition::walkDefinitions()
     }
 }
 
-void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger) const
+bool LocalReferenceVariableDefinition::validate(ValidationLogger& validation_logger) const
 {
-    if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return;
+    if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return false;
 
     assert(variable_.hasValue());
     auto type = type_.as<lang::Type>();
@@ -87,13 +87,13 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
         validation_logger.logError("Cannot bind reference to variable of non-reference type "
                                        + type->getAnnotatedName(),
                                    type_location_);
-        return;
+        return false;
     }
 
-    if (!type->validate(validation_logger, type_location_)) return;
+    if (!type->validate(validation_logger, type_location_)) return false;
 
     bool const reference_is_valid = reference_->validate(validation_logger);
-    if (!reference_is_valid) return;
+    if (!reference_is_valid) return false;
 
     lang::Type const& reference_type = reference_->type();
 
@@ -105,8 +105,10 @@ void LocalReferenceVariableDefinition::validate(ValidationLogger& validation_log
         validation_logger.logError("Cannot bind " + declared_referenced_type.getAnnotatedName()
                                        + " reference to value of type " + provided_referenced_type.getAnnotatedName(),
                                    reference_->location());
-        return;
+        return false;
     }
+
+    return true;
 }
 
 Statements LocalReferenceVariableDefinition::expandWith(Expressions subexpressions,

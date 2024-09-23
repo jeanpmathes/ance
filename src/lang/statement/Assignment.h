@@ -33,7 +33,7 @@ class Assignment
     [[nodiscard]] lang::Assigner    assigner() const;
     [[nodiscard]] Expression const& assigned() const;
 
-    void validate(ValidationLogger& validation_logger) const override;
+    bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                         Statements     substatements,

@@ -31,6 +31,12 @@ namespace lang
         [[nodiscard]] virtual bool              isDefined() const = 0;
 
         /**
+         * Whether this can be called at compile time.
+         * @return True if this can be called at compile time.
+         */
+        [[nodiscard]] virtual bool isCMP() const;
+
+        /**
          * Get the name of this callable with helpful annotations. Useful for validation messages.
          * @param is_safe Whether the callable is currently safe to use. Set to false when endless loops could occur.
          * @return The annotated name.

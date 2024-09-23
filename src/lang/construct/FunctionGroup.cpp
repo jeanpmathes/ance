@@ -18,6 +18,18 @@ lang::Identifier const& lang::FunctionGroup::name() const
     return name_;
 }
 
+bool lang::FunctionGroup::isCMP() const
+{
+    bool is_cmp = true;
+
+    for (auto& function : functions())
+    {
+        is_cmp &= function->isCMP();// todo: validate that function group has uniform cmp-ness
+    }
+
+    return is_cmp;
+}
+
 void lang::FunctionGroup::setScope(lang::Scope& scope)
 {
     assert(scope_ == nullptr);

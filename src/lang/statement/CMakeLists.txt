@@ -4,6 +4,7 @@ target_sources(ance PRIVATE Assignment.cpp
                Erase.cpp
                Delete.cpp
                Break.cpp
+               CompileTimeStatement.cpp
                Continue.cpp
                Return.cpp
                ExpressionStatement.cpp

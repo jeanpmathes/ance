@@ -5,9 +5,15 @@
 
 Continue::Continue(lang::Location location) : Statement(location) {}
 
-void Continue::validate(ValidationLogger& validation_logger) const
+bool Continue::validate(ValidationLogger& validation_logger) const
 {
-    if (getLoopParent() == nullptr) { validation_logger.logError("No loop to continue", location()); }
+    if (getLoopParent() == nullptr)
+    {
+        validation_logger.logError("No loop to continue", location());
+        return false;
+    }
+
+    return true;
 }
 
 std::vector<Owned<lang::BasicBlock>> Continue::createBasicBlocks(lang::BasicBlock& entry, lang::Function&)

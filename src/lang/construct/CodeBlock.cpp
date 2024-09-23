@@ -147,9 +147,13 @@ bool lang::CodeBlock::isCompound() const
     return scoped_;
 }
 
-void lang::CodeBlock::validate(ValidationLogger& validation_logger) const
+bool lang::CodeBlock::validate(ValidationLogger& validation_logger) const
 {
-    for (auto& sub : subs_) { sub->validate(validation_logger); }
+    bool valid = true;
+
+    for (auto& sub : subs_) { valid &= sub->validate(validation_logger); }
+
+    return valid;
 }
 
 Statements lang::CodeBlock::expandWith(Expressions, Statements substatements, lang::Context&) const

@@ -46,17 +46,21 @@ std::vector<Owned<lang::BasicBlock>> If::createBasicBlocks(lang::BasicBlock& ent
     return blocks;
 }
 
-void If::validate(ValidationLogger& validation_logger) const
+bool If::validate(ValidationLogger& validation_logger) const
 {
-    if (!condition_->validate(validation_logger)) return;
+    if (!condition_->validate(validation_logger)) return false;
 
-    if (if_block_.hasValue()) if_block_.value()->validate(validation_logger);
-    if (else_block_.hasValue()) else_block_.value()->validate(validation_logger);
+    bool valid = true;
 
-    lang::Type::checkMismatch(scope().context().getBooleanType(),
-                              condition_->type(),
+    if (if_block_.hasValue()) valid &= if_block_.value()->validate(validation_logger);
+    if (else_block_.hasValue()) valid &= else_block_.value()->validate(validation_logger);
+
+    valid &= lang::Type::checkMismatch(scope().context().getBooleanType(),
+                                       condition_->type(),
                               condition_->location(),
                               validation_logger);
+
+    return valid;
 }
 
 Statements If::expandWith(Expressions subexpressions, Statements substatements, lang::Context&) const

@@ -14,9 +14,9 @@ Expression const& ExpressionStatement::expression() const
     return *expression_;
 }
 
-void ExpressionStatement::validate(ValidationLogger& validation_logger) const
+bool ExpressionStatement::validate(ValidationLogger& validation_logger) const
 {
-    expression_->validate(validation_logger);
+    return expression_->validate(validation_logger);
 }
 
 Statements ExpressionStatement::expandWith(Expressions subexpressions, Statements, lang::Context&) const

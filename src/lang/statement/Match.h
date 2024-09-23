@@ -124,7 +124,7 @@ class Match
 
     std::vector<std::reference_wrapper<lang::OrderedScope>> getSubScopesInOrder() override;
 
-    void validate(ValidationLogger& validation_logger) const override;
+    bool validate(ValidationLogger& validation_logger) const override;
 
     /**
      * Validate the type matched by this match.

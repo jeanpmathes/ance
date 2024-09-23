@@ -95,20 +95,20 @@ void LocalVariableDefinition::walkDefinitions()
     }
 }
 
-void LocalVariableDefinition::validate(ValidationLogger& validation_logger) const
+bool LocalVariableDefinition::validate(ValidationLogger& validation_logger) const
 {
     if (assigned_.hasValue())
     {
-        if (!assigned_.value()->validate(validation_logger)) return;
+        if (!assigned_.value()->validate(validation_logger)) return false;
     }
 
     if (not type_opt_.hasValue() && !assigned_.hasValue())
     {
         validation_logger.logError("Default-initialized local variable must have explicit type", location());
-        return;
+        return false;
     }
 
-    if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return;
+    if (lang::Type::checkMismatch<lang::Type>(type_, "type", type_location_, validation_logger)) return false;
 
     auto type = type_.as<lang::Type>();
 
@@ -117,23 +117,25 @@ void LocalVariableDefinition::validate(ValidationLogger& validation_logger) cons
 
     assert(variable->type() == *type);
 
-    if (!type->validate(validation_logger, type_location_)) return;
+    if (!type->validate(validation_logger, type_location_)) return false;
 
     if (type->isReferenceType())
     {
         validation_logger.logError("Cannot declare variable of reference type without binding to a value", location());
-        return;
+        return false;
     }
 
     if (assigned_.hasValue())
     {
-        if (!assigned_.value()->type().isDefined()) return;
+        if (!assigned_.value()->type().isDefined()) return false;
 
-        lang::Type::checkMismatch(variable->type(),
-                                  assigned_.value()->type(),
+        return lang::Type::checkMismatch(variable->type(),
+                                         assigned_.value()->type(),
                                   assigned_.value()->location(),
                                   validation_logger);
     }
+
+    return true;
 }
 
 Statements LocalVariableDefinition::expandWith(Expressions subexpressions, Statements, lang::Context& new_context) const

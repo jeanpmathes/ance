@@ -66,6 +66,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 
     Owned<lang::FunctionDescription> description =
         makeOwned<lang::FunctionDescription>(lang::Accessibility::local(access),
+                                             false,
                                              identifier,
                                              return_type,
                                              return_type_location,
@@ -161,6 +162,7 @@ std::any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
 std::any SourceVisitor::visitFunctionDescription(anceParser::FunctionDescriptionContext* ctx)
 {
     auto                              access     = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
+    bool                              is_cmp     = ctx->COMPILETIME();
     lang::Identifier const            identifier = ident(ctx->IDENTIFIER());
     lang::ResolvingHandle<lang::Type> return_type =
         ctx->type() ? erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type())) : context().getUnitType();
@@ -195,6 +197,7 @@ std::any SourceVisitor::visitFunctionDescription(anceParser::FunctionDescription
     }
 
     return static_cast<lang::Description*>(new lang::FunctionDescription(lang::Accessibility::local(access),
+                                                                         is_cmp,
                                                                          identifier,
                                                                          return_type,
                                                                          return_type_location,

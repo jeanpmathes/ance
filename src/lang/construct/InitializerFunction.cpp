@@ -10,6 +10,7 @@ lang::InitializerFunction::InitializerFunction(lang::Function& function,
                                                lang::Scope&    containing_scope)
     : lang::StatementFunction(function,
                               lang::AccessModifier::PRIVATE_ACCESS,
+                              false,
                               containing_scope.context().getUnitType(),
                               lang::Location::global(),
                               {},

@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_RETURN_H_
 #define ANCE_SRC_LANG_STATEMENT_RETURN_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include <optional>
 
@@ -13,7 +13,7 @@ class Expression;
  * Returns from the containing function.
  */
 class Return
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<Return, ANCE_CONSTRUCTS>
 {
   public:
@@ -28,7 +28,7 @@ class Return
 
     std::vector<Owned<lang::BasicBlock>> createBasicBlocks(lang::BasicBlock& entry, lang::Function& function) override;
 
-    void validate(ValidationLogger& validation_logger) const override;
+    bool validate(ValidationLogger& validation_logger) const override;
 
   protected:
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,

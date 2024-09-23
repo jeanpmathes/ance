@@ -21,9 +21,9 @@ std::vector<Owned<lang::BasicBlock>> Loop::createBasicBlocks(lang::BasicBlock& e
     return blocks;
 }
 
-void Loop::validate(ValidationLogger& validation_logger) const
+bool Loop::validate(ValidationLogger& validation_logger) const
 {
-    block_->validate(validation_logger);
+    return block_->validate(validation_logger);
 }
 
 Statements Loop::expandWith(Expressions, Statements substatements, lang::Context&) const

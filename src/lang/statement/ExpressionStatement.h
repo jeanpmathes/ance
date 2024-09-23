@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_EXPRESSIONSTATEMENT_H_
 #define ANCE_SRC_LANG_STATEMENT_EXPRESSIONSTATEMENT_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * A statement that consists of an expression.
  */
 class ExpressionStatement
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<ExpressionStatement, ANCE_CONSTRUCTS>
 {
   public:
@@ -22,7 +22,7 @@ class ExpressionStatement
 
     [[nodiscard]] Expression const& expression() const;
 
-    void validate(ValidationLogger& validation_logger) const override;
+    bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                         Statements     substatements,

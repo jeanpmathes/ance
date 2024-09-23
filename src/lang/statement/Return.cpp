@@ -31,9 +31,11 @@ std::vector<Owned<lang::BasicBlock>> Return::createBasicBlocks(lang::BasicBlock&
     return blocks;
 }
 
-void Return::validate(ValidationLogger& validation_logger) const
+bool Return::validate(ValidationLogger& validation_logger) const
 {
-    if (return_value_.hasValue()) return_value_.value()->validate(validation_logger);
+    if (return_value_.hasValue()) return return_value_.value()->validate(validation_logger);
+
+    return true;
 }
 
 Statements Return::expandWith(Expressions subexpressions, Statements, lang::Context& new_context) const

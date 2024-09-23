@@ -408,19 +408,21 @@ Statements Match::expandWith(Expressions subexpressions, Statements, lang::Conte
     return statements;
 }
 
-void Match::validate(ValidationLogger& validation_logger) const
+bool Match::validate(ValidationLogger& validation_logger) const
 {
     bool valid = true;
 
     valid &= expression_->validate(validation_logger);
 
-    if (!valid) return;
+    if (!valid) return false;
 
     valid &= validateType(*expression_, validation_logger);
 
-    if (!valid) return;
+    if (!valid) return false;
 
-    validateCases(location(), *expression_, cases_, validation_logger);
+    valid &= validateCases(location(), *expression_, cases_, validation_logger);
+
+    return valid;
 }
 
 bool Match::validateType(Expression const& expression, ValidationLogger& validation_logger)

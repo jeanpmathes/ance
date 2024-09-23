@@ -50,7 +50,7 @@ class LocalVariableDefinition
     void setScope(lang::Scope& scope) override;
     void walkDefinitions() override;
 
-    void validate(ValidationLogger& validation_logger) const override;
+    bool validate(ValidationLogger& validation_logger) const override;
 
     [[nodiscard]] Statements expandWith(Expressions    subexpressions,
                                         Statements     substatements,

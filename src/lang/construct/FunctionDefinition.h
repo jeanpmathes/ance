@@ -142,6 +142,12 @@ namespace lang
          */
         [[nodiscard]] virtual bool isImported() const;
 
+        /**
+         * Get whether this function can be evaluated at compile time.
+         * @return True if the function can be evaluated at compile time.
+         */
+        [[nodiscard]] virtual bool isCMP() const;
+
         virtual void resolveFollowingOrder();
 
         /**

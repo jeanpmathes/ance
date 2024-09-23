@@ -20,17 +20,19 @@ Expression const& Assertion::condition() const
     return *condition_;
 }
 
-void Assertion::validate(ValidationLogger& validation_logger) const
+bool Assertion::validate(ValidationLogger& validation_logger) const
 {
-    bool const is_valid = condition_->validate(validation_logger);
-    if (!is_valid) return;
+    bool is_valid = condition_->validate(validation_logger);
+    if (!is_valid) return false;
 
-    lang::Type::checkMismatch(scope().context().getBooleanType(),
-                              condition_->type(),
+    is_valid &= lang::Type::checkMismatch(scope().context().getBooleanType(),
+                                          condition_->type(),
                               condition_->location(),
                               validation_logger);
 
-    scope().context().validateRuntimeDependency(location(), validation_logger);
+    is_valid &= scope().context().validateRuntimeDependency(location(), validation_logger);
+
+    return is_valid;
 }
 
 Statements Assertion::expandWith(Expressions subexpressions, Statements, lang::Context&) const

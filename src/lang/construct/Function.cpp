@@ -34,6 +34,12 @@ bool lang::Function::isRuntime() const
     return definition_.value()->isRuntime();
 }
 
+bool lang::Function::isCMP() const
+{
+    assert(isDefined());
+    return definition_.value()->isCMP();
+}
+
 bool lang::Function::preserveUnitReturn() const
 {
     assert(isDefined());
@@ -59,6 +65,7 @@ void lang::Function::defineAsImported(Scope&                                    
 }
 
 void lang::Function::defineAsCustom(lang::AccessModifier                        access,
+                                    bool                                        is_cmp,
                                     lang::ResolvingHandle<lang::Type>           return_type,
                                     lang::Location                              return_type_location,
                                     std::vector<Shared<lang::Parameter>> const& parameters,
@@ -69,6 +76,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
 {
     definition_ = makeOwned<lang::CustomFunction>(*this,
                                                   access,
+                                                  is_cmp,
                                                   return_type,
                                                   return_type_location,
                                                   parameters,
