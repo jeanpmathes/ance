@@ -100,7 +100,7 @@ namespace lang
          */
         void setScope(Scope& scope);
 
-        virtual void performInitialization() = 0;
+        virtual void setUp() = 0;
 
         Scope&                     scope();
         [[nodiscard]] Scope const& scope() const;

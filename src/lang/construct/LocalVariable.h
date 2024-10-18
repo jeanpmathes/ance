@@ -49,6 +49,8 @@ namespace lang
                                                                         lang::Function&  containing_function);
 
         void registerDeclaration(Execution& exec) const override;
+        void registerDefinition(Execution& exec) const override;
+
         void performInitialization(Execution& exec) const override;
         void performFinalization(Execution& exec) const override;
 

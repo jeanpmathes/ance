@@ -20,116 +20,6 @@ void NativeBuilder::postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable)
     if (located != nullptr) { native_build_.resetDebugLocation(); }
 }
 
-std::any NativeBuilder::visit(lang::bb::def::Empty const& empty_bb)
-{
-    branchToNextOrReturnVoid(empty_bb.next());
-
-    return {};
-}
-
-std::any NativeBuilder::visit(lang::bb::def::Finalizing const& finalizing_bb)
-{
-    finalizing_bb.scope().performEntityFinalizations(native_build_);
-
-    branchToNextOrReturnVoid(finalizing_bb.next());
-
-    return {};
-}
-
-std::any NativeBuilder::visit(lang::bb::def::Simple const& simple_bb)
-{
-    for (Statement const* statement : simple_bb.statements()) visitTree(*statement);
-
-    branchToNextOrReturnVoid(simple_bb.next());
-
-    return {};
-}
-
-std::any NativeBuilder::visit(lang::bb::def::Returning const& returning_bb)
-{
-    for (Statement const* statement : returning_bb.statements()) visitTree(*statement);
-
-    lang::Scope const* current = &returning_bb.scope();
-    while (current->isPartOfFunction())
-    {
-        current->performEntityFinalizations(native_build_);
-        current = &current->scope();
-    }
-
-    lang::Type const& return_type = returning_bb.getContainingFunction()->returnType();
-
-    if (return_type.isUnitType()) { native_build_.performReturn(std::nullopt); }
-    else
-    {
-        Shared<lang::Value> return_value = getV(returning_bb.ret());
-
-        return_value = lang::Type::makeMatching(return_type, return_value, native_build_);
-
-        native_build_.performReturn(return_value);
-    }
-
-    return {};
-}
-
-std::any NativeBuilder::visit(lang::bb::def::Branching const& branching_bb)
-{
-    for (Statement const* statement : branching_bb.statements()) visitTree(*statement);
-
-    Shared<lang::Value> truth = getV(branching_bb.condition());
-    Shared<lang::Value> boolean_truth =
-        lang::Type::makeMatching(native_build_.ctx().getBooleanType(), truth, native_build_);
-
-    native_build_.ir().CreateCondBr(native_build_.llvmContentValue(boolean_truth),
-                                    bb_map_[branching_bb.trueNext()],
-                                    bb_map_[branching_bb.falseNext()]);
-
-    return {};
-}
-
-std::any NativeBuilder::visit(lang::bb::def::Matching const& matching_bb)
-{
-    auto const& cases    = matching_bb.cases();
-    auto const& branches = matching_bb.branches();
-
-    for (Statement const* statement : matching_bb.statements()) visitTree(*statement);
-
-    llvm::BasicBlock* default_block = nullptr;
-
-    for (auto const [case_values, branch_block] : llvm::zip(cases, branches))
-    {
-        if (case_values.empty())
-        {
-            default_block = bb_map_[branch_block];
-            break;
-        }
-    }
-
-    if (!default_block) { default_block = bb_map_[branches.front()]; }
-
-    Shared<lang::Value> value = getV(matching_bb.matched());
-
-    auto switch_instance = native_build_.ir().CreateSwitch(native_build_.llvmContentValue(value),
-                                                           default_block,
-                                                           static_cast<unsigned>(cases.size()));
-
-    for (auto const [case_values, branch_block] : llvm::zip(cases, branches))
-    {
-        llvm::BasicBlock* branch_native_block = bb_map_[branch_block];
-
-        if (case_values.empty() || branch_native_block == default_block) continue;
-
-        for (auto& case_value : case_values)
-        {
-            Shared<lang::Constant> constant = getC(*case_value);
-
-            auto native_integer_constant = llvm::cast<llvm::ConstantInt>(native_build_.llvmConstant(constant));
-            switch_instance->addCase(native_integer_constant, branch_native_block);
-        }
-    }
-
-    return {};
-}
-
 Execution& NativeBuilder::exec()
 {
     return native_build_;
@@ -212,4 +102,49 @@ void NativeBuilder::branchToNextOrReturnVoid(lang::BasicBlock const* next)
 {
     if (next != nullptr) native_build_.ir().CreateBr(bb_map_[next]);
     else native_build_.ir().CreateRetVoid();
+}
+
+void NativeBuilder::branchConditional(lang::bb::def::Branching const& branching_bb, Shared<lang::Value> boolean_truth)
+{
+    native_build_.ir().CreateCondBr(native_build_.llvmContentValue(boolean_truth),
+                                    bb_map_[branching_bb.trueNext()],
+                                    bb_map_[branching_bb.falseNext()]);
+}
+
+void NativeBuilder::branchMatching(lang::bb::def::Matching const& matching_bb, Shared<lang::Value> value)
+{
+    auto const& cases    = matching_bb.cases();
+    auto const& branches = matching_bb.branches();
+
+    llvm::BasicBlock* default_block = nullptr;
+
+    for (auto const [case_values, branch_block] : llvm::zip(cases, branches))
+    {
+        if (case_values.empty())
+        {
+            default_block = bb_map_[branch_block];
+            break;
+        }
+    }
+
+    if (!default_block) { default_block = bb_map_[branches.front()]; }
+
+    auto switch_instance = native_build_.ir().CreateSwitch(native_build_.llvmContentValue(value),
+                                                           default_block,
+                                                           static_cast<unsigned>(cases.size()));
+
+    for (auto const [case_values, branch_block] : llvm::zip(cases, branches))
+    {
+        llvm::BasicBlock* branch_native_block = bb_map_[branch_block];
+
+        if (case_values.empty() || branch_native_block == default_block) continue;
+
+        for (auto& case_value : case_values)
+        {
+            Shared<lang::Constant> constant = getC(*case_value);
+
+            auto native_integer_constant = llvm::cast<llvm::ConstantInt>(native_build_.llvmConstant(constant));
+            switch_instance->addCase(native_integer_constant, branch_native_block);
+        }
+    }
 }

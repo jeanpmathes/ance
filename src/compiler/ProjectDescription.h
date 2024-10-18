@@ -14,6 +14,8 @@ class ProjectDescription : public Unit
      */
     void setBinaryDescriptionPath(std::filesystem::path path);
 
+    [[nodiscard]] bool isProjectDefinition() const override;
+
     [[nodiscard]] std::string const&                 getName() const override;
     [[nodiscard]] std::filesystem::path              getProjectFile() const override;
     [[nodiscard]] std::filesystem::path              getProjectDirectory() const override;

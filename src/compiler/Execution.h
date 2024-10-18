@@ -37,11 +37,8 @@ namespace lang
     class Constant;
     class Value;
 
-    using GlobalInitializer =
-        Optional<std::variant<std::reference_wrapper<lang::Function>, std::reference_wrapper<CompileTimeExpression>>>;
-
+    // todo: replace LocalInitializer and LocalParameterInitializer with proper types
     using LocalParameterInitializer = std::pair<std::reference_wrapper<lang::Function const>, size_t>;
-
     using LocalInitializer = Optional<std::variant<std::reference_wrapper<Expression>, LocalParameterInitializer>>;
 }
 
@@ -216,6 +213,12 @@ class Execution
         virtual ~FnCtx() = default;
 
         /**
+         * Get the associated function.
+         * @return The function.
+         */
+        virtual lang::Function const& function() = 0;
+
+        /**
          * Get the value of a parameter the current function.
          * @param index The index of the parameter.
          * @return The value of the parameter.
@@ -326,14 +329,16 @@ class Execution
     virtual void registerArrayType(lang::Type const& array_type) = 0;
 
     /**
-     * Register a global variable.
-     * @param global_variable The global variable to register.
-     * @param is_imported Whether the global variable is imported.
-     * @param init The initializer of the global variable.
+     * Declare a global variable.
+     * @param global_variable The global variable to declare.
      */
-    virtual void registerGlobalVariable(lang::GlobalVariable const& global_variable,
-                                        bool                        is_imported,
-                                      lang::GlobalInitializer     init) = 0;
+    virtual void declareGlobalVariable(lang::GlobalVariable const& global_variable) = 0;
+
+    /**
+     * Define a local variable.
+     * @param global_variable The global variable to declare.
+     */
+    virtual void defineGlobalVariable(lang::GlobalVariable const& global_variable) = 0;
 
     /**
      * Declare a local variable.

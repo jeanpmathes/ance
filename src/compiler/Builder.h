@@ -24,6 +24,13 @@ class Builder : public lang::ApplicationVisitorConst
 
     std::any visit(lang::Function const& function) override;
 
+    std::any visit(lang::bb::def::Empty const& emtpy_bb) override;
+    std::any visit(lang::bb::def::Finalizing const& finalizing_bb) override;
+    std::any visit(lang::bb::def::Simple const& simple_bb) override;
+    std::any visit(lang::bb::def::Returning const& returning_bb) override;
+    std::any visit(lang::bb::def::Branching const& branching_bb) override;
+    std::any visit(lang::bb::def::Matching const& matching_bb) override;
+
     std::any visit(Addressof const& addressof) override;
     std::any visit(Allocation const& allocation) override;
     std::any visit(And const& an_and) override;
@@ -71,6 +78,9 @@ class Builder : public lang::ApplicationVisitorConst
     virtual Execution& exec() = 0;
 
     virtual void visitFunctionDefinition(lang::Function const& function) = 0;
+    virtual void branchToNextOrReturnVoid(lang::BasicBlock const* next)                                             = 0;
+    virtual void branchConditional(lang::bb::def::Branching const& branching_bb, Shared<lang::Value> boolean_truth) = 0;
+    virtual void branchMatching(lang::bb::def::Matching const& matching_bb, Shared<lang::Value> value)              = 0;
 
   private:
     enum class GlobalPhase

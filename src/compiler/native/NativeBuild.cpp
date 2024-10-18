@@ -332,9 +332,6 @@ void NativeBuild::registerFunction(lang::Function const& function)
     Optional<lang::AccessModifier> access = function.isRuntime() ? std::nullopt : makeOptional<>(function.access());
     lang::Scope const*             scope  = function.isRuntime() ? nullptr : &function.scope();
 
-    std::vector<std::reference_wrapper<lang::Type const>> parameter_types;
-    parameter_types.reserve(function.parameters().size());
-
     std::vector<llvm::Type*> native_parameter_types;
     native_parameter_types.reserve(function.parameters().size());
 
@@ -344,7 +341,6 @@ void NativeBuild::registerFunction(lang::Function const& function)
     parameter_debug_types.push_back(llvmDiType(function.returnType()));
     for (auto& parameter : function.parameters())
     {
-        parameter_types.emplace_back(parameter->type());
         native_parameter_types.push_back(llvmType(parameter->type()));
         parameter_debug_types.push_back(llvmDiType(parameter->type()));
     }
@@ -392,8 +388,7 @@ void NativeBuild::registerFunction(lang::Function const& function)
     }
 
     functions_.emplace(
-        &function,
-        NativeFunction {native_function, function.preserveUnitReturn(), function.returnType(), parameter_types});
+        &function, NativeFunction {&function, native_function});
 }
 
 NativeBuild::NativeFnCtx::NativeFnCtx(NativeBuild& build, NativeFunction& function) : build_(build), function_(function)
@@ -403,12 +398,17 @@ Shared<lang::Value> NativeBuild::NativeFnCtx::getParameterValue(size_t index)
 {
     llvm::Value* arg = function_.llvm_function->getArg(static_cast<unsigned int>(index));
 
-    return makeShared<WrappedContentValue>(function_.parameter_types.at(index).get(), arg);
+    return makeShared<WrappedContentValue>(function_.lang_function->parameter(index).type(), arg);
 }
 
 Execution& NativeBuild::NativeFnCtx::exec()
 {
     return build_;
+}
+
+lang::Function const& NativeBuild::NativeFnCtx::function()
+{
+    return *function_.lang_function;
 }
 
 llvm::Function* NativeBuild::NativeFnCtx::llvmFunction() const
@@ -418,12 +418,12 @@ llvm::Function* NativeBuild::NativeFnCtx::llvmFunction() const
 
 lang::Type const& NativeBuild::NativeFnCtx::returnType() const
 {
-    return function_.return_type;
+    return function_.lang_function->returnType();
 }
 
 bool NativeBuild::NativeFnCtx::preserveUnitReturn() const
 {
-    return function_.preserve_unit_return;
+    return function_.lang_function->preserveUnitReturn();
 }
 
 void NativeBuild::defineFunctionBody(lang::Function const&                       function, std::function<void(FnCtx&)> const& builder)
@@ -444,14 +444,15 @@ void NativeBuild::defineFunctionBody(lang::Function const&                      
 Shared<lang::Value> NativeBuild::performFunctionCall(lang::Function const&            function,
                                                      std::vector<Shared<lang::Value>> arguments)
 {
-    auto& [native_function, preserve_unit_return, return_type, parameters] = functions_.at(&function);
+    auto& [lang_function, native_function] = functions_.at(&function);
 
     std::vector<llvm::Value*> native_arguments;
     native_arguments.reserve(arguments.size());
 
-    for (auto [parameter, arg] : llvm::zip(parameters, arguments))
+    for (size_t index = 0; index < arguments.size(); index++)
     {
-        Shared<lang::Value> matching_argument = lang::Type::makeMatching(parameter, arg, *this);
+        Shared<lang::Value> matching_argument =
+            lang::Type::makeMatching(lang_function->parameter(index).type(), arguments[index], *this);
         native_arguments.push_back(llvmContentValue(matching_argument));
     }
 
@@ -459,9 +460,9 @@ Shared<lang::Value> NativeBuild::performFunctionCall(lang::Function const&      
     if (!native_function->getFunctionType()->getReturnType()->isVoidTy())
         return_value_content->setName(LLVM_NAME(native_function, ".call"));
 
-    if (return_type.isUnitType()) return getDefault(return_type);
+    if (lang_function->returnType().isUnitType()) return getDefault(lang_function->returnType());
 
-    return makeShared<WrappedContentValue>(return_type, return_value_content);
+    return makeShared<WrappedContentValue>(lang_function->returnType(), return_value_content);
 }
 
 void NativeBuild::registerStruct(lang::Type const&                                 type,
@@ -782,29 +783,26 @@ void NativeBuild::registerArrayType(lang::Type const& array_type)
     types_[&array_type] = {llvm_array_type, di_type, default_value};
 }
 
-void NativeBuild::registerGlobalVariable(lang::GlobalVariable const& global_variable,
-                                         bool                        is_imported,
-                                         lang::GlobalInitializer     init)
+void NativeBuild::declareGlobalVariable(lang::GlobalVariable const& global_variable)
 {
     llvm::Constant* native_initializer = nullptr;
 
-    if (init.hasValue())
+    if (!global_variable.isImported())
     {
-        if (std::holds_alternative<std::reference_wrapper<CompileTimeExpression>>(init.value()))
+        if (global_variable.isCMP())
         {
             Shared<lang::Constant> initial_constant = cmp_build_->getGlobalVariableValue(global_variable, *this);
             native_initializer                      = llvmConstant(initial_constant);
 
             assert(lang::Type::areSame(initial_constant->type(), global_variable.type()));
         }
+        else if (global_variable.initializer() == nullptr) { native_initializer = llvmDefault(global_variable.type()); }
         else
         {
             // Will be initialized at startup.
-            assert(std::holds_alternative<std::reference_wrapper<lang::Function>>(init.value()));
             native_initializer = llvm::Constant::getNullValue(llvmType(global_variable.type()));
         }
     }
-    else if (!is_imported) { native_initializer = llvmDefault(global_variable.type()); }
 
     llvm::Type*       native_type  = llvmType(global_variable.type());
     std::string const linkage_name = std::string(global_variable.name().text());
@@ -818,16 +816,16 @@ void NativeBuild::registerGlobalVariable(lang::GlobalVariable const& global_vari
                                                      nullptr,
                                                      llvm::GlobalValue::NotThreadLocal,
                                                      std::nullopt,
-                                                     is_imported);
+                                                     global_variable.isImported());
 
     llvm::GlobalValue::DLLStorageClassTypes dll_storage_class = llvm::GlobalValue::DefaultStorageClass;
     if (global_variable.access() == lang::AccessModifier::PUBLIC_ACCESS)
     {
-        dll_storage_class =
-            is_imported ? llvm::GlobalValue::DLLImportStorageClass : llvm::GlobalValue::DLLExportStorageClass;
+        dll_storage_class = global_variable.isImported() ? llvm::GlobalValue::DLLImportStorageClass
+                                                         : llvm::GlobalValue::DLLExportStorageClass;
     }
     native_variable->setDLLStorageClass(dll_storage_class);
-    native_variable->setDSOLocal(!is_imported);
+    native_variable->setDSOLocal(!global_variable.isImported());
 
     llvm::MaybeAlign const alignment = llvm_module_.getDataLayout().getABITypeAlign(native_type);
     native_variable->setAlignment(alignment);
@@ -844,6 +842,11 @@ void NativeBuild::registerGlobalVariable(lang::GlobalVariable const& global_vari
     native_variable->addDebugInfo(debug_info);
 
     global_variables_.emplace(&global_variable.self(), NativeGlobalVariable {native_variable, global_variable.type()});
+}
+
+void NativeBuild::defineGlobalVariable(lang::GlobalVariable const&)
+{
+    // Initialization is performed at startup.
 }
 
 void NativeBuild::declareLocalVariable(lang::LocalVariable const& local_variable)

@@ -54,19 +54,29 @@ std::any Builder::visit(lang::VariableDescription const& variable_description)
         case GlobalPhase::DECLARE:
         {
             variable_description.variable()->registerDeclaration(exec());
+
+            // Initializer function might refer to variable, so the variable is declared first.
+
+            if (variable_description.initializerFunction() != nullptr)
+            {
+                visitTree(variable_description.initializerFunction()->function());
+            }
         }
         break;
         case GlobalPhase::DEFINE:
         {
+            if (variable_description.variable()->initializer() != nullptr)
+            {
+                visitTree(*variable_description.variable()->initializer());
+            }
+
+            // Initializer function is used in variable definition, so it is defined first.
+
+            variable_description.variable()->registerDefinition(exec());
         }
         break;
         default:
             throw std::logic_error("Invalid global scope phase");
-    }
-
-    if (variable_description.initializerFunction() != nullptr)
-    {
-        visitTree(variable_description.initializerFunction()->function());
     }
 
     return {};
@@ -136,6 +146,80 @@ std::any Builder::visit(lang::Function const& function)
         default:
             throw std::logic_error("Invalid global scope phase");
     }
+
+    return {};
+}
+
+std::any Builder::visit(lang::bb::def::Empty const& empty_bb)
+{
+    branchToNextOrReturnVoid(empty_bb.next());
+
+    return {};
+}
+
+std::any Builder::visit(lang::bb::def::Finalizing const& finalizing_bb)
+{
+    finalizing_bb.scope().performEntityFinalizations(exec());
+
+    branchToNextOrReturnVoid(finalizing_bb.next());
+
+    return {};
+}
+
+std::any Builder::visit(lang::bb::def::Simple const& simple_bb)
+{
+    for (Statement const* statement : simple_bb.statements()) visitTree(*statement);
+
+    branchToNextOrReturnVoid(simple_bb.next());
+
+    return {};
+}
+
+std::any Builder::visit(lang::bb::def::Returning const& returning_bb)
+{
+    for (Statement const* statement : returning_bb.statements()) visitTree(*statement);
+
+    lang::Scope const* current = &returning_bb.scope();
+    while (current->isPartOfFunction())
+    {
+        current->performEntityFinalizations(exec());
+        current = &current->scope();
+    }
+
+    lang::Type const& return_type = returning_bb.getContainingFunction()->returnType();
+
+    if (return_type.isUnitType()) { exec().performReturn(std::nullopt); }
+    else
+    {
+        Shared<lang::Value> return_value = getV(returning_bb.ret());
+
+        return_value = lang::Type::makeMatching(return_type, return_value, exec());
+
+        exec().performReturn(return_value);
+    }
+
+    return {};
+}
+
+std::any Builder::visit(lang::bb::def::Branching const& branching_bb)
+{
+    for (Statement const* statement : branching_bb.statements()) visitTree(*statement);
+
+    Shared<lang::Value> truth         = getV(branching_bb.condition());
+    Shared<lang::Value> boolean_truth = lang::Type::makeMatching(exec().ctx().getBooleanType(), truth, exec());
+
+    branchConditional(branching_bb, boolean_truth);
+
+    return {};
+}
+
+std::any Builder::visit(lang::bb::def::Matching const& matching_bb)
+{
+    for (Statement const* statement : matching_bb.statements()) visitTree(*statement);
+
+    Shared<lang::Value> value = getV(matching_bb.matched());
+
+    branchMatching(matching_bb, value);
 
     return {};
 }

@@ -3,6 +3,7 @@
 
 #include "compiler/Execution.h"
 
+#include <stack>
 #include <variant>
 
 #include "lang/utility/ResolvingHandle.h"
@@ -59,9 +60,8 @@ class CompileTimeBuild : public Execution
     void registerCodepointType(lang::Type const& codepoint_type) override;
     void registerArrayType(lang::Type const& array_type) override;
 
-    void                registerGlobalVariable(lang::GlobalVariable const& global_variable,
-                                               bool                        is_imported,
-                                               lang::GlobalInitializer     init) override;
+    void                declareGlobalVariable(lang::GlobalVariable const& global_variable) override;
+    void                defineGlobalVariable(lang::GlobalVariable const& global_variable) override;
     void                declareLocalVariable(lang::LocalVariable const& local_variable) override;
     void                defineLocalVariable(lang::LocalVariable const& local_variable,
                                             lang::Scope const&         scope,
@@ -113,14 +113,6 @@ class CompileTimeBuild : public Execution
 
     Shared<lang::Value> performIntegerReinterpretation(Shared<lang::Value> value,
                                                        lang::Type const&   target_type) override;
-
-    /**
-     * Evaluate an expression at compile time.
-     * @param expression The expression to evaluate. It is evaluated in this context.
-     * @param exec The context in which to embed the expression.
-     * @return The result of the evaluation.
-     */
-    Shared<lang::Constant> evaluate(CompileTimeExpression const& expression, Execution& exec);
 
     /**
      * Get the value of a global variable.
@@ -190,8 +182,6 @@ class CompileTimeBuild : public Execution
     Shared<CompileTimeValue> cmpHandledValueOf(Shared<lang::Value> value);// todo: remove
     Shared<CompileTimeValue> cmpHandledValueOf(Address address, lang::Type const& type);
 
-    Shared<CompileTimeValue> evaluate(CompileTimeExpression const& expression);
-
     using Memory    = std::vector<std::vector<Shared<CompileTimeValue>>>;
     using Variables = std::map<lang::Variable const*, Address>;
     Memory& memory(Address::Location location);
@@ -230,21 +220,23 @@ class CompileTimeBuild : public Execution
       public:
         ~CmpFnCtx() override = default;
 
-        CmpFnCtx(CompileTimeBuild& build, std::vector<Shared<lang::Value>> arguments);
+        CmpFnCtx(lang::Function const& fn, CompileTimeBuild& build, std::vector<Shared<lang::Value>> arguments);
 
         Shared<lang::Value> getParameterValue(size_t index) override;
         Execution&          exec() override;
+        lang::Function const& function() override;
 
         Memory                             memory;
         Variables                          variables;
         Optional<Shared<CompileTimeValue>> return_value;
 
       private:
+        lang::Function const&            function_;
         CompileTimeBuild&                build_;
         std::vector<Shared<lang::Value>> arguments_;
     };
 
-    CmpFnCtx* current_fn_ctx_ = nullptr;
+    std::stack<CmpFnCtx> fns_;
 };
 
 #endif

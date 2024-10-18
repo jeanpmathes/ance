@@ -113,9 +113,11 @@ lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHand
     return predefined_function;
 }
 
-lang::InitializerFunction& lang::Function::defineAsInit(Statement& code, lang::Scope& containing_scope)
+lang::InitializerFunction& lang::Function::defineAsInit(Statement&                        code,
+                                                        lang::ResolvingHandle<lang::Type> type,
+                                                        lang::Scope&                      containing_scope)
 {
-    auto definition = makeOwned<lang::InitializerFunction>(*this, code, containing_scope);
+    auto definition = makeOwned<lang::InitializerFunction>(*this, code, type, containing_scope);
 
     lang::InitializerFunction& initializer_function = *definition;
 

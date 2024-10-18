@@ -19,19 +19,17 @@ class CompileTimeBuilder : public Builder
 
     [[nodiscard]] bool isDescriptionAccepted(lang::Description const& description) const override;
 
-    std::any visit(lang::bb::def::Empty const& emtpy_bb) override;
-    std::any visit(lang::bb::def::Finalizing const& finalizing_bb) override;
-    std::any visit(lang::bb::def::Simple const& simple_bb) override;
-    std::any visit(lang::bb::def::Returning const& returning_bb) override;
-    std::any visit(lang::bb::def::Branching const& branching_bb) override;
-    std::any visit(lang::bb::def::Matching const& matching_bb) override;
-
   protected:
     Execution& exec() override;
 
     void visitFunctionDefinition(lang::Function const& function) override;
+    void branchToNextOrReturnVoid(lang::BasicBlock const* next) override;
+    void branchConditional(lang::bb::def::Branching const& branching_bb, Shared<lang::Value> boolean_truth) override;
+    void branchMatching(lang::bb::def::Matching const& matching_bb, Shared<lang::Value> value) override;
 
   private:
+    bool getB(Shared<lang::Value> value);
+
     CompileTimeBuild& compile_time_build_;
 };
 

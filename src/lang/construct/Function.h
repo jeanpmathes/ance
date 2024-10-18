@@ -144,9 +144,12 @@ namespace lang
         /**
          * Define this function as a variable initialization function.
          * @param code The initializer.
+         * @param type The return type of the function.
          * @param containing_scope The scope containing the function.
          */
-        InitializerFunction& defineAsInit(Statement& code, Scope& containing_scope);
+        InitializerFunction& defineAsInit(Statement&                        code,
+                                          lang::ResolvingHandle<lang::Type> type,
+                                          Scope&                            containing_scope);
 
         /**
          * Define this function as a runtime function, meaning it is part of the runtime library.

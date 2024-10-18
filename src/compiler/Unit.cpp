@@ -24,6 +24,11 @@ void Unit::setTargetInfo(TargetDescriptor const& target_descriptor)
     lang::UnsignedIntegerPointerType::init(*this);
 }
 
+bool Unit::isProjectDefinition() const
+{
+    return false;
+}
+
 TargetDescriptor const& Unit::getTarget() const
 {
     return target_descriptor_;
@@ -130,6 +135,9 @@ bool Unit::preparePackageDependencies(Packages const&              packages,
             valid &= is_ok;
 
             out << "ance: packages: Preparing package '" << package.name << "'";
+
+            if (isProjectDefinition()) { out << " (for project definition)"; }
+
             if (is_ok) { out << " succeeded" << std::endl; }
             else { out << " failed" << std::endl; }
         }

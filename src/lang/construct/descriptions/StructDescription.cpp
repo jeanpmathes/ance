@@ -81,7 +81,7 @@ std::vector<lang::Description::Dependency> lang::StructDescription::getDefinitio
     return dependencies;
 }
 
-void lang::StructDescription::performInitialization()
+void lang::StructDescription::setUp()
 {
     std::vector<std::reference_wrapper<lang::Member>> members;
     members.reserve(members_.size());

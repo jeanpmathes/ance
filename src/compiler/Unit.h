@@ -44,6 +44,8 @@ class Unit : public lang::Element<Unit, ANCE_CONSTRUCTS>
      */
     void setTargetInfo(TargetDescriptor const& target_descriptor);
 
+    [[nodiscard]] virtual bool isProjectDefinition() const;
+
     /**
      * Get the name of the unit.
      * @return The name.

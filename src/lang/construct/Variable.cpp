@@ -24,7 +24,7 @@ lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang:
                                                      Scope&                            containing_scope,
                                                      lang::AccessModifier              access,
                                                      bool                              is_import,
-                                                     lang::GlobalInitializer           init,
+                                                     lang::Function const*             init,
                                                      lang::Assigner                    assigner,
                                                      bool                              is_cmp,
                                                      lang::Location                    location)
@@ -35,7 +35,7 @@ lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang:
                                                                                   containing_scope,
                                                                                   access,
                                                                                   is_import,
-                                                                                  std::move(init),
+                                                                                  init,
                                                                                   assigner,
                                                                                   is_cmp,
                                                                                   location);

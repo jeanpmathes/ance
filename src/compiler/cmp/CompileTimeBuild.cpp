@@ -346,8 +346,11 @@ void CompileTimeBuild::registerFunction(lang::Function const&)
     // Nothing to do.
 }
 
-CompileTimeBuild::CmpFnCtx::CmpFnCtx(CompileTimeBuild& build, std::vector<Shared<lang::Value>> arguments)
-    : build_(build)
+CompileTimeBuild::CmpFnCtx::CmpFnCtx(lang::Function const&            fn,
+                                     CompileTimeBuild&                build,
+                                     std::vector<Shared<lang::Value>> arguments)
+    : function_(fn)
+    , build_(build)
     , arguments_(std::move(arguments))
 {}
 
@@ -359,6 +362,11 @@ Shared<lang::Value> CompileTimeBuild::CmpFnCtx::getParameterValue(size_t index)
 Execution& CompileTimeBuild::CmpFnCtx::exec()
 {
     return build_;
+}
+
+lang::Function const& CompileTimeBuild::CmpFnCtx::function()
+{
+    return function_;
 }
 
 void CompileTimeBuild::defineFunctionBody(lang::Function const& function, std::function<void(FnCtx&)> const& builder)
@@ -376,12 +384,16 @@ Shared<lang::Value> CompileTimeBuild::performFunctionCall(lang::Function const& 
 
     for (Shared<lang::Value>& argument : arguments) { arguments_content.emplace_back(cmpContentOf(argument)); }
 
-    CmpFnCtx fn_ctx(*this, std::move(arguments_content));
+    CmpFnCtx&           fn_ctx       = fns_.emplace(function, *this, std::move(arguments_content));
+    Shared<lang::Value> return_value = getDefault(context_.getUnitType());
+
     function_information.body(fn_ctx);
 
-    if (fn_ctx.return_value.hasValue()) { return cmpContentOf(fn_ctx.return_value.value()); }
+    if (fn_ctx.return_value.hasValue()) return_value = fn_ctx.return_value.value();
 
-    return getDefault(context_.getUnitType());
+    fns_.pop();
+
+    return return_value;
 }
 
 void CompileTimeBuild::registerStruct(lang::Type const&                                 type,
@@ -464,34 +476,36 @@ void CompileTimeBuild::registerArrayType(lang::Type const& array_type)
     type_information_.emplace(&array_type, TypeInformation {getArray(std::move(values), array_type)});
 }
 
-void CompileTimeBuild::registerGlobalVariable(lang::GlobalVariable const& global_variable,
-                                              bool                        is_imported,
-                                              lang::GlobalInitializer     init)
+void CompileTimeBuild::declareGlobalVariable(lang::GlobalVariable const& global_variable)
 {
     Address address = allocateGlobal(global_variable.type());
     global_variables_.emplace(&global_variable.self(), address);
 
-    if (is_imported)
+    if (global_variable.isImported())
     {
-        // todo: store the serialized value of the exported variable in the .apkg file and put it into init to use here
+        // todo: store the serialized value of the exported variable in the .apkg file and store it as value here
     }
-    else if (init.hasValue())
+    else if (global_variable.initializer() == nullptr)
     {
-        if (auto* constant_init = std::get_if<std::reference_wrapper<CompileTimeExpression>>(&init.value()))
-        {
-            store(address, evaluate(*constant_init));
-        }
-        else if (auto* function_init = std::get_if<std::reference_wrapper<lang::Function>>(&init.value()))
-        {
-            performFunctionCall(*function_init, {});
-        }
+        store(address, cmpContentOf(getDefault(global_variable.type())));
     }
+}
+
+void CompileTimeBuild::defineGlobalVariable(lang::GlobalVariable const& global_variable)
+{
+    if (global_variable.isImported()) return;
+    if (global_variable.initializer() == nullptr) return;
+
+    Address address = global_variables_.at(&global_variable.self());
+
+    Shared<lang::Value> initial_value = performFunctionCall(*global_variable.initializer(), {});
+    store(address, cmpContentOf(initial_value));
 }
 
 void CompileTimeBuild::declareLocalVariable(lang::LocalVariable const& local_variable)
 {
     Address address = allocateLocal(local_variable.type());
-    current_fn_ctx_->variables.emplace(&local_variable.self(), address);
+    fns_.top().variables.emplace(&local_variable.self(), address);
 }
 
 void CompileTimeBuild::defineLocalVariable(lang::LocalVariable const&,
@@ -510,7 +524,7 @@ Shared<lang::Value> CompileTimeBuild::computeInitializerValue(lang::LocalInitial
     {
         auto [function, parameter_index] = *parameter;
 
-        return current_fn_ctx_->getParameterValue(parameter_index);
+        return fns_.top().getParameterValue(parameter_index);
     }
 
     if (auto* expression = std::get_if<std::reference_wrapper<Expression>>(&initializer.value()))
@@ -525,12 +539,11 @@ Shared<lang::Value> CompileTimeBuild::computeAddressOfVariable(lang::Variable co
 {
     Address address;
 
-    if (global_variables_.contains(&variable)) { address = global_variables_.at(&variable); }
+    if (global_variables_.contains(&variable)) address = global_variables_.at(&variable);
 
-    if (current_fn_ctx_ != nullptr && current_fn_ctx_->variables.contains(&variable))
-    {
-        address = current_fn_ctx_->variables.at(&variable);
-    }
+    if (!fns_.empty() && fns_.top().variables.contains(&variable)) address = fns_.top().variables.at(&variable);
+
+    assert(address != Address::NULL_ADDRESS);
 
     return makeShared<cmp::AddressValue>(address, context_.getPointerType(variable.type()), context_);
 }
@@ -806,7 +819,7 @@ void CompileTimeBuild::performPointerIteration(Shared<lang::Value>              
 {
     assert(pointer->type().isPointerType());
     assert(lang::Type::areSame(count->type(), ctx().getSizeType()));
-    assert(current_fn_ctx_ != nullptr);
+    assert(!fns_.empty());
 
     Shared<cmp::AddressValue> cmp_pointer  = cmpContentOf(pointer).cast<cmp::AddressValue>();
     Address                   base_address = cmp_pointer->address();
@@ -822,8 +835,8 @@ void CompileTimeBuild::performPointerIteration(Shared<lang::Value>              
 
 void CompileTimeBuild::performReturn(Optional<Shared<lang::Value>> value)
 {
-    if (value.hasValue()) { current_fn_ctx_->return_value = cmpContentOf(value.value()); }
-    else { current_fn_ctx_->return_value = makeShared<cmp::UnitValue>(context_.getUnitType(), context_); }
+    if (value.hasValue()) { fns_.top().return_value = cmpContentOf(value.value()); }
+    else { fns_.top().return_value = makeShared<cmp::UnitValue>(context_.getUnitType(), context_); }
 }
 
 void CompileTimeBuild::performMemoryClear(Shared<lang::Value> address, Shared<lang::Value> count)
@@ -1464,11 +1477,6 @@ Shared<lang::Value> CompileTimeBuild::performIntegerReinterpretation(Shared<lang
     return cmpContentOf(value)->withType(target_type, context_);
 }
 
-Shared<lang::Constant> CompileTimeBuild::evaluate(CompileTimeExpression const& expression, Execution& exec)
-{
-    return evaluate(expression)->embed(exec);
-}
-
 Shared<lang::Constant> CompileTimeBuild::getGlobalVariableValue(lang::GlobalVariable const& variable, Execution& exec)
 {
     Address address = computeAddressOfVariable(variable.self()).cast<cmp::AddressValue>()->address();
@@ -1639,20 +1647,6 @@ Shared<CompileTimeValue> CompileTimeBuild::cmpHandledValueOf(Address address, la
     return makeShared<cmp::HandledValue>(address, type, *this);
 }
 
-Shared<CompileTimeValue> CompileTimeBuild::evaluate(CompileTimeExpression const& expression)
-{
-    assert(current_fn_ctx_ == nullptr);
-
-    CmpFnCtx fn_ctx(*this, {});
-    current_fn_ctx_ = &fn_ctx;
-
-    Shared<CompileTimeValue> value = cmpContentOf(visitor_->getV(expression));
-
-    current_fn_ctx_ = nullptr;
-
-    return value;
-}
-
 CompileTimeBuild::Address CompileTimeBuild::allocateGlobal(lang::Type const& type, size_t count)
 {
     return allocate(Address::Location::Global, global_memory_, type, count, *this);
@@ -1660,16 +1654,16 @@ CompileTimeBuild::Address CompileTimeBuild::allocateGlobal(lang::Type const& typ
 
 CompileTimeBuild::Address CompileTimeBuild::allocateLocal(lang::Type const& type, size_t count)
 {
-    assert(current_fn_ctx_ != nullptr);
+    assert(!fns_.empty());
 
-    return allocate(Address::Location::Local, current_fn_ctx_->memory, type, count, *this);
+    return allocate(Address::Location::Local, fns_.top().memory, type, count, *this);
 }
 
 Shared<CompileTimeValue> CompileTimeBuild::load(CompileTimeBuild::Address const& address)
 {
     assert(address.location() != Address::Location::Null);
 
-    Memory& memory = address.location() == Address::Location::Global ? global_memory_ : current_fn_ctx_->memory;
+    Memory& memory = address.location() == Address::Location::Global ? global_memory_ : fns_.top().memory;
     Shared<CompileTimeValue> value = memory.at(address.memory()).at(address.array());
 
     for (size_t index : address.inners())
@@ -1686,7 +1680,7 @@ void CompileTimeBuild::store(CompileTimeBuild::Address address, Shared<CompileTi
 {
     assert(address.location() != Address::Location::Null);
 
-    Memory& memory = address.location() == Address::Location::Global ? global_memory_ : current_fn_ctx_->memory;
+    Memory& memory = address.location() == Address::Location::Global ? global_memory_ : fns_.top().memory;
     Shared<CompileTimeValue>* slot = &memory.at(address.memory()).at(address.array());
 
     if (address.inners().empty())
@@ -1728,8 +1722,8 @@ CompileTimeBuild::Memory& CompileTimeBuild::memory(CompileTimeBuild::Address::Lo
 
     if (location == Address::Location::Local)
     {
-        assert(current_fn_ctx_ != nullptr);
-        return current_fn_ctx_->memory;
+        assert(!fns_.empty());
+        return fns_.top().memory;
     }
 
     throw std::logic_error("Invalid location");

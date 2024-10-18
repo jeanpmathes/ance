@@ -60,7 +60,7 @@ namespace lang
          * @param containing_scope The containing scope.
          * @param access The access modifier.
          * @param is_import Whether the variable is imported.
-         * @param init The expression or function used for initialization.
+         * @param init The function used for initialization, nullptr if there is none.
          * @param assigner The assigner used for initialization.
          * @param is_cmp Whether the variable is a compile-time variable.
          * @param location The source location.
@@ -71,7 +71,7 @@ namespace lang
                                              Scope&                            containing_scope,
                                              lang::AccessModifier              access,
                                              bool                              is_import,
-                                             lang::GlobalInitializer           init,
+                                             lang::Function const*             init,
                                              lang::Assigner                    assigner,
                                              bool                              is_cmp,
                                              lang::Location                    location);

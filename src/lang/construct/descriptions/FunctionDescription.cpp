@@ -54,7 +54,7 @@ bool lang::FunctionDescription::isCMP() const
     return false;
 }
 
-void lang::FunctionDescription::performInitialization()
+void lang::FunctionDescription::setUp()
 {
     function_ = lang::makeHandled<lang::Function>(name_);
 

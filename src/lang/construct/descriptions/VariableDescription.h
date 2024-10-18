@@ -77,7 +77,7 @@ namespace lang
         void performFinalization(Execution& exec) override;
 
       protected:
-        void performInitialization() override;
+        void setUp() override;
         void sync(Storage& storage) override;
 
       private:
@@ -89,7 +89,6 @@ namespace lang
         lang::Location                              location_;
 
         lang::ResolvingHandle<lang::Type> type_handle_;
-        CompileTimeExpression*            cmp_init_;
         Expression*                       init_expression_ptr_;
 
         Optional<Owned<Expression>> init_expression_;

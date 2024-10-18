@@ -66,6 +66,11 @@ void lang::LocalVariable::registerDeclaration(Execution& exec) const
     exec.declareLocalVariable(*this);
 }
 
+void lang::LocalVariable::registerDefinition(Execution&) const
+{
+    // Nothing to do, variable is defined on initialization.
+}
+
 void lang::LocalVariable::performInitialization(Execution& exec) const
 {
     exec.defineLocalVariable(*this, scope(), parameter_index_, location());

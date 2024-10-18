@@ -31,7 +31,10 @@ namespace lang
     class InitializerFunction : public lang::StatementFunction
     {
       public:
-        InitializerFunction(Function& function, Statement& initializer, Scope& containing_scope);
+        InitializerFunction(Function&                         function,
+                            Statement&                        initializer,
+                            lang::ResolvingHandle<lang::Type> return_type,
+                            Scope&                            containing_scope);
 
         [[nodiscard]] bool isMangled() const override;
 
@@ -44,11 +47,13 @@ namespace lang
          * Create a code block that initializes a global variable.
          * @param variable The variable to initialize.
          * @param assigner The assigner to use.
+         * @param is_cmp Whether the initializer is for a compile-time variable.
          * @param initializer The initializer expression, providing the value to assign.
          * @return The initializer block.
          */
         static Owned<Statement> makeInitializerBlock(lang::ResolvingHandle<lang::Variable> variable,
                                                      lang::Assigner                        assigner,
+                                                     bool                                  is_cmp,
                                                      Owned<Expression>                     initializer);
     };
 }

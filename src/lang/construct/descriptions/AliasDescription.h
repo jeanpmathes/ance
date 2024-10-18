@@ -50,7 +50,7 @@ namespace lang
         [[nodiscard]] Descriptions expand(lang::Context& new_context) const override;
 
       protected:
-        void performInitialization() override;
+        void setUp() override;
         void resolveDeclaration() override;
         void resolveDefinition() override;
         void sync(Storage& storage) override;

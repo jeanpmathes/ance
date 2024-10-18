@@ -64,6 +64,7 @@ namespace lang
         [[nodiscard]] bool isFinal() const;
 
         virtual void registerDeclaration(Execution& exec) const   = 0;
+        virtual void registerDefinition(Execution& exec) const    = 0;
         virtual void performInitialization(Execution& exec) const = 0;
         virtual void performFinalization(Execution& exec) const   = 0;
 

@@ -76,9 +76,8 @@ class NativeBuild : public Execution
     void registerCodepointType(lang::Type const& codepoint_type) override;
     void registerArrayType(lang::Type const& array_type) override;
 
-    void                registerGlobalVariable(lang::GlobalVariable const& global_variable,
-                                               bool                        is_imported,
-                                             lang::GlobalInitializer     init) override;
+    void                declareGlobalVariable(lang::GlobalVariable const& global_variable) override;
+    void                defineGlobalVariable(lang::GlobalVariable const& global_variable) override;
     void                declareLocalVariable(lang::LocalVariable const& local_variable) override;
     void                defineLocalVariable(lang::LocalVariable const& local_variable,
                                             lang::Scope const&         scope,
@@ -177,10 +176,8 @@ class NativeBuild : public Execution
     std::map<std::string, llvm::Constant*>    c_strings_         = {};
 
     struct NativeFunction {
+        lang::Function const* lang_function;
         llvm::Function*                                       llvm_function;
-        bool                                                  preserve_unit_return;
-        lang::Type const&                                     return_type;
-        std::vector<std::reference_wrapper<lang::Type const>> parameter_types;
     };
 
     struct NativeType {
@@ -233,6 +230,7 @@ class NativeBuild : public Execution
 
         Shared<lang::Value> getParameterValue(size_t index) override;
         Execution&          exec() override;
+        lang::Function const& function() override;
 
         [[nodiscard]] llvm::Function*   llvmFunction() const;
         [[nodiscard]] lang::Type const& returnType() const;

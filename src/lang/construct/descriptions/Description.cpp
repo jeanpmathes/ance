@@ -24,7 +24,7 @@ void lang::Description::setScope(lang::Scope& scope)
 void lang::Description::initialize(lang::Scope& scope)
 {
     setScope(scope);
-    performInitialization();
+    setUp();
 }
 
 void lang::Description::resolveDeclaration() {}

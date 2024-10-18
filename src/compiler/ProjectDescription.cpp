@@ -13,6 +13,11 @@ void ProjectDescription::setBinaryDescriptionPath(std::filesystem::path path)
     binary_description_path_ = std::move(path);
 }
 
+bool ProjectDescription::isProjectDefinition() const
+{
+    return true;
+}
+
 std::string const& ProjectDescription::getName() const
 {
     return name_;

@@ -86,7 +86,7 @@ std::vector<lang::Description::Dependency> lang::AliasDescription::getDefinition
     return result;
 }
 
-void lang::AliasDescription::performInitialization()
+void lang::AliasDescription::setUp()
 {
     Owned<lang::TypeDefinition> alias_definition =
         makeOwned<lang::TypeAlias>(access(), name_, actual_, definition_location_);

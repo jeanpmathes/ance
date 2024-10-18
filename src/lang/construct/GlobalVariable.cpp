@@ -15,7 +15,7 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
                                      Scope&                                containing_scope,
                                      lang::AccessModifier                  access,
                                      bool                                  is_import,
-                                     GlobalInitializer                     init,
+                                     lang::Function const*                 init,
                                      Assigner                              assigner,
                                      bool                                  is_cmp,
                                      lang::Location                        location)
@@ -23,16 +23,9 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
     , access_(access)
     , is_import_(is_import)
     , is_cmp_(is_cmp)
-    , init_(std::move(init))
+    , init_(init)
     , assigner_(assigner)
 {
-    if (init_.hasValue())
-    {
-        if (auto* constant_init = std::get_if<std::reference_wrapper<CompileTimeExpression>>(&init_.value()))
-        {
-            constant_init->get().setContainingScope(containing_scope);
-        }
-    }
 }
 
 lang::AccessModifier lang::GlobalVariable::access() const
@@ -45,25 +38,34 @@ bool lang::GlobalVariable::isCMP() const
     return is_cmp_;
 }
 
+bool lang::GlobalVariable::isImported() const
+{
+    return is_import_;
+}
+
 lang::Assigner lang::GlobalVariable::assigner() const
 {
     return assigner_;
 }
 
+lang::Function const* lang::GlobalVariable::initializer() const
+{
+    return init_;
+}
+
 void lang::GlobalVariable::registerDeclaration(Execution& exec) const
 {
-    exec.registerGlobalVariable(*this, is_import_, init_);
+    exec.declareGlobalVariable(*this);
+}
+
+void lang::GlobalVariable::registerDefinition(Execution& exec) const
+{
+    exec.defineGlobalVariable(*this);
 }
 
 void lang::GlobalVariable::performInitialization(Execution& exec) const
 {
-    if (init_.hasValue())
-    {
-        if (auto* function_init = std::get_if<std::reference_wrapper<lang::Function>>(&init_.value()))
-        {
-            function_init->get().execCall({}, exec);
-        }
-    }
+    if (init_ != nullptr && !isCMP()) { init_->execCall({}, exec); }
 }
 
 void lang::GlobalVariable::performFinalization(Execution& exec) const

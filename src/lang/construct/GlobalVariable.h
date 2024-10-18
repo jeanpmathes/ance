@@ -41,16 +41,20 @@ namespace lang
                        Scope&                                containing_scope,
                        lang::AccessModifier                  access,
                        bool                                  is_import,
-                       lang::GlobalInitializer               init,
+                       lang::Function const*                 init,
                        Assigner                              assigner,
                        bool                                  is_cmp,
                        lang::Location                        location);
 
         [[nodiscard]] lang::AccessModifier access() const;
         [[nodiscard]] bool                 isCMP() const;
+        [[nodiscard]] bool                        isImported() const;
         [[nodiscard]] lang::Assigner       assigner() const;
+        [[nodiscard]] lang::Function const*       initializer() const;
 
         void registerDeclaration(Execution& exec) const override;
+        void registerDefinition(Execution& exec) const override;
+
         void performInitialization(Execution& exec) const override;
         void performFinalization(Execution& exec) const override;
 
@@ -60,7 +64,7 @@ namespace lang
         lang::AccessModifier access_;
         bool                 is_import_;
         bool                 is_cmp_;
-        GlobalInitializer    init_;
+        lang::Function const* init_;
         Assigner             assigner_;
     };
 }
