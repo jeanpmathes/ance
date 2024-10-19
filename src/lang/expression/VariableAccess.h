@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_VARIABLEACCESS_H_
 #define ANCE_SRC_LANG_EXPRESSION_VARIABLEACCESS_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 #include "lang/construct/Variable.h"
@@ -16,7 +16,7 @@ namespace lang
  * Access a variable and get or set its current value.
  */
 class VariableAccess
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<VariableAccess, ANCE_CONSTRUCTS>
 {
   public:
