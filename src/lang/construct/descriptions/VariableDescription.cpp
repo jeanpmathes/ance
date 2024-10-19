@@ -240,28 +240,18 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
                 return;
             }
 
-            if (!lang::Type::areSame(type_handle_, init_expression_ptr_->type()))
-            {
-                validation_logger.logError("Compile-time initializer must be of variable type "
-                                               + type_handle_->getAnnotatedName(),
-                                           init_expression_ptr_->location());
-                return;
-            }
-
             if (!assigner_.isFinal())
             {
                 validation_logger.logError("Assignment to compile-time variables must be final", location_);
                 return;
             }
         }
-        else
-        {
-            if (!lang::Type::checkMismatch(type_handle_,
-                                           init_expression_ptr_->type(),
-                                           init_expression_ptr_->location(),
-                                           validation_logger))
-                return;
-        }
+
+        if (!lang::Type::checkMismatch(type_handle_,
+                                       init_expression_ptr_->type(),
+                                       init_expression_ptr_->location(),
+                                       validation_logger))
+            return;
     }
     else if (!type_.hasValue())
     {
