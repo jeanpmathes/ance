@@ -122,6 +122,12 @@ std::vector<lang::Description::Dependency> lang::VariableDescription::getDefinit
             dependencies.emplace_back(dependency, false);
         }
 
+        for (auto& dependency : init_block_.value()->getBlockScope()->getDependenciesOnCall())
+        {
+            // If this is a cmp variable, the definition will call the function, therefore it must be defined.
+            dependencies.emplace_back(dependency, is_cmp_);
+        }
+
         for (auto& dependency : init_block_.value()->getBlockScope()->getDependenciesOnDefinition())
         {
             dependencies.emplace_back(dependency);

@@ -37,6 +37,30 @@ namespace lang
     class Context;
 
     /**
+     * How an entity dependency is used by the dependent entity.
+     */
+    enum class EntityUsage
+    {
+        /**
+         * The entity needs the definition of the dependency.
+         * This is the default usage.
+         */
+        DEFINITION,
+        /**
+         * The entity only needs the declaration of the dependency.
+         * For example, writing to a variable only needs the declaration.
+         * This allows writing to undefined variables.
+         */
+        DECLARATION,
+        /**
+         * The entity calls the dependency.
+         * Whether this means the declaration or definition is needed depends on the context.
+         * In most cases this will be declaration usage, but in a cmp context it will be definition usage.
+         */
+        CALL
+    };
+
+    /**
      * Any named entity in the language.
      * Will be replaced by something like Value in the future, when types, variables and function (groups) are unified.
      */

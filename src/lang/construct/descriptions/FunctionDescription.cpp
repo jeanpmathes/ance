@@ -51,7 +51,7 @@ bool lang::FunctionDescription::isOverloadAllowed() const
 
 bool lang::FunctionDescription::isCMP() const
 {
-    return false;
+    return is_cmp_;
 }
 
 void lang::FunctionDescription::setUp()
@@ -168,6 +168,11 @@ std::vector<lang::Description::Dependency> lang::FunctionDescription::getDefinit
     for (auto parameter : self->parameters_) { add(parameter->type()); }
 
     for (auto& dependency : function_.value()->getDependenciesOnDeclaration())
+    {
+        dependencies.emplace_back(dependency, false);
+    }
+
+    for (auto& dependency : function_.value()->getDependenciesOnCall())
     {
         dependencies.emplace_back(dependency, false);
     }

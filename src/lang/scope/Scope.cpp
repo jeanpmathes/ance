@@ -75,33 +75,33 @@ Owned<lang::OrderedScope> lang::Scope::makeLocalScope(lang::CodeBlock& code_bloc
     return local_scope;
 }
 
-void lang::Scope::registerUsage(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared)
+void lang::Scope::registerUsage(lang::ResolvingHandle<lang::Entity> entity, EntityUsage usage)
 {
     if (auto type = entity.as<lang::Type>(); type.hasValue())
     {
         if ((**type).getDefinition() == nullptr)
         {
             if (!(**type).isDefined()) { onRegisterUsage(*type); }
-            addDependency(*type, is_only_declared);
+            addDependency(*type, usage);
         }
         else
         {
             for (auto& extracted : (**type).getDeclarationDependencies())
             {
                 if (!extracted->isDefined()) { onRegisterUsage(extracted); }
-                addDependency(extracted, true);
+                addDependency(extracted, EntityUsage::DECLARATION);
             }
             for (auto& extracted : (**type).getDefinitionDependencies())
             {
                 if (!extracted->isDefined()) { onRegisterUsage(extracted); }
-                addDependency(extracted, true);
+                addDependency(extracted, EntityUsage::DECLARATION);
             }
         }
     }
     else
     {
         if (!entity->isDefined()) { onRegisterUsage(entity); }
-        addDependency(entity, is_only_declared);
+        addDependency(entity, usage);
     }
 }
 
@@ -113,30 +113,37 @@ Optional<lang::OwningHandle<lang::Entity>> lang::Scope::connectWithDefinitionAcc
 
 void lang::Scope::postResolve() {}
 
-void lang::Scope::addDependency(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared)
+void lang::Scope::addDependency(lang::ResolvingHandle<lang::Entity> entity, EntityUsage usage)
 {
-    if (is_only_declared)
+    switch (usage)
     {
-        if (!entity_to_declaration_dependency_index_.contains(entity))
-        {
-            entity_to_declaration_dependency_index_.emplace(entity, entity_declaration_dependencies_.size());
-            entity_declaration_dependencies_.emplace_back(entity);
-        }
-
-        entity_declaration_dependencies_[entity_to_declaration_dependency_index_.at(entity)].count++;
+        case EntityUsage::DECLARATION:
+            if (!entity_to_declaration_dependency_index_.contains(entity))
+            {
+                entity_to_declaration_dependency_index_.emplace(entity, entity_declaration_dependencies_.size());
+                entity_declaration_dependencies_.emplace_back(entity);
+            }
+            entity_declaration_dependencies_[entity_to_declaration_dependency_index_.at(entity)].count++;
+            break;
+        case EntityUsage::DEFINITION:
+            if (!entity_to_definition_dependency_index_.contains(entity))
+            {
+                entity_to_definition_dependency_index_.emplace(entity, entity_definition_dependencies_.size());
+                entity_definition_dependencies_.emplace_back(entity);
+            }
+            entity_definition_dependencies_[entity_to_definition_dependency_index_.at(entity)].count++;
+            break;
+        case EntityUsage::CALL:
+            if (!entity_to_call_dependency_index_.contains(entity))
+            {
+                entity_to_call_dependency_index_.emplace(entity, entity_call_dependencies_.size());
+                entity_call_dependencies_.emplace_back(entity);
+            }
+            entity_call_dependencies_[entity_to_call_dependency_index_.at(entity)].count++;
+            break;
     }
-    else
-    {
-        if (!entity_to_definition_dependency_index_.contains(entity))
-        {
-            entity_to_definition_dependency_index_.emplace(entity, entity_definition_dependencies_.size());
-            entity_definition_dependencies_.emplace_back(entity);
-        }
 
-        entity_definition_dependencies_[entity_to_definition_dependency_index_.at(entity)].count++;
-    }
-
-    if (&scope() != this) scope().addDependency(entity, is_only_declared);
+    if (&scope() != this) scope().addDependency(entity, usage);
 }
 
 std::vector<lang::Scope::Dependency<lang::Entity>> lang::Scope::getDependenciesOnDeclaration()
@@ -165,6 +172,21 @@ std::vector<std::reference_wrapper<lang::Entity const>> lang::Scope::getDependen
     result.reserve(entity_definition_dependencies_.size());
 
     for (auto& dependency : entity_definition_dependencies_) { result.emplace_back(dependency.entity); }
+
+    return result;
+}
+
+std::vector<lang::Scope::Dependency<lang::Entity>> lang::Scope::getDependenciesOnCall()
+{
+    return entity_call_dependencies_;
+}
+
+std::vector<std::reference_wrapper<lang::Entity const>> lang::Scope::getDependenciesOnCall() const
+{
+    std::vector<std::reference_wrapper<lang::Entity const>> result;
+    result.reserve(entity_call_dependencies_.size());
+
+    for (auto& dependency : entity_call_dependencies_) { result.emplace_back(dependency.entity); }
 
     return result;
 }

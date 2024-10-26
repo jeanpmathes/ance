@@ -73,6 +73,11 @@ std::vector<lang::Description::Dependency> lang::StructDescription::getDefinitio
         dependencies.emplace_back(dependency, false);
     }
 
+    for (auto& dependency : struct_scope_.value()->getDependenciesOnCall())
+    {
+        dependencies.emplace_back(dependency, false);
+    }
+
     for (auto& dependency : struct_scope_.value()->getDependenciesOnDefinition())
     {
         dependencies.emplace_back(dependency);

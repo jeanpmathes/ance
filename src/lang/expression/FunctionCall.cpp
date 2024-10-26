@@ -62,7 +62,7 @@ void FunctionCall::walkDefinitions()
 {
     Expression::walkDefinitions();
 
-    scope().registerUsage(callable_, true);
+    scope().registerUsage(callable_, lang::EntityUsage::CALL);
 }
 
 void FunctionCall::postResolve()

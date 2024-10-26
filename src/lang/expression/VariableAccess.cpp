@@ -20,7 +20,7 @@ lang::Entity const& VariableAccess::variable() const
 
 void VariableAccess::walkDefinitions()
 {
-    scope().registerUsage(variable_, !is_defined_);
+    scope().registerUsage(variable_, is_defined_ ? lang::EntityUsage::DEFINITION : lang::EntityUsage::DECLARATION);
 
     type();
 }

@@ -144,9 +144,9 @@ namespace lang
         /**
          * Register the usage of a entity in this scope. Only entity that are registered will be resolved.
          * @param entity The entity to register and resolve. An entity can be registered multiple times.
-         * @param is_only_declared Whether a declaration is sufficient or a definition is required.
+         * @param usage The usage of the entity.
          */
-        void registerUsage(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared = false);
+        void registerUsage(lang::ResolvingHandle<lang::Entity> entity, EntityUsage usage = EntityUsage::DEFINITION);
 
       protected:
         virtual void onRegisterUsage(lang::ResolvingHandle<lang::Entity> entity) = 0;
@@ -184,7 +184,7 @@ namespace lang
         virtual void performEntityFinalizations(Execution& exec) const = 0;
 
       private:
-        void addDependency(lang::ResolvingHandle<lang::Entity> entity, bool is_only_declared);
+        void addDependency(lang::ResolvingHandle<lang::Entity> entity, EntityUsage usage);
 
       public:
         template<typename Entity>
@@ -223,6 +223,17 @@ namespace lang
          */
         [[nodiscard]] std::vector<std::reference_wrapper<lang::Entity const>> getDependenciesOnDefinition() const;
 
+        /**
+         * Get the dependencies on calls of this scope and their count.
+         * @return The dependencies.
+         */
+        std::vector<Dependency<lang::Entity>> getDependenciesOnCall();
+        /**
+         * Get the dependencies on calls of this scope and their count.
+         * @return The dependencies.
+         */
+        [[nodiscard]] std::vector<std::reference_wrapper<lang::Entity const>> getDependenciesOnCall() const;
+
         ~Scope() override = default;
 
       private:
@@ -233,6 +244,9 @@ namespace lang
 
         std::vector<Dependency<lang::Entity>>                 entity_definition_dependencies_;
         std::map<lang::ResolvingHandle<lang::Entity>, size_t> entity_to_definition_dependency_index_;
+
+        std::vector<Dependency<lang::Entity>>                 entity_call_dependencies_;
+        std::map<lang::ResolvingHandle<lang::Entity>, size_t> entity_to_call_dependency_index_;
     };
 }
 #endif
