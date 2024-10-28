@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_AND_H_
 #define ANCE_SRC_LANG_EXPRESSION_AND_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * Logical 'and' expression, with short-circuit evaluation.
  */
 class And
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<And, ANCE_CONSTRUCTS>
 {
   public:

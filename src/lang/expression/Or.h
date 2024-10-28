@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_OR_H_
 #define ANCE_SRC_LANG_EXPRESSION_OR_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include "lang/Element.h"
 
@@ -9,7 +9,7 @@
  * Logical 'or' expression, with short-circuit evaluation.
  */
 class Or
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<Or, ANCE_CONSTRUCTS>
 {
   public:

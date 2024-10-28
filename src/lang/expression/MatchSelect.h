@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_EXPRESSION_MATCHSELECT_H_
 #define ANCE_SRC_LANG_EXPRESSION_MATCHSELECT_H_
 
-#include "Expression.h"
+#include "CompileTimeExpression.h"
 
 #include <memory>
 
@@ -11,7 +11,7 @@
  * Selects a value from multiple cases.
  */
 class MatchSelect
-    : public Expression
+    : public CompileTimeExpression
     , public lang::Element<MatchSelect, ANCE_CONSTRUCTS>
 {
   public:
