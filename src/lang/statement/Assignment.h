@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_ASSIGNMENT_H_
 #define ANCE_SRC_LANG_STATEMENT_ASSIGNMENT_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include "lang/Assigner.h"
 
@@ -13,7 +13,7 @@ class Expression;
  * A statement with an assignment operation.
  */
 class Assignment
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<Assignment, ANCE_CONSTRUCTS>
 {
   public:

@@ -221,9 +221,36 @@ Shared<CompileTimeValue> cmp::StructValue::withType(lang::Type const& type, lang
     std::vector<Shared<CompileTimeValue>> values;
     values.reserve(values_.size());
 
-    for (auto const& value : values_) values.push_back(value->withType(type, new_context));
+    for (auto const& value : values_) { values.push_back(value->withType(value->type(), new_context)); }
 
     return makeShared<StructValue>(type, std::move(values), new_context);
+}
+
+Shared<CompileTimeValue> cmp::StructValue::access(size_t index, Shared<CompileTimeValue>* op, bool* ok, Execution& exec)
+{
+    *ok = values_.size() > index;
+
+    if (op == nullptr)
+    {
+        if (*ok) return values_.at(index);
+        else return makeShared<UnitValue>(exec.ctx().getUnitType(), exec.ctx());
+    }
+    else
+    {
+        if (*ok)
+        {
+            std::vector<Shared<CompileTimeValue>> new_values;
+
+            for (size_t i = 0; i < values_.size(); ++i)
+            {
+                if (i == index) new_values.emplace_back(*op);
+                else new_values.emplace_back(values_.at(i));
+            }
+
+            return makeShared<StructValue>(type(), std::move(new_values), exec.ctx());
+        }
+        else return makeShared<UnitValue>(exec.ctx().getUnitType(), exec.ctx());
+    }
 }
 
 cmp::VectorValue::VectorValue(lang::Type const&                       element_type,

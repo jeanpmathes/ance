@@ -764,7 +764,7 @@ Shared<lang::Value> CompileTimeBuild::computePointerFromReference(Shared<lang::V
 
     lang::Type const& pointer_type = context_.getPointerType(reference->type().getElementType());
 
-    return reference.cast<cmp::AddressValue>()->withType(pointer_type, context_);
+    return reference.cast<CompileTimeValue>()->withType(pointer_type, context_);
 }
 
 Shared<lang::Value> CompileTimeBuild::computeReferenceFromPointer(Shared<lang::Value> pointer)
@@ -773,7 +773,7 @@ Shared<lang::Value> CompileTimeBuild::computeReferenceFromPointer(Shared<lang::V
 
     lang::Type const& reference_type = context_.getReferenceType(pointer->type().getElementType());
 
-    return pointer.cast<cmp::AddressValue>()->withType(reference_type, context_);
+    return pointer.cast<CompileTimeValue>()->withType(reference_type, context_);
 }
 
 Shared<lang::Value> CompileTimeBuild::computeAddressIsNotNull(Shared<lang::Value> address)

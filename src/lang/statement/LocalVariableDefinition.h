@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_LOCALVARIABLEDEFINITION_H_
 #define ANCE_SRC_LANG_STATEMENT_LOCALVARIABLEDEFINITION_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include <optional>
 
@@ -21,7 +21,7 @@ class Expression;
  * Defines a local variable in the containing function.
  */
 class LocalVariableDefinition
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<LocalVariableDefinition, ANCE_CONSTRUCTS>
 {
   public:

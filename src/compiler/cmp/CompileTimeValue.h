@@ -160,6 +160,8 @@ namespace cmp
         Shared<lang::Constant>   embed(Execution& exec) const override;
         Shared<CompileTimeValue> withType(lang::Type const& type, lang::Context& new_context) const override;
 
+        Shared<CompileTimeValue> access(size_t index, Shared<CompileTimeValue>* op, bool* ok, Execution& exec) override;
+
       private:
         std::vector<Shared<CompileTimeValue>> values_;
     };
