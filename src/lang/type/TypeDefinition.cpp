@@ -58,6 +58,11 @@ bool lang::TypeDefinition::isImported() const
     return false;// Only custom types can be imported.
 }
 
+bool lang::TypeDefinition::isCMP() const
+{
+    return true;
+}
+
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::clone(lang::Context&) const
 {
     assert(!isCustom() && "TypeDefinition::clone() called on custom type definition.");
