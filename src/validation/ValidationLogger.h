@@ -69,10 +69,12 @@ class ValidationLogger
      * Emit all logged messages.
      * @param source_files The source file containing the code that was validated with this logger.
      * @param stream The stream to emit the messages to.
+     * @param category_name The name of the validation category.
      * @param step_name The name of the validation step.
      */
     void emitMessages(std::vector<std::reference_wrapper<SourceFile>> const& source_files,
                       std::ostream&                                          stream,
+                      std::string const&                                     category_name,
                       std::string const&                                     step_name);
 
     /**

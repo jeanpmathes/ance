@@ -634,28 +634,28 @@ class Execution
     virtual std::filesystem::path getSourceFilePath(lang::Location location) = 0;
 
     /**
-     * Set the current debug location.
+     * Set the current source location.
      * @param location The source location.
      * @param scope The current scope.
      */
-    virtual void setDebugLocation(lang::Location location, lang::Scope const& scope) = 0;
+    virtual void pushSourceLocation(lang::Location location, lang::Scope const& scope) = 0;
 
     /**
-     * Reset the previous debug location.
+     * Reset to the previous debug location.
      */
-    virtual void resetDebugLocation() = 0;
+    virtual void popSourceLocation() = 0;
 
     /**
-     * Get whether all debug locations were popped.
+     * Get whether all source locations were popped.
      * @return True if all locations were popped correctly.
      */
-    virtual bool allDebugLocationsPopped() = 0;
+    virtual bool allSourceLocationsPopped() = 0;
 
     /**
-     * Get a string describing the current location in the source code.
-     * @return The location string.
+     * Get the current source location.
+     * @return The current source location.
      */
-    virtual std::string getLocationString() = 0;
+    virtual lang::Location getCurrentSourceLocation() = 0;
 
   private:
     Unit&    unit_;

@@ -37,16 +37,20 @@ void ValidationLogger::log(ValidationLogger::LogLevel level, std::string const& 
 
 void ValidationLogger::emitMessages(std::vector<std::reference_wrapper<SourceFile>> const& source_files,
                                     std::ostream&                                          stream,
+                                    std::string const&                                     category_name,
                                     std::string const&                                     step_name)
 {
-    stream << "ance: validation: (" << step_name << ") " << warningCount() << " warnings, " << errorCount() << " errors"
-           << std::endl;
+    if (!step_name.empty())
+    {
+        stream << "ance: " << category_name << " (" << step_name << ") " << warningCount() << " warnings, "
+               << errorCount() << " errors" << std::endl;
+    }
 
     for (auto& entry : entries_)
     {
         size_t start = 0;
 
-        stream << "ance: ";
+        stream << "ance: " << category_name << " ";
 
         switch (entry.level_)
         {

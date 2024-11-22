@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <utility>
 
 #include <llvm/Analysis/ModuleSummaryAnalysis.h>
 #include <llvm/Bitcode/BitcodeWriter.h>
@@ -23,12 +24,12 @@
 #include "compiler/native/WrappedNativeValue.h"
 #include "lang/type/FixedWidthIntegerType.h"
 
-AnceCompiler::AnceCompiler(SourceTree& tree, TargetDescriptor const& target_descriptor)
+AnceCompiler::AnceCompiler(SourceTree& tree, TargetDescriptor target_descriptor)
     : module_(tree.unit().getName(), llvm_context_)
     , ir_(llvm_context_)
     , di_(module_)
     , unit_(tree.unit())
-    , target_descriptor_(target_descriptor)
+    , target_descriptor_(std::move(target_descriptor))
     , runtime_()
     , native_build_(tree, runtime_, llvm_context_, module_, ir_, di_)
 {
@@ -43,8 +44,12 @@ AnceCompiler::AnceCompiler(SourceTree& tree, TargetDescriptor const& target_desc
     module_.addModuleFlag(llvm::Module::Warning, "Debug Info Version", llvm::DEBUG_METADATA_VERSION);
 }
 
-void AnceCompiler::compile(std::filesystem::path const& ilr, std::filesystem::path const& obj)
+void AnceCompiler::compile(std::filesystem::path const& ilr,
+                           std::filesystem::path const& obj,
+                           ValidationLogger&            validation_logger)
 {
+    Unit const& unit = unit_;
+
     // Print control flow graph.
 
     if (unit_.isEmittingExtras())
@@ -53,7 +58,6 @@ void AnceCompiler::compile(std::filesystem::path const& ilr, std::filesystem::pa
         std::ofstream               cfg_out(cfg_path);
         ControlFlowGraphPrinter     cfg_printer(cfg_out);
 
-        Unit const& unit = unit_;
         cfg_printer.visit(unit);
     }
 
@@ -64,13 +68,21 @@ void AnceCompiler::compile(std::filesystem::path const& ilr, std::filesystem::pa
     CompileTimeBuild   cmp_build(unit_, runtime_, native_build_);
     CompileTimeBuilder cmp_builder(cmp_build);
 
+    try
+    {
+        cmp_builder.visit(unit);
+        assert(cmp_build.allSourceLocationsPopped());
+    }
+    catch (CompileTimeError const& e)
+    {
+        validation_logger.logError(e.message(), e.location());
+        return;
+    }
+
     if (unit_.isUsingRuntime()) runtime_.init(native_build_);
 
-    Unit const& unit = unit_;
-    cmp_builder.visit(unit);
     builder.visit(unit);
-
-    assert(native_build_.allDebugLocationsPopped());// Every setDebugLocation must be ended with a resetDebugLocation!
+    assert(native_build_.allSourceLocationsPopped());
 
     // Prepare entry and exit functions.
 
@@ -149,7 +161,10 @@ void AnceCompiler::compile(std::filesystem::path const& ilr, std::filesystem::pa
         std::error_code      ec;
         llvm::raw_fd_ostream out_stream(ilr.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
 
-        if (ec) { std::cerr << "IO error while creating IR file stream: " << ec.message() << std::endl; }
+        if (ec)
+        {
+            std::cerr << "ance: internal error: IO error while creating IR file stream: " << ec.message() << std::endl;
+        }
 
         module_.print(out_stream, nullptr);
     }
@@ -160,7 +175,11 @@ void AnceCompiler::compile(std::filesystem::path const& ilr, std::filesystem::pa
         std::error_code      ec;
         llvm::raw_fd_ostream file(obj.string(), ec, llvm::sys::fs::OpenFlags::OF_None);
 
-        if (ec) { std::cerr << "IO error while creating object file stream: " << ec.message() << std::endl; }
+        if (ec)
+        {
+            std::cerr << "ance: internal error: IO error while creating object file stream: " << ec.message()
+                      << std::endl;
+        }
 
         llvm::ModuleSummaryIndex* index = nullptr;
         if (opt_level != llvm::OptimizationLevel::O0)

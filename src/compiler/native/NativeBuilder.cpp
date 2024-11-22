@@ -11,13 +11,13 @@ NativeBuilder::NativeBuilder(NativeBuild& native_build) : native_build_(native_b
 void NativeBuilder::preVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable)
 {
     auto const* located = dynamic_cast<lang::Located const*>(&visitable);
-    if (located != nullptr) { native_build_.setDebugLocation(located->location(), located->scope()); }
+    if (located != nullptr) { native_build_.pushSourceLocation(located->location(), located->scope()); }
 }
 
 void NativeBuilder::postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable)
 {
     auto const* located = dynamic_cast<lang::Located const*>(&visitable);
-    if (located != nullptr) { native_build_.resetDebugLocation(); }
+    if (located != nullptr) { native_build_.popSourceLocation(); }
 }
 
 Execution& NativeBuilder::exec()

@@ -148,7 +148,10 @@ void lang::IntegerType::execRequestedOverload(lang::Type const&         paramete
 
                             Shared<lang::Value> fits =
                                 ctx.exec().performOperator(lang::BinaryOperator::BITWISE_AND, fits_min, fits_max);
-                            ctx.exec().runtime().execAssert(fits, error_message, ctx.exec());
+                            ctx.exec().runtime().execAssert(fits,
+                                                            error_message,
+                                                            ctx.exec().getCurrentSourceLocation(),
+                                                            ctx.exec());
                         }
                         else
                         {
@@ -159,7 +162,10 @@ void lang::IntegerType::execRequestedOverload(lang::Type const&         paramete
                                 ctx.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL,
                                                            original,
                                                            max_value);
-                            ctx.exec().runtime().execAssert(fits, error_message, ctx.exec());
+                            ctx.exec().runtime().execAssert(fits,
+                                                            error_message,
+                                                            ctx.exec().getCurrentSourceLocation(),
+                                                            ctx.exec());
                         }
                     }
                 }
@@ -172,7 +178,10 @@ void lang::IntegerType::execRequestedOverload(lang::Type const&         paramete
 
                         Shared<lang::Value> fits =
                             ctx.exec().performOperator(lang::BinaryOperator::LESS_THAN_OR_EQUAL, original, max_value);
-                        ctx.exec().runtime().execAssert(fits, error_message, ctx.exec());
+                        ctx.exec().runtime().execAssert(fits,
+                                                        error_message,
+                                                        ctx.exec().getCurrentSourceLocation(),
+                                                        ctx.exec());
                     }
                 }
                 else// this is unsigned and original is signed.
@@ -193,7 +202,10 @@ void lang::IntegerType::execRequestedOverload(lang::Type const&         paramete
                         fits = ctx.exec().performOperator(lang::BinaryOperator::BITWISE_AND, fits, fits_max);
                     }
 
-                    ctx.exec().runtime().execAssert(fits, error_message, ctx.exec());
+                    ctx.exec().runtime().execAssert(fits,
+                                                    error_message,
+                                                    ctx.exec().getCurrentSourceLocation(),
+                                                    ctx.exec());
                 }
             }
 

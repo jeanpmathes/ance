@@ -993,7 +993,7 @@ Shared<lang::Value> NativeBuild::computeElementPointer(Shared<lang::Value> seque
 
         Shared<lang::Value> truth = makeShared<WrappedContentValue>(ctx().getBooleanType(), in_bounds);
 
-        runtime().execAssert(truth, "Index out of bounds at " + getLocationString(), *this);
+        runtime().execAssert(truth, "Index out of bounds", getCurrentSourceLocation(), *this);
     }
 
     lang::Type const& ptr_type    = ctx().getPointerType(element_type.value());
@@ -1787,7 +1787,7 @@ NativeBuild::NativeType& NativeBuild::getNativeType(lang::Type const& type)
     return types_[&type];
 }
 
-void NativeBuild::setDebugLocation(lang::Location location, lang::Scope const& scope)
+void NativeBuild::pushSourceLocation(lang::Location location, lang::Scope const& scope)
 {
     debug_loc_stack_.push(current_debug_location_);
 
@@ -1797,7 +1797,7 @@ void NativeBuild::setDebugLocation(lang::Location location, lang::Scope const& s
     current_debug_location_.di_location = ir().getCurrentDebugLocation();
 }
 
-void NativeBuild::resetDebugLocation()
+void NativeBuild::popSourceLocation()
 {
     current_debug_location_ = debug_loc_stack_.top();
     debug_loc_stack_.pop();
@@ -1805,12 +1805,12 @@ void NativeBuild::resetDebugLocation()
     ir().SetCurrentDebugLocation(current_debug_location_.di_location);
 }
 
-bool NativeBuild::allDebugLocationsPopped()
+bool NativeBuild::allSourceLocationsPopped()
 {
     return debug_loc_stack_.empty();
 }
 
-std::string NativeBuild::getLocationString()
+lang::Location NativeBuild::getCurrentSourceLocation()
 {
-    return current_debug_location_.location.toString(*this);
+    return current_debug_location_.location;
 }

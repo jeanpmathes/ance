@@ -1734,22 +1734,22 @@ std::filesystem::path CompileTimeBuild::getSourceFilePath(lang::Location locatio
     return native_.getSourceFilePath(location);
 }
 
-void CompileTimeBuild::setDebugLocation(lang::Location location, lang::Scope const& scope)
+void CompileTimeBuild::pushSourceLocation(lang::Location location, lang::Scope const&)
 {
-    native_.setDebugLocation(location, scope);
+    source_locations_.push(location);
 }
 
-void CompileTimeBuild::resetDebugLocation()
+void CompileTimeBuild::popSourceLocation()
 {
-    native_.resetDebugLocation();
+    source_locations_.pop();
 }
 
-bool CompileTimeBuild::allDebugLocationsPopped()
+bool CompileTimeBuild::allSourceLocationsPopped()
 {
-    return native_.allDebugLocationsPopped();
+    return source_locations_.empty();
 }
 
-std::string CompileTimeBuild::getLocationString()
+lang::Location CompileTimeBuild::getCurrentSourceLocation()
 {
-    return native_.getLocationString();
+    return source_locations_.top();
 }

@@ -35,7 +35,7 @@ Shared<lang::Value> lang::IndirectType::execIndirection(Shared<lang::Value> valu
     if (exec.ctx().isContainingRuntime())
     {
         Shared<lang::Value> not_null = exec.computeAddressIsNotNull(value);
-        exec.runtime().execAssert(not_null, "Null pointer dereference at " + exec.getLocationString(), exec);
+        exec.runtime().execAssert(not_null, "Null pointer dereference", exec.getCurrentSourceLocation(), exec);
     }
 
     return exec.computeReferenceFromPointer(value);

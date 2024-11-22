@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_ASSERTION_H_
 #define ANCE_SRC_LANG_STATEMENT_ASSERTION_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include "lang/Element.h"
 
@@ -11,7 +11,7 @@ class Expression;
  * A statement that asserts a condition.
  */
 class Assertion
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<Assertion, ANCE_CONSTRUCTS>
 {
   public:

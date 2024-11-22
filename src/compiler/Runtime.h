@@ -99,9 +99,13 @@ class Runtime
      * Build an assertion. Only performed when assertions are enabled.
      * @param value The boolean value to assert.
      * @param description The description of the assertion.
+     * @param location The location of the assertion.
      * @param exec The current execution context.
      */
-    void execAssert(Shared<lang::Value> value, std::string const& description, Execution& exec);
+    void execAssert(Shared<lang::Value> value,
+                    std::string const&  description,
+                    lang::Location      location,
+                    Execution&          exec);
 
     /**
      * Build an abort.
@@ -111,7 +115,7 @@ class Runtime
     void buildAbort(std::string const& reason, Execution& exec);
 
   private:
-    bool is_initialized_ {false};
+    bool is_building_for_runtime {false};
 
     Shared<lang::Value> allocateAutomatic(lang::Type const& type, Shared<lang::Value> count, Execution& exec);
 

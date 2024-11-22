@@ -123,10 +123,10 @@ class CompileTimeBuild : public Execution
     Shared<lang::Constant> getGlobalVariableValue(lang::GlobalVariable const& variable, Execution& exec);
 
     std::filesystem::path getSourceFilePath(lang::Location location) override;
-    void                  setDebugLocation(lang::Location location, lang::Scope const& scope) override;
-    void                  resetDebugLocation() override;
-    bool                  allDebugLocationsPopped() override;
-    std::string           getLocationString() override;
+    void                  pushSourceLocation(lang::Location location, lang::Scope const& scope) override;
+    void                  popSourceLocation() override;
+    bool                  allSourceLocationsPopped() override;
+    lang::Location        getCurrentSourceLocation() override;
 
     struct Address {
         friend class CompileTimeBuild;
@@ -211,6 +211,8 @@ class CompileTimeBuild : public Execution
     std::map<std::u32string, Shared<CompileTimeValue>> codepoint_strings_;
     std::map<std::string, Shared<CompileTimeValue>>    byte_strings_;
     std::map<std::string, Shared<CompileTimeValue>>    c_strings_;
+
+    std::stack<lang::Location> source_locations_;
 
     Memory    global_memory_;
     Variables global_variables_;

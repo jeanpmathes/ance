@@ -156,10 +156,10 @@ class NativeBuild : public Execution
 
     std::filesystem::path getSourceFilePath(lang::Location location) override;
 
-    void        setDebugLocation(lang::Location location, lang::Scope const& scope) override;
-    void        resetDebugLocation() override;
-    bool        allDebugLocationsPopped() override;
-    std::string getLocationString() override;
+    void           pushSourceLocation(lang::Location location, lang::Scope const& scope) override;
+    void           popSourceLocation() override;
+    bool           allSourceLocationsPopped() override;
+    lang::Location getCurrentSourceLocation() override;
 
   private:
     NativeBuilder*  visitor_ = nullptr;

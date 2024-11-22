@@ -482,10 +482,9 @@ std::any Builder::visit(lang::CodeBlock const&)
 std::any Builder::visit(Assertion const& assertion)
 {
     Shared<lang::Value> condition = getV(assertion.condition());
-    std::string const   message =
-        std::format("Assertion failed at [{}] {}", exec().unit().getName(), exec().getLocationString());
+    std::string const   message   = std::format("Assertion failed in [{}]", exec().unit().getName());
 
-    exec().runtime().execAssert(condition, message, exec());
+    exec().runtime().execAssert(condition, message, assertion.condition().location(), exec());
 
     return {};
 }

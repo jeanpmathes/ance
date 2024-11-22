@@ -17,6 +17,23 @@
 class Unit;
 class SourceTree;
 
+class CompileTimeError : public std::runtime_error
+{
+  public:
+    explicit CompileTimeError(std::string const& message, lang::Location location)
+        : std::runtime_error(message)
+        , message_(message)
+        , location_(location)
+    {}
+
+    [[nodiscard]] std::string const&    message() const { return message_; }
+    [[nodiscard]] lang::Location const& location() const { return location_; }
+
+  private:
+    std::string    message_;
+    lang::Location location_;
+};
+
 /**
  * Represents the compile step, which transforms a unit into a llvm module.
  */
@@ -28,14 +45,17 @@ class AnceCompiler
      * @param tree The source tree.
      * @param target_descriptor The target descriptor.
      */
-    AnceCompiler(SourceTree& tree, TargetDescriptor const& target_descriptor);
+    AnceCompiler(SourceTree& tree, TargetDescriptor target_descriptor);
 
     /**
      * Compile the application, emitting an object file and potentially an IR file.
      * @param ilr The path at which to emit the IR file.
      * @param obj The path at which to emit the object file.
+     * @param validation_logger The logger for validation messages.
      */
-    void compile(std::filesystem::path const& ilr, std::filesystem::path const& obj);
+    void compile(std::filesystem::path const& ilr,
+                 std::filesystem::path const& obj,
+                 ValidationLogger&            validation_logger);
 
   private:
     llvm::Function* buildInit();

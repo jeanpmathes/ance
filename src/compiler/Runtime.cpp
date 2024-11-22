@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+#include "compiler/AnceCompiler.h"
+#include "compiler/cmp/CompileTimeValue.h"
 #include "lang/ApplicationVisitor.h"
 #include "lang/construct/Value.h"
 #include "lang/type/BooleanType.h"
@@ -61,7 +63,7 @@ void Runtime::init(Execution& exec)
 
     for (lang::Function* function : functions_) { function->registerDeclaration(exec); }
 
-    is_initialized_ = true;
+    is_building_for_runtime = true;
 }
 
 bool Runtime::isNameReserved(lang::Identifier const& name)
@@ -74,7 +76,7 @@ Shared<lang::Value> Runtime::allocate(Allocator                     allocation,
                                       Optional<Shared<lang::Value>> count,
                                       Execution&                    exec)
 {
-    assert(is_initialized_);
+    assert(is_building_for_runtime);
 
     lang::Type const& return_type = count.hasValue() ? exec.ctx().getBufferType(type) : exec.ctx().getPointerType(type);
 
@@ -103,7 +105,7 @@ Shared<lang::Value> Runtime::allocate(Allocator                     allocation,
 
 void Runtime::deleteDynamic(Shared<lang::Value> address, bool delete_buffer, Execution& exec)
 {
-    assert(is_initialized_);
+    assert(is_building_for_runtime);
 
     assert(delete_buffer || address->type().isPointerType());// Not deleting a buffer implies a pointer type.
     assert(!delete_buffer || address->type().isBufferType());// Deleting a buffer implies a buffer type.
@@ -136,24 +138,35 @@ void Runtime::deleteDynamic(Shared<lang::Value> address, bool delete_buffer, Exe
     delete_dynamic_->execCall(parameters, exec);
 }
 
-void Runtime::execAssert(Shared<lang::Value> value, std::string const& description, Execution& exec)
+void Runtime::execAssert(Shared<lang::Value> value,
+                         std::string const&  description,
+                         lang::Location      location,
+                         Execution&          exec)
 {
-    assert(is_initialized_);
-
     if (!exec.unit().isAssertionsEnabled()) return;
 
-    Shared<lang::Value> truth_value     = exec.performBooleanCollapse(value);
-    Shared<lang::Value> description_ptr = exec.getCString(description);
+    if (is_building_for_runtime)
+    {
+        Shared<lang::Value> truth_value     = exec.performBooleanCollapse(value);
+        Shared<lang::Value> description_ptr = exec.getCString(description + " at " + location.toString(exec));
 
-    std::vector<Shared<lang::Value>> parameters;
-    parameters.emplace_back(truth_value);
-    parameters.emplace_back(description_ptr);
-    assertion_->execCall(parameters, exec);
+        std::vector<Shared<lang::Value>> parameters;
+        parameters.emplace_back(truth_value);
+        parameters.emplace_back(description_ptr);
+        assertion_->execCall(parameters, exec);
+    }
+    else
+    {
+        Shared<lang::Value> truth_value = exec.performBooleanCollapse(value);
+        bool const          truth       = truth_value.cast<cmp::BooleanValue>()->value();
+
+        if (!truth) { throw CompileTimeError(description, location); }
+    }
 }
 
 void Runtime::buildAbort(std::string const& reason, Execution& exec)
 {
-    assert(is_initialized_);
+    assert(is_building_for_runtime);
 
     Shared<lang::Value> reason_ptr = exec.getCString(reason);
 

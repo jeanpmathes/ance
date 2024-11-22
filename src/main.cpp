@@ -17,9 +17,13 @@
 #include "lang/ApplicationVisitor.h"
 #include "validation/ValidationLogger.h"
 
-static bool emit(SourceTree& tree, ValidationLogger& validation_logger, std::ostream& out, std::string const& step_name)
+static bool emit(SourceTree&        tree,
+                 ValidationLogger&  validation_logger,
+                 std::ostream&      out,
+                 std::string const& category_name,
+                 std::string const& step_name)
 {
-    validation_logger.emitMessages(tree.getSourceFiles(), out, step_name);
+    validation_logger.emitMessages(tree.getSourceFiles(), out, category_name, step_name);
 
     if (validation_logger.errorCount() != 0
         || (tree.unit().isWarningsAsErrors() && validation_logger.warningCount() != 0))
@@ -27,7 +31,7 @@ static bool emit(SourceTree& tree, ValidationLogger& validation_logger, std::ost
         bool const failed_by_warning = validation_logger.errorCount() == 0;
 
         out << std::endl;
-        out << "ance: validation: Failed";
+        out << "ance: " << category_name << ": Failed";
         if (failed_by_warning) out << " (by warning)";
         out << std::endl;
 
@@ -54,7 +58,7 @@ static bool validateTree(SourceTree& tree, ValidationLogger& validation_logger, 
 
     tree.unit().validate(validation_logger);
 
-    return emit(tree, validation_logger, out, "tree");
+    return emit(tree, validation_logger, out, "validation", "tree");
 }
 
 /**
@@ -64,7 +68,7 @@ static bool validateFlow(SourceTree& tree, ValidationLogger& validation_logger, 
 {
     tree.unit().validateFlow(validation_logger);
 
-    return emit(tree, validation_logger, out, "flow");
+    return emit(tree, validation_logger, out, "validation", "flow");
 }
 
 static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir,
@@ -76,6 +80,7 @@ static std::filesystem::path getResultPath(std::filesystem::path const& bin_dir,
 
 static bool build(SourceTree&                  tree,
                   TargetDescriptor const&      target_descriptor,
+                  ValidationLogger&            validation_logger,
                   std::filesystem::path const& obj_dir,
                   std::filesystem::path const& bin_dir,
                   std::ostream&                out)
@@ -90,7 +95,10 @@ static bool build(SourceTree&                  tree,
     std::filesystem::path const obj = obj_dir / (tree.unit().getName() + ".obj");
     std::filesystem::path const res = getResultPath(bin_dir, tree.unit(), tree.unit().getTarget());
 
-    compiler.compile(ilr, obj);
+    compiler.compile(ilr, obj, validation_logger);
+
+    bool const ok = emit(tree, validation_logger, out, "cmp", "");
+    if (!ok) return false;
 
     tree.unit().exportPackage(bin_dir);
 
@@ -166,7 +174,7 @@ static Optional<Owned<Project>> prepareProject(std::filesystem::path const&     
         ok = validateFlow(tree, validation_logger, out);
         if (!ok) return std::nullopt;
 
-        ok = build(tree, target_descriptor, project_definition_obj, project_definition_bin, out);
+        ok = build(tree, target_descriptor, validation_logger, project_definition_obj, project_definition_bin, out);
         if (!ok) return std::nullopt;
     }
 
@@ -242,7 +250,7 @@ static Optional<bool> buildProject(Project&                                     
         ok = validateFlow(tree, info.validation_logger, info.out);
         if (!ok) return false;
 
-        ok = build(tree, info.target_descriptor, obj_dir, bin_dir, info.out);
+        ok = build(tree, info.target_descriptor, info.validation_logger, obj_dir, bin_dir, info.out);
         if (!ok) return false;
 
         info.out << "ance: build: Success";
