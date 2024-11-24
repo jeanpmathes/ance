@@ -8,6 +8,18 @@ CompileTimeBuilder::CompileTimeBuilder(CompileTimeBuild& compile_time_build) : c
     compile_time_build_.setActiveVisitor(this);
 }
 
+void CompileTimeBuilder::preVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable)
+{
+    auto const* located = dynamic_cast<lang::Located const*>(&visitable);
+    if (located != nullptr) { compile_time_build_.pushSourceLocation(located->location(), located->scope()); }
+}
+
+void CompileTimeBuilder::postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable)
+{
+    auto const* located = dynamic_cast<lang::Located const*>(&visitable);
+    if (located != nullptr) { compile_time_build_.popSourceLocation(); }
+}
+
 bool CompileTimeBuilder::isDescriptionAccepted(lang::Description const& description) const
 {
     return description.isCMP();

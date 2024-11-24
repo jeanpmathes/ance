@@ -17,6 +17,9 @@ class CompileTimeBuilder : public Builder
      */
     explicit CompileTimeBuilder(CompileTimeBuild& compile_time_build);
 
+    void preVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable) override;
+    void postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable) override;
+
     [[nodiscard]] bool isDescriptionAccepted(lang::Description const& description) const override;
 
   protected:
