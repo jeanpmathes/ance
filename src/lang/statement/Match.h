@@ -1,7 +1,8 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_MATCH_H_
 #define ANCE_SRC_LANG_STATEMENT_MATCH_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
+
 #include <vector>
 
 #include "lang/Element.h"
@@ -100,7 +101,7 @@ class Case : public lang::Element<Case, ANCE_CONSTRUCTS>
  * A match control-flow statement. It matches an expression against a list of cases.
  */
 class Match
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<Match, ANCE_CONSTRUCTS>
 {
   public:

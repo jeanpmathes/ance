@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_CONTINUE_H_
 #define ANCE_SRC_LANG_STATEMENT_CONTINUE_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include "lang/Element.h"
 
@@ -11,7 +11,7 @@ class Expression;
  * A statement to continue a loop.
  */
 class Continue
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<Continue, ANCE_CONSTRUCTS>
 {
   public:

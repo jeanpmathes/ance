@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_LOOP_H_
 #define ANCE_SRC_LANG_STATEMENT_LOOP_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include <memory>
 
@@ -13,7 +13,7 @@ class Expression;
  * A loop control flow statement.
  */
 class Loop
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<Loop, ANCE_CONSTRUCTS>
 {
   public:

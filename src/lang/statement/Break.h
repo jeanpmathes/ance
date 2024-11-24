@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_BREAK_H_
 #define ANCE_SRC_LANG_STATEMENT_BREAK_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include "lang/Element.h"
 
@@ -11,7 +11,7 @@ class Expression;
  * A statement to break a loop.
  */
 class Break
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<Break, ANCE_CONSTRUCTS>
 {
   public:

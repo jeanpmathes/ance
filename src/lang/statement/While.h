@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_WHILE_H_
 #define ANCE_SRC_LANG_STATEMENT_WHILE_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include <memory>
 
@@ -13,7 +13,7 @@ class Expression;
  * A while control flow statement.
  */
 class While
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<While, ANCE_CONSTRUCTS>
 {
   public:

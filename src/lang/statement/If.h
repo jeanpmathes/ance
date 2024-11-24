@@ -1,7 +1,7 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_IF_H_
 #define ANCE_SRC_LANG_STATEMENT_IF_H_
 
-#include "Statement.h"
+#include "CompileTimeStatement.h"
 
 #include "lang/Element.h"
 
@@ -13,7 +13,7 @@ class Expression;
  * An if-else control flow statement.
  */
 class If
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<If, ANCE_CONSTRUCTS>
 {
   public:

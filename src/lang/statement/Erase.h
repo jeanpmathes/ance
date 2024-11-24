@@ -1,9 +1,9 @@
 #ifndef ANCE_SRC_LANG_STATEMENT_ERASE_H_
 #define ANCE_SRC_LANG_STATEMENT_ERASE_H_
 
-#include "Statement.h"
-
+#include "CompileTimeStatement.h"
 #include "lang/Element.h"
+
 #include "lang/construct/Variable.h"
 #include "lang/utility/ResolvingHandle.h"
 
@@ -13,7 +13,7 @@ class Expression;
  * The erase statement removes a defined variable.
  */
 class Erase
-    : public Statement
+    : public CompileTimeStatement
     , public lang::Element<Erase, ANCE_CONSTRUCTS>
 {
   public:
