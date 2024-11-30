@@ -13,6 +13,23 @@ class CompileTimeValue;
 
 class NativeBuild;
 
+class CompileTimeError : public std::runtime_error
+{
+  public:
+    explicit CompileTimeError(std::string const& message, lang::Location location)
+        : std::runtime_error(message)
+        , message_(message)
+        , location_(location)
+    {}
+
+    [[nodiscard]] std::string const&    message() const { return message_; }
+    [[nodiscard]] lang::Location const& location() const { return location_; }
+
+  private:
+    std::string    message_;
+    lang::Location location_;
+};
+
 class CompileTimeBuild : public Execution
 {
   public:
@@ -187,6 +204,8 @@ class CompileTimeBuild : public Execution
     Memory& memory(Address::Location location);
 
   private:
+    constexpr static size_t RECURSION_LIMIT = 100;
+
     lang::Context& context_;
     NativeBuild&   native_;
 

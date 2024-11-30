@@ -17,23 +17,6 @@
 class Unit;
 class SourceTree;
 
-class CompileTimeError : public std::runtime_error
-{
-  public:
-    explicit CompileTimeError(std::string const& message, lang::Location location)
-        : std::runtime_error(message)
-        , message_(message)
-        , location_(location)
-    {}
-
-    [[nodiscard]] std::string const&    message() const { return message_; }
-    [[nodiscard]] lang::Location const& location() const { return location_; }
-
-  private:
-    std::string    message_;
-    lang::Location location_;
-};
-
 /**
  * Represents the compile step, which transforms a unit into a llvm module.
  */

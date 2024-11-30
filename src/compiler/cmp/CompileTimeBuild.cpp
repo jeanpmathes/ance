@@ -377,6 +377,11 @@ void CompileTimeBuild::defineFunctionBody(lang::Function const& function, std::f
 Shared<lang::Value> CompileTimeBuild::performFunctionCall(lang::Function const&            function,
                                                           std::vector<Shared<lang::Value>> arguments)
 {
+    if (fns_.size() >= RECURSION_LIMIT)
+    {
+        throw CompileTimeError("Recursion limit reached", getCurrentSourceLocation());
+    }
+
     FunctionInformation& function_information = getFunctionInformation(function);
 
     std::vector<Shared<lang::Value>> arguments_content;
