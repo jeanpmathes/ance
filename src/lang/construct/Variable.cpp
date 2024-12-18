@@ -26,7 +26,7 @@ lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang:
                                                      bool                              is_import,
                                                      lang::Function const*             init,
                                                      lang::Assigner                    assigner,
-                                                     bool                              is_cmp,
+                                                     lang::CMP                         cmp,
                                                      lang::Location                    location)
 {
     Owned<lang::GlobalVariable> global_variable     = makeOwned<lang::GlobalVariable>(self(),
@@ -37,7 +37,7 @@ lang::GlobalVariable* lang::Variable::defineAsGlobal(lang::ResolvingHandle<lang:
                                                                                   is_import,
                                                                                   init,
                                                                                   assigner,
-                                                                                  is_cmp,
+                                                                                  cmp,
                                                                                   location);
     auto*                       global_variable_ptr = &*global_variable;
 
@@ -102,6 +102,12 @@ bool lang::Variable::isFinal() const
 {
     assert(definition_.hasValue());
     return definition_.value()->isFinal();
+}
+
+lang::CMP lang::Variable::cmp() const
+{
+    assert(definition_.hasValue());
+    return definition_.value()->cmp();
 }
 
 void lang::Variable::registerDeclaration(Execution& exec) const

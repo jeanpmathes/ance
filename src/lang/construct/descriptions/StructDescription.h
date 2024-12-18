@@ -37,7 +37,7 @@ namespace lang
         [[nodiscard]] Identifier const&                                       name() const override;
         [[nodiscard]] std::vector<std::reference_wrapper<lang::Member const>> members() const;
         [[nodiscard]] bool                                                    isOverloadAllowed() const override;
-        [[nodiscard]] bool                                                    isCMP() const override;
+        [[nodiscard]] lang::CMP                                               cmp() const override;
 
         [[nodiscard]] lang::Type const& type() const;
 

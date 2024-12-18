@@ -62,7 +62,7 @@ namespace lang
          * @param is_import Whether the variable is imported.
          * @param init The function used for initialization, nullptr if there is none.
          * @param assigner The assigner used for initialization.
-         * @param is_cmp Whether the variable is a compile-time variable.
+         * @param cmp The compile-time execution mode.
          * @param location The source location.
          * @return The global variable.
          */
@@ -73,7 +73,7 @@ namespace lang
                                              bool                              is_import,
                                              lang::Function const*             init,
                                              lang::Assigner                    assigner,
-                                             bool                              is_cmp,
+                                             lang::CMP                         cmp,
                                              lang::Location                    location);
 
         /**
@@ -129,6 +129,8 @@ namespace lang
          * @return Whether it is final.
          */
         [[nodiscard]] bool isFinal() const;
+
+        [[nodiscard]] lang::CMP cmp() const override;
 
         /**
          * Build the variable declaration which prepares the storage.

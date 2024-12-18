@@ -44,9 +44,9 @@ bool lang::StructDescription::isOverloadAllowed() const
     return false;
 }
 
-bool lang::StructDescription::isCMP() const
+lang::CMP lang::StructDescription::cmp() const
 {
-    return true;
+    return lang::CMP::OPTIONAL_CMP;
 }
 
 lang::Type const& lang::StructDescription::type() const

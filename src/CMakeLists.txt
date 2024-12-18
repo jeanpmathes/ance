@@ -23,6 +23,7 @@ set(ERROR_OPTIONS
     -Wno-exit-time-destructors
     -Wno-global-constructors
     -Wno-unsafe-buffer-usage
+    -Wno-switch-default
     -Wno-switch-enum)
 
 target_compile_options(ance PRIVATE /EHsc -MDd ${ERROR_OPTIONS})

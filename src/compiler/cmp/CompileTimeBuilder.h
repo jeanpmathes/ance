@@ -21,6 +21,7 @@ class CompileTimeBuilder : public Builder
     void postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable) override;
 
     [[nodiscard]] bool isDescriptionAccepted(lang::Description const& description) const override;
+    [[nodiscard]] bool isEntityAccepted(lang::Entity const& entity) const override;
 
   protected:
     Execution& exec() override;

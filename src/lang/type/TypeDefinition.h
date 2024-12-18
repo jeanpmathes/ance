@@ -68,7 +68,7 @@ namespace lang
         [[nodiscard]] lang::Location    getDefinitionLocation() const;
         [[nodiscard]] virtual bool      isCustom() const;
         [[nodiscard]] virtual bool      isImported() const;
-        [[nodiscard]] virtual bool      isCMP() const;
+        [[nodiscard]] virtual lang::CMP cmp() const;
 
         [[nodiscard]] virtual StateCount getStateCount() const = 0;
 

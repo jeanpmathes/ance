@@ -17,12 +17,12 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
                                      bool                                  is_import,
                                      lang::Function const*                 init,
                                      Assigner                              assigner,
-                                     bool                                  is_cmp,
+                                     lang::CMP                             cmp,
                                      lang::Location                        location)
     : VariableDefinition(self, type, type_location, containing_scope, assigner.isFinal(), location)
     , access_(access)
     , is_import_(is_import)
-    , is_cmp_(is_cmp)
+    , cmp_(cmp)
     , init_(init)
     , assigner_(assigner)
 {
@@ -31,11 +31,6 @@ lang::GlobalVariable::GlobalVariable(lang::ResolvingHandle<lang::Variable> self,
 lang::AccessModifier lang::GlobalVariable::access() const
 {
     return access_;
-}
-
-bool lang::GlobalVariable::isCMP() const
-{
-    return is_cmp_;
 }
 
 bool lang::GlobalVariable::isImported() const
@@ -53,6 +48,11 @@ lang::Function const* lang::GlobalVariable::initializer() const
     return init_;
 }
 
+lang::CMP lang::GlobalVariable::cmp() const
+{
+    return cmp_;
+}
+
 void lang::GlobalVariable::registerDeclaration(Execution& exec) const
 {
     exec.declareGlobalVariable(*this);
@@ -65,7 +65,7 @@ void lang::GlobalVariable::registerDefinition(Execution& exec) const
 
 void lang::GlobalVariable::performInitialization(Execution& exec) const
 {
-    if (init_ != nullptr && !isCMP()) { init_->execCall({}, exec); }
+    if (init_ != nullptr && !cmp().isCompileTime()) { init_->execCall({}, exec); }
 }
 
 void lang::GlobalVariable::performFinalization(Execution& exec) const

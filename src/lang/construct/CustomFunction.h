@@ -35,7 +35,7 @@ namespace lang
       public:
         CustomFunction(Function&                            function,
                        lang::AccessModifier                 access,
-                       bool                                 is_cmp,
+                       lang::CMP                            cmp,
                        lang::ResolvingHandle<lang::Type>    return_type,
                        lang::Location                       return_type_location,
                        std::vector<Shared<lang::Parameter>> parameters,

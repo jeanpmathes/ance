@@ -23,6 +23,9 @@ class NativeBuilder : public Builder
     void preVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable) override;
     void postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable) override;
 
+    bool isDescriptionAccepted(lang::Description const& description) const override;
+    bool isEntityAccepted(lang::Entity const& entity) const override;
+
   protected:
     Execution& exec() override;
 

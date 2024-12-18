@@ -109,7 +109,7 @@ namespace lang
          */
         void define(Owned<lang::TypeDefinition> definition);
 
-        [[nodiscard]] bool isCMP() const override;
+        [[nodiscard]] lang::CMP cmp() const override;
 
         /**
          * Get the number of states for this type.

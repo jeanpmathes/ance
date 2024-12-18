@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "lang/CMP.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/OwningHandle.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -31,10 +32,10 @@ namespace lang
         [[nodiscard]] virtual bool              isDefined() const = 0;
 
         /**
-         * Whether this can be called at compile time.
-         * @return True if this can be called at compile time.
+         * Get the compile-time execution mode of this callable.
+         * @return The compile-time execution mode.
          */
-        [[nodiscard]] virtual bool isCMP() const;
+        [[nodiscard]] virtual lang::CMP cmp() const = 0;
 
         /**
          * Get the name of this callable with helpful annotations. Useful for validation messages.

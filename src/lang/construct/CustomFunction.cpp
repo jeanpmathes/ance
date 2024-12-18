@@ -12,7 +12,7 @@
 
 lang::CustomFunction::CustomFunction(Function&                            function,
                                      lang::AccessModifier                 access,
-                                     bool                                 is_cmp,
+                                     lang::CMP                            cmp,
                                      lang::ResolvingHandle<lang::Type>    return_type,
                                      lang::Location                       return_type_location,
                                      std::vector<Shared<lang::Parameter>> parameters,
@@ -22,7 +22,7 @@ lang::CustomFunction::CustomFunction(Function&                            functi
                                      lang::Location                       definition_location)
     : lang::StatementFunction(function,
                               access,
-                              is_cmp,
+                              cmp,
                               return_type,
                               return_type_location,
                               std::move(parameters),

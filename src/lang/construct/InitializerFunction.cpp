@@ -7,11 +7,12 @@
 
 lang::InitializerFunction::InitializerFunction(lang::Function& function,
                                                Statement&      initializer,
+                                               lang::CMP                         cmp,
                                                lang::ResolvingHandle<lang::Type> return_type,
                                                lang::Scope&    containing_scope)
     : lang::StatementFunction(function,
                               lang::AccessModifier::PRIVATE_ACCESS,
-                              false,
+                              cmp,
                               return_type,
                               lang::Location::global(),
                               {},
@@ -22,12 +23,12 @@ lang::InitializerFunction::InitializerFunction(lang::Function& function,
 
 Owned<Statement> lang::InitializerFunction::makeInitializerBlock(lang::ResolvingHandle<lang::Variable> variable,
                                                                  lang::Assigner                        assigner,
-                                                                 bool                                  is_cmp,
+                                                                 lang::CMP                             cmp,
                                                                  Owned<Expression>                     initializer)
 {
     Owned<lang::CodeBlock> code = lang::CodeBlock::makeScoped(lang::Location::global());
 
-    if (is_cmp)
+    if (cmp.isCompileTime())
     {
         Owned<Statement> returning = makeOwned<Return>(std::move(initializer), lang::Location::global());
 

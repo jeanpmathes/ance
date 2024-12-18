@@ -47,9 +47,9 @@ void Statement::setScope(lang::Scope& scope)
     for (auto& substatement : substatements_) { substatement.get().setContainingScope(scope); }
 }
 
-bool Statement::isRootCMP() const
+lang::CMP Statement::rootCMP() const
 {
-    return false;
+    return lang::CMP::NO_CMP;
 }
 
 lang::Scope& Statement::scope()
@@ -62,21 +62,17 @@ lang::Scope const& Statement::scope() const
     return *containing_scope_;
 }
 
-bool Statement::isCMP() const
+lang::CMP Statement::cmp() const
 {
-    if (!isRootCMP()) return false;
+    lang::CMP result = rootCMP();
 
     for (Statement const& substatement : substatements_)
-    {
-        if (!substatement.isCMP()) return false;
-    }
+    { result = result & substatement.cmp(); }
 
     for (Expression const& subexpression : subexpressions_)
-    {
-        if (!subexpression.isCMP()) return false;
-    }
+    { result = result & subexpression.cmp(); }
 
-    return true;
+    return result;
 }
 
 lang::OrderedScope* Statement::getBlockScope()

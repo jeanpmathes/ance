@@ -58,9 +58,9 @@ bool lang::TypeDefinition::isImported() const
     return false;// Only custom types can be imported.
 }
 
-bool lang::TypeDefinition::isCMP() const
+lang::CMP lang::TypeDefinition::cmp() const
 {
-    return true;
+    return lang::CMP::OPTIONAL_CMP;
 }
 
 lang::ResolvingHandle<lang::Type> lang::TypeDefinition::clone(lang::Context&) const

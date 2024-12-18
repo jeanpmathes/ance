@@ -4,9 +4,9 @@
 #include "lang/construct/Function.h"
 #include "validation/ValidationLogger.h"
 
-bool lang::Callable::isCMP() const
+lang::CMP lang::Callable::cmp() const
 {
-    return false;
+    return CMP::NO_CMP;
 }
 
 std::string lang::Callable::getAnnotatedName(bool) const

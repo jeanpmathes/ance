@@ -10,7 +10,7 @@
 class CompileTimeStatement : public virtual Statement
 {
   public:
-    [[nodiscard]] bool isRootCMP() const override;
+    [[nodiscard]] lang::CMP rootCMP() const override;
 };
 
 #endif

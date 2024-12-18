@@ -66,7 +66,7 @@ std::any SourceVisitor::visitProjectFile(anceParser::ProjectFileContext* ctx)
 
     Owned<lang::FunctionDescription> description =
         makeOwned<lang::FunctionDescription>(lang::Accessibility::local(access),
-                                             false,
+                                             lang::CMP::NO_CMP,
                                              identifier,
                                              return_type,
                                              return_type_location,
@@ -94,7 +94,7 @@ std::any SourceVisitor::visitGlobal(anceParser::GlobalContext* ctx)
 std::any SourceVisitor::visitVariableDescription(anceParser::VariableDescriptionContext* ctx)
 {
     auto       access      = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
-    bool const is_cmp = ctx->COMPILETIME();
+    lang::CMP const cmp    = ctx->COMPILETIME() ? lang::CMP::OPTIONAL_CMP : lang::CMP::NO_CMP;
 
     Optional<lang::ResolvingHandle<lang::Type>> type;
     lang::Location                              type_location = lang::Location::global();
@@ -122,7 +122,7 @@ std::any SourceVisitor::visitVariableDescription(anceParser::VariableDescription
                                                                          lang::Accessibility::local(access),
                                                                          wrap(initial_value),
                                                                          assigner,
-                                                                         is_cmp,
+                                                                         cmp,
                                                                          location(ctx)));
 }
 
@@ -162,7 +162,7 @@ std::any SourceVisitor::visitMember(anceParser::MemberContext* ctx)
 std::any SourceVisitor::visitFunctionDescription(anceParser::FunctionDescriptionContext* ctx)
 {
     auto                              access     = std::any_cast<lang::AccessModifier>(visit(ctx->accessModifier()));
-    bool                              is_cmp     = ctx->COMPILETIME();
+    lang::CMP const                   cmp        = ctx->COMPILETIME() ? lang::CMP::OPTIONAL_CMP : lang::CMP::NO_CMP;
     lang::Identifier const            identifier = ident(ctx->IDENTIFIER());
     lang::ResolvingHandle<lang::Type> return_type =
         ctx->type() ? erasedCast<lang::ResolvingHandle<lang::Type>>(visit(ctx->type())) : context().getUnitType();
@@ -197,7 +197,7 @@ std::any SourceVisitor::visitFunctionDescription(anceParser::FunctionDescription
     }
 
     return static_cast<lang::Description*>(new lang::FunctionDescription(lang::Accessibility::local(access),
-                                                                         is_cmp,
+                                                                         cmp,
                                                                          identifier,
                                                                          return_type,
                                                                          return_type_location,

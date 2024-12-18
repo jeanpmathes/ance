@@ -22,7 +22,12 @@ void CompileTimeBuilder::postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visit
 
 bool CompileTimeBuilder::isDescriptionAccepted(lang::Description const& description) const
 {
-    return description.isCMP();
+    return description.cmp().isCompileTime();
+}
+
+bool CompileTimeBuilder::isEntityAccepted(lang::Entity const& entity) const
+{
+    return entity.cmp().isCompileTime();
 }
 
 Execution& CompileTimeBuilder::exec()

@@ -8,7 +8,7 @@
 #include "validation/ValidationLogger.h"
 
 lang::FunctionDescription::FunctionDescription(lang::Accessibility                  accessibility,
-                                               bool                                 is_cmp,
+                                               lang::CMP                            cmp,
                                                lang::Identifier                     name,
                                                lang::ResolvingHandle<lang::Type>    return_type,
                                                lang::Location                       return_type_location,
@@ -17,7 +17,7 @@ lang::FunctionDescription::FunctionDescription(lang::Accessibility              
                                                lang::Location                       declaration_location,
                                                lang::Location                       definition_location)
     : Description(accessibility)
-    , is_cmp_(is_cmp)
+    , cmp_(cmp)
     , name_(name)
     , return_type_(std::move(return_type))
     , return_type_location_(return_type_location)
@@ -29,7 +29,7 @@ lang::FunctionDescription::FunctionDescription(lang::Accessibility              
 
 lang::FunctionDescription::FunctionDescription(bool from_public_import)
     : Description(lang::Accessibility::imported(from_public_import))
-    , is_cmp_(false)
+    , cmp_(lang::CMP::NO_CMP)
     , name_(lang::Identifier::empty())
     , return_type_(lang::Type::getUndefined())
     , return_type_location_(lang::Location::global())
@@ -49,9 +49,9 @@ bool lang::FunctionDescription::isOverloadAllowed() const
     return true;
 }
 
-bool lang::FunctionDescription::isCMP() const
+lang::CMP lang::FunctionDescription::cmp() const
 {
-    return is_cmp_;
+    return cmp_;
 }
 
 void lang::FunctionDescription::setUp()
@@ -61,7 +61,7 @@ void lang::FunctionDescription::setUp()
     if (code_.hasValue())
     {
         function_.value()->defineAsCustom(access().modifier(),
-                                          is_cmp_,
+                                          cmp_,
                                           return_type_,
                                           return_type_location_,
                                           parameters_,
@@ -232,7 +232,7 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
 
         if (code.validate(validation_logger))
         {
-            if (is_cmp_ && !code.isCMP())
+            if (cmp_.isCompileTime() && !code.cmp().isCompileTime())
             {
                 validation_logger.logError("Only compile-time-evaluable code is allowed in a compile-time function",
                                            code.location());
@@ -266,7 +266,7 @@ lang::Description::Descriptions lang::FunctionDescription::expand(lang::Context&
     for (auto& parameter : parameters_) { expanded_parameters.emplace_back(parameter->expand(new_context)); }
 
     auto expanded = makeOwned<lang::FunctionDescription>(access(),
-                                                         is_cmp_,
+                                                         cmp_,
                                                          name_,
                                                          return_type_->getUndefinedTypeClone(new_context),
                                                          return_type_location_,

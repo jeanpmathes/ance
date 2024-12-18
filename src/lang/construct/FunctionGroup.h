@@ -28,7 +28,7 @@ namespace lang
         [[nodiscard]] bool              isDefined() const override;
         [[nodiscard]] Identifier const& name() const override;
 
-        [[nodiscard]] bool isCMP() const override;
+        [[nodiscard]] lang::CMP cmp() const override;
 
         void setScope(lang::Scope& scope);
 

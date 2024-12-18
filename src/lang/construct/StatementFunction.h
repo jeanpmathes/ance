@@ -35,10 +35,9 @@ namespace lang
       public:
         StatementFunction(Function&                            function,
                           lang::AccessModifier                 access,
-                          bool                              is_cmp,
+                          lang::CMP                            cmp,
                           lang::ResolvingHandle<lang::Type>    return_type,
                           lang::Location                       return_type_location,
-
                           std::vector<Shared<lang::Parameter>> parameters,
                           Statement&                           code,
                           Scope&                               containing_scope,
@@ -46,7 +45,7 @@ namespace lang
 
         void setup() override;
 
-        bool isCMP() const override;
+        lang::CMP cmp() const override;
 
         [[nodiscard]] lang::AccessModifier access() const override;
         [[nodiscard]] Statement const*     code() const override;
@@ -72,7 +71,7 @@ namespace lang
         lang::Scope* inside_scope_ {nullptr};
 
         lang::AccessModifier access_;
-        bool                 is_cmp_;
+        lang::CMP            cmp_;
 
         Owned<lang::BasicBlock>              initial_block_;
         std::vector<Owned<lang::BasicBlock>> blocks_ {};

@@ -12,7 +12,7 @@
 
 lang::StatementFunction::StatementFunction(Function&                            function,
                                            lang::AccessModifier                 access,
-                                           bool                              is_cmp,
+                                           lang::CMP                         cmp,
                                            lang::ResolvingHandle<lang::Type>    return_type,
                                            lang::Location                       return_type_location,
 
@@ -28,7 +28,7 @@ lang::StatementFunction::StatementFunction(Function&                            
                                declaration_location)
     , code_(code)
     , access_(access)
-    , is_cmp_(is_cmp)
+    , cmp_(cmp)
     , initial_block_(lang::BasicBlock::createEmpty())
 {}
 
@@ -59,9 +59,9 @@ void lang::StatementFunction::setup()
     code_.walkDefinitions();
 }
 
-bool lang::StatementFunction::isCMP() const
+lang::CMP lang::StatementFunction::cmp() const
 {
-    return is_cmp_;
+    return cmp_;
 }
 
 lang::AccessModifier lang::StatementFunction::access() const

@@ -20,6 +20,16 @@ void NativeBuilder::postVisit(lang::Visitable<ANCE_CONSTRUCTS> const& visitable)
     if (located != nullptr) { native_build_.popSourceLocation(); }
 }
 
+bool NativeBuilder::isDescriptionAccepted(lang::Description const& description) const
+{
+    return description.cmp().isRuntime();
+}
+
+bool NativeBuilder::isEntityAccepted(lang::Entity const& entity) const
+{
+    return entity.cmp().isRuntime();
+}
+
 Execution& NativeBuilder::exec()
 {
     return native_build_;

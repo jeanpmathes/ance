@@ -70,12 +70,7 @@ namespace lang
          */
         [[nodiscard]] bool isRuntime() const;
 
-        /**
-         * Get whether this function can be evaluated at compile time.
-         * This does not mean that it cannot be called at runtime.
-         * @return True if this function can be evaluated at compile time, false otherwise.
-         */
-        [[nodiscard]] bool isCMP() const;
+        [[nodiscard]] lang::CMP cmp() const override;
 
         /**
          * Whether to preserve the unit return type or use void.
@@ -103,7 +98,7 @@ namespace lang
         /**
          * Define this function as a custom function.
          * @param access The access level.
-         * @param is_cmp Whether the function can be evaluated at compile time.
+         * @param cmp The compile-time evaluation mode.
          * @param return_type The return type of the function.
          * @param return_type_location The location of the return type.
          * @param parameters The parameters for this function.
@@ -113,7 +108,7 @@ namespace lang
          * @param definition_location The location of the function definition, meaning its code.
          */
         void defineAsCustom(lang::AccessModifier                        access,
-                            bool                                        is_cmp,
+                            lang::CMP                                   cmp,
                             lang::ResolvingHandle<lang::Type>           return_type,
                             lang::Location                              return_type_location,
                             std::vector<Shared<lang::Parameter>> const& parameters,
@@ -144,10 +139,12 @@ namespace lang
         /**
          * Define this function as a variable initialization function.
          * @param code The initializer.
+         * @param cmp The compile-time evaluation mode.
          * @param type The return type of the function.
          * @param containing_scope The scope containing the function.
          */
         InitializerFunction& defineAsInit(Statement&                        code,
+                                          lang::CMP                         cmp,
                                           lang::ResolvingHandle<lang::Type> type,
                                           Scope&                            containing_scope);
 

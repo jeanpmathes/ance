@@ -72,10 +72,10 @@ void lang::Type::define(Owned<lang::TypeDefinition> definition)
     definition_.value()->setType(this);
 }
 
-bool lang::Type::isCMP() const
+lang::CMP lang::Type::cmp() const
 {
     assert(isDefined());
-    return definition_.value()->isCMP();
+    return definition_.value()->cmp();
 }
 
 StateCount lang::Type::getStateCount() const

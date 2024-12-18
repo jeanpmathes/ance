@@ -43,14 +43,15 @@ namespace lang
                        bool                                  is_import,
                        lang::Function const*                 init,
                        Assigner                              assigner,
-                       bool                                  is_cmp,
+                       lang::CMP                             cmp,
                        lang::Location                        location);
 
         [[nodiscard]] lang::AccessModifier access() const;
-        [[nodiscard]] bool                 isCMP() const;
         [[nodiscard]] bool                        isImported() const;
         [[nodiscard]] lang::Assigner       assigner() const;
         [[nodiscard]] lang::Function const*       initializer() const;
+
+        [[nodiscard]] lang::CMP cmp() const override;
 
         void registerDeclaration(Execution& exec) const override;
         void registerDefinition(Execution& exec) const override;
@@ -63,7 +64,7 @@ namespace lang
       private:
         lang::AccessModifier access_;
         bool                 is_import_;
-        bool                 is_cmp_;
+        lang::CMP             cmp_;
         lang::Function const* init_;
         Assigner             assigner_;
     };

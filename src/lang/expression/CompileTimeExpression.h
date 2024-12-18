@@ -10,7 +10,7 @@
 class CompileTimeExpression : public virtual Expression
 {
   public:
-    [[nodiscard]] bool isRootCMP() const override;
+    [[nodiscard]] lang::CMP rootCMP() const override;
 };
 
 #endif

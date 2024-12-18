@@ -3,6 +3,7 @@
 
 #include "lang/Element.h"
 
+#include "lang/CMP.h"
 #include "lang/construct/Value.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
@@ -62,6 +63,8 @@ namespace lang
          * Get whether this variable is defined as final.
          */
         [[nodiscard]] bool isFinal() const;
+
+        [[nodiscard]] virtual lang::CMP cmp() const = 0;
 
         virtual void registerDeclaration(Execution& exec) const   = 0;
         virtual void registerDefinition(Execution& exec) const    = 0;

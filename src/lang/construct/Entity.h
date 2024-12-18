@@ -1,38 +1,12 @@
 #ifndef ANCE_SRC_LANG_CONSTRUCT_ENTITY_H_
 #define ANCE_SRC_LANG_CONSTRUCT_ENTITY_H_
 
+#include "lang/CMP.h"
 #include "lang/utility/Identifier.h"
 #include "lang/utility/ResolvingHandle.h"
 
 namespace lang
 {
-    class Entity;
-
-    class FunctionGroup;
-    class Function;
-    class Type;
-    class Variable;
-
-    template<>
-    struct HandleConfig<FunctionGroup> {
-        using BaseType = Entity;
-    };
-
-    template<>
-    struct HandleConfig<Function> {
-        using BaseType = Entity;
-    };
-
-    template<>
-    struct HandleConfig<Type> {
-        using BaseType = Entity;
-    };
-
-    template<>
-    struct HandleConfig<Variable> {
-        using BaseType = Entity;
-    };
-
     class Scope;
     class Context;
 
@@ -86,6 +60,12 @@ namespace lang
          * @return The annotated name.
          */
         [[nodiscard]] virtual std::string getAnnotatedName() const;
+
+        /**
+         * Get the compile-time execution mode of this entity.
+         * @return The compile-time execution mode.
+         */
+        [[nodiscard]] virtual lang::CMP cmp() const = 0;
 
         /**
          * Get the scope this entity is defined in.

@@ -789,7 +789,7 @@ void NativeBuild::declareGlobalVariable(lang::GlobalVariable const& global_varia
 
     if (!global_variable.isImported())
     {
-        if (global_variable.isCMP())
+        if (global_variable.cmp().isCompileTime())
         {
             Shared<lang::Constant> initial_constant = cmp_build_->getGlobalVariableValue(global_variable, *this);
             native_initializer                      = llvmConstant(initial_constant);
@@ -809,7 +809,7 @@ void NativeBuild::declareGlobalVariable(lang::GlobalVariable const& global_varia
 
     auto* native_variable = new llvm::GlobalVariable(llvm_module_,
                                                      native_type,
-                                                     global_variable.isCMP(),
+                                                     global_variable.cmp(),
                                                      getLinkage(global_variable.access()),
                                                      native_initializer,
                                                      linkage_name,
@@ -929,7 +929,7 @@ Shared<lang::Value> NativeBuild::computeAddressOfVariable(lang::Variable const& 
         return makeShared<WrappedContentValue>(type_ptr, native_value);
     }
 
-    throw std::logic_error("Variable not found");
+    throw std::logic_error(std::format("Variable '{}' not found", variable.name().text()));
 }
 
 Shared<lang::Value> NativeBuild::computeAsActualType(Shared<lang::Value> value)

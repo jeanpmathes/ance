@@ -2,7 +2,7 @@
 #define ANCE_SRC_LANG_CONSTRUCT_DESCRIPTIONS_VARIABLEDESCRIPTION_H_
 
 #include "Description.h"
-#include <experimental/vector>
+
 #include <vector>
 
 #include "lang/AccessModifier.h"
@@ -37,7 +37,7 @@ namespace lang
                             lang::Accessibility                         accessibility,
                             Optional<Owned<Expression>>                 init,
                             lang::Assigner                              assigner,
-                            bool                                        is_cmp,
+                            lang::CMP                                   cmp,
                             lang::Location                              location);
 
         VariableDescription(lang::Identifier                            name,
@@ -48,7 +48,7 @@ namespace lang
                             Optional<Owned<Expression>>                 init_expression,
                             Expression*                                 init_expression_ptr,
                             lang::Assigner                              assigner,
-                            bool                                        is_cmp,
+                            lang::CMP                                   cmp,
                             lang::Location                              location);
 
         explicit VariableDescription(bool from_public_import);
@@ -60,7 +60,7 @@ namespace lang
         [[nodiscard]] lang::GlobalVariable const* variable() const;
         [[nodiscard]] Expression const*           initializer() const;
         [[nodiscard]] InitializerFunction const*  initializerFunction() const;
-        [[nodiscard]] bool                        isCMP() const override;
+        [[nodiscard]] lang::CMP                   cmp() const override;
 
         [[nodiscard]] std::vector<std::reference_wrapper<Entity const>> getProvidedEntities() const override;
         [[nodiscard]] std::vector<Dependency>                           getDeclarationDependencies() const override;
@@ -85,7 +85,7 @@ namespace lang
         Optional<lang::ResolvingHandle<lang::Type>> type_;
         lang::Location                              type_location_;
         Assigner                                    assigner_;
-        bool                                        is_cmp_;
+        lang::CMP                                   cmp_;
         lang::Location                              location_;
 
         lang::ResolvingHandle<lang::Type> type_handle_;

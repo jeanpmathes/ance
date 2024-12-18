@@ -43,10 +43,10 @@ class Expression
     [[nodiscard]] bool isInitialized() const;
 
     /**
-     * Whether this expression can be evaluated at compile-time.
-     * @return True if this expression can be evaluated at compile-time.
+     * Get the compile-time execution mode of this expression.
+     * @return The compile-time execution mode.
      */
-    [[nodiscard]] bool isCMP() const;
+    [[nodiscard]] virtual lang::CMP cmp() const;
 
     /**
      * Set the scope containing this expression.
@@ -160,7 +160,7 @@ class Expression
      * Whether this expression, without considering subexpressions, can be evaluated at compile-time.
      * @return True if the root if the expression tree can be evaluated at compile-time.
      */
-    [[nodiscard]] virtual bool isRootCMP() const;
+    [[nodiscard]] virtual lang::CMP rootCMP() const;
 
   private:
     lang::Location location_;

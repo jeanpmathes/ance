@@ -2,7 +2,7 @@
 
 #include "lang/ApplicationVisitor.h"
 
-bool CompileTimeStatement::isRootCMP() const
+lang::CMP CompileTimeStatement::rootCMP() const
 {
-    return true;
+    return lang::CMP::OPTIONAL_CMP;
 }

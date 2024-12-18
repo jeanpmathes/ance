@@ -79,10 +79,10 @@ class Statement
     [[nodiscard]] lang::Scope const& scope() const final;
 
     /**
-     * Whether this statement can be evaluated at compile-time.
-     * @return True if this statement can be evaluated at compile-time.
+     * Get the compile-time execution mode of this callable.
+     * @return The compile-time execution mode.
      */
-    [[nodiscard]] bool isCMP() const;
+    [[nodiscard]] virtual lang::CMP cmp() const;
 
     /**
      * Get the block scope of the statement, if any.
@@ -134,7 +134,7 @@ class Statement
      * Whether this statement, without considering substatement and subexpressions, can be evaluated at compile-time.
      * @return True if the root if the statement tree can be evaluated at compile-time.
      */
-    [[nodiscard]] virtual bool isRootCMP() const;
+    [[nodiscard]] virtual lang::CMP rootCMP() const;
 
   public:
     /**

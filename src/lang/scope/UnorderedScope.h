@@ -3,7 +3,6 @@
 
 #include "Scope.h"
 
-#include <experimental/vector>
 #include <map>
 #include <optional>
 #include <ranges>

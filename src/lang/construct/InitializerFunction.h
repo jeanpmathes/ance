@@ -33,6 +33,7 @@ namespace lang
       public:
         InitializerFunction(Function&                         function,
                             Statement&                        initializer,
+                            lang::CMP                         cmp,
                             lang::ResolvingHandle<lang::Type> return_type,
                             Scope&                            containing_scope);
 
@@ -47,13 +48,13 @@ namespace lang
          * Create a code block that initializes a global variable.
          * @param variable The variable to initialize.
          * @param assigner The assigner to use.
-         * @param is_cmp Whether the initializer is for a compile-time variable.
+         * @param cmp The compile-time evaluation mode of the variable.
          * @param initializer The initializer expression, providing the value to assign.
          * @return The initializer block.
          */
         static Owned<Statement> makeInitializerBlock(lang::ResolvingHandle<lang::Variable> variable,
                                                      lang::Assigner                        assigner,
-                                                     bool                                  is_cmp,
+                                                     lang::CMP                             cmp,
                                                      Owned<Expression>                     initializer);
     };
 }

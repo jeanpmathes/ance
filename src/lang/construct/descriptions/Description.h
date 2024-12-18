@@ -4,6 +4,8 @@
 #include "lang/Element.h"
 
 #include "lang/Accessibility.h"
+#include "lang/CMP.h"
+#include "lang/construct/Entity.h"
 #include "lang/utility/ResolvingHandle.h"
 
 namespace lang
@@ -32,7 +34,7 @@ namespace lang
         [[nodiscard]] virtual lang::Identifier const& name() const              = 0;
         [[nodiscard]] virtual bool                    isOverloadAllowed() const = 0;
         [[nodiscard]] lang::Accessibility             access() const;
-        [[nodiscard]] virtual bool                    isCMP() const = 0;
+        [[nodiscard]] virtual lang::CMP               cmp() const = 0;
 
         struct Dependency {
             std::reference_wrapper<lang::Entity const> entity;

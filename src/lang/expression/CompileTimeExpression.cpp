@@ -1,6 +1,6 @@
 #include "CompileTimeExpression.h"
 
-bool CompileTimeExpression::isRootCMP() const
+lang::CMP CompileTimeExpression::rootCMP() const
 {
-    return true;
+    return lang::CMP::OPTIONAL_CMP;
 }

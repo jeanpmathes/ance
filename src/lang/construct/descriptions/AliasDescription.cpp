@@ -43,9 +43,9 @@ bool lang::AliasDescription::isOverloadAllowed() const
     return false;
 }
 
-bool lang::AliasDescription::isCMP() const
+lang::CMP lang::AliasDescription::cmp() const
 {
-    return true;
+    return lang::CMP::OPTIONAL_CMP;
 }
 
 lang::Type const& lang::AliasDescription::type() const

@@ -48,6 +48,8 @@ namespace lang
                                                                         size_t           parameter_index,
                                                                         lang::Function&  containing_function);
 
+        [[nodiscard]] lang::CMP cmp() const override;
+
         void registerDeclaration(Execution& exec) const override;
         void registerDefinition(Execution& exec) const override;
 

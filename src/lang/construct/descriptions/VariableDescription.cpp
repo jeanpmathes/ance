@@ -11,14 +11,14 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
                                                lang::Accessibility                         accessibility,
                                                Optional<Owned<Expression>>                 init,
                                                Assigner                                    assigner,
-                                               bool                                        is_cmp,
+                                               lang::CMP                                   cmp,
                                                lang::Location                              location)
     : Description(accessibility)
     , name_(name)
     , type_(std::move(type))
     , type_location_(type_location)
     , assigner_(assigner)
-    , is_cmp_(is_cmp)
+    , cmp_(cmp)
     , location_(location)
     , type_handle_(type_.valueOr(init.hasValue() ? init.value()->type() : lang::Type::getUndefined()))
     , init_expression_ptr_(getPtr(init))
@@ -35,14 +35,14 @@ lang::VariableDescription::VariableDescription(lang::Identifier                 
                                                Optional<Owned<Expression>>                 init_expression,
                                                Expression*                                 init_expression_ptr,
                                                Assigner                                    assigner,
-                                               bool                                        is_cmp,
+                                               lang::CMP                                   cmp,
                                                lang::Location                              location)
     : Description(accessibility)
     , name_(name)
     , type_(std::move(type))
     , type_location_(type_location)
     , assigner_(assigner)
-    , is_cmp_(is_cmp)
+    , cmp_(cmp)
     , location_(location)
     , type_handle_(
           type_.valueOr(init_expression_ptr != nullptr ? init_expression_ptr->type() : lang::Type::getUndefined()))
@@ -58,7 +58,7 @@ lang::VariableDescription::VariableDescription(bool from_public_import)
     , type_(lang::Type::getUndefined())
     , type_location_(lang::Location::global())
     , assigner_(Assigner::UNSPECIFIED)
-    , is_cmp_(false)
+    , cmp_(lang::CMP::NO_CMP)
     , location_(lang::Location::global())
     , type_handle_(type_.value())
     , init_expression_ptr_(nullptr)
@@ -92,9 +92,9 @@ lang::InitializerFunction const* lang::VariableDescription::initializerFunction(
     return init_function_;
 }
 
-bool lang::VariableDescription::isCMP() const
+lang::CMP lang::VariableDescription::cmp() const
 {
-    return is_cmp_;
+    return cmp_;
 }
 
 std::vector<std::reference_wrapper<lang::Entity const>> lang::VariableDescription::getProvidedEntities() const
@@ -125,7 +125,7 @@ std::vector<lang::Description::Dependency> lang::VariableDescription::getDefinit
         for (auto& dependency : init_block_.value()->getBlockScope()->getDependenciesOnCall())
         {
             // If this is a cmp variable, the definition will call the function, therefore it must be defined.
-            dependencies.emplace_back(dependency, is_cmp_);
+            dependencies.emplace_back(dependency, cmp_.isCompileTime());
         }
 
         for (auto& dependency : init_block_.value()->getBlockScope()->getDependenciesOnDefinition())
@@ -153,9 +153,9 @@ void lang::VariableDescription::setUp()
 
         lang::ResolvingHandle<lang::Type> init_function_return_type = scope().context().getUnitType();
 
-        if (is_cmp_) init_function_return_type = type_handle_;
+        if (cmp_.isCompileTime()) init_function_return_type = type_handle_;
 
-        init_function_ = &init_function->defineAsInit(**init_block_, init_function_return_type, scope());
+        init_function_ = &init_function->defineAsInit(**init_block_, cmp_.strict(), init_function_return_type, scope());
         init           = &init_function.get();
 
         scope().addEntity(std::move(init_function));
@@ -164,7 +164,7 @@ void lang::VariableDescription::setUp()
     {
         init_block_ = lang::InitializerFunction::makeInitializerBlock(variable_handle_->toUndefined(),
                                                                       assigner_,
-                                                                      is_cmp_,
+                                                                      cmp_,
                                                                       std::move(init_expression_.value()));
 
         init_block_.value()->setContainingScope(scope());
@@ -180,7 +180,7 @@ void lang::VariableDescription::setUp()
                                                         access().isImported(),
                                                         init,
                                                         assigner_,
-                                                        is_cmp_,
+                                                        cmp_,
                                                         location_);
 
     scope().addEntity(OwningHandle<lang::Variable>::takeOwnership(variable_handle_));
@@ -237,9 +237,9 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
     {
         if (!init_expression_ptr_->validate(validation_logger)) return;
 
-        if (is_cmp_)
+        if (cmp_.isCompileTime())
         {
-            if (!init_expression_ptr_->isCMP())
+            if (!init_expression_ptr_->cmp().isCompileTime())
             {
                 validation_logger.logError("Compile-time variable initializer must be compile-time expression",
                                            init_expression_ptr_->location());
@@ -264,7 +264,7 @@ void lang::VariableDescription::validate(ValidationLogger& validation_logger) co
         validation_logger.logError("Default-initialized global variable must have explicit type", location_);
         return;
     }
-    else if (is_cmp_)
+    else if (cmp_.isCompileTime())
     {
         validation_logger.logError("Compile-time variables require an explicit initializer", location_);
         return;
@@ -306,7 +306,7 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
                                                          std::move(expanded_init_expression),
                                                          expanded_init_expression_ptr,
                                                          assigner_,
-                                                         is_cmp_,
+                                                         cmp_,
                                                          location_);
 
     Descriptions descriptions;
@@ -329,7 +329,7 @@ void lang::VariableDescription::sync(Storage& storage)
 {
     storage.sync(name_);
     storage.sync(type_handle_);
-    storage.sync(is_cmp_);
+    storage.sync(cmp_);
     storage.sync(assigner_);
 
     if (storage.isReading()) { variable_handle_ = lang::makeHandled<lang::Variable>(name_); }

@@ -37,11 +37,6 @@ std::any Builder::visit(lang::GlobalScope const& global_scope)
     return {};
 }
 
-bool Builder::isDescriptionAccepted(lang::Description const&) const
-{
-    return true;
-}
-
 std::any Builder::visit(lang::FunctionDescription const& function_description)
 {
     return visitTree(*function_description.function());
@@ -131,6 +126,8 @@ std::any Builder::visit(lang::Member const&)
 
 std::any Builder::visit(lang::Function const& function)
 {
+    if (!isEntityAccepted(function)) return {};
+
     switch (g_phase_)
     {
         case GlobalPhase::DECLARE:

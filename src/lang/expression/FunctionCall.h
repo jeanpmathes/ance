@@ -45,7 +45,7 @@ class FunctionCall
     void walkDefinitions() override;
     void postResolve() override;
 
-    bool isRootCMP() const override;
+    [[nodiscard]] lang::CMP rootCMP() const override;
 
   public:
     bool validate(ValidationLogger& validation_logger) const override;

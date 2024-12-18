@@ -87,11 +87,11 @@ void FunctionCall::postResolve()
     type();
 }
 
-bool FunctionCall::isRootCMP() const
+lang::CMP FunctionCall::rootCMP() const
 {
-    if (getCallable() == nullptr) return false;
+    if (getCallable() == nullptr) return lang::CMP::NO_CMP;
 
-    return getCallable()->isCMP();
+    return getCallable()->cmp();
 }
 
 void FunctionCall::defineType(lang::ResolvingHandle<lang::Type> type)

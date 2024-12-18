@@ -34,10 +34,10 @@ bool lang::Function::isRuntime() const
     return definition_.value()->isRuntime();
 }
 
-bool lang::Function::isCMP() const
+lang::CMP lang::Function::cmp() const
 {
     assert(isDefined());
-    return definition_.value()->isCMP();
+    return definition_.value()->cmp();
 }
 
 bool lang::Function::preserveUnitReturn() const
@@ -65,7 +65,7 @@ void lang::Function::defineAsImported(Scope&                                    
 }
 
 void lang::Function::defineAsCustom(lang::AccessModifier                        access,
-                                    bool                                        is_cmp,
+                                    lang::CMP                                   cmp,
                                     lang::ResolvingHandle<lang::Type>           return_type,
                                     lang::Location                              return_type_location,
                                     std::vector<Shared<lang::Parameter>> const& parameters,
@@ -76,7 +76,7 @@ void lang::Function::defineAsCustom(lang::AccessModifier                        
 {
     definition_ = makeOwned<lang::CustomFunction>(*this,
                                                   access,
-                                                  is_cmp,
+                                                  cmp,
                                                   return_type,
                                                   return_type_location,
                                                   parameters,
@@ -114,10 +114,11 @@ lang::PredefinedFunction& lang::Function::defineAsPredefined(lang::ResolvingHand
 }
 
 lang::InitializerFunction& lang::Function::defineAsInit(Statement&                        code,
+                                                        lang::CMP                         cmp,
                                                         lang::ResolvingHandle<lang::Type> type,
                                                         lang::Scope&                      containing_scope)
 {
-    auto definition = makeOwned<lang::InitializerFunction>(*this, code, type, containing_scope);
+    auto definition = makeOwned<lang::InitializerFunction>(*this, code, cmp, type, containing_scope);
 
     lang::InitializerFunction& initializer_function = *definition;
 

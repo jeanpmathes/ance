@@ -11,6 +11,7 @@
 #include "compiler/Execution.h"
 #include "lang/AccessModifier.h"
 #include "lang/Element.h"
+#include "lang/construct/Entity.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/OwningHandle.h"
 #include "lang/utility/ResolvingHandle.h"

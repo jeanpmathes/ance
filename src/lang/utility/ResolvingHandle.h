@@ -17,7 +17,7 @@ namespace lang// This is somewhat of a hack to allow upcasting of handles.
     class ResolvingHandle;
 }
 
-#include "lang/construct/Entity.h"
+#include "lang/construct/Entities.h"
 
 namespace lang
 {

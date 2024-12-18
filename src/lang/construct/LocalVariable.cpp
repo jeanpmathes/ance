@@ -61,6 +61,11 @@ lang::OwningHandle<lang::Variable> lang::LocalVariable::makeParameterVariable(la
     return lang::OwningHandle<lang::Variable>::takeOwnership(variable);
 }
 
+lang::CMP lang::LocalVariable::cmp() const
+{
+    return lang::CMP::NO_CMP;
+}
+
 void lang::LocalVariable::registerDeclaration(Execution& exec) const
 {
     exec.declareLocalVariable(*this);

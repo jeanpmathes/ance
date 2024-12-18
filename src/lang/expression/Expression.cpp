@@ -31,16 +31,18 @@ bool Expression::isInitialized() const
     return containing_scope_ != nullptr;
 }
 
-bool Expression::isCMP() const
+lang::CMP Expression::cmp() const
 {
-    if (!isRootCMP()) return false;
+    lang::CMP result = rootCMP();
 
-    return std::ranges::all_of(subexpressions_, [](auto& subexpression) { return subexpression.get().isCMP(); });
+    for (auto& subexpression : subexpressions_) { result = result & subexpression.get().cmp(); }
+
+    return result;
 }
 
-bool Expression::isRootCMP() const
+lang::CMP Expression::rootCMP() const
 {
-    return false;
+    return lang::CMP::NO_CMP;
 }
 
 lang::ResolvingHandle<lang::Type> Expression::type()

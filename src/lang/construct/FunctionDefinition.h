@@ -144,9 +144,9 @@ namespace lang
 
         /**
          * Get whether this function can be evaluated at compile time.
-         * @return True if the function can be evaluated at compile time.
+         * @return The compile time evaluation mode.
          */
-        [[nodiscard]] virtual bool isCMP() const;
+        [[nodiscard]] virtual lang::CMP cmp() const;
 
         virtual void resolveFollowingOrder();
 

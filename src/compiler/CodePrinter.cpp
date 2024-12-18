@@ -19,9 +19,7 @@ std::any CodePrinter::visit(lang::VariableDescription const& variable_descriptio
     lang::GlobalVariable const& variable = *variable_description.variable();
 
     out_ << variable.access().toString() << " ";
-    if (variable.isCMP())
-        out_ << "cmp"
-             << " ";
+    if (variable.cmp().isCompileTime()) out_ << variable.cmp().toString() << " ";
     out_ << variable.name() << ": ";
     out_ << variable.type().name();
 

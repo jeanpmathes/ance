@@ -18,16 +18,16 @@ lang::Identifier const& lang::FunctionGroup::name() const
     return name_;
 }
 
-bool lang::FunctionGroup::isCMP() const
+lang::CMP lang::FunctionGroup::cmp() const
 {
-    bool is_cmp = true;
+    lang::CMP result = lang::CMP::OPTIONAL_CMP;
 
     for (auto& function : functions())
     {
-        is_cmp &= function->isCMP();// todo: validate that function group has uniform cmp-ness
+        result = result & function->cmp();// todo: validate that function group has uniform cmp-ness
     }
 
-    return is_cmp;
+    return result;
 }
 
 void lang::FunctionGroup::setScope(lang::Scope& scope)

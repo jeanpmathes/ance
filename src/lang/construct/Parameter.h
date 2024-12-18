@@ -3,6 +3,7 @@
 
 #include <string>
 
+#include "lang/utility/Identifier.h"
 #include "lang/utility/Location.h"
 #include "lang/utility/ResolvingHandle.h"
 
@@ -10,6 +11,7 @@ namespace lang
 {
     class Type;
     class Value;
+    class Context;
 }
 
 class Storage;
