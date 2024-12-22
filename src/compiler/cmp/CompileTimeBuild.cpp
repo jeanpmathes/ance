@@ -601,8 +601,14 @@ Shared<lang::Value> CompileTimeBuild::computeElementPointer(Shared<lang::Value> 
 
     if (bounds.hasValue())
     {
-        // todo: cause compile time error if index is out of bounds, stop compilation
-        // todo: also have a test for that case
+        size_t bounds_value = bounds.value();
+
+        if (index_value < 0 || index_value >= static_cast<ptrdiff_t>(bounds_value))
+        {
+            throw CompileTimeError("Index out of bounds", getCurrentSourceLocation());
+        }
+
+        // todo: create a test case causing this compiler error
     }
 
     Shared<cmp::AddressValue> cmp_address  = cmpContentOf(sequence).cast<cmp::AddressValue>();
@@ -655,16 +661,12 @@ Shared<lang::Value> CompileTimeBuild::computeAddressOf(Shared<lang::Value> value
 
 Shared<lang::Value> CompileTimeBuild::computePointerToInteger(Shared<lang::Value>)
 {
-    throw std::logic_error("Pointer-to-integer conversion is not supported in compile-time execution");
-
-    // todo: forbid this at higher level, cause compile time error
+    throw CompileTimeError("Address operations are not allowed in compile-time execution", getCurrentSourceLocation());
 }
 
 Shared<lang::Value> CompileTimeBuild::computeIntegerToPointer(Shared<lang::Value>, lang::Type const&)
 {
-    throw std::logic_error("Integer-to-pointer conversion is not supported in compile-time execution");
-
-    // todo: forbid this at higher level, cause compile time error
+    throw CompileTimeError("Address operations are not allowed in compile-time execution", getCurrentSourceLocation());
 }
 
 Shared<lang::Value> CompileTimeBuild::computeCastedAddress(Shared<lang::Value> address, lang::Type const& new_type)
@@ -793,9 +795,7 @@ Shared<lang::Value> CompileTimeBuild::computeAddressIsNotNull(Shared<lang::Value
 
 Shared<lang::Value> CompileTimeBuild::computeAddressDiff(Shared<lang::Value>, Shared<lang::Value>)
 {
-    throw std::logic_error("Address difference is not supported in compile-time execution");
-
-    // todo: forbid this at higher level, cause compile time error
+    throw CompileTimeError("Address operations are not allowed in compile-time execution", getCurrentSourceLocation());
 }
 
 Shared<lang::Value> CompileTimeBuild::performLoadFromAddress(Shared<lang::Value> address)
@@ -1084,7 +1084,9 @@ Shared<lang::Value> CompileTimeBuild::performOperator(lang::BinaryOperator op,
                     return_type,
                     context_,
                     [this, is_signed](Shared<INT> left, Shared<INT> right, lang::Type const& t) -> Shared<INT> {
-                        // todo: compile time error if division by zero, use new CompileTimeException
+                        if (right->value().isZero())
+                            throw CompileTimeError("Division by zero", getCurrentSourceLocation());
+
                         if (is_signed)
                             return makeShared<cmp::IntegerValue>(left->value().sdiv(right->value()), t, context_);
                         else return makeShared<cmp::IntegerValue>(left->value().udiv(right->value()), t, context_);
@@ -1641,12 +1643,6 @@ Shared<CompileTimeValue> CompileTimeBuild::cmpAddressValueOf(Shared<lang::Value>
                                          context_);
 }
 
-Shared<CompileTimeValue> CompileTimeBuild::cmpHandledValueOf(Shared<lang::Value> value)
-{
-    Address address = cmpAddressOf(value);
-    return cmpHandledValueOf(address, value.cast<CompileTimeValue>()->type());
-}
-
 Shared<CompileTimeValue> CompileTimeBuild::cmpHandledValueOf(Address address, lang::Type const& type)
 {
     return makeShared<cmp::HandledValue>(address, type, *this);
@@ -1675,7 +1671,8 @@ Shared<CompileTimeValue> CompileTimeBuild::load(CompileTimeBuild::Address const&
     {
         bool ok = true;
         value   = value->access(index, nullptr, &ok, *this);
-        assert(ok);// todo: use for compiler error
+
+        if (!ok) { throw CompileTimeError("Invalid memory read", getCurrentSourceLocation()); }
     }
 
     return value;
@@ -1702,19 +1699,22 @@ void CompileTimeBuild::store(CompileTimeBuild::Address address, Shared<CompileTi
         {
             ok     = true;
             target = target->access(address.inners()[index], &value, &ok, *this);
-            assert(ok);// todo: use for compiler error
+
+            if (!ok) { throw CompileTimeError("Invalid memory write", getCurrentSourceLocation()); }
         }
         else
         {
             ok                               = true;
             Shared<CompileTimeValue> current = target->access(address.inners()[index], nullptr, &ok, *this);
-            assert(ok);// todo: use for compiler error
+
+            if (!ok) { throw CompileTimeError("Invalid memory read", getCurrentSourceLocation()); }
 
             replace(current, index + 1);
 
             ok     = true;
             target = target->access(address.inners()[index], &current, &ok, *this);
-            assert(ok);// todo: use for compiler error
+
+            if (!ok) { throw CompileTimeError("Invalid memory write", getCurrentSourceLocation()); }
         }
     };
 

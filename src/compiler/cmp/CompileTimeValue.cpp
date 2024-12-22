@@ -47,7 +47,7 @@ cmp::AddressValue::AddressValue(CompileTimeBuild::Address address, lang::Type co
 
 Shared<lang::Constant> cmp::AddressValue::embed(Execution& exec) const
 {
-    return exec.getNull(type());// todo: think about this
+    return exec.getNull(type());
 }
 
 Shared<CompileTimeValue> cmp::AddressValue::withType(lang::Type const& type, lang::Context& new_context) const

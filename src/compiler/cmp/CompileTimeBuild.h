@@ -196,7 +196,6 @@ class CompileTimeBuild : public Execution
     Address                  cmpAddressOf(Shared<lang::Value> value);
     Shared<CompileTimeValue> cmpAddressValueOf(Shared<lang::Value> value);
 
-    Shared<CompileTimeValue> cmpHandledValueOf(Shared<lang::Value> value);// todo: remove
     Shared<CompileTimeValue> cmpHandledValueOf(Address address, lang::Type const& type);
 
     using Memory    = std::vector<std::vector<Shared<CompileTimeValue>>>;
