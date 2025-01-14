@@ -37,7 +37,6 @@ namespace lang
     class Constant;
     class Value;
 
-    // todo: replace LocalInitializer and LocalParameterInitializer with proper types
     using LocalParameterInitializer = std::pair<std::reference_wrapper<lang::Function const>, size_t>;
     using LocalInitializer = Optional<std::variant<std::reference_wrapper<Expression>, LocalParameterInitializer>>;
 }

@@ -287,7 +287,7 @@ lang::Description::Descriptions lang::VariableDescription::expand(lang::Context&
 
     Optional<Owned<Expression>> expanded_init_expression;
 
-    if (init_expression_.hasValue())// todo: is this ever true?
+    if (init_expression_.hasValue())
     {
         auto [leading_statements, new_expression, following_statements] = init_expression_.value()->expand(new_context);
 

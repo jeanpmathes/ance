@@ -299,7 +299,6 @@ static int anceMain(int argc, char** argv)
     if (argc != 2)
     {
         std::cout << "ance: command: Requires exactly one argument" << std::endl;
-
         return EXIT_FAILURE;
     }
 

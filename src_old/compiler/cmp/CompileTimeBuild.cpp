@@ -607,8 +607,6 @@ Shared<lang::Value> CompileTimeBuild::computeElementPointer(Shared<lang::Value> 
         {
             throw CompileTimeError("Index out of bounds", getCurrentSourceLocation());
         }
-
-        // todo: create a test case causing this compiler error
     }
 
     Shared<cmp::AddressValue> cmp_address  = cmpContentOf(sequence).cast<cmp::AddressValue>();

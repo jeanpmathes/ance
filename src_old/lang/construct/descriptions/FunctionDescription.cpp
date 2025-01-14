@@ -236,10 +236,6 @@ void lang::FunctionDescription::validate(ValidationLogger& validation_logger) co
             {
                 validation_logger.logError("Only compile-time-evaluable code is allowed in a compile-time function",
                                            code.location());
-
-                // todo: think how to get better error message - mark the offending statement or expression
-                // todo: for classes with conditional cmp like FunctionCall the error should be caused there
-                // todo: so maybe pass a context to validate and in the necessary classes check the context
             }
         }
     }

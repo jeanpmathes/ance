@@ -24,7 +24,7 @@ lang::CMP lang::FunctionGroup::cmp() const
 
     for (auto& function : functions())
     {
-        result = result & function->cmp();// todo: validate that function group has uniform cmp-ness
+        result = result & function->cmp();
     }
 
     return result;
