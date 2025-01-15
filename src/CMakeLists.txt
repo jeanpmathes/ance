@@ -1,9 +1,31 @@
 add_executable(ance)
 
-add_subdirectory(grammar)
 add_subdirectory(ance)
+add_subdirectory(grammar)
 
-target_sources(ance PRIVATE main.cxx)
+target_sources(ance PRIVATE main.cpp)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reserved-macro-identifier -Wno-unused-macros")
+
+set(ERROR_OPTIONS
+    -Werror -Weverything
+    -Wno-c++98-compat
+    -Wno-c++98-compat-pedantic
+    -Wno-c++98-c++11-compat-pedantic
+    -Wno-exit-time-destructors
+    -Wno-global-constructors
+    -Wno-unsafe-buffer-usage
+    -Wno-switch-default
+    -Wno-switch-enum)
+
+target_compile_options(ance PRIVATE /EHsc -MDd ${ERROR_OPTIONS})
+
+set_source_files_properties(grammar/anceBaseVisitor.cpp
+                            grammar/anceLexer.cpp
+                            grammar/anceParser.cpp
+                            grammar/anceVisitor.cpp
+                            PROPERTIES
+                            COMPILE_FLAGS -Wno-everything)
 
 target_include_directories(ance PUBLIC .)
 target_include_directories(ance SYSTEM PRIVATE grammar)

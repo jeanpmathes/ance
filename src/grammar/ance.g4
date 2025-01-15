@@ -6,7 +6,7 @@ statement
     ;
 
 expression
-    : entity '{' arguments '}' # Call
+    : entity '(' arguments ')' # Call
     ;
 
 arguments
