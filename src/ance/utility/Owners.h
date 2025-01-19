@@ -2,6 +2,7 @@
 #define ANCE_UTILITY_OWNERS_H
 
 #include <memory>
+#include <any>
 
 #include "Optional.h"
 
@@ -68,6 +69,13 @@ namespace ance::utility
     {
         if (value) return Optional<Owned<T>>(Owned<T>(*value));
         return std::nullopt;
+    }
+
+    template<typename T>
+    Owned<T> wrap(std::any const& value)
+    {
+        T* ptr = std::any_cast<T*>(value);
+        return Owned<T>(*ptr);
     }
 
     template<typename T>

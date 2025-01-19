@@ -12,12 +12,13 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, IDENTIFIER = 4, SEMICOLON = 5, WHITESPACE = 6, 
-    BLOCK_COMMENT = 7, LINE_COMMENT = 8, ERROR_CHAR = 9
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, IDENTIFIER = 6, SEMICOLON = 7, 
+    WHITESPACE = 8, BLOCK_COMMENT = 9, LINE_COMMENT = 10, ERROR_CHAR = 11
   };
 
   enum {
-    RuleStatement = 0, RuleExpression = 1, RuleArguments = 2, RuleEntity = 3
+    RuleFile = 0, RuleStatement = 1, RuleExpression = 2, RuleArguments = 3, 
+    RuleEntity = 4
   };
 
   explicit anceParser(antlr4::TokenStream *input);
@@ -37,10 +38,25 @@ public:
   antlr4::atn::SerializedATNView getSerializedATN() const override;
 
 
+  class FileContext;
   class StatementContext;
   class ExpressionContext;
   class ArgumentsContext;
   class EntityContext; 
+
+  class  FileContext : public antlr4::ParserRuleContext {
+  public:
+    FileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    StatementContext *statement();
+    antlr4::tree::TerminalNode *EOF();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  FileContext* file();
 
   class  StatementContext : public antlr4::ParserRuleContext {
   public:

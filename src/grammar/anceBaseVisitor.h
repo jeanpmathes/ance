@@ -15,6 +15,10 @@
 class  anceBaseVisitor : public anceVisitor {
 public:
 
+  virtual std::any visitFile(anceParser::FileContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitBlockStatement(anceParser::BlockStatementContext *ctx) override {
     return visitChildren(ctx);
   }

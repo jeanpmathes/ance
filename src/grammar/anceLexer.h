@@ -12,8 +12,8 @@
 class  anceLexer : public antlr4::Lexer {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, IDENTIFIER = 4, SEMICOLON = 5, WHITESPACE = 6, 
-    BLOCK_COMMENT = 7, LINE_COMMENT = 8, ERROR_CHAR = 9
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, IDENTIFIER = 6, SEMICOLON = 7, 
+    WHITESPACE = 8, BLOCK_COMMENT = 9, LINE_COMMENT = 10, ERROR_CHAR = 11
   };
 
   explicit anceLexer(antlr4::CharStream *input);

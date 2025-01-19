@@ -1,0 +1,1 @@
+target_sources(ance PRIVATE Identifier.cpp Location.cpp StringStorage.cpp Reporter.cpp)

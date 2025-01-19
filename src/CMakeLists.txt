@@ -15,6 +15,7 @@ set(ERROR_OPTIONS
     -Wno-exit-time-destructors
     -Wno-global-constructors
     -Wno-unsafe-buffer-usage
+    -Wno-ctad-maybe-unsupported
     -Wno-switch-default
     -Wno-switch-enum)
 

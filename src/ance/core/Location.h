@@ -1,11 +1,9 @@
-#ifndef ANCE_SRC_LANG_UTILITY_LOCATION_H_
-#define ANCE_SRC_LANG_UTILITY_LOCATION_H_
+#ifndef ANCE_CORE_LOCATION_H
+#define ANCE_CORE_LOCATION_H
 
-#include <llvm/IR/DebugLoc.h>
+#include <ostream>
 
-class Execution;
-
-namespace lang
+namespace ance::core
 {
     /**
      * A location in a source file.
@@ -28,6 +26,15 @@ namespace lang
          * @return A global location.
          */
         static Location global();
+
+        /**
+         * Create a simple location. It targets a single code point.
+         * @param line The line number.
+         * @param column The column number.
+         * @param file_index The index of the file.
+         * @return The location.
+         */
+        static Location simple(size_t line, size_t column, size_t file_index);
 
         /**
          * Get the line number.
@@ -69,7 +76,7 @@ namespace lang
          * Extend this location to include another location.
          * @param location The location to extend to.
          */
-        void extend(lang::Location location);
+        void extend(Location const& location);
 
         /**
          * Get the first location of two locations.
@@ -77,14 +84,9 @@ namespace lang
          * If the locations are in different files, the location a is returned.
          * @return The first location.
          */
-        static lang::Location getFirst(lang::Location a, lang::Location b);
+        static Location getFirst(Location a, Location b);
 
-        /*
-         * Format this location as a string, in the format "file:line:column".
-         */
-        std::string toString(Execution& exec);
-
-        friend std::ostream& operator<<(std::ostream& os, lang::Location const& location);
+        friend std::ostream& operator<<(std::ostream& os, Location const& location);
 
       private:
         size_t                  start_line_;

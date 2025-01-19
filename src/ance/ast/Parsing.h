@@ -3,27 +3,36 @@
 
 #include <filesystem>
 
+#include "ance/core/Reporter.h"
+#include "ance/sources/SourceTree.h"
 #include "ance/utility/Owners.h"
-
-#include "Node.h"
 
 namespace ance::ast
 {
+    struct Statement;
+
     /**
      * Parses files into ASTs.
      */
     class Parsing
     {
-        // todo: the parser class should internally use the antlr4 visitor to create the ast
-        // todo: that should handle fault tolerance - check what old does but do not fail on errors, instead handle by checking the antlr4 ctx objects and return error nodes
-        // todo: cause compiler errors (create a reporter class, should take source file)
+      public:
+        Parsing(sources::SourceTree& source_tree, core::Reporter& reporter);
+        ~Parsing();
 
         /**
          * Reads and parses a passed file into an AST.
-         * @param file_path The file to parse.
+         * @param index The index of the file in the source tree.
          * @return The parsed AST.
          */
-        utility::Owned<Statement> parse(std::filesystem::path const& file_path);
+        utility::Owned<Statement> parse(size_t index);
+
+      private:
+        sources::SourceTree& source_tree_;
+        core::Reporter&      reporter_;
+
+        struct Implementation;
+        utility::Owned<Implementation> implementation_;
     };
 }
 

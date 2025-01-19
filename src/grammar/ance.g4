@@ -1,5 +1,7 @@
 grammar ance;
 
+file : statement EOF ;
+
 statement
     : '{' ( statement )* '}' # BlockStatement
     | expression ';' # ExpressionStatement

@@ -19,6 +19,8 @@ public:
   /**
    * Visit parse trees produced by anceParser.
    */
+    virtual std::any visitFile(anceParser::FileContext *context) = 0;
+
     virtual std::any visitBlockStatement(anceParser::BlockStatementContext *context) = 0;
 
     virtual std::any visitExpressionStatement(anceParser::ExpressionStatementContext *context) = 0;
