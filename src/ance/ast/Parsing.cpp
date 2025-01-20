@@ -9,8 +9,11 @@
 #include "anceParser.h"
 
 #include "ance/sources/SourceFile.h"
+#include "ance/sources/SourceTree.h"
 
 #include "Node.h"
+
+#include <boost/locale/encoding_utf.hpp>
 
 namespace ance
 {
@@ -28,24 +31,14 @@ namespace ance
           public:
             explicit LexerErrorListener(ErrorHandler& parent) : parent_(parent) {}
 
-            void syntaxError(antlr4::Recognizer*      recognizer,
-                             antlr4::Token*           offending_symbol,
-                             size_t const             line,
-                             size_t const             char_position_in_line,
+            void syntaxError(antlr4::Recognizer*      ,
+                             antlr4::Token*           ,
+                             size_t const             ,
+                             size_t const             ,
                              std::string const&       msg,
-                             std::exception_ptr const e) override
+                             std::exception_ptr const ) override
             {
-                (void) recognizer;// todo: remove
-                (void) offending_symbol;
-                (void) line;
-                (void) char_position_in_line;
-                (void) msg;
-                (void) e;
-
-                // todo: test some possible errors here
-                // todo: if fitting, convert to useful error message and report
-
-                throw std::logic_error("Error handling for lexer error not implemented: " + msg);
+                throw std::logic_error("Unhandled lexer error: " + msg);
             }
 
             ErrorHandler& parent_;
@@ -63,13 +56,10 @@ namespace ance
                              std::string const&  msg,
                              std::exception_ptr const) override
             {
-                // todo: test some possible errors here
-                // todo: if fitting, convert to useful error message and report
-
                 auto* parser = dynamic_cast<anceParser*>(recognizer);
                 if (!parser) return;
 
-                char_position = parent_.source_file_.getUtf8Index(line, char_position);
+                char_position += 1;
 
                 antlr4::Token* previous_symbol = parser->getTokenStream()->LT(-1);
 
@@ -79,9 +69,8 @@ namespace ance
                 if (previous_symbol)
                 {
                     previous_line = previous_symbol->getLine();
-                    previous_char_position =
-                        parent_.source_file_.getUtf8Index(previous_line, previous_symbol->getCharPositionInLine())
-                        + previous_symbol->getText().size();
+                    previous_char_position = previous_symbol->getCharPositionInLine()
+                        + boost::locale::conv::utf_to_utf<char32_t>(previous_symbol->getText()).size();
 
                     if (offending_symbol->getType() == antlr4::Token::EOF)
                     {
@@ -99,11 +88,18 @@ namespace ance
                     return;
                 }
 
+                if (offending_symbol->getType() == anceLexer::EOF)
+                {
+                    parent_.reporter_.error("Unexpected end of file",
+                                            core::Location::simple(line, char_position, parent_.source_file_.index()));
+                    return;
+                }
+
                 auto const expected_tokens = parser->getExpectedTokens();
 
                 if (static_cast<size_t>(expected_tokens.getSingleElement()) == anceLexer::EOF)
                 {
-                    parent_.reporter_.error("Exactly one statement is allowed per file",
+                    parent_.reporter_.error("At most one top-level statement per file allowed",
                                             core::Location::simple(line, char_position, parent_.source_file_.index()));
                     return;
                 }
@@ -117,6 +113,17 @@ namespace ance
                     return;
                 }
 
+                if (expected_tokens.contains(static_cast<size_t>(anceLexer::BRACKET_CLOSE))
+                    || expected_tokens.contains(static_cast<size_t>(anceLexer::CURLY_BRACKET_CLOSE))
+                    || expected_tokens.contains(static_cast<size_t>(anceLexer::SQUARE_BRACKET_CLOSE))
+                    || expected_tokens.contains(static_cast<size_t>(anceLexer::POINTY_BRACKET_CLOSE)))
+                {
+                    parent_.reporter_.error("Potential missing or mismatched closing bracket",
+                                            core::Location::simple(line, char_position, parent_.source_file_.index()));
+                    return;
+                }
+
+
                 if (expected_tokens.size() == 1)
                 {
                     std::string const expected_text(parser->getVocabulary().getLiteralName(
@@ -127,7 +134,7 @@ namespace ance
                     return;
                 }
 
-                throw std::logic_error("Error handling for parser error not implemented: " + msg);
+                throw std::logic_error("Unhandled parser error: " + msg);
             }
 
             ErrorHandler& parent_;
@@ -145,12 +152,29 @@ namespace ance
         sources::SourceFile const& source_file_;
     };
 
+    static utility::Owned<ast::Statement> expectStatement(std::any const& result)
+    {
+        if (result.has_value())
+            return utility::wrap<ast::Statement>(result);
+
+        return utility::makeOwned<ast::ErrorStatement>();
+    }
+
+    static utility::Owned<ast::Expression> expectExpression(std::any const& result)
+    {
+        if (result.has_value())
+            return utility::wrap<ast::Expression>(result);
+
+        return utility::makeOwned<ast::ErrorExpression>();
+    }
+
     class SourceVisitor : public anceBaseVisitor
     {
-        // todo: source locations in nodes
-
       public:
-        std::any visitFile(anceParser::FileContext* context) override { return visit(context->statement()); }
+        std::any visitFile(anceParser::FileContext* context) override
+        {
+            return visit(context->statement());
+        }
 
         std::any visitBlockStatement(anceParser::BlockStatementContext* context) override
         {
@@ -158,7 +182,7 @@ namespace ance
 
             for (anceParser::StatementContext* statement : context->statement())
             {
-                statements.push_back(utility::wrap<ast::Statement>(visit(statement)));
+                statements.push_back(expectStatement(visit(statement)));
             }
 
             ast::Statement* statement = new ast::Block(std::move(statements));
@@ -167,7 +191,7 @@ namespace ance
 
         std::any visitExpressionStatement(anceParser::ExpressionStatementContext* context) override
         {
-            utility::Owned<ast::Expression> expression = utility::wrap<ast::Expression>(visit(context->expression()));
+            utility::Owned<ast::Expression> expression = expectExpression(visit(context->expression()));
 
             ast::Statement* statement = new ast::Independent(std::move(expression));
             return statement;
@@ -204,15 +228,13 @@ struct ance::ast::Parsing::Implementation {
         antlr4::tree::ParseTree* tree = parser->file();
 
         SourceVisitor visitor;
-        return utility::wrap<Statement>(visitor.visit(tree));
+        return expectStatement(visitor.visit(tree));
 
-        // todo: cause compiler errors (create a reporter class, should take source tree), should only be called in the listeners
-        // todo: give source to reporter and emit the logs
-        // todo: test out many cases to break the current simple grammar
+        // todo: try to find one lexer error
 
-        // todo: make the visitor fault tolerant - return error nodes
-        // todo: it might be that the simple grammar does not have cases where error nodes are needed, try some stuff out
-        // todo: when the grammar gets more complex, error nodes might be needed
+        // todo: source locations in nodes, use uft32 positions - before determining length conversion has to be done
+        // todo: add utf32 length measurement on utf8 string as utility function in this file and use it in the error handler too
+        // todo: then do the all the other steps and their node trees
     }
 
   private:

@@ -12,8 +12,10 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, IDENTIFIER = 6, SEMICOLON = 7, 
-    WHITESPACE = 8, BLOCK_COMMENT = 9, LINE_COMMENT = 10, ERROR_CHAR = 11
+    T__0 = 1, IDENTIFIER = 2, SEMICOLON = 3, WHITESPACE = 4, BLOCK_COMMENT = 5, 
+    LINE_COMMENT = 6, BRACKET_OPEN = 7, BRACKET_CLOSE = 8, CURLY_BRACKET_OPEN = 9, 
+    CURLY_BRACKET_CLOSE = 10, SQUARE_BRACKET_OPEN = 11, SQUARE_BRACKET_CLOSE = 12, 
+    POINTY_BRACKET_OPEN = 13, POINTY_BRACKET_CLOSE = 14, ERROR_CHAR = 15
   };
 
   enum {
@@ -85,6 +87,8 @@ public:
   public:
     BlockStatementContext(StatementContext *ctx);
 
+    antlr4::tree::TerminalNode *CURLY_BRACKET_OPEN();
+    antlr4::tree::TerminalNode *CURLY_BRACKET_CLOSE();
     std::vector<StatementContext *> statement();
     StatementContext* statement(size_t i);
 
@@ -111,7 +115,9 @@ public:
     CallContext(ExpressionContext *ctx);
 
     EntityContext *entity();
+    antlr4::tree::TerminalNode *BRACKET_OPEN();
     ArgumentsContext *arguments();
+    antlr4::tree::TerminalNode *BRACKET_CLOSE();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

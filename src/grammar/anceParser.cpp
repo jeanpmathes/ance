@@ -46,26 +46,29 @@ void anceParserInitialize() {
       "file", "statement", "expression", "arguments", "entity"
     },
     std::vector<std::string>{
-      "", "'{'", "'}'", "'('", "')'", "','", "", "';'"
+      "", "','", "", "';'", "", "", "", "'('", "')'", "'{'", "'}'", "'['", 
+      "']'", "'<'", "'>'"
     },
     std::vector<std::string>{
-      "", "", "", "", "", "", "IDENTIFIER", "SEMICOLON", "WHITESPACE", "BLOCK_COMMENT", 
-      "LINE_COMMENT", "ERROR_CHAR"
+      "", "", "IDENTIFIER", "SEMICOLON", "WHITESPACE", "BLOCK_COMMENT", 
+      "LINE_COMMENT", "BRACKET_OPEN", "BRACKET_CLOSE", "CURLY_BRACKET_OPEN", 
+      "CURLY_BRACKET_CLOSE", "SQUARE_BRACKET_OPEN", "SQUARE_BRACKET_CLOSE", 
+      "POINTY_BRACKET_OPEN", "POINTY_BRACKET_CLOSE", "ERROR_CHAR"
     }
   );
   static const int32_t serializedATNSegment[] = {
-  	4,1,11,44,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,1,0,1,0,1,0,1,1,1,1,
+  	4,1,15,44,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,1,0,1,0,1,0,1,1,1,1,
   	5,1,16,8,1,10,1,12,1,19,9,1,1,1,1,1,1,1,1,1,3,1,25,8,1,1,2,1,2,1,2,1,
   	2,1,2,1,3,1,3,1,3,5,3,35,8,3,10,3,12,3,38,9,3,3,3,40,8,3,1,4,1,4,1,4,
   	0,0,5,0,2,4,6,8,0,0,42,0,10,1,0,0,0,2,24,1,0,0,0,4,26,1,0,0,0,6,39,1,
-  	0,0,0,8,41,1,0,0,0,10,11,3,2,1,0,11,12,5,0,0,1,12,1,1,0,0,0,13,17,5,1,
+  	0,0,0,8,41,1,0,0,0,10,11,3,2,1,0,11,12,5,0,0,1,12,1,1,0,0,0,13,17,5,9,
   	0,0,14,16,3,2,1,0,15,14,1,0,0,0,16,19,1,0,0,0,17,15,1,0,0,0,17,18,1,0,
-  	0,0,18,20,1,0,0,0,19,17,1,0,0,0,20,25,5,2,0,0,21,22,3,4,2,0,22,23,5,7,
-  	0,0,23,25,1,0,0,0,24,13,1,0,0,0,24,21,1,0,0,0,25,3,1,0,0,0,26,27,3,8,
-  	4,0,27,28,5,3,0,0,28,29,3,6,3,0,29,30,5,4,0,0,30,5,1,0,0,0,31,36,3,4,
-  	2,0,32,33,5,5,0,0,33,35,3,4,2,0,34,32,1,0,0,0,35,38,1,0,0,0,36,34,1,0,
-  	0,0,36,37,1,0,0,0,37,40,1,0,0,0,38,36,1,0,0,0,39,31,1,0,0,0,39,40,1,0,
-  	0,0,40,7,1,0,0,0,41,42,5,6,0,0,42,9,1,0,0,0,4,17,24,36,39
+  	0,0,18,20,1,0,0,0,19,17,1,0,0,0,20,25,5,10,0,0,21,22,3,4,2,0,22,23,5,
+  	3,0,0,23,25,1,0,0,0,24,13,1,0,0,0,24,21,1,0,0,0,25,3,1,0,0,0,26,27,3,
+  	8,4,0,27,28,5,7,0,0,28,29,3,6,3,0,29,30,5,8,0,0,30,5,1,0,0,0,31,36,3,
+  	4,2,0,32,33,5,1,0,0,33,35,3,4,2,0,34,32,1,0,0,0,35,38,1,0,0,0,36,34,1,
+  	0,0,0,36,37,1,0,0,0,37,40,1,0,0,0,38,36,1,0,0,0,39,31,1,0,0,0,39,40,1,
+  	0,0,0,40,7,1,0,0,0,41,42,5,2,0,0,42,9,1,0,0,0,4,17,24,36,39
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -205,6 +208,14 @@ std::any anceParser::ExpressionStatementContext::accept(tree::ParseTreeVisitor *
 }
 //----------------- BlockStatementContext ------------------------------------------------------------------
 
+tree::TerminalNode* anceParser::BlockStatementContext::CURLY_BRACKET_OPEN() {
+  return getToken(anceParser::CURLY_BRACKET_OPEN, 0);
+}
+
+tree::TerminalNode* anceParser::BlockStatementContext::CURLY_BRACKET_CLOSE() {
+  return getToken(anceParser::CURLY_BRACKET_CLOSE, 0);
+}
+
 std::vector<anceParser::StatementContext *> anceParser::BlockStatementContext::statement() {
   return getRuleContexts<anceParser::StatementContext>();
 }
@@ -238,17 +249,17 @@ anceParser::StatementContext* anceParser::statement() {
     setState(24);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case anceParser::T__0: {
+      case anceParser::CURLY_BRACKET_OPEN: {
         _localctx = _tracker.createInstance<anceParser::BlockStatementContext>(_localctx);
         enterOuterAlt(_localctx, 1);
         setState(13);
-        match(anceParser::T__0);
+        match(anceParser::CURLY_BRACKET_OPEN);
         setState(17);
         _errHandler->sync(this);
         _la = _input->LA(1);
-        while (_la == anceParser::T__0
+        while (_la == anceParser::IDENTIFIER
 
-        || _la == anceParser::IDENTIFIER) {
+        || _la == anceParser::CURLY_BRACKET_OPEN) {
           setState(14);
           statement();
           setState(19);
@@ -256,7 +267,7 @@ anceParser::StatementContext* anceParser::statement() {
           _la = _input->LA(1);
         }
         setState(20);
-        match(anceParser::T__1);
+        match(anceParser::CURLY_BRACKET_CLOSE);
         break;
       }
 
@@ -305,8 +316,16 @@ anceParser::EntityContext* anceParser::CallContext::entity() {
   return getRuleContext<anceParser::EntityContext>(0);
 }
 
+tree::TerminalNode* anceParser::CallContext::BRACKET_OPEN() {
+  return getToken(anceParser::BRACKET_OPEN, 0);
+}
+
 anceParser::ArgumentsContext* anceParser::CallContext::arguments() {
   return getRuleContext<anceParser::ArgumentsContext>(0);
+}
+
+tree::TerminalNode* anceParser::CallContext::BRACKET_CLOSE() {
+  return getToken(anceParser::BRACKET_CLOSE, 0);
 }
 
 anceParser::CallContext::CallContext(ExpressionContext *ctx) { copyFrom(ctx); }
@@ -335,11 +354,11 @@ anceParser::ExpressionContext* anceParser::expression() {
     setState(26);
     entity();
     setState(27);
-    match(anceParser::T__2);
+    match(anceParser::BRACKET_OPEN);
     setState(28);
     arguments();
     setState(29);
-    match(anceParser::T__3);
+    match(anceParser::BRACKET_CLOSE);
    
   }
   catch (RecognitionException &e) {
@@ -402,9 +421,9 @@ anceParser::ArgumentsContext* anceParser::arguments() {
       setState(36);
       _errHandler->sync(this);
       _la = _input->LA(1);
-      while (_la == anceParser::T__4) {
+      while (_la == anceParser::T__0) {
         setState(32);
-        match(anceParser::T__4);
+        match(anceParser::T__0);
         setState(33);
         expression();
         setState(38);

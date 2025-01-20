@@ -8,6 +8,7 @@ namespace ance::sources
 {
     /**
      * Represents a source code file and stores the content in memory.
+     * The files are stored in UTF-32 encoding.
      */
     class SourceFile
     {
@@ -28,7 +29,7 @@ namespace ance::sources
          * @param line The line number, starting from 1.
          * @return A view of the line.
          */
-        [[nodiscard]] std::string_view getLine(size_t line) const;
+        [[nodiscard]] std::u32string_view getLine(size_t line) const;
 
         /**
          * Get a string view of a slice of a line.
@@ -37,7 +38,7 @@ namespace ance::sources
          * @param column_end The last column to include.
          * @return A view of the slice.
          */
-        [[nodiscard]] std::string_view getLineSlice(size_t       line,
+        [[nodiscard]] std::u32string_view getLineSlice(size_t       line,
                                                     unsigned int column_start,
                                                     unsigned int column_end) const;
 
@@ -66,21 +67,13 @@ namespace ance::sources
         [[nodiscard]] std::filesystem::path getFilename() const;
 
         /**
-         * Get the UTF-8 column index for a given UTF-32 column index.
-         * @param line The line index.
-         * @param utf_32_column The UTF-32 column index.
-         * @return The UTF-8 column index.
-         */
-        [[nodiscard]] size_t getUtf8Index(size_t line, size_t utf_32_column) const;
-
-        /**
          * Get the index of the file in the source tree.
          * @return The index.
          */
         [[nodiscard]] size_t index() const;
 
       private:
-        std::vector<std::string> lines_;
+        std::vector<std::u32string> lines_;
 
         std::filesystem::path    relative_path_;
         std::filesystem::path    full_path_;

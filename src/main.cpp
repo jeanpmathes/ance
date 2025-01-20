@@ -3,10 +3,10 @@
 
 #include <boost/locale.hpp>
 
-#include "ance/ast/Parsing.h"
 #include "ance/ast/Node.h"
-
+#include "ance/ast/Parsing.h"
 #include "ance/run/Running.h"
+#include "ance/sources/SourceTree.h"
 
 namespace ance
 {

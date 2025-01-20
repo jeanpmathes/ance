@@ -24,6 +24,14 @@ namespace ance::ast
     };
 
     /**
+     * A statement that could not be parsed correctly.
+     */
+    struct ErrorStatement
+        : Statement
+        , utility::ConcreteNode<ErrorStatement, Visitor> {
+    };
+
+    /**
      * A block statement combines multiple statements into a single statement.
      */
     struct Block
@@ -53,6 +61,14 @@ namespace ance::ast
     struct Expression
         : virtual Node
         , virtual utility::AbstractNode<Visitor> {
+    };
+
+    /**
+     * An expression that could not be parsed correctly.
+     */
+    struct ErrorExpression
+        : Expression
+        , utility::ConcreteNode<ErrorExpression, Visitor> {
     };
 
     /**
