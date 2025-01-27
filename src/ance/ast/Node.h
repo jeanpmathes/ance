@@ -5,6 +5,8 @@
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
+#include <ance/core/Reporter.h>
+
 namespace ance::ast
 {
     class Visitor;
@@ -13,6 +15,9 @@ namespace ance::ast
      * Base class for all nodes in the AST.
      */
     struct Node : virtual utility::AbstractNode<Visitor> {
+        explicit Node(core::Location const& source_location);
+
+        core::Location location;
     };
 
     /**
@@ -26,18 +31,19 @@ namespace ance::ast
     /**
      * A statement that could not be parsed correctly.
      */
-    struct ErrorStatement
+    struct ErrorStatement final
         : Statement
         , utility::ConcreteNode<ErrorStatement, Visitor> {
+        ErrorStatement();
     };
 
     /**
      * A block statement combines multiple statements into a single statement.
      */
-    struct Block
+    struct Block final
         : Statement
         , utility::ConcreteNode<Block, Visitor> {
-        explicit Block(utility::List<utility::Owned<Statement>> statements);
+        Block(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location);
 
         utility::List<utility::Owned<Statement>> statements = {};
     };
@@ -47,10 +53,10 @@ namespace ance::ast
     /**
      * An independent expression statement is a statement that consists of a single expression.
      */
-    struct Independent
+    struct Independent final
         : Statement
         , utility::ConcreteNode<Independent, Visitor> {
-        explicit Independent(utility::Owned<Expression> independent_expression);
+        Independent(utility::Owned<Expression> independent_expression, core::Location const& source_location);
 
         utility::Owned<Expression> expression;
     };
@@ -66,17 +72,19 @@ namespace ance::ast
     /**
      * An expression that could not be parsed correctly.
      */
-    struct ErrorExpression
+    struct ErrorExpression final
         : Expression
         , utility::ConcreteNode<ErrorExpression, Visitor> {
+        ErrorExpression();
     };
 
     /**
      * A call is an expression that performs the call-operator on a callable entity.
      */
-    struct Call
+    struct Call final
         : Expression
         , utility::ConcreteNode<Call, Visitor> {
+        explicit Call(core::Location const& source_location);
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>

@@ -17,6 +17,11 @@
 
 namespace ance
 {
+    static size_t getUtf32Length(std::string const& utf8)
+    {
+        return boost::locale::conv::utf_to_utf<char32_t>(utf8).size();
+    }
+
     class ErrorHandler
     {
       public:
@@ -69,8 +74,7 @@ namespace ance
                 if (previous_symbol)
                 {
                     previous_line = previous_symbol->getLine();
-                    previous_char_position = previous_symbol->getCharPositionInLine()
-                        + boost::locale::conv::utf_to_utf<char32_t>(previous_symbol->getText()).size();
+                    previous_char_position = previous_symbol->getCharPositionInLine() + getUtf32Length(previous_symbol->getText());
 
                     if (offending_symbol->getType() == antlr4::Token::EOF)
                     {
@@ -170,6 +174,22 @@ namespace ance
 
     class SourceVisitor : public anceBaseVisitor
     {
+    public:
+        explicit SourceVisitor(size_t const file_index) : file_index_(file_index) {}
+
+    private:
+        core::Location location(antlr4::ParserRuleContext const* ctx) const
+        {
+            size_t const start_line   = ctx->getStart()->getLine();
+            size_t const start_column = ctx->getStart()->getCharPositionInLine() + 1;
+
+            size_t const end_line   = ctx->getStop()->getLine();
+            size_t const end_column = ctx->getStop()->getCharPositionInLine()
+                                    + getUtf32Length(ctx->getStop()->getText());
+
+            return {start_line, start_column, end_line, end_column, file_index_};
+        }
+
       public:
         std::any visitFile(anceParser::FileContext* context) override
         {
@@ -185,7 +205,7 @@ namespace ance
                 statements.push_back(expectStatement(visit(statement)));
             }
 
-            ast::Statement* statement = new ast::Block(std::move(statements));
+            ast::Statement* statement = new ast::Block(std::move(statements), location(context));
             return statement;
         }
 
@@ -193,15 +213,18 @@ namespace ance
         {
             utility::Owned<ast::Expression> expression = expectExpression(visit(context->expression()));
 
-            ast::Statement* statement = new ast::Independent(std::move(expression));
+            ast::Statement* statement = new ast::Independent(std::move(expression), location(context));
             return statement;
         }
 
-        std::any visitCall(anceParser::CallContext*) override
+        std::any visitCall(anceParser::CallContext* context) override
         {
-            ast::Expression* expression = new ast::Call();
+            ast::Expression* expression = new ast::Call(location(context));
             return expression;
         }
+
+    private:
+        size_t file_index_;
     };
 }
 
@@ -227,14 +250,13 @@ struct ance::ast::Parsing::Implementation {
 
         antlr4::tree::ParseTree* tree = parser->file();
 
-        SourceVisitor visitor;
+        SourceVisitor visitor {source_file.index()};
         return expectStatement(visitor.visit(tree));
 
-        // todo: try to find one lexer error
-
-        // todo: source locations in nodes, use uft32 positions - before determining length conversion has to be done
-        // todo: add utf32 length measurement on utf8 string as utility function in this file and use it in the error handler too
-        // todo: then do the all the other steps and their node trees
+        // todo: add identifier() function similar to location() to get the identifier, use for call for now
+        // todo: remove the first goal step from planning
+        // todo: then do the all the other trees and their nodes (minimal grammar with just call expression but until the end of the pipeline)
+        // todo: then do the nearly full grammar with all expressions and statements
     }
 
   private:
