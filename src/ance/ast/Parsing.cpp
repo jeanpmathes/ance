@@ -10,9 +10,9 @@
 #include "anceLexer.h"
 #include "anceParser.h"
 
+#include "ance/core/Identifier.h"
 #include "ance/sources/SourceFile.h"
 #include "ance/sources/SourceTree.h"
-#include "ance/core/Identifier.h"
 
 #include "Node.h"
 
@@ -197,7 +197,7 @@ namespace ance
         {
             std::string const text = i->getText();
 
-            auto const token        = i->getSymbol();
+            auto const token = i->getSymbol();
 
             size_t const start_line   = token->getLine();
             size_t const start_column = token->getCharPositionInLine() + 1;
