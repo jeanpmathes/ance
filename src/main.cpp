@@ -12,6 +12,9 @@ namespace ance
 {
     static int program(const int argc, char** argv)
     {
+        // todo: do the all the other trees and their nodes (minimal grammar with just call expression but until the end of the pipeline)
+        // todo: then do the nearly full grammar with all expressions and statements
+
         if (argc != 2)
         {
             std::cout << "ance: command: Requires exactly one argument" << std::endl;

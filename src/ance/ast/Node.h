@@ -5,6 +5,7 @@
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
+#include <ance/core/Identifier.h>
 #include <ance/core/Reporter.h>
 
 namespace ance::ast
@@ -84,7 +85,9 @@ namespace ance::ast
     struct Call final
         : Expression
         , utility::ConcreteNode<Call, Visitor> {
-        explicit Call(core::Location const& source_location);
+        explicit Call(core::Identifier const& callable, core::Location const& source_location);
+
+        core::Identifier identifier;
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>

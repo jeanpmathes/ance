@@ -2,6 +2,8 @@
 
 #include <exception>
 
+#include <boost/locale/encoding_utf.hpp>
+
 #include <ANTLRInputStream.h>
 
 #include "anceBaseVisitor.h"
@@ -10,10 +12,9 @@
 
 #include "ance/sources/SourceFile.h"
 #include "ance/sources/SourceTree.h"
+#include "ance/core/Identifier.h"
 
 #include "Node.h"
-
-#include <boost/locale/encoding_utf.hpp>
 
 namespace ance
 {
@@ -74,7 +75,8 @@ namespace ance
                 if (previous_symbol)
                 {
                     previous_line = previous_symbol->getLine();
-                    previous_char_position = previous_symbol->getCharPositionInLine() + getUtf32Length(previous_symbol->getText());
+                    previous_char_position =
+                        previous_symbol->getCharPositionInLine() + getUtf32Length(previous_symbol->getText());
 
                     if (offending_symbol->getType() == antlr4::Token::EOF)
                     {
@@ -174,20 +176,36 @@ namespace ance
 
     class SourceVisitor : public anceBaseVisitor
     {
-    public:
+      public:
         explicit SourceVisitor(size_t const file_index) : file_index_(file_index) {}
 
-    private:
+      private:
         core::Location location(antlr4::ParserRuleContext const* ctx) const
         {
             size_t const start_line   = ctx->getStart()->getLine();
             size_t const start_column = ctx->getStart()->getCharPositionInLine() + 1;
 
-            size_t const end_line   = ctx->getStop()->getLine();
-            size_t const end_column = ctx->getStop()->getCharPositionInLine()
-                                    + getUtf32Length(ctx->getStop()->getText());
+            size_t const end_line = ctx->getStop()->getLine();
+            size_t const end_column =
+                ctx->getStop()->getCharPositionInLine() + getUtf32Length(ctx->getStop()->getText());
+            // todo: check if -1 is needed for end_column
 
             return {start_line, start_column, end_line, end_column, file_index_};
+        }
+
+        core::Identifier identifier(antlr4::tree::TerminalNode* i) const
+        {
+            std::string const text = i->getText();
+
+            auto const token        = i->getSymbol();
+
+            size_t const start_line   = token->getLine();
+            size_t const start_column = token->getCharPositionInLine() + 1;
+
+            size_t const end_line   = start_line;
+            size_t const end_column = start_column + getUtf32Length(text) - 1;
+
+            return core::Identifier::like(text, {start_line, start_column, end_line, end_column, file_index_});
         }
 
       public:
@@ -219,11 +237,13 @@ namespace ance
 
         std::any visitCall(anceParser::CallContext* context) override
         {
-            ast::Expression* expression = new ast::Call(location(context));
+            core::Identifier const callable = identifier(context->entity()->IDENTIFIER());
+
+            ast::Expression* expression = new ast::Call(callable, location(context));
             return expression;
         }
 
-    private:
+      private:
         size_t file_index_;
     };
 }
@@ -252,11 +272,6 @@ struct ance::ast::Parsing::Implementation {
 
         SourceVisitor visitor {source_file.index()};
         return expectStatement(visitor.visit(tree));
-
-        // todo: add identifier() function similar to location() to get the identifier, use for call for now
-        // todo: remove the first goal step from planning
-        // todo: then do the all the other trees and their nodes (minimal grammar with just call expression but until the end of the pipeline)
-        // todo: then do the nearly full grammar with all expressions and statements
     }
 
   private:
