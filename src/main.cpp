@@ -3,18 +3,15 @@
 
 #include <boost/locale.hpp>
 
-#include "ance/ast/Node.h"
-#include "ance/ast/Parsing.h"
-#include "ance/run/Running.h"
 #include "ance/sources/SourceTree.h"
+
+#include "ance/ast/Node.h"
+#include "ance/ast/Parser.h"
 
 namespace ance
 {
     static int program(const int argc, char** argv)
     {
-        // todo: do the all the other trees and their nodes (minimal grammar with just call expression but until the end of the pipeline)
-        // todo: then do the nearly full grammar with all expressions and statements
-
         if (argc != 2)
         {
             std::cout << "ance: command: Requires exactly one argument" << std::endl;
@@ -60,8 +57,7 @@ namespace ance
             return false;
         };
 
-        ast::Parsing parsing {source_tree, reporter};
-        run::Running running;
+        ast::Parser parsing {source_tree, reporter};
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
 
@@ -71,8 +67,6 @@ namespace ance
             return EXIT_FAILURE;
 
         // todo: intermediate steps followed by check for fail
-
-        (void)running; // todo: replace with actual running
 
         if (check_for_fail())
             return EXIT_FAILURE;

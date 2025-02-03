@@ -1,5 +1,5 @@
-#ifndef ANCE_AST_PARSING_H
-#define ANCE_AST_PARSING_H
+#ifndef ANCE_AST_PARSER_H
+#define ANCE_AST_PARSER_H
 
 #include "ance/core/Reporter.h"
 #include "ance/utility/Owners.h"
@@ -11,11 +11,11 @@ namespace ance::ast
     /**
      * Parses files into ASTs.
      */
-    class Parsing
+    class Parser
     {
       public:
-        Parsing(sources::SourceTree& source_tree, core::Reporter& reporter);
-        ~Parsing();
+        Parser(sources::SourceTree& source_tree, core::Reporter& reporter);
+        ~Parser();
 
         /**
          * Reads and parses a passed file into an AST.

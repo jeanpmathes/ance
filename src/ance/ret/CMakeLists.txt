@@ -1,0 +1,1 @@
+target_sources(ance PRIVATE Resolver.cpp Node.cpp)

@@ -1,13 +1,16 @@
 #ifndef ANCE_AST_NODE_H
 #define ANCE_AST_NODE_H
 
+#include "ance/core/Identifier.h"
+#include "ance/core/Reporter.h"
+
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
-#include <ance/core/Identifier.h>
-#include <ance/core/Reporter.h>
-
+/**
+ * The abstract syntax tree (AST) namespace.
+ */
 namespace ance::ast
 {
     class Visitor;

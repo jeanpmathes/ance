@@ -1,4 +1,4 @@
-#include "Parsing.h"
+#include "Parser.h"
 
 #include <exception>
 
@@ -248,7 +248,8 @@ namespace ance
     };
 }
 
-struct ance::ast::Parsing::Implementation {
+struct ance::ast::Parser::Implementation
+{
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
     utility::Owned<Statement> parse(sources::SourceFile const& source_file)
@@ -278,15 +279,15 @@ struct ance::ast::Parsing::Implementation {
     core::Reporter& reporter_;
 };
 
-ance::ast::Parsing::Parsing(sources::SourceTree& source_tree, core::Reporter& reporter)
+ance::ast::Parser::Parser(sources::SourceTree& source_tree, core::Reporter& reporter)
     : source_tree_(source_tree)
     , reporter_(reporter)
     , implementation_(utility::makeOwned<Implementation>(reporter))
 {}
 
-ance::ast::Parsing::~Parsing() = default;
+ance::ast::Parser::~Parser() = default;
 
-ance::utility::Owned<ance::ast::Statement> ance::ast::Parsing::parse(size_t const index)
+ance::utility::Owned<ance::ast::Statement> ance::ast::Parser::parse(size_t const index)
 {
     return implementation_->parse(source_tree_.getFile(index));
 }
