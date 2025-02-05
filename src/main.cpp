@@ -8,6 +8,9 @@
 #include "ance/ast/Node.h"
 #include "ance/ast/Parser.h"
 
+#include "ance/est/Node.h"
+#include "ance/est/Expander.h"
+
 namespace ance
 {
     static int program(const int argc, char** argv)
@@ -57,11 +60,20 @@ namespace ance
             return false;
         };
 
-        ast::Parser parsing {source_tree, reporter};
+        ast::Parser parser {source_tree, reporter};
+        est::Expander expander;
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
 
-        parsing.parse(primary_file.index());
+        if (check_for_fail())
+            return EXIT_FAILURE;
+
+        utility::Owned<ast::Statement> parsed = parser.parse(primary_file.index());
+
+        if (check_for_fail())
+            return EXIT_FAILURE;
+
+        utility::Owned<est::Statement> expanded = expander.expand(*parsed);
 
         if (check_for_fail())
             return EXIT_FAILURE;

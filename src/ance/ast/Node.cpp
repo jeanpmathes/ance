@@ -17,7 +17,16 @@ ance::ast::Independent::Independent(utility::Owned<Expression> independent_expre
 
 ance::ast::ErrorExpression::ErrorExpression() : Node(core::Location::global()), Expression() {}
 
-ance::ast::Call::Call(core::Identifier const& callable, core::Location const& source_location) : Node(source_location), Expression(), identifier(callable) {}
+ance::ast::Call::Call(core::Identifier const& callable, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , identifier(callable)
+{}
+
+void ance::ast::Visitor::visit(ErrorStatement&)
+{
+
+}
 
 void ance::ast::Visitor::visit(Block const& block)
 {
@@ -27,6 +36,11 @@ void ance::ast::Visitor::visit(Block const& block)
 void ance::ast::Visitor::visit(Independent const& independent)
 {
     visit(*independent.expression);
+}
+
+void ance::ast::Visitor::visit(ErrorExpression&)
+{
+
 }
 
 void ance::ast::Visitor::visit(Call const&) {}
