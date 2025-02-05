@@ -19,4 +19,8 @@ ance::est::Independent::Independent(utility::Owned<Expression> independent_expre
 
 ance::est::ErrorExpression::ErrorExpression() : Node(core::Location::global()), Expression() {}
 
-ance::est::Call::Call(core::Identifier const& callable, core::Location const& source_location) : Node(source_location), Expression(), identifier(callable) {}
+ance::est::Call::Call(core::Identifier const& callable, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , identifier(callable)
+{}
