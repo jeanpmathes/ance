@@ -14,6 +14,8 @@
 #include "ance/ret/Node.h"
 #include "ance/ret/Resolver.h"
 
+#include "ance/analyze/Analyzer.h"
+
 namespace ance
 {
     static int program(const int argc, char** argv)
@@ -66,28 +68,26 @@ namespace ance
         ast::Parser   parser {source_tree, reporter};
         est::Expander expander;
         ret::Resolver resolver;
+        analyze::Analyzer analyzer;
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
-
         if (check_for_fail()) return EXIT_FAILURE;
 
         utility::Owned<ast::Statement> parsed = parser.parse(primary_file.index());
-
-        if (check_for_fail())
-            return EXIT_FAILURE;
+        if (check_for_fail()) return EXIT_FAILURE;
 
         utility::Owned<est::Statement> expanded = expander.expand(*parsed);
-
         if (check_for_fail()) return EXIT_FAILURE;
 
         utility::Owned<ret::Statement> resolved = resolver.resolve(*expanded);
+        if (check_for_fail()) return EXIT_FAILURE;
 
+        analyzer.analyze(*resolved);
         if (check_for_fail()) return EXIT_FAILURE;
 
         // todo: intermediate steps followed by check for fail
 
-        if (check_for_fail())
-            return EXIT_FAILURE;
+        if (check_for_fail()) return EXIT_FAILURE;
 
         // todo: create the runner and parser and the intermediate steps
         // todo: parse the file

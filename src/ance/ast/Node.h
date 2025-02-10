@@ -100,12 +100,12 @@ namespace ance::ast
 
         ~Visitor() override = default;
 
-        virtual void visit(ErrorStatement const& error);
-        virtual void visit(Block const& block);
-        virtual void visit(Independent const& independent);
+        virtual void visit(ErrorStatement const& error) = 0;
+        virtual void visit(Block const& block) = 0;
+        virtual void visit(Independent const& independent) = 0;
 
-        virtual void visit(ErrorExpression const& error);
-        virtual void visit(Call const& call);
+        virtual void visit(ErrorExpression const& error) = 0;
+        virtual void visit(Call const& call) = 0;
     };
 }
 
