@@ -22,39 +22,39 @@ namespace ance
 
         void setResult(utility::Owned<est::Statement> statement)
         {
-            assert(!statement_expansion.hasValue() && !expression_expansion.hasValue());
+            assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
             Statements statements;
             statements.emplace_back(std::move(statement));
 
-            statement_expansion  = std::move(statements);
-            expression_expansion = std::nullopt;
+            statement_expansion_  = std::move(statements);
+            expression_expansion_ = std::nullopt;
         }
 
         void setResult(Statements statements)
         {
-            assert(!statement_expansion.hasValue() && !expression_expansion.hasValue());
+            assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
-            statement_expansion  = std::move(statements);
-            expression_expansion = std::nullopt;
+            statement_expansion_  = std::move(statements);
+            expression_expansion_ = std::nullopt;
         }
 
         void setResult(utility::Owned<est::Expression> expression)
         {
-            assert(!statement_expansion.hasValue() && !expression_expansion.hasValue());
+            assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
-            statement_expansion  = std::nullopt;
-            expression_expansion = {.before = {}, .center = std::move(expression), .after = {}};
+            statement_expansion_  = std::nullopt;
+            expression_expansion_ = {.before = {}, .center = std::move(expression), .after = {}};
         }
 
         Statements expand(ast::Statement const& statement)
         {
             visit(statement);
 
-            assert(statement_expansion.hasValue());
+            assert(statement_expansion_.hasValue());
 
-            Statements result   = std::move(*statement_expansion);
-            statement_expansion = std::nullopt;
+            Statements result    = std::move(*statement_expansion_);
+            statement_expansion_ = std::nullopt;
 
             return result;
         }
@@ -63,15 +63,15 @@ namespace ance
         {
             visit(expression);
 
-            assert(expression_expansion.hasValue());
+            assert(expression_expansion_.hasValue());
 
-            Expansion result     = std::move(*expression_expansion);
-            expression_expansion = std::nullopt;
+            Expansion result      = std::move(*expression_expansion_);
+            expression_expansion_ = std::nullopt;
 
             return result;
         }
 
-        void visit(ast::ErrorStatement&) override { setResult(utility::makeOwned<est::ErrorStatement>()); }
+        void visit(ast::ErrorStatement const&) override { setResult(utility::makeOwned<est::ErrorStatement>()); }
 
         void visit(ast::Block const& block) override
         {
@@ -106,15 +106,16 @@ namespace ance
             setResult(std::move(statements));
         }
 
-        void visit(ast::ErrorExpression&) override { setResult(utility::makeOwned<est::ErrorExpression>()); }
+        void visit(ast::ErrorExpression const&) override { setResult(utility::makeOwned<est::ErrorExpression>()); }
 
         void visit(ast::Call const& call) override
         {
             setResult(utility::makeOwned<est::Call>(call.identifier, call.location));
         }
 
-        utility::Optional<Statements> statement_expansion;
-        utility::Optional<Expansion>  expression_expansion;
+      private:
+        utility::Optional<Statements> statement_expansion_;
+        utility::Optional<Expansion>  expression_expansion_;
     };
 }
 

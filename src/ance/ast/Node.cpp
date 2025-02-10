@@ -23,7 +23,7 @@ ance::ast::Call::Call(core::Identifier const& callable, core::Location const& so
     , identifier(callable)
 {}
 
-void ance::ast::Visitor::visit(ErrorStatement&) {}
+void ance::ast::Visitor::visit(ErrorStatement const&) {}
 
 void ance::ast::Visitor::visit(Block const& block)
 {
@@ -35,6 +35,6 @@ void ance::ast::Visitor::visit(Independent const& independent)
     visit(*independent.expression);
 }
 
-void ance::ast::Visitor::visit(ErrorExpression&) {}
+void ance::ast::Visitor::visit(ErrorExpression const&) {}
 
 void ance::ast::Visitor::visit(Call const&) {}

@@ -11,6 +11,9 @@
 #include "ance/est/Expander.h"
 #include "ance/est/Node.h"
 
+#include "ance/ret/Node.h"
+#include "ance/ret/Resolver.h"
+
 namespace ance
 {
     static int program(const int argc, char** argv)
@@ -62,6 +65,7 @@ namespace ance
 
         ast::Parser   parser {source_tree, reporter};
         est::Expander expander;
+        ret::Resolver resolver;
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
 
@@ -73,6 +77,10 @@ namespace ance
             return EXIT_FAILURE;
 
         utility::Owned<est::Statement> expanded = expander.expand(*parsed);
+
+        if (check_for_fail()) return EXIT_FAILURE;
+
+        utility::Owned<ret::Statement> resolved = resolver.resolve(*expanded);
 
         if (check_for_fail()) return EXIT_FAILURE;
 

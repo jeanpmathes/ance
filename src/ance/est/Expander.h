@@ -28,12 +28,6 @@ namespace ance::est
          */
         utility::Owned<Statement> expand(ast::Statement const& statement);
 
-        // todo: do all the intermediate steps for the minimal grammar, starting with the expander
-        // todo: when arrived at the compiler, do nothing there
-        // todo: in the runner, simply print the identifiers
-        // todo: then add the function registration to runner
-        // todo: then add an extended grammar with all statements and expressions
-
       private:
         struct Implementation;
         utility::Owned<Implementation> implementation_;

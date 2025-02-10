@@ -15,7 +15,6 @@ namespace ance::cet
         ~Runner();
 
         // todo: has a method Owned<cet::Node> run(Owned<bbt::Statement> const& statement);
-        // todo: the runner should also have a method addFunction(std::string const& name, std::function<void()> const& function)
 
     private:
         struct Implementation;
