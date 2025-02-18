@@ -16,6 +16,9 @@
 
 #include "ance/analyze/Analyzer.h"
 
+#include "ance/bbt/Node.h"
+#include "ance/bbt/Segmenter.h"
+
 namespace ance
 {
     static int program(const int argc, char** argv)
@@ -69,6 +72,7 @@ namespace ance
         est::Expander expander;
         ret::Resolver resolver;
         analyze::Analyzer analyzer;
+        bbt::Segmenter segmenter;
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
         if (check_for_fail()) return EXIT_FAILURE;
@@ -83,6 +87,9 @@ namespace ance
         if (check_for_fail()) return EXIT_FAILURE;
 
         analyzer.analyze(*resolved);
+        if (check_for_fail()) return EXIT_FAILURE;
+
+        utility::Owned<bbt::BasicBlock> segmented = segmenter.segment(*resolved);
         if (check_for_fail()) return EXIT_FAILURE;
 
         // todo: intermediate steps followed by check for fail

@@ -4,8 +4,15 @@
 #include "ance/core/Reporter.h"
 #include "ance/utility/Owners.h"
 
+namespace ance::ret
+{
+    struct Statement;
+}
+
 namespace ance::bbt
 {
+  struct BasicBlock;
+
   /**
    * Segments RETs into BBTs.
    */
@@ -15,12 +22,15 @@ namespace ance::bbt
     Segmenter();
     ~Segmenter();
 
-    // todo: do all the intermediate steps for the minimal grammar
-    // todo: do the segmenter without any complex algorithm for now, simply put all statements in one BB
-    // todo: when arrived at the compiler, add empty visitor there
-    // todo: in the runner, simply print the identifiers to console
-    // todo: then add the function registration to resolver and an intrinsic class instead of std::function
-    // todo: then add an extended grammar with all statements and expressions
+    /**
+     * Segment a statement into a basic block.
+     * @param statement The statement to segment.
+     * @return The basic block.
+     */
+    utility::Owned<BasicBlock> segment(ret::Statement const& statement);
+
+    // todo: think how to do simplification here, maybe internal bb representation first with mutable state
+    // todo: then run simplify on that like in old implementation, only then return the bb nodes
 
   private:
     struct Implementation;

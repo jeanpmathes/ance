@@ -2,12 +2,14 @@
 
 #include "ance/ret/Node.h"
 
-namespace ance
+namespace ance::analyze
 {
     class RET final : public ret::Visitor
     {
       public:
         using Visitor::visit;
+
+        ~RET() override = default;
 
         void visit(ret::ErrorStatement const&) override
         {
@@ -42,9 +44,9 @@ struct ance::analyze::Analyzer::Implementation
 {
     void analyze(ret::Statement const& statement)
     {
-        RET ret;
+        utility::Owned<RET> ret = utility::makeOwned<RET>();
 
-        ret.visit(statement);
+        ret->visit(statement);
     }
 };
 

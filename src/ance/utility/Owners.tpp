@@ -60,6 +60,7 @@ T& ance::utility::Owned<T>::operator*()
 {
     return *value_;
 }
+
 template<typename T>
 T* ance::utility::Owned<T>::operator->()
 {

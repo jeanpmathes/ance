@@ -5,13 +5,13 @@
 #include "ance/ast/Node.h"
 #include "ance/est/Node.h"
 
-namespace ance
+namespace ance::est
 {
-    using Statements = utility::List<utility::Owned<est::Statement>>;
+    using Statements = utility::List<utility::Owned<Statement>>;
 
     struct Expansion {
         Statements                      before;
-        utility::Owned<est::Expression> center;
+        utility::Owned<Expression> center;
         Statements                      after;
     };
 
@@ -20,7 +20,9 @@ namespace ance
       public:
         using Visitor::visit;
 
-        void setResult(utility::Owned<est::Statement> statement)
+        ~AST() override = default;
+
+        void setResult(utility::Owned<Statement> statement)
         {
             assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
@@ -39,7 +41,7 @@ namespace ance
             expression_expansion_ = std::nullopt;
         }
 
-        void setResult(utility::Owned<est::Expression> expression)
+        void setResult(utility::Owned<Expression> expression)
         {
             assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
@@ -71,11 +73,11 @@ namespace ance
             return result;
         }
 
-        void visit(ast::ErrorStatement const&) override { setResult(utility::makeOwned<est::ErrorStatement>()); }
+        void visit(ast::ErrorStatement const&) override { setResult(utility::makeOwned<ErrorStatement>()); }
 
         void visit(ast::Block const& block) override
         {
-            utility::List<utility::Owned<est::Statement>> statements;
+            utility::List<utility::Owned<Statement>> statements;
 
             for (auto& statement : block.statements)
             {
@@ -85,7 +87,7 @@ namespace ance
                                   make_move_iterator(expanded.end()));
             }
 
-            setResult(utility::makeOwned<est::Block>(std::move(statements), block.location));
+            setResult(utility::makeOwned<Block>(std::move(statements), block.location));
         }
 
         void visit(ast::Independent const& independent) override
@@ -98,7 +100,7 @@ namespace ance
                               make_move_iterator(expansion.before.begin()),
                               make_move_iterator(expansion.before.end()));
             statements.emplace_back(
-                utility::makeOwned<est::Independent>(std::move(expansion.center), independent.location));
+                utility::makeOwned<Independent>(std::move(expansion.center), independent.location));
             statements.insert(statements.end(),
                               make_move_iterator(expansion.after.begin()),
                               make_move_iterator(expansion.after.end()));
@@ -106,11 +108,11 @@ namespace ance
             setResult(std::move(statements));
         }
 
-        void visit(ast::ErrorExpression const&) override { setResult(utility::makeOwned<est::ErrorExpression>()); }
+        void visit(ast::ErrorExpression const&) override { setResult(utility::makeOwned<ErrorExpression>()); }
 
         void visit(ast::Call const& call) override
         {
-            setResult(utility::makeOwned<est::Call>(call.identifier, call.location));
+            setResult(utility::makeOwned<Call>(call.identifier, call.location));
         }
 
       private:
@@ -122,9 +124,9 @@ namespace ance
 struct ance::est::Expander::Implementation {
     utility::Owned<Statement> expand(ast::Statement const& statement)
     {
-        AST ast;
+        utility::Owned<AST> ast = utility::makeOwned<AST>();
 
-        Statements statements = ast.expand(statement);
+        Statements statements = ast->expand(statement);
 
         return utility::makeOwned<Block>(std::move(statements), statement.location);
     }

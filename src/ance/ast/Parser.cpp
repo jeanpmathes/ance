@@ -16,7 +16,7 @@
 
 #include "Node.h"
 
-namespace ance
+namespace ance::ast
 {
     static size_t getUtf32Length(std::string const& utf8)
     {
@@ -178,6 +178,8 @@ namespace ance
     {
       public:
         explicit SourceVisitor(size_t const file_index) : file_index_(file_index) {}
+
+        ~SourceVisitor() override = default;
 
       private:
         core::Location location(antlr4::ParserRuleContext const* ctx) const
