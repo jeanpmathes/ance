@@ -19,9 +19,14 @@
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Segmenter.h"
 
+#include "ance/cet/Node.h"
+#include "ance/cet/Runner.h"
+
+#include "ance/build/Compiler.h"
+
 namespace ance
 {
-    static int program(const int argc, char** argv)
+    static int program(int const argc, char** argv)
     {
         if (argc != 2)
         {
@@ -46,21 +51,19 @@ namespace ance
         std::filesystem::path const base_path = file_path.parent_path();
         std::filesystem::path const file_name = file_path.filename();
 
-        bool const warnings_as_errors = false; // todo: allow setting
+        bool const warnings_as_errors = false;// todo: allow setting
 
         sources::SourceTree source_tree {base_path};
         core::Reporter      reporter;
 
-        auto check_for_fail = [&source_tree, &reporter, &out]()
-        {
+        auto check_for_fail = [&source_tree, &reporter, &out]() {
             if (reporter.errorCount() > 0 || (warnings_as_errors && reporter.warningCount() > 0))
             {
                 reporter.emit(source_tree, out);
 
                 out << "ance: Failed";
 
-                if (reporter.errorCount() == 0)
-                    out << " (by warning)";
+                if (reporter.errorCount() == 0) out << " (by warning)";
 
                 return true;
             }
@@ -68,11 +71,13 @@ namespace ance
             return false;
         };
 
-        ast::Parser   parser {source_tree, reporter};
-        est::Expander expander;
-        ret::Resolver resolver;
+        ast::Parser       parser {source_tree, reporter};
+        est::Expander     expander;
+        ret::Resolver     resolver;
         analyze::Analyzer analyzer;
-        bbt::Segmenter segmenter;
+        bbt::Segmenter    segmenter;
+        cet::Runner       runner;
+        build::Compiler   compiler;
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
         if (check_for_fail()) return EXIT_FAILURE;
@@ -92,14 +97,16 @@ namespace ance
         utility::Owned<bbt::BasicBlock> segmented = segmenter.segment(*resolved);
         if (check_for_fail()) return EXIT_FAILURE;
 
-        // todo: intermediate steps followed by check for fail
-
+        utility::Owned<cet::Unit> unit = runner.run(*segmented);
         if (check_for_fail()) return EXIT_FAILURE;
 
-        // todo: create the runner and parser and the intermediate steps
-        // todo: parse the file
-        // todo: do the intermediate steps
-        // todo: give it to the runner
+        compiler.compile(*unit);
+        if (check_for_fail()) return EXIT_FAILURE;
+
+        // todo: add the function registration to resolver and an intrinsic class (no std::function), remove identifier from intrinsic nodes
+        // todo: add all control flow statements to grammar and support them in the compiler
+        // todo: add all expressions (both value and control flow) to grammar and support them in the compiler - needs types - do simpler types without the definition bridge
+        // todo: add code that is actually compiled, main only for now
 
         reporter.emit(source_tree, out);
 

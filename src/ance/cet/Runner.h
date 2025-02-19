@@ -3,8 +3,15 @@
 
 #include "ance/utility/Owners.h"
 
+namespace ance::bbt
+{
+    struct BasicBlock;
+}
+
 namespace ance::cet
 {
+    struct Unit;
+
     /**
      * Runs code in basic-block form (BBT) at compile-time, producing CETs.
      */
@@ -14,14 +21,12 @@ namespace ance::cet
         Runner();
         ~Runner();
 
-        // todo: do all the intermediate steps for the minimal grammar
-        // todo: the CET is for now nearly identical to the BBT in nodes, but the runner should output an empty CET unit as highest node
-        // todo: when arrived at the compiler, add empty visitor there
-        // todo: in the runner, simply print the identifiers to console
-        // todo: then add the function registration to resolver and an intrinsic class instead of std::function
-        // todo: then add an extended grammar with all statements and expressions
-
-        // todo: has a method Owned<cet::Node> run(Owned<bbt::Statement> const& statement);
+        /**
+         * Run the given tree in basic-block form.
+         * @param block The basic block to run.
+         * @return The resulting compile-able unit.
+         */
+        utility::Owned<Unit> run(bbt::BasicBlock const& block); // todo: should maybe become bbt::Unit or bbt::Function to allow control flow
 
     private:
         struct Implementation;
