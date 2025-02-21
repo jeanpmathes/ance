@@ -72,12 +72,12 @@ namespace ance
         };
 
         ast::Parser       parser {source_tree, reporter};
-        est::Expander     expander;
-        ret::Resolver     resolver;
-        analyze::Analyzer analyzer;
-        bbt::Segmenter    segmenter;
-        cet::Runner       runner;
-        build::Compiler   compiler;
+        est::Expander     expander {reporter};
+        ret::Resolver     resolver {reporter};
+        analyze::Analyzer analyzer {reporter};
+        bbt::Segmenter    segmenter {reporter};
+        cet::Runner       runner {reporter};
+        build::Compiler   compiler {reporter};
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
         if (check_for_fail()) return EXIT_FAILURE;
@@ -103,12 +103,15 @@ namespace ance
         compiler.compile(*unit);
         if (check_for_fail()) return EXIT_FAILURE;
 
-        // todo: add the function registration to resolver and an intrinsic class (no std::function), remove identifier from intrinsic nodes
+        reporter.emit(source_tree, out);
+
+        // todo: add a printer visitor for each tree, use it to print to file after each stage, write some utility functions to simplify this
+        // todo: add the intrinsic registration to resolver and an intrinsic class (contain no functionality, instead intrinsic visitor), remove identifier from intrinsic nodes and use intrinsic refs instead
+        //      ->> to support writing with hardcoded intrinsics, some intrinsics should have a class with singletons, intrinsics use an intrinsic visitor with the hardcoded types and one dynamic intrinsic for all others 
         // todo: add all control flow statements to grammar and support them in the compiler
         // todo: add all expressions (both value and control flow) to grammar and support them in the compiler - needs types - do simpler types without the definition bridge
-        // todo: add code that is actually compiled, main only for now
-
-        reporter.emit(source_tree, out);
+        // todo: add intrinsic functions to include another file, running the cmp code in there too
+        // todo: add first non-cmp code and do actual compilation
 
         out << "ance: Success";
 

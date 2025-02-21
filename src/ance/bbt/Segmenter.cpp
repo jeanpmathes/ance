@@ -12,6 +12,7 @@ namespace ance::bbt
       public:
         using Visitor::visit;
 
+        explicit RET(core::Reporter& reporter) : reporter_(reporter) {}
         ~RET() override = default;
 
         utility::Owned<BasicBlock> segment(ret::Statement const& statement)
@@ -74,25 +75,34 @@ namespace ance::bbt
             utility::Owned<Expression> expression = utility::makeOwned<Intrinsic>(intrinsic.identifier, intrinsic.location);
 
             setResult(std::move(expression));
+
+            (void)reporter_; // todo: use it or remove it
         }
 
       private:
-        utility::List<utility::Owned<Statement>> statements_                ;
-        utility::Optional<utility::Owned<Expression>> segmented_expression_ ;
+        utility::List<utility::Owned<Statement>> statements_;
+        utility::Optional<utility::Owned<Expression>> segmented_expression_;
+
+        core::Reporter& reporter_;
     };
 }
 
 struct ance::bbt::Segmenter::Implementation
 {
+    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
+
     utility::Owned<BasicBlock> segment(ret::Statement const& statement)
     {
-        utility::Owned<RET> ret = utility::makeOwned<RET>();
+        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
 
         return ret->segment(statement);
     }
+
+private:
+    core::Reporter& reporter_;
 };
 
-ance::bbt::Segmenter::Segmenter() : implementation_(utility::makeOwned<Implementation>()) {}
+ance::bbt::Segmenter::Segmenter(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
 
 ance::bbt::Segmenter::~Segmenter() = default;
 

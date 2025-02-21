@@ -20,6 +20,7 @@ namespace ance::est
       public:
         using Visitor::visit;
 
+        explicit AST(core::Reporter& reporter) : reporter_(reporter) {}
         ~AST() override = default;
 
         void setResult(utility::Owned<Statement> statement)
@@ -52,6 +53,8 @@ namespace ance::est
         Statements expand(ast::Statement const& statement)
         {
             visit(statement);
+
+            (void)reporter_;//todo: use reporter or remove from expander at some point
 
             assert(statement_expansion_.hasValue());
 
@@ -118,21 +121,29 @@ namespace ance::est
       private:
         utility::Optional<Statements> statement_expansion_;
         utility::Optional<Expansion>  expression_expansion_;
+
+        core::Reporter& reporter_;
     };
 }
 
-struct ance::est::Expander::Implementation {
+struct ance::est::Expander::Implementation
+{
+    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
+
     utility::Owned<Statement> expand(ast::Statement const& statement)
     {
-        utility::Owned<AST> ast = utility::makeOwned<AST>();
+        utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
 
         Statements statements = ast->expand(statement);
 
         return utility::makeOwned<Block>(std::move(statements), statement.location);
     }
+
+private:
+    core::Reporter& reporter_;
 };
 
-ance::est::Expander::Expander() : implementation_(utility::makeOwned<Implementation>()) {}
+ance::est::Expander::Expander(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
 
 ance::est::Expander::~Expander() = default;
 

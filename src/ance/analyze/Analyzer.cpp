@@ -9,6 +9,7 @@ namespace ance::analyze
       public:
         using Visitor::visit;
 
+        explicit RET(core::Reporter& reporter) : reporter_(reporter) {}
         ~RET() override = default;
 
         void visit(ret::ErrorStatement const&) override
@@ -35,22 +36,30 @@ namespace ance::analyze
 
         void visit(ret::Intrinsic const&) override
         {
-
+            (void)reporter_; //todo: use it here
         }
+
+    private:
+        core::Reporter& reporter_;
     };
 }
 
 struct ance::analyze::Analyzer::Implementation
 {
+    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
+
     void analyze(ret::Statement const& statement)
     {
-        utility::Owned<RET> ret = utility::makeOwned<RET>();
+        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
 
         ret->visit(statement);
     }
+
+private:
+    core::Reporter& reporter_;
 };
 
-ance::analyze::Analyzer::Analyzer() : implementation_(utility::makeOwned<Implementation>()) {}
+ance::analyze::Analyzer::Analyzer(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
 
 ance::analyze::Analyzer::~Analyzer() = default;
 

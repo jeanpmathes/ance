@@ -19,17 +19,17 @@ namespace ance::ret
     class Resolver
     {
       public:
-        Resolver();
+        explicit Resolver(core::Reporter& reporter);
         ~Resolver();
 
         /**
-       * Resolve a statement.
-       * @param statement The statement to resolve.
-       * @return The resolved statement.
-       */
+         * Resolve a statement.
+         * @param statement The statement to resolve.
+         * @return The resolved statement.
+         */
         utility::Owned<Statement> resolve(est::Statement const& statement);
 
-        // todo: should also have a method addFunction(std::string const& name, std::function<void()> const& function)
+        // todo: should also have a method register(std::string const& name, Intrinsic intrinsic)
 
       private:
         struct Implementation;

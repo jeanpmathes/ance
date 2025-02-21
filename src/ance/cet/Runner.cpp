@@ -13,6 +13,7 @@ namespace ance::cet
     public:
         using Visitor::visit;
 
+        explicit BBT(core::Reporter& reporter) : reporter_(reporter) {}
         ~BBT() override = default;
 
         void visit(bbt::BasicBlock const& basic_block) override
@@ -41,27 +42,36 @@ namespace ance::cet
         void visit(bbt::Intrinsic const& intrinsic) override
         {
             std::cout << "DEBUG: " << intrinsic.identifier << std::endl; // todo: remove
+
+            (void) reporter_; // todo: use reporter or remove from runner at some point
         }
 
     private:
         bool is_invalid_ = false;
+
+        core::Reporter& reporter_;
     };
 }
 
 struct ance::cet::Runner::Implementation
 {
+    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
+
     utility::Owned<Unit> run(bbt::BasicBlock const& block)
     {
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
 
-        utility::Owned<BBT> bbt = utility::makeOwned<BBT>();
+        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(reporter_);
         bbt->visit(block);
 
         return unit;
     }
+
+private:
+    core::Reporter& reporter_;
 };
 
-ance::cet::Runner::Runner() : implementation_(utility::makeOwned<Implementation>()) {}
+ance::cet::Runner::Runner(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
 
 ance::cet::Runner::~Runner() = default;
 

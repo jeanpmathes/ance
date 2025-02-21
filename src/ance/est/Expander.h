@@ -2,6 +2,7 @@
 #define ANCE_EST_EXPANDER_H
 
 #include "ance/utility/Owners.h"
+#include "ance/core/Reporter.h"
 
 namespace ance::ast
 {
@@ -18,7 +19,7 @@ namespace ance::est
     class Expander
     {
       public:
-        Expander();
+        explicit Expander(core::Reporter& reporter);
         ~Expander();
 
         /**

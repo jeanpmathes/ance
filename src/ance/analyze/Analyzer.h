@@ -17,7 +17,7 @@ namespace ance::analyze
     class Analyzer
     {
     public:
-      Analyzer();
+      explicit Analyzer(core::Reporter& reporter);
       ~Analyzer();
 
       /**

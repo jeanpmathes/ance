@@ -19,7 +19,7 @@ namespace ance::bbt
   class Segmenter
   {
   public:
-    Segmenter();
+    explicit Segmenter(core::Reporter& reporter);
     ~Segmenter();
 
     /**

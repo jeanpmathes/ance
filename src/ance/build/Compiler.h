@@ -17,7 +17,7 @@ namespace ance::build
     class Compiler
     {
       public:
-        Compiler();
+        explicit Compiler(core::Reporter& reporter);
         ~Compiler();
 
         /**

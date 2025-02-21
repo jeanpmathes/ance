@@ -12,6 +12,7 @@ namespace ance::ret
       public:
         using Visitor::visit;
 
+        explicit EST(core::Reporter& reporter) : reporter_(reporter) {}
         ~EST() override = default;
 
         void setResult(utility::Owned<Statement> statement)
@@ -33,6 +34,8 @@ namespace ance::ret
         utility::Owned<Statement> resolve(est::Statement const& statement)
         {
             visit(statement);
+
+            (void)reporter_;//todo: use reporter or remove from resolver at some point
 
             assert(resolved_statement_.hasValue());
 
@@ -86,20 +89,27 @@ namespace ance::ret
       private:
         utility::Optional<utility::Owned<Statement>>  resolved_statement_;
         utility::Optional<utility::Owned<Expression>> resolved_expression_;
+
+        core::Reporter& reporter_;
     };
 }
 
 struct ance::ret::Resolver::Implementation
 {
+    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
+
     utility::Owned<Statement> resolve(est::Statement const& statement)
     {
-        utility::Owned<EST> est = utility::makeOwned<EST>();
+        utility::Owned<EST> est = utility::makeOwned<EST>(reporter_);
 
         return est->resolve(statement);
     }
+
+private:
+    core::Reporter& reporter_;
 };
 
-ance::ret::Resolver::Resolver() : implementation_(utility::makeOwned<Implementation>()) {}
+ance::ret::Resolver::Resolver(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
 
 ance::ret::Resolver::~Resolver() = default;
 

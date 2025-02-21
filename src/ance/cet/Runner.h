@@ -2,6 +2,7 @@
 #define ANCE_CET_RUNNER_H
 
 #include "ance/utility/Owners.h"
+#include "ance/core/Reporter.h"
 
 namespace ance::bbt
 {
@@ -18,7 +19,7 @@ namespace ance::cet
     class Runner
     {
     public:
-        Runner();
+        explicit Runner(core::Reporter& reporter);
         ~Runner();
 
         /**
