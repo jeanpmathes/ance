@@ -5,7 +5,7 @@
 #include "ance/ret/Node.h"
 #include "ance/bbt/Node.h"
 
-namespace ance::bbt
+struct ance::bbt::Segmenter::Implementation
 {
     class RET final : public ret::Visitor
     {
@@ -85,10 +85,7 @@ namespace ance::bbt
 
         core::Reporter& reporter_;
     };
-}
 
-struct ance::bbt::Segmenter::Implementation
-{
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
     utility::Owned<BasicBlock> segment(ret::Statement const& statement)

@@ -5,11 +5,12 @@
 #include "ance/ast/Node.h"
 #include "ance/est/Node.h"
 
-namespace ance::est
+struct ance::est::Expander::Implementation
 {
     using Statements = utility::List<utility::Owned<Statement>>;
 
-    struct Expansion {
+    struct Expansion
+    {
         Statements                      before;
         utility::Owned<Expression> center;
         Statements                      after;
@@ -124,10 +125,7 @@ namespace ance::est
 
         core::Reporter& reporter_;
     };
-}
 
-struct ance::est::Expander::Implementation
-{
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
     utility::Owned<Statement> expand(ast::Statement const& statement)

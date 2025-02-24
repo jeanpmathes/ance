@@ -6,7 +6,7 @@
 #include "ance/bbt/Node.h"
 #include "ance/cet/Node.h"
 
-namespace ance::cet
+struct ance::cet::Runner::Implementation
 {
     class BBT final : public bbt::Visitor
     {
@@ -51,10 +51,7 @@ namespace ance::cet
 
         core::Reporter& reporter_;
     };
-}
 
-struct ance::cet::Runner::Implementation
-{
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
     utility::Owned<Unit> run(bbt::BasicBlock const& block)

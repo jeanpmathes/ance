@@ -5,7 +5,7 @@
 #include "ance/est/Node.h"
 #include "ance/ret/Node.h"
 
-namespace ance::ret
+struct ance::ret::Resolver::Implementation
 {
     class EST final : public est::Visitor
     {
@@ -92,10 +92,7 @@ namespace ance::ret
 
         core::Reporter& reporter_;
     };
-}
 
-struct ance::ret::Resolver::Implementation
-{
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
     utility::Owned<Statement> resolve(est::Statement const& statement)

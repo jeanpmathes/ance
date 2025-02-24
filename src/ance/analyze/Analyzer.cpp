@@ -2,11 +2,11 @@
 
 #include "ance/ret/Node.h"
 
-namespace ance::analyze
+struct ance::analyze::Analyzer::Implementation
 {
     class RET final : public ret::Visitor
     {
-      public:
+    public:
         using Visitor::visit;
 
         explicit RET(core::Reporter& reporter) : reporter_(reporter) {}
@@ -42,10 +42,7 @@ namespace ance::analyze
     private:
         core::Reporter& reporter_;
     };
-}
 
-struct ance::analyze::Analyzer::Implementation
-{
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
     void analyze(ret::Statement const& statement)

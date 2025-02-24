@@ -2,7 +2,8 @@
 
 #include "ance/ast/Node.h"
 
-struct ance::ast::Printer::Implementation {
+struct ance::ast::Printer::Implementation
+{
     class AST final : public Visitor
     {
       public:
@@ -13,9 +14,9 @@ struct ance::ast::Printer::Implementation {
 
         void indent() const { out_ << std::string(indent_ * 4, ' '); }
 
-        void visit(ast::ErrorStatement const&) override { out_ << "// error"; }
+        void visit(ErrorStatement const&) override { out_ << "// error"; }
 
-        void visit(ast::Block const& block) override
+        void visit(Block const& block) override
         {
             out_ << "{" << std::endl;
             indent_++;
@@ -32,15 +33,15 @@ struct ance::ast::Printer::Implementation {
             out_ << "}";
         }
 
-        void visit(ast::Independent const& independent) override
+        void visit(Independent const& independent) override
         {
             visit(*independent.expression);
             out_ << ";";
         }
 
-        void visit(ast::ErrorExpression const&) override { out_ << "// error"; }
+        void visit(ErrorExpression const&) override { out_ << "// error"; }
 
-        void visit(ast::Call const& call) override { out_ << call.identifier << "()"; }
+        void visit(Call const& call) override { out_ << call.identifier << "()"; }
 
       private:
         std::ostream& out_;

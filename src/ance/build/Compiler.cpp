@@ -4,7 +4,7 @@
 
 #include "ance/cet/Node.h"
 
-namespace ance::build
+struct ance::build::Compiler::Implementation
 {
     class CET final : public cet::Visitor
     {
@@ -39,10 +39,7 @@ namespace ance::build
     private:
         core::Reporter& reporter_;
     };
-}
 
-struct ance::build::Compiler::Implementation
-{
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
     void compile(cet::Unit const& unit)
