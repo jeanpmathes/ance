@@ -1,4 +1,5 @@
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 
 #include <boost/locale.hpp>
@@ -7,6 +8,7 @@
 
 #include "ance/ast/Node.h"
 #include "ance/ast/Parser.h"
+#include "ance/ast/Printer.h"
 
 #include "ance/est/Expander.h"
 #include "ance/est/Node.h"
@@ -26,6 +28,16 @@
 
 namespace ance
 {
+    template<class Printer, class Tree>
+    void print(Tree const& tree, std::filesystem::path const& debug_path, std::string const& tree_name)
+    {
+        std::filesystem::path const tree_path = debug_path / (tree_name + ".txt");
+        std::ofstream               out {tree_path};
+
+        Printer printer {out};
+        printer.print(tree);
+    }
+
     static int program(int const argc, char** argv)
     {
         if (argc != 2)
@@ -50,6 +62,12 @@ namespace ance
 
         std::filesystem::path const base_path = file_path.parent_path();
         std::filesystem::path const file_name = file_path.filename();
+
+        std::filesystem::path const output_path = base_path / "bld";
+        create_directories(output_path);
+
+        std::filesystem::path const debug_path = output_path / "dbg";
+        create_directories(debug_path);
 
         bool const warnings_as_errors = false;// todo: allow setting
 
@@ -84,6 +102,8 @@ namespace ance
 
         utility::Owned<ast::Statement> parsed = parser.parse(primary_file.index());
         if (check_for_fail()) return EXIT_FAILURE;
+
+        print<ast::Printer>(*parsed, debug_path, "ast");
 
         utility::Owned<est::Statement> expanded = expander.expand(*parsed);
         if (check_for_fail()) return EXIT_FAILURE;
