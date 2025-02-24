@@ -2,51 +2,51 @@
 
 #include "ance/ast/Node.h"
 
+#include "ance/core/Printer.h"
+
 struct ance::ast::Printer::Implementation
 {
-    class AST final : public Visitor
+    class AST final
+        : public Visitor
+        , core::Printer
     {
       public:
         using Visitor::visit;
 
-        explicit AST(std::ostream& out) : out_(out) {}
+        explicit AST(std::ostream& out) : Printer(out) {}
         ~AST() override = default;
 
-        void indent() const { out_ << std::string(indent_ * 4, ' '); }
-
-        void visit(ErrorStatement const&) override { out_ << "// error"; }
+        void visit(ErrorStatement const&) override { print("// error"); }
 
         void visit(Block const& block) override
         {
-            out_ << "{" << std::endl;
-            indent_++;
+            print("{");
+            line();
+            enter();
 
             for (auto& statement : block.statements)
             {
-                indent();
                 visit(*statement);
-                out_ << std::endl;
+                line();
             }
 
-            indent_--;
-            indent();
-            out_ << "}";
+            exit();
+            print("}");
         }
 
         void visit(Independent const& independent) override
         {
             visit(*independent.expression);
-            out_ << ";";
+            print(";");
         }
 
-        void visit(ErrorExpression const&) override { out_ << "// error"; }
+        void visit(ErrorExpression const&) override { print("/* error */"); }
 
-        void visit(Call const& call) override { out_ << call.identifier << "()"; }
-
-      private:
-        std::ostream& out_;
-
-        size_t indent_ = 0;
+        void visit(Call const& call) override
+        {
+            print(call.identifier);
+            print("()");
+        }
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}

@@ -125,7 +125,7 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add a printer visitor for each tree, use it to print to file after each stage, write some utility functions to simplify this
+        // todo: add a printer visitor for each tree: est, ret, bbt, cet
         // todo: add the intrinsic registration to resolver and an intrinsic class (contain no functionality, instead intrinsic visitor), remove identifier from intrinsic nodes and use intrinsic refs instead
         //      ->> to support writing with hardcoded intrinsics, some intrinsics should have a class with singletons, intrinsics use an intrinsic visitor with the hardcoded types and one dynamic intrinsic for all others 
         // todo: add all control flow statements to grammar and support them in the compiler
