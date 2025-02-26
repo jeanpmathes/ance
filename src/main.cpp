@@ -21,12 +21,12 @@
 #include "ance/analyze/Analyzer.h"
 
 #include "ance/bbt/Node.h"
-#include "ance/bbt/Segmenter.h"
 #include "ance/bbt/Printer.h"
+#include "ance/bbt/Segmenter.h"
 
 #include "ance/cet/Node.h"
-#include "ance/cet/Runner.h"
 #include "ance/cet/Printer.h"
+#include "ance/cet/Runner.h"
 
 #include "ance/build/Compiler.h"
 
