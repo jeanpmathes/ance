@@ -1,1 +1,1 @@
-target_sources(ance PRIVATE Resolver.cpp Node.cpp)
+target_sources(ance PRIVATE Resolver.cpp Node.cpp Printer.cpp)

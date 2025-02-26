@@ -1,1 +1,1 @@
-target_sources(ance PRIVATE Segmenter.cpp Node.cpp)
+target_sources(ance PRIVATE Segmenter.cpp Node.cpp Printer.cpp)

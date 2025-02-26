@@ -11,9 +11,9 @@ struct ance::est::Expander::Implementation
 
     struct Expansion
     {
-        Statements                      before;
+        Statements                 before;
         utility::Owned<Expression> center;
-        Statements                      after;
+        Statements                 after;
     };
 
     class AST final : public ast::Visitor

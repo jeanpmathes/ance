@@ -1,19 +1,19 @@
 #include "Printer.h"
 
 #include "ance/core/Printer.h"
-#include "ance/est/Node.h"
+#include "ance/ret/Node.h"
 
-struct ance::est::Printer::Implementation
+struct ance::ret::Printer::Implementation
 {
-    class EST final
+    class RET final
         : public Visitor
         , core::Printer
     {
       public:
         using Visitor::visit;
 
-        explicit EST(std::ostream& out) : Printer(out) {}
-        ~EST() override = default;
+        explicit RET(std::ostream& out) : Printer(out) {}
+        ~RET() override = default;
 
         void visit(ErrorStatement const&) override { print("// error"); }
 
@@ -41,9 +41,9 @@ struct ance::est::Printer::Implementation
 
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
-        void visit(Call const& call) override
+        void visit(Intrinsic const& intrinsic) override
         {
-            print(call.identifier);
+            print(intrinsic.identifier);
             print("()");
         }
     };
@@ -52,18 +52,18 @@ struct ance::est::Printer::Implementation
 
     void print(Statement const& statement) const
     {
-        utility::Owned<EST> est = utility::makeOwned<EST>(out_);
-        est->visit(statement);
+        utility::Owned<RET> ret = utility::makeOwned<RET>(out_);
+        ret->visit(statement);
     }
 
   private:
     std::ostream& out_;
 };
 
-ance::est::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
-ance::est::Printer::~Printer() = default;
+ance::ret::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
+ance::ret::Printer::~Printer() = default;
 
-void ance::est::Printer::print(Statement const& statement) const
+void ance::ret::Printer::print(Statement const& statement) const
 {
     implementation_->print(statement);
 }

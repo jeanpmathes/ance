@@ -15,15 +15,18 @@
 #include "ance/est/Printer.h"
 
 #include "ance/ret/Node.h"
+#include "ance/ret/Printer.h"
 #include "ance/ret/Resolver.h"
 
 #include "ance/analyze/Analyzer.h"
 
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Segmenter.h"
+#include "ance/bbt/Printer.h"
 
 #include "ance/cet/Node.h"
 #include "ance/cet/Runner.h"
+#include "ance/cet/Printer.h"
 
 #include "ance/build/Compiler.h"
 
@@ -114,21 +117,26 @@ namespace ance
         utility::Owned<ret::Statement> resolved = resolver.resolve(*expanded);
         if (check_for_fail()) return EXIT_FAILURE;
 
+        print<ret::Printer>(*resolved, debug_path, "ret");
+
         analyzer.analyze(*resolved);
         if (check_for_fail()) return EXIT_FAILURE;
 
         utility::Owned<bbt::BasicBlock> segmented = segmenter.segment(*resolved);
         if (check_for_fail()) return EXIT_FAILURE;
 
+        print<bbt::Printer>(*segmented, debug_path, "bbt");
+
         utility::Owned<cet::Unit> unit = runner.run(*segmented);
         if (check_for_fail()) return EXIT_FAILURE;
+
+        print<cet::Printer>(*unit, debug_path, "cet");
 
         compiler.compile(*unit);
         if (check_for_fail()) return EXIT_FAILURE;
 
         reporter.emit(source_tree, out);
 
-        // todo: add a printer visitor for each tree: ret, bbt, cet
         // todo: add the intrinsic registration to resolver and an intrinsic class (contain no functionality, instead intrinsic visitor), remove identifier from intrinsic nodes and use intrinsic refs instead
         //      ->> to support writing with hardcoded intrinsics, some intrinsics should have a class with singletons, intrinsics use an intrinsic visitor with the hardcoded types and one dynamic intrinsic for all others 
         // todo: add all control flow statements to grammar and support them in the compiler
