@@ -12,6 +12,7 @@
 
 #include "ance/est/Expander.h"
 #include "ance/est/Node.h"
+#include "ance/est/Printer.h"
 
 #include "ance/ret/Node.h"
 #include "ance/ret/Resolver.h"
@@ -108,6 +109,8 @@ namespace ance
         utility::Owned<est::Statement> expanded = expander.expand(*parsed);
         if (check_for_fail()) return EXIT_FAILURE;
 
+        print<est::Printer>(*expanded, debug_path, "est");
+
         utility::Owned<ret::Statement> resolved = resolver.resolve(*expanded);
         if (check_for_fail()) return EXIT_FAILURE;
 
@@ -125,7 +128,7 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add a printer visitor for each tree: est, ret, bbt, cet
+        // todo: add a printer visitor for each tree: ret, bbt, cet
         // todo: add the intrinsic registration to resolver and an intrinsic class (contain no functionality, instead intrinsic visitor), remove identifier from intrinsic nodes and use intrinsic refs instead
         //      ->> to support writing with hardcoded intrinsics, some intrinsics should have a class with singletons, intrinsics use an intrinsic visitor with the hardcoded types and one dynamic intrinsic for all others 
         // todo: add all control flow statements to grammar and support them in the compiler
