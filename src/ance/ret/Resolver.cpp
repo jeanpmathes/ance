@@ -91,7 +91,7 @@ struct ance::ret::Resolver::Implementation
             }
             else
             {
-                reporter_.error("Unknown intrinsic '" + call.identifier + "'", call.location);
+                reporter_.error("Unknown intrinsic '" + call.identifier + "'", call.identifier.location());
 
                 setResult(utility::makeOwned<ErrorExpression>());
             }

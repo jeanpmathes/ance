@@ -141,7 +141,7 @@ struct ance::core::Reporter::Implementation {
                 size_t const missing_to_mark   = length_to_mark - text_to_mark.size();
                 size_t const missing_with_mark = length_of_mark - text_with_mark.size();
 
-                size_t const marker_start  = std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 1uz);
+                size_t const marker_start  = std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 0uz);
                 size_t const marker_length = std::max(text::estimateWidth(text_with_mark) + missing_with_mark, 1uz);
 
                 out << '\t' << std::string(marker_start, ' ') << std::string(marker_length, '~') << std::endl;
