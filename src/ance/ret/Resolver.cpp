@@ -1,6 +1,9 @@
 #include "Resolver.h"
 
 #include <array>
+#include <map>
+
+#include "ance/core/Intrinsic.h"
 
 #include "ance/est/Node.h"
 #include "ance/ret/Node.h"
@@ -12,7 +15,8 @@ struct ance::ret::Resolver::Implementation
       public:
         using Visitor::visit;
 
-        explicit EST(core::Reporter& reporter) : reporter_(reporter) {}
+        EST(core::Reporter& reporter, std::map<core::Identifier, std::reference_wrapper<const core::Intrinsic>> const& intrinsics)
+            : reporter_(reporter), intrinsics_(intrinsics) {}
         ~EST() override = default;
 
         void setResult(utility::Owned<Statement> statement)
@@ -34,8 +38,6 @@ struct ance::ret::Resolver::Implementation
         utility::Owned<Statement> resolve(est::Statement const& statement)
         {
             visit(statement);
-
-            (void)reporter_;//todo: use reporter or remove from resolver at some point
 
             assert(resolved_statement_.hasValue());
 
@@ -83,7 +85,16 @@ struct ance::ret::Resolver::Implementation
 
         void visit(est::Call const& call) override
         {
-            setResult(utility::makeOwned<Intrinsic>(call.identifier, call.location));
+            if (intrinsics_.contains(call.identifier))
+            {
+                setResult(utility::makeOwned<Intrinsic>(intrinsics_.at(call.identifier).get(), call.location));
+            }
+            else
+            {
+                reporter_.error("Unknown intrinsic '" + call.identifier + "'", call.location);
+
+                setResult(utility::makeOwned<ErrorExpression>());
+            }
         }
 
       private:
@@ -91,24 +102,37 @@ struct ance::ret::Resolver::Implementation
         utility::Optional<utility::Owned<Expression>> resolved_expression_;
 
         core::Reporter& reporter_;
+        std::map<core::Identifier, std::reference_wrapper<const core::Intrinsic>> const& intrinsics_;
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
+    void add(core::Intrinsic const& intrinsic)
+    {
+        intrinsics_.emplace(intrinsic.identifier(), std::cref(intrinsic));
+    }
+
     utility::Owned<Statement> resolve(est::Statement const& statement)
     {
-        utility::Owned<EST> est = utility::makeOwned<EST>(reporter_);
+        utility::Owned<EST> est = utility::makeOwned<EST>(reporter_, intrinsics_);
 
         return est->resolve(statement);
     }
 
 private:
     core::Reporter& reporter_;
+
+    std::map<core::Identifier, std::reference_wrapper<const core::Intrinsic>> intrinsics_ = {};
 };
 
 ance::ret::Resolver::Resolver(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
 
 ance::ret::Resolver::~Resolver() = default;
+
+void ance::ret::Resolver::add(core::Intrinsic const& intrinsic)
+{
+    implementation_->add(intrinsic);
+}
 
 ance::utility::Owned<ance::ret::Statement> ance::ret::Resolver::resolve(est::Statement const& statement)
 {

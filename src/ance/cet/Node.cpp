@@ -15,6 +15,6 @@ ance::cet::Independent::Independent(utility::Owned<Expression> independent_expre
     : Node(source_location), Statement(), expression(std::move(independent_expression))
 {}
 
-ance::cet::Intrinsic::Intrinsic(core::Identifier const& callable, core::Location const& source_location)
-    : Node(source_location), Expression(), identifier(callable)
+ance::cet::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location const& source_location)
+    : Node(source_location), Expression(), intrinsic(used)
 {}

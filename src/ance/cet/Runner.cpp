@@ -3,11 +3,50 @@
 #include <array>
 #include <iostream>
 
+#include "ance/core/Intrinsic.h"
+
 #include "ance/bbt/Node.h"
 #include "ance/cet/Node.h"
 
 struct ance::cet::Runner::Implementation
 {
+    class Intrinsics final : core::IntrinsicVisitor
+    {
+    public:
+        using IntrinsicVisitor::visit;
+
+        explicit Intrinsics(core::Reporter& reporter) : reporter_(reporter) {}
+
+        void run(core::Intrinsic const& intrinsic, core::Location const& location)
+        {
+            location_ = location;
+
+            this->visit(intrinsic);
+
+            location_ = core::Location::global();
+        }
+
+        void visit(core::Dynamic const& dynamic) override
+        {
+            reporter_.error("Unsupported intrinsic '" + dynamic.identifier() + "'", location_);
+        }
+
+        void visit(core::Print const&) override
+        {
+            std::cout << "DEBUG: " << "foo" << std::endl; // todo: remove
+        }
+
+        void visit(core::NoOp const&) override
+        {
+            // Do nothing.
+        }
+
+    private:
+        core::Reporter& reporter_;
+
+        core::Location location_ = core::Location::global();
+    };
+
     class BBT final : public bbt::Visitor
     {
     public:
@@ -41,15 +80,15 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Intrinsic const& intrinsic) override
         {
-            std::cout << "DEBUG: " << intrinsic.identifier << std::endl; // todo: remove
-
-            (void) reporter_; // todo: use reporter or remove from runner at some point
+            intrinsics_.run(intrinsic.intrinsic, intrinsic.location);
         }
 
     private:
         bool is_invalid_ = false;
 
         core::Reporter& reporter_;
+
+        Intrinsics intrinsics_ {reporter_};
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}

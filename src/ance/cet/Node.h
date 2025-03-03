@@ -8,6 +8,11 @@
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
+namespace ance::core
+{
+    struct Intrinsic;
+}
+
 /**
  * The compile-able entity tree (CET) namespace.
  */
@@ -84,9 +89,9 @@ namespace ance::cet
     struct Intrinsic final
         : Expression
         , utility::ConcreteNode<Intrinsic, Visitor> {
-        explicit Intrinsic(core::Identifier const& callable, core::Location const& source_location);
+        Intrinsic(core::Intrinsic const& used, core::Location const& source_location);
 
-        core::Identifier identifier;
+        core::Intrinsic const& intrinsic;
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>

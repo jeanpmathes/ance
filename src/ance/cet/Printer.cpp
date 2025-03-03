@@ -54,8 +54,10 @@ struct ance::cet::Printer::Implementation
 
         void visit(Intrinsic const& intrinsic) override
         {
-            print(intrinsic.identifier);
-            print("()");
+            print("(");
+            print("call ");
+            print(intrinsic.intrinsic);
+            print(")");
         }
     };
 

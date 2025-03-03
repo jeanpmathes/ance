@@ -72,7 +72,7 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(ret::Intrinsic const& intrinsic) override
         {
-            utility::Owned<Expression> expression = utility::makeOwned<Intrinsic>(intrinsic.identifier, intrinsic.location);
+            utility::Owned<Expression> expression = utility::makeOwned<Intrinsic>(intrinsic.intrinsic, intrinsic.location);
 
             setResult(std::move(expression));
 

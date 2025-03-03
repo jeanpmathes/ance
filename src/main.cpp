@@ -4,6 +4,8 @@
 
 #include <boost/locale.hpp>
 
+#include "ance/core/Intrinsic.h"
+
 #include "ance/sources/SourceTree.h"
 
 #include "ance/ast/Node.h"
@@ -101,6 +103,8 @@ namespace ance
         cet::Runner       runner {reporter};
         build::Compiler   compiler {reporter};
 
+        resolver.add(core::Intrinsic::print());
+
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
         if (check_for_fail()) return EXIT_FAILURE;
 
@@ -137,12 +141,14 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add the intrinsic registration to resolver and an intrinsic class (contain no functionality, instead intrinsic visitor), remove identifier from intrinsic nodes and use intrinsic refs instead
-        //      ->> to support writing with hardcoded intrinsics, some intrinsics should have a class with singletons, intrinsics use an intrinsic visitor with the hardcoded types and one dynamic intrinsic for all others 
+        // todo: add basic variable declaration and assignment to grammar and support them in the compiler, no types yet (everything is bool)
         // todo: add all control flow statements to grammar and support them in the compiler
-        // todo: add all expressions (both value and control flow) to grammar and support them in the compiler - needs types - do simpler types without the definition bridge
+        // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
+        // todo: add intrinsics and function calls with arguments
+        // todo: add all expressions (both value and control flow) to grammar and support them in the compiler - needs types - do simpler types without the definition bridge, type expressions
         // todo: add intrinsic functions to include another file, running the cmp code in there too
-        // todo: add first non-cmp code and do actual compilation
+        // todo: add first non-cmp code (and declarable functions) and do actual compilation
+        // todo: add unordered scopes, have them as default at file top-level - maybe make distinction explicit in compiler code
 
         out << "ance: Success";
 

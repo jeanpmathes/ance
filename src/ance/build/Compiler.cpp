@@ -2,10 +2,54 @@
 
 #include <array>
 
+#include "ance/core/Intrinsic.h"
+
 #include "ance/cet/Node.h"
 
 struct ance::build::Compiler::Implementation
 {
+    class Intrinsics final : core::IntrinsicVisitor
+    {
+    public:
+        using IntrinsicVisitor::visit;
+
+        explicit Intrinsics(core::Reporter& reporter) : reporter_(reporter) {}
+
+        void run(core::Intrinsic const& intrinsic, core::Location const& location)
+        {
+            location_ = location;
+
+            this->visit(intrinsic);
+
+            location_ = core::Location::global();
+        }
+
+        void unsupported(core::Intrinsic const& intrinsic) const
+        {
+            reporter_.error("Unsupported intrinsic '" + intrinsic.identifier() + "'", location_);
+        }
+
+        void visit(core::Dynamic const& dynamic) override
+        {
+            unsupported(dynamic);
+        }
+
+        void visit(core::Print const& print) override
+        {
+            unsupported(print);
+        }
+
+        void visit(core::NoOp const&) override
+        {
+            // Do nothing.
+        }
+
+    private:
+        core::Reporter& reporter_;
+
+        core::Location location_ = core::Location::global();
+    };
+
     class CET final : public cet::Visitor
     {
     public:
@@ -31,13 +75,13 @@ struct ance::build::Compiler::Implementation
 
         void visit(cet::Intrinsic const& intrinsic) override
         {
-            (void) intrinsic;// todo: implement
-
-            (void)reporter_;//todo: use reporter or remove from compiler at some point
+            intrinsics_.run(intrinsic.intrinsic, intrinsic.location);
         }
 
     private:
         core::Reporter& reporter_;
+
+        Intrinsics intrinsics_ {reporter_};
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}

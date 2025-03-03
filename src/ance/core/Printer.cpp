@@ -1,5 +1,7 @@
 #include "Printer.h"
 
+#include "ance/core/Intrinsic.h"
+
 ance::core::Printer::Printer(std::ostream& out) : out_(out) {}
 
 ance::core::Printer::~Printer() = default;
@@ -20,6 +22,12 @@ void ance::core::Printer::print(Identifier const& identifier)
 {
     indent();
     out_ << identifier;
+}
+
+void ance::core::Printer::print(Intrinsic const& intrinsic)
+{
+    indent();
+    out_ << intrinsic;
 }
 
 void ance::core::Printer::line()

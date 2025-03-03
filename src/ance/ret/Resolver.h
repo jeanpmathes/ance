@@ -4,6 +4,11 @@
 #include "ance/core/Reporter.h"
 #include "ance/utility/Owners.h"
 
+namespace ance::core
+{
+    struct Intrinsic;
+}
+
 namespace ance::est
 {
     struct Statement;
@@ -23,13 +28,17 @@ namespace ance::ret
         ~Resolver();
 
         /**
+         * Register an intrinsic.
+         * @param intrinsic The intrinsic to register.
+         */
+        void add(core::Intrinsic const& intrinsic);
+
+        /**
          * Resolve a statement.
          * @param statement The statement to resolve.
          * @return The resolved statement.
          */
         utility::Owned<Statement> resolve(est::Statement const& statement);
-
-        // todo: should also have a method register(std::string const& name, Intrinsic intrinsic)
 
       private:
         struct Implementation;

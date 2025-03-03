@@ -8,6 +8,11 @@
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
+namespace ance::core
+{
+  struct Intrinsic;
+}
+
 /**
  * The basic-block tree (BBT) namespace.
  */
@@ -18,7 +23,8 @@ namespace ance::bbt
   /**
    * Base class for all nodes in the BBT.
    */
-  struct Node : virtual utility::AbstractNode<Visitor> {
+  struct Node : virtual utility::AbstractNode<Visitor>
+  {
     explicit Node(core::Location const& source_location);
 
     core::Location location;
@@ -32,7 +38,8 @@ namespace ance::bbt
    */
   struct BasicBlock final
       : Node
-      , utility::ConcreteNode<BasicBlock, Visitor> {
+      , utility::ConcreteNode<BasicBlock, Visitor>
+  {
     BasicBlock(utility::List<utility::Owned<Statement>> content, core::Location const& source_location);
 
     utility::List<utility::Owned<Statement>> statements;
@@ -43,7 +50,8 @@ namespace ance::bbt
  */
   struct Statement
       : virtual Node
-      , virtual utility::AbstractNode<Visitor> {
+      , virtual utility::AbstractNode<Visitor>
+  {
   };
 
   /**
@@ -51,7 +59,8 @@ namespace ance::bbt
    */
   struct ErrorStatement final
       : Statement
-      , utility::ConcreteNode<ErrorStatement, Visitor> {
+      , utility::ConcreteNode<ErrorStatement, Visitor>
+  {
     ErrorStatement();
   };
 
@@ -62,7 +71,8 @@ namespace ance::bbt
    */
   struct Independent final
       : Statement
-      , utility::ConcreteNode<Independent, Visitor> {
+      , utility::ConcreteNode<Independent, Visitor>
+  {
     Independent(utility::Owned<Expression> independent_expression, core::Location const& source_location);
 
     utility::Owned<Expression> expression;
@@ -73,7 +83,8 @@ namespace ance::bbt
    */
   struct Expression
       : virtual Node
-      , virtual utility::AbstractNode<Visitor> {
+      , virtual utility::AbstractNode<Visitor>
+  {
   };
 
   /**
@@ -81,7 +92,8 @@ namespace ance::bbt
    */
   struct ErrorExpression final
       : Expression
-      , utility::ConcreteNode<ErrorExpression, Visitor> {
+      , utility::ConcreteNode<ErrorExpression, Visitor>
+  {
     ErrorExpression();
   };
 
@@ -90,10 +102,11 @@ namespace ance::bbt
    */
   struct Intrinsic final
       : Expression
-      , utility::ConcreteNode<Intrinsic, Visitor> {
-    explicit Intrinsic(core::Identifier const& callable, core::Location const& source_location);
+      , utility::ConcreteNode<Intrinsic, Visitor>
+  {
+    Intrinsic(core::Intrinsic const& used, core::Location const& source_location);
 
-    core::Identifier identifier;
+    core::Intrinsic const& intrinsic;
   };
 
   class Visitor : public utility::AbstractVisitor<Visitor>

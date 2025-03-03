@@ -7,6 +7,8 @@
 
 namespace ance::core
 {
+    struct Intrinsic;
+
     /**
      * Utility to simplify implementing code printers for different trees.
      */
@@ -30,7 +32,12 @@ namespace ance::core
         /**
          * Print an identifier to the output stream.
          */
-        void print(core::Identifier const& identifier);
+        void print(Identifier const& identifier);
+
+        /**
+         * Print an intrinsic to the output stream.
+         */
+        void print(Intrinsic const& intrinsic);
 
         /**
          * Start a new line.

@@ -17,7 +17,6 @@ namespace ance::core
      */
     class Identifier
     {
-      private:
         Identifier(std::string_view string, Location const& location);
 
       public:
