@@ -1,6 +1,5 @@
 #include "Runner.h"
 
-#include <array>
 #include <iostream>
 
 #include "ance/core/Intrinsic.h"
@@ -63,9 +62,9 @@ struct ance::cet::Runner::Implementation
             }
         }
 
-        void visit(bbt::ErrorStatement const&) override
+        void visit(bbt::ErrorStatement const& error_statement) override
         {
-            is_invalid_ = true;
+            reporter_.error("Cannot execute this statement", error_statement.location);
         }
 
         void visit(bbt::Independent const& independent) override
@@ -73,9 +72,14 @@ struct ance::cet::Runner::Implementation
             visit(*independent.expression);
         }
 
-        void visit(bbt::ErrorExpression const&) override
+        void visit(bbt::Let const& let) override
         {
-            is_invalid_ = true;
+            std::cout << "declare " << let.variable.identifier() << std::endl; // todo: remove
+        }
+
+        void visit(bbt::ErrorExpression const& error_expression) override
+        {
+            reporter_.error("Cannot execute this expression", error_expression.location);
         }
 
         void visit(bbt::Intrinsic const& intrinsic) override
@@ -83,9 +87,12 @@ struct ance::cet::Runner::Implementation
             intrinsics_.run(intrinsic.intrinsic, intrinsic.location);
         }
 
-    private:
-        bool is_invalid_ = false;
+        void visit(bbt::Access const& access) override
+        {
+            std::cout << "read " << access.variable.identifier() << std::endl; // todo: remove
+        }
 
+    private:
         core::Reporter& reporter_;
 
         Intrinsics intrinsics_ {reporter_};

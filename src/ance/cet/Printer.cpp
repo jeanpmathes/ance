@@ -52,12 +52,31 @@ struct ance::cet::Printer::Implementation
             print(";");
         }
 
+        void visit(Let const& let) override
+        {
+            print("let ");
+            print(let.variable.identifier());
+
+            if (let.value.hasValue())
+            {
+                print(" <: ");
+                visit(**let.value);
+            }
+
+            print(";");
+        }
+
         void visit(Intrinsic const& intrinsic) override
         {
             print("(");
             print("call ");
             print(intrinsic.intrinsic);
             print(")");
+        }
+
+        void visit(Access const& access) override
+        {
+            print(access.variable.identifier());
         }
     };
 

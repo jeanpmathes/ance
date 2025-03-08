@@ -29,6 +29,14 @@ struct ance::analyze::Analyzer::Implementation
             visit(*independent.expression);
         }
 
+        void visit(ret::Let const& let) override
+        {
+            if (let.value.hasValue())
+            {
+                visit(**let.value);
+            }
+        }
+
         void visit(ret::ErrorExpression const&) override
         {
 
@@ -37,6 +45,11 @@ struct ance::analyze::Analyzer::Implementation
         void visit(ret::Intrinsic const&) override
         {
             (void)reporter_; //todo: use it here
+        }
+
+        void visit(ret::Access const&) override
+        {
+
         }
 
     private:

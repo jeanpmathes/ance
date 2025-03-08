@@ -39,12 +39,31 @@ struct ance::est::Printer::Implementation
             print(";");
         }
 
+        void visit(Let const& let) override
+        {
+            print("let ");
+            print(let.variable);
+
+            if (let.value.hasValue())
+            {
+                print(" <: ");
+                visit(**let.value);
+            }
+
+            print(";");
+        }
+
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Call const& call) override
         {
             print(call.identifier);
             print("()");
+        }
+
+        void visit(Access const& access) override
+        {
+            print(access.identifier);
         }
     };
 

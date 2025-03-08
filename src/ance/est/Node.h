@@ -67,6 +67,18 @@ namespace ance::est
     };
 
     /**
+     * A let statement declares a variable and can also define its value.
+     */
+    struct Let final
+        : Statement
+        , utility::ConcreteNode<Let, Visitor> {
+        Let(core::Identifier const& identifier, utility::Optional<utility::Owned<Expression>> definition, core::Location const& source_location);
+
+        core::Identifier variable;
+        utility::Optional<utility::Owned<Expression>> value;
+    };
+
+    /**
      * Expression node in the EST.
      */
     struct Expression
@@ -94,6 +106,17 @@ namespace ance::est
         core::Identifier identifier;
     };
 
+    /**
+     * Access is an expression that reads the value of a variable.
+     */
+    struct Access final
+        : Expression
+        , utility::ConcreteNode<Access, Visitor> {
+        Access(core::Identifier const& accessed, core::Location const& source_location);
+
+        core::Identifier identifier;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -104,9 +127,11 @@ namespace ance::est
         virtual void visit(ErrorStatement const& error)    = 0;
         virtual void visit(Block const& block)             = 0;
         virtual void visit(Independent const& independent) = 0;
+        virtual void visit(Let const& let)                 = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Call const& call)             = 0;
+        virtual void visit(Access const& access)         = 0;
     };
 }
 

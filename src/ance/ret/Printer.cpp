@@ -39,6 +39,20 @@ struct ance::ret::Printer::Implementation
             print(";");
         }
 
+        void visit(Let const& let) override
+        {
+            print("let ");
+            print(let.variable.identifier());
+
+            if (let.value.hasValue())
+            {
+                print(" <: ");
+                visit(**let.value);
+            }
+
+            print(";");
+        }
+
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Intrinsic const& intrinsic) override
@@ -47,6 +61,11 @@ struct ance::ret::Printer::Implementation
             print("call ");
             print(intrinsic.intrinsic);
             print(")");
+        }
+        
+        void visit(Access const& access) override
+        {
+            print(access.variable.identifier());
         }
     };
 

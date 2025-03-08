@@ -2,6 +2,7 @@
 #define ANCE_SRC_LANG_UTILITY_OPTIONAL_H
 
 #include <optional>
+#include <array>
 
 #include "Concepts.h"
 

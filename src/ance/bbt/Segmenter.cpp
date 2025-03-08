@@ -1,7 +1,5 @@
 #include "Segmenter.h"
 
-#include <array>
-
 #include "ance/ret/Node.h"
 #include "ance/bbt/Node.h"
 
@@ -63,6 +61,18 @@ struct ance::bbt::Segmenter::Implementation
             statements_.emplace_back(utility::makeOwned<Independent>(std::move(expression), independent.location));
         }
 
+        void visit(ret::Let const& let) override
+        {
+            utility::Optional<utility::Owned<Expression>> value;
+
+            if (let.value.hasValue())
+            {
+                value = segment(**let.value);
+            }
+
+            statements_.emplace_back(utility::makeOwned<Let>(let.variable, std::move(value), let.location));
+        }
+
         void visit(ret::ErrorExpression const&) override
         {
             utility::Owned<Expression> expression = utility::makeOwned<ErrorExpression>();
@@ -77,6 +87,13 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(expression));
 
             (void)reporter_; // todo: use it or remove it
+        }
+
+        void visit(ret::Access const& access) override
+        {
+            utility::Owned<Expression> expression = utility::makeOwned<Access>(access.variable, access.location);
+
+            setResult(std::move(expression));
         }
 
       private:

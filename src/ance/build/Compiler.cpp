@@ -1,7 +1,5 @@
 #include "Compiler.h"
 
-#include <array>
-
 #include "ance/core/Intrinsic.h"
 
 #include "ance/cet/Node.h"
@@ -73,9 +71,19 @@ struct ance::build::Compiler::Implementation
             (void) independent;// todo: implement
         }
 
+        void visit(cet::Let const& let) override
+        {
+            (void) let;// todo: implement
+        }
+
         void visit(cet::Intrinsic const& intrinsic) override
         {
             intrinsics_.run(intrinsic.intrinsic, intrinsic.location);
+        }
+
+        void visit(cet::Access const& access) override
+        {
+            (void) access;// todo: implement
         }
 
     private:

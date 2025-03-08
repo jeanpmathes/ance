@@ -5,6 +5,7 @@
 #include <boost/locale.hpp>
 
 #include "ance/core/Intrinsic.h"
+#include "ance/core/Scope.h"
 
 #include "ance/sources/SourceTree.h"
 
@@ -141,8 +142,13 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add basic variable declaration and assignment to grammar and support them in the compiler, no types yet (everything is bool)
-        // todo: add all control flow statements to grammar and support them in the compiler
+        // todo: give correct location to error expressions and error statements - change the constructor in all trees - check current output
+        // todo: fix that source parsing does throw any error - check if there is a default visit for non-existing rules to detect them and throw / assert, only then implement the new parsing
+        // todo: test the new resolving, test nested scopes, test re-declaring, test blocking
+        // todo: replace all /** doc with /// doc
+        // todo: update runner to actually store the values of the variables and provide on access in map
+        // todo: add only if control flow statement to grammar and support it in the compiler, requires BB changes
+        // todo: add the loop, break and continue statements as well as while
         // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
         // todo: add intrinsics and function calls with arguments
         // todo: add all expressions (both value and control flow) to grammar and support them in the compiler - needs types - do simpler types without the definition bridge, type expressions

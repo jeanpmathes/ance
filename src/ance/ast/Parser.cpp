@@ -158,20 +158,20 @@ namespace ance::ast
         sources::SourceFile const& source_file_;
     };
 
-    static utility::Owned<ast::Statement> expectStatement(std::any const& result)
+    static utility::Owned<Statement> expectStatement(std::any const& result)
     {
         if (result.has_value())
-            return utility::wrap<ast::Statement>(result);
+            return utility::wrap<Statement>(result);
 
-        return utility::makeOwned<ast::ErrorStatement>();
+        return utility::makeOwned<ErrorStatement>();
     }
 
-    static utility::Owned<ast::Expression> expectExpression(std::any const& result)
+    static utility::Owned<Expression> expectExpression(std::any const& result)
     {
         if (result.has_value())
-            return utility::wrap<ast::Expression>(result);
+            return utility::wrap<Expression>(result);
 
-        return utility::makeOwned<ast::ErrorExpression>();
+        return utility::makeOwned<ErrorExpression>();
     }
 
     class SourceVisitor : public anceBaseVisitor
@@ -218,22 +218,22 @@ namespace ance::ast
 
         std::any visitBlockStatement(anceParser::BlockStatementContext* context) override
         {
-            utility::List<utility::Owned<ast::Statement>> statements;
+            utility::List<utility::Owned<Statement>> statements;
 
             for (anceParser::StatementContext* statement : context->statement())
             {
                 statements.push_back(expectStatement(visit(statement)));
             }
 
-            ast::Statement* statement = new ast::Block(std::move(statements), location(context));
+            Statement* statement = new Block(std::move(statements), location(context));
             return statement;
         }
 
         std::any visitExpressionStatement(anceParser::ExpressionStatementContext* context) override
         {
-            utility::Owned<ast::Expression> expression = expectExpression(visit(context->expression()));
+            utility::Owned<Expression> expression = expectExpression(visit(context->expression()));
 
-            ast::Statement* statement = new ast::Independent(std::move(expression), location(context));
+            Statement* statement = new Independent(std::move(expression), location(context));
             return statement;
         }
 
@@ -241,7 +241,7 @@ namespace ance::ast
         {
             core::Identifier const callable = identifier(context->entity()->IDENTIFIER());
 
-            ast::Expression* expression = new ast::Call(callable, location(context));
+            Expression* expression = new Call(callable, location(context));
             return expression;
         }
 

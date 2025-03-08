@@ -5,10 +5,12 @@ file : statement EOF ;
 statement
     : '{' ( statement )* '}' # BlockStatement
     | expression ';' # ExpressionStatement
+    | 'let' IDENTIFIER ( '<:' expression )? ';' # LetStatement
     ;
 
 expression
     : entity '(' arguments ')' # Call
+    | entity # Access
     ;
 
 arguments

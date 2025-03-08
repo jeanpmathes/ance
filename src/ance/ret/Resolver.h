@@ -7,6 +7,8 @@
 namespace ance::core
 {
     struct Intrinsic;
+
+    class Scope;
 }
 
 namespace ance::est

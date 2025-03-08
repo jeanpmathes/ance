@@ -27,7 +27,15 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitLetStatement(anceParser::LetStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitCall(anceParser::CallContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitAccess(anceParser::AccessContext *ctx) override {
     return visitChildren(ctx);
   }
 

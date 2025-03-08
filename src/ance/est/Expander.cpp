@@ -1,6 +1,6 @@
 #include "Expander.h"
 
-#include <array>
+#include "ance/core/Scope.h"
 
 #include "ance/ast/Node.h"
 #include "ance/est/Node.h"
@@ -112,11 +112,42 @@ struct ance::est::Expander::Implementation
             setResult(std::move(statements));
         }
 
+        void visit(ast::Let const& let) override
+        {
+            Statements statements;
+
+            utility::Optional<utility::Owned<Expression>> value;
+
+            if (let.value.hasValue())
+            {
+                auto [before, center, after] = expand(**let.value);
+
+                statements.insert(statements.end(),
+                                make_move_iterator(before.begin()),
+                                make_move_iterator(before.end()));
+
+                value = std::move(center);
+
+                statements.insert(statements.end(),
+                                make_move_iterator(after.begin()),
+                                make_move_iterator(after.end()));
+            }
+
+            statements.emplace_back(utility::makeOwned<Let>(let.variable, std::move(value), let.location));
+
+            setResult(std::move(statements));
+        }
+
         void visit(ast::ErrorExpression const&) override { setResult(utility::makeOwned<ErrorExpression>()); }
 
         void visit(ast::Call const& call) override
         {
             setResult(utility::makeOwned<Call>(call.identifier, call.location));
+        }
+
+        void visit(ast::Access const& access) override
+        {
+            setResult(utility::makeOwned<Access>(access.identifier, access.location));
         }
 
       private:

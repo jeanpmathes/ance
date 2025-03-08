@@ -12,10 +12,11 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    T__0 = 1, IDENTIFIER = 2, SEMICOLON = 3, WHITESPACE = 4, BLOCK_COMMENT = 5, 
-    LINE_COMMENT = 6, BRACKET_OPEN = 7, BRACKET_CLOSE = 8, CURLY_BRACKET_OPEN = 9, 
-    CURLY_BRACKET_CLOSE = 10, SQUARE_BRACKET_OPEN = 11, SQUARE_BRACKET_CLOSE = 12, 
-    POINTY_BRACKET_OPEN = 13, POINTY_BRACKET_CLOSE = 14, ERROR_CHAR = 15
+    T__0 = 1, T__1 = 2, T__2 = 3, IDENTIFIER = 4, SEMICOLON = 5, WHITESPACE = 6, 
+    BLOCK_COMMENT = 7, LINE_COMMENT = 8, BRACKET_OPEN = 9, BRACKET_CLOSE = 10, 
+    CURLY_BRACKET_OPEN = 11, CURLY_BRACKET_CLOSE = 12, SQUARE_BRACKET_OPEN = 13, 
+    SQUARE_BRACKET_CLOSE = 14, POINTY_BRACKET_OPEN = 15, POINTY_BRACKET_CLOSE = 16, 
+    ERROR_CHAR = 17
   };
 
   enum {
@@ -95,6 +96,17 @@ public:
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
+  class  LetStatementContext : public StatementContext {
+  public:
+    LetStatementContext(StatementContext *ctx);
+
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *SEMICOLON();
+    ExpressionContext *expression();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   StatementContext* statement();
 
   class  ExpressionContext : public antlr4::ParserRuleContext {
@@ -118,6 +130,15 @@ public:
     antlr4::tree::TerminalNode *BRACKET_OPEN();
     ArgumentsContext *arguments();
     antlr4::tree::TerminalNode *BRACKET_CLOSE();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  AccessContext : public ExpressionContext {
+  public:
+    AccessContext(ExpressionContext *ctx);
+
+    EntityContext *entity();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

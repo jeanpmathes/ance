@@ -3,6 +3,7 @@
 
 #include "ance/core/Identifier.h"
 #include "ance/core/Reporter.h"
+#include "ance/core/Variable.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -76,6 +77,18 @@ namespace ance::cet
     };
 
     /**
+     * A let statement declares a variable and can also define its value.
+     */
+    struct Let final
+        : Statement
+        , utility::ConcreteNode<Let, Visitor> {
+        Let(core::Variable const& identifier, utility::Optional<utility::Owned<Expression>> definition, core::Location const& source_location);
+
+        core::Variable const& variable;
+        utility::Optional<utility::Owned<Expression>> value;
+    };
+
+    /**
      * Expression node in the CET.
      */
     struct Expression
@@ -94,6 +107,17 @@ namespace ance::cet
         core::Intrinsic const& intrinsic;
     };
 
+    /**
+     * Access is an expression that reads the value of a variable.
+     */
+    struct Access final
+        : Expression
+        , utility::ConcreteNode<Access, Visitor> {
+        Access(core::Variable const& accessed, core::Location const& source_location);
+
+        core::Variable const& variable;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -104,8 +128,10 @@ namespace ance::cet
         virtual void visit(BasicBlock const& basic_block) = 0;
 
         virtual void visit(Independent const& independent) = 0;
+        virtual void visit(Let const& let) = 0;
 
         virtual void visit(Intrinsic const& intrinsic) = 0;
+        virtual void visit(Access const& access) = 0;
 
         ~Visitor() override = default;
     };
