@@ -117,7 +117,6 @@ struct ance::core::Reporter::Implementation {
             if (entry.location_.isGlobal())
             {
                 out << entry.message_ << std::endl;
-                out << std::endl;
                 continue;
             }
 

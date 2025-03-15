@@ -158,23 +158,7 @@ namespace ance::ast
         sources::SourceFile const& source_file_;
     };
 
-    static utility::Owned<Statement> expectStatement(std::any const& result)
-    {
-        if (result.has_value())
-            return utility::wrap<Statement>(result);
-
-        return utility::makeOwned<ErrorStatement>();
-    }
-
-    static utility::Owned<Expression> expectExpression(std::any const& result)
-    {
-        if (result.has_value())
-            return utility::wrap<Expression>(result);
-
-        return utility::makeOwned<ErrorExpression>();
-    }
-
-    class SourceVisitor : public anceBaseVisitor
+    class SourceVisitor final : public anceBaseVisitor
     {
       public:
         explicit SourceVisitor(size_t const file_index) : file_index_(file_index) {}
@@ -210,7 +194,26 @@ namespace ance::ast
             return core::Identifier::like(text, {start_line, start_column, end_line, end_column, file_index_});
         }
 
-      public:
+    public:
+        template<typename T>
+        utility::Owned<Statement> expectStatement(T* ctx)
+        {
+            if (std::any const result = visit(ctx); result.has_value())
+                return utility::wrap<Statement>(result);
+
+            return utility::makeOwned<ErrorStatement>(location(ctx));
+        }
+
+        template<typename T>
+        utility::Owned<Expression> expectExpression(T* ctx)
+        {
+            if (std::any const result = visit(ctx); result.has_value())
+                return utility::wrap<Expression>(result);
+
+            return utility::makeOwned<ErrorExpression>(location(ctx));
+        }
+
+    protected:
         std::any visitFile(anceParser::FileContext* context) override
         {
             return visit(context->statement());
@@ -222,7 +225,7 @@ namespace ance::ast
 
             for (anceParser::StatementContext* statement : context->statement())
             {
-                statements.push_back(expectStatement(visit(statement)));
+                statements.push_back(expectStatement(statement));
             }
 
             Statement* statement = new Block(std::move(statements), location(context));
@@ -231,7 +234,7 @@ namespace ance::ast
 
         std::any visitExpressionStatement(anceParser::ExpressionStatementContext* context) override
         {
-            utility::Owned<Expression> expression = expectExpression(visit(context->expression()));
+            utility::Owned<Expression> expression = expectExpression(context->expression());
 
             Statement* statement = new Independent(std::move(expression), location(context));
             return statement;
@@ -271,10 +274,10 @@ struct ance::ast::Parser::Implementation
         parser->removeErrorListeners();
         parser->addErrorListener(syntax_error_listener->parserErrorListener());
 
-        antlr4::tree::ParseTree* tree = parser->file();
+        anceParser::FileContext* file = parser->file();
 
         SourceVisitor visitor {source_file.index()};
-        return expectStatement(visitor.visit(tree));
+        return visitor.expectStatement(file);
     }
 
   private:

@@ -3,7 +3,6 @@
 
 #include "ance/core/Identifier.h"
 #include "ance/core/Reporter.h"
-#include "ance/core/Variable.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -39,7 +38,7 @@ namespace ance::ast
     struct ErrorStatement final
         : Statement
         , utility::ConcreteNode<ErrorStatement, Visitor> {
-        ErrorStatement();
+        explicit ErrorStatement(core::Location const& source_location);
     };
 
     /**
@@ -92,7 +91,7 @@ namespace ance::ast
     struct ErrorExpression final
         : Expression
         , utility::ConcreteNode<ErrorExpression, Visitor> {
-        ErrorExpression();
+        explicit ErrorExpression(core::Location const& source_location);
     };
 
     /**

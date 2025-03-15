@@ -4,7 +4,7 @@
 
 ance::ret::Node::Node(core::Location const& source_location) : location(source_location) {}
 
-ance::ret::ErrorStatement::ErrorStatement() : Node(core::Location::global()), Statement() {}
+ance::ret::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}
 
 ance::ret::Block::Block(utility::Owned<core::Scope> own_scope, utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location)
     : Node(source_location)
@@ -29,7 +29,7 @@ ance::ret::Let::Let(core::Variable const&                       identifier,
     , value(std::move(definition))
 {}
 
-ance::ret::ErrorExpression::ErrorExpression() : Node(core::Location::global()), Expression() {}
+ance::ret::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::ret::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location const& source_location)
     : Node(source_location)

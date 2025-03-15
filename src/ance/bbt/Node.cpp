@@ -8,7 +8,7 @@ ance::bbt::BasicBlock::BasicBlock(utility::List<utility::Owned<Statement>> conte
     , statements(std::move(content))
 {}
 
-ance::bbt::ErrorStatement::ErrorStatement() : Node(core::Location::global()), Statement() {}
+ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}
 
 ance::bbt::Independent::Independent(utility::Owned<Expression> independent_expression,
                                     core::Location const&      source_location)
@@ -26,7 +26,7 @@ ance::bbt::Let::Let(core::Variable const&                         identifier,
     , value(std::move(definition))
 {}
 
-ance::bbt::ErrorExpression::ErrorExpression() : Node(core::Location::global()), Expression() {}
+ance::bbt::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::bbt::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location const& source_location)
     : Node(source_location)

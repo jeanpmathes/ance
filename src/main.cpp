@@ -142,8 +142,7 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: give correct location to error expressions and error statements - change the constructor in all trees - check current output
-        // todo: fix that source parsing does throw any error - check if there is a default visit for non-existing rules to detect them and throw / assert, only then implement the new parsing
+        // todo: fix that source parsing does not throw any error - check if there is a default visit for non-existing rules to detect them and throw / assert, only then implement the new parsing
         // todo: test the new resolving, test nested scopes, test re-declaring, test blocking
         // todo: replace all /** doc with /// doc
         // todo: update runner to actually store the values of the variables and provide on access in map
@@ -152,6 +151,13 @@ namespace ance
         // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
         // todo: add intrinsics and function calls with arguments
         // todo: add all expressions (both value and control flow) to grammar and support them in the compiler - needs types - do simpler types without the definition bridge, type expressions
+        // todo: rethink resolution - it should be done using intrinsics by the runner
+        //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper
+        //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
+        //      todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
+        //      todo: for blockers, scopes (internal class of runner and ance type) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
+        //      todo: remove the scope and variable classes from core
+        //      todo: for expanding with temporaries, use three new nodes in EST: DeclareTemporary, ReadTemporary, WriteTemporary (the last two have a reference to the declaration)
         // todo: add intrinsic functions to include another file, running the cmp code in there too
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
         // todo: add unordered scopes, have them as default at file top-level - maybe make distinction explicit in compiler code

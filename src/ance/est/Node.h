@@ -39,7 +39,7 @@ namespace ance::est
     struct ErrorStatement final
         : Statement
         , utility::ConcreteNode<ErrorStatement, Visitor> {
-        ErrorStatement();
+        explicit ErrorStatement(core::Location const& source_location);
     };
 
     /**
@@ -92,7 +92,7 @@ namespace ance::est
     struct ErrorExpression final
         : Expression
         , utility::ConcreteNode<ErrorExpression, Visitor> {
-        ErrorExpression();
+        explicit ErrorExpression(core::Location const& source_location);
     };
 
     /**

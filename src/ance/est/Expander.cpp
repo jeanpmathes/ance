@@ -77,7 +77,7 @@ struct ance::est::Expander::Implementation
             return result;
         }
 
-        void visit(ast::ErrorStatement const&) override { setResult(utility::makeOwned<ErrorStatement>()); }
+        void visit(ast::ErrorStatement const& error_statement) override { setResult(utility::makeOwned<ErrorStatement>(error_statement.location)); }
 
         void visit(ast::Block const& block) override
         {
@@ -138,7 +138,7 @@ struct ance::est::Expander::Implementation
             setResult(std::move(statements));
         }
 
-        void visit(ast::ErrorExpression const&) override { setResult(utility::makeOwned<ErrorExpression>()); }
+        void visit(ast::ErrorExpression const& error_expression) override { setResult(utility::makeOwned<ErrorExpression>(error_expression.location)); }
 
         void visit(ast::Call const& call) override
         {

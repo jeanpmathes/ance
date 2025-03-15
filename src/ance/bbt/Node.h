@@ -62,7 +62,7 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<ErrorStatement, Visitor>
     {
-        ErrorStatement();
+        explicit ErrorStatement(core::Location const& source_location);
     };
 
     struct Expression;
@@ -110,7 +110,7 @@ namespace ance::bbt
         : Expression
         , utility::ConcreteNode<ErrorExpression, Visitor>
     {
-        ErrorExpression();
+        explicit ErrorExpression(core::Location const& source_location);
     };
 
     /**

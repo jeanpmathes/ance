@@ -41,9 +41,9 @@ struct ance::bbt::Segmenter::Implementation
             segmented_expression_ = std::move(expression);
         }
 
-        void visit(ret::ErrorStatement const&) override
+        void visit(ret::ErrorStatement const& error_statement) override
         {
-            statements_.emplace_back(utility::makeOwned<ErrorStatement>());
+            statements_.emplace_back(utility::makeOwned<ErrorStatement>(error_statement.location));
         }
 
         void visit(ret::Block const& block) override
@@ -73,9 +73,9 @@ struct ance::bbt::Segmenter::Implementation
             statements_.emplace_back(utility::makeOwned<Let>(let.variable, std::move(value), let.location));
         }
 
-        void visit(ret::ErrorExpression const&) override
+        void visit(ret::ErrorExpression const& error_expression) override
         {
-            utility::Owned<Expression> expression = utility::makeOwned<ErrorExpression>();
+            utility::Owned<Expression> expression = utility::makeOwned<ErrorExpression>(error_expression.location);
 
             setResult(std::move(expression));
         }

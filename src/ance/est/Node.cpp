@@ -4,7 +4,7 @@
 
 ance::est::Node::Node(core::Location const& source_location) : location(source_location) {}
 
-ance::est::ErrorStatement::ErrorStatement() : Node(core::Location::global()), Statement() {}
+ance::est::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}
 
 ance::est::Block::Block(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location)
     : Node(source_location)
@@ -26,7 +26,7 @@ ance::est::Let::Let(core::Identifier const& identifier, utility::Optional<utilit
     , value(std::move(definition))
 {}
 
-ance::est::ErrorExpression::ErrorExpression() : Node(core::Location::global()), Expression() {}
+ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::est::Call::Call(core::Identifier const& callable, core::Location const& source_location)
     : Node(source_location)

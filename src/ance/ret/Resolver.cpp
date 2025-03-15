@@ -223,7 +223,7 @@ struct ance::ret::Resolver::Implementation
             return utility::makeOwned<core::Scope>();
         }
 
-        void visit(est::ErrorStatement const&) override { setResult(utility::makeOwned<ErrorStatement>()); }
+        void visit(est::ErrorStatement const& error_statement) override { setResult(utility::makeOwned<ErrorStatement>(error_statement.location)); }
 
         void visit(est::Block const& block) override
         {
@@ -263,7 +263,7 @@ struct ance::ret::Resolver::Implementation
             setResult(utility::makeOwned<Let>(variable, std::move(value), let.location));
         }
 
-        void visit(est::ErrorExpression const&) override { setResult(utility::makeOwned<ErrorExpression>()); }
+        void visit(est::ErrorExpression const& error_expression) override { setResult(utility::makeOwned<ErrorExpression>(error_expression.location)); }
 
         void visit(est::Call const& call) override
         {
@@ -279,7 +279,7 @@ struct ance::ret::Resolver::Implementation
             {
                 reporter_.error("Unknown intrinsic '" + call.identifier + "'", call.identifier.location());
 
-                setResult(utility::makeOwned<ErrorExpression>());
+                setResult(utility::makeOwned<ErrorExpression>(call.location));
             }
         }
 
@@ -306,7 +306,7 @@ struct ance::ret::Resolver::Implementation
                         break;
                 }
 
-                setResult(utility::makeOwned<ErrorExpression>());
+                setResult(utility::makeOwned<ErrorExpression>(access.location));
             }
         }
 

@@ -50,7 +50,7 @@ namespace ance::ret
         : Statement
         , utility::ConcreteNode<ErrorStatement, Visitor>
     {
-        ErrorStatement();
+        explicit ErrorStatement(core::Location const& source_location);
     };
 
     /**
@@ -109,7 +109,7 @@ namespace ance::ret
         : Expression
         , utility::ConcreteNode<ErrorExpression, Visitor>
     {
-        ErrorExpression();
+        explicit ErrorExpression(core::Location const& source_location);
     };
 
     /**
