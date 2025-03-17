@@ -240,12 +240,39 @@ namespace ance::ast
             return statement;
         }
 
+        std::any visitLetStatement(anceParser::LetStatementContext* ctx) override
+        {
+            core::Identifier const identifier = this->identifier(ctx->IDENTIFIER());
+
+            utility::Optional<utility::Owned<Expression>> expression;
+
+            if (ctx->expression() != nullptr) expression = expectExpression(ctx->expression());
+
+            Statement* statement = new Let(identifier, std::move(expression), location(ctx));
+            return statement;
+        }
+
         std::any visitCall(anceParser::CallContext* context) override
         {
             core::Identifier const callable = identifier(context->entity()->IDENTIFIER());
 
             Expression* expression = new Call(callable, location(context));
             return expression;
+        }
+
+        std::any visitAccess(anceParser::AccessContext* ctx) override
+        {
+            core::Identifier const accessed = identifier(ctx->entity()->IDENTIFIER());
+
+            Expression* expression = new Access(accessed, location(ctx));
+            return expression;
+        }
+
+        std::any visitTerminal(antlr4::tree::TerminalNode*) override
+        {
+            assert(false);// Indicates a missing implementation of a node.
+
+            return {};
         }
 
       private:

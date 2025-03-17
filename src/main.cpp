@@ -142,11 +142,10 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: fix that source parsing does not throw any error - check if there is a default visit for non-existing rules to detect them and throw / assert, only then implement the new parsing
-        // todo: test the new resolving, test nested scopes, test re-declaring, test blocking
         // todo: replace all /** doc with /// doc
-        // todo: update runner to actually store the values of the variables and provide on access in map
+        // todo: update runner to actually store the values of the variables and provide on access in map, print should print var states
         // todo: add only if control flow statement to grammar and support it in the compiler, requires BB changes
+        // todo: test the new resolving, test nested scopes, test re-declaring, test blocking (no use of outer if later declared in inner)
         // todo: add the loop, break and continue statements as well as while
         // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
         // todo: add intrinsics and function calls with arguments
