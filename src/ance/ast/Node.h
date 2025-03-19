@@ -8,45 +8,39 @@
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
-/**
- * The abstract syntax tree (AST) namespace.
- */
+/// The abstract syntax tree (AST) namespace.
 namespace ance::ast
 {
     class Visitor;
 
-    /**
-     * Base class for all nodes in the AST.
-     */
-    struct Node : virtual utility::AbstractNode<Visitor> {
+    /// Base class for all nodes in the AST.
+    struct Node : virtual utility::AbstractNode<Visitor>
+    {
         explicit Node(core::Location const& source_location);
 
         core::Location location;
     };
 
-    /**
-     * A statement is an independent part of code.
-     */
+    /// A statement is an independent part of code.
     struct Statement
         : virtual Node
-        , virtual utility::AbstractNode<Visitor> {
+        , virtual utility::AbstractNode<Visitor>
+    {
     };
 
-    /**
-     * A statement that could not be parsed correctly.
-     */
+    /// A statement that could not be parsed correctly.
     struct ErrorStatement final
         : Statement
-        , utility::ConcreteNode<ErrorStatement, Visitor> {
+        , utility::ConcreteNode<ErrorStatement, Visitor>
+    {
         explicit ErrorStatement(core::Location const& source_location);
     };
 
-    /**
-     * A block statement combines multiple statements into a single statement.
-     */
+    /// A block statement combines multiple statements into a single statement.
     struct Block final
         : Statement
-        , utility::ConcreteNode<Block, Visitor> {
+        , utility::ConcreteNode<Block, Visitor>
+    {
         Block(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location);
 
         utility::List<utility::Owned<Statement>> statements = {};
@@ -54,63 +48,60 @@ namespace ance::ast
 
     struct Expression;
 
-    /**
-     * An independent expression statement is a statement that consists of a single expression.
-     */
+    /// An independent expression statement is a statement that consists of a single expression.
     struct Independent final
         : Statement
-        , utility::ConcreteNode<Independent, Visitor> {
+        , utility::ConcreteNode<Independent, Visitor>
+    {
         Independent(utility::Owned<Expression> independent_expression, core::Location const& source_location);
 
         utility::Owned<Expression> expression;
     };
 
-    /**
-     * A let statement declares a variable and can also define its value.
-     */
+    /// A let statement declares a variable and can also define its value.
     struct Let final
         : Statement
-        , utility::ConcreteNode<Let, Visitor> {
-        Let(core::Identifier const& identifier, utility::Optional<utility::Owned<Expression>> definition, core::Location const& source_location);
+        , utility::ConcreteNode<Let, Visitor>
+    {
+        Let(core::Identifier const&                       identifier,
+            utility::Optional<utility::Owned<Expression>> definition,
+            core::Location const&                         source_location);
 
-        core::Identifier variable;
+        core::Identifier                              variable;
         utility::Optional<utility::Owned<Expression>> value;
     };
 
-    /**
-     * An expression is a piece of code that produces a value.
-     */
+    /// An expression is a piece of code that produces a value.
     struct Expression
         : virtual Node
-        , virtual utility::AbstractNode<Visitor> {
+        , virtual utility::AbstractNode<Visitor>
+    {
     };
 
-    /**
-     * An expression that could not be parsed correctly.
-     */
+    /// An expression that could not be parsed correctly.
     struct ErrorExpression final
         : Expression
-        , utility::ConcreteNode<ErrorExpression, Visitor> {
+        , utility::ConcreteNode<ErrorExpression, Visitor>
+    {
         explicit ErrorExpression(core::Location const& source_location);
     };
 
-    /**
-     * A call is an expression that performs the call-operator on a callable entity.
-     */
+    /// A call is an expression that performs the call-operator on a callable entity.
+
     struct Call final
         : Expression
-        , utility::ConcreteNode<Call, Visitor> {
+        , utility::ConcreteNode<Call, Visitor>
+    {
         explicit Call(core::Identifier const& callable, core::Location const& source_location);
 
         core::Identifier identifier;
     };
 
-    /**
-     * Access is an expression that reads the value of a named entity.
-     */
+    /// Access is an expression that reads the value of a named entity.
     struct Access final
         : Expression
-        , utility::ConcreteNode<Access, Visitor> {
+        , utility::ConcreteNode<Access, Visitor>
+    {
         Access(core::Identifier const& accessed, core::Location const& source_location);
 
         core::Identifier identifier;
@@ -123,14 +114,14 @@ namespace ance::ast
 
         ~Visitor() override = default;
 
-        virtual void visit(ErrorStatement const& error) = 0;
-        virtual void visit(Block const& block) = 0;
+        virtual void visit(ErrorStatement const& error)    = 0;
+        virtual void visit(Block const& block)             = 0;
         virtual void visit(Independent const& independent) = 0;
-        virtual void visit(Let const& let) = 0;
+        virtual void visit(Let const& let)                 = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
-        virtual void visit(Call const& call) = 0;
-        virtual void visit(Access const& access) = 0;
+        virtual void visit(Call const& call)             = 0;
+        virtual void visit(Access const& access)         = 0;
     };
 }
 

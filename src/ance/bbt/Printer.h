@@ -9,9 +9,7 @@ namespace ance::bbt
 {
     struct BasicBlock;
 
-    /**
-     * Prints the BBT (Basic Block Tree) to a stream.
-     */
+    /// Prints the BBT (Basic Block Tree) to a stream.
     class Printer
     {
       public:

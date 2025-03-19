@@ -9,9 +9,7 @@ namespace ance::ret
 {
     struct Statement;
 
-    /**
-     * Prints the RET to a stream.
-     */
+    /// Prints the RET to a stream.
     class Printer
     {
       public:

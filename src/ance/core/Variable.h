@@ -6,32 +6,24 @@
 
 namespace ance::core
 {
-    /**
-     * Represents a variable.
-     */
+    /// Represents a variable.
     class Variable
     {
       public:
-        /**
-         * Creates a new variable.
-         * @param identifier The identifier of the variable.
-         * @param location The location where the variable was defined.
-         */
+        /// Creates a new variable.
+        /// \param identifier The identifier of the variable.
+        /// \param location The location where the variable was defined.
         Variable(Identifier const& identifier, Location const& location);
 
-        /**
-         * Gets the identifier of this variable.
-         */
-        Identifier const& identifier() const;
+        /// Gets the identifier of this variable.
+        [[nodiscard]] Identifier const& identifier() const;
 
-        /**
-         * Gets the location where this variable was defined.
-         */
-        Location const& location() const;
+        /// Gets the location where this variable was defined.
+        [[nodiscard]] Location const& location() const;
 
       private:
         Identifier identifier_;
-        Location location_;
+        Location   location_;
     };
 }
 

@@ -11,19 +11,15 @@ namespace ance::ret
 
 namespace ance::analyze
 {
-    /**
-     * Analyzes the RET for semantic correctness.
-     */
+    /// Analyzes the RET for semantic correctness.
     class Analyzer
     {
     public:
       explicit Analyzer(core::Reporter& reporter);
       ~Analyzer();
 
-      /**
-       * Analyze a statement.
-       * @param statement The statement to analyze.
-       */
+      /// Analyze a statement.
+      /// \param statement The statement to analyze.
       void analyze(ret::Statement const& statement);
 
     private:

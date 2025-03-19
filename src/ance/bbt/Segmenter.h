@@ -13,20 +13,16 @@ namespace ance::bbt
 {
   struct BasicBlock;
 
-  /**
-   * Segments RETs into BBTs.
-   */
+  /// Segments RETs into BBTs.
   class Segmenter
   {
   public:
     explicit Segmenter(core::Reporter& reporter);
     ~Segmenter();
 
-    /**
-     * Segment a statement into a basic block.
-     * @param statement The statement to segment.
-     * @return The basic block.
-     */
+    /// Segment a statement into a basic block.
+    /// \param statement The statement to segment.
+    /// \return The basic block.
     utility::Owned<BasicBlock> segment(ret::Statement const& statement);
 
     // todo: think how to do simplification here, maybe internal bb representation first with mutable state

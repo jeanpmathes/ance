@@ -13,20 +13,16 @@ namespace ance::est
 {
     struct Statement;
 
-    /**
-     * Expands ASTs into ESTs.
-     */
+    /// Expands ASTs into ESTs.
     class Expander
     {
       public:
         explicit Expander(core::Reporter& reporter);
         ~Expander();
 
-        /**
-         * Expand a statement, removing syntactic sugar.
-         * @param statement The statement to expand.
-         * @return The expanded statement.
-         */
+        /// Expand a statement, removing syntactic sugar.
+        /// \param statement The statement to expand.
+        /// \return The expanded statement.
         utility::Owned<Statement> expand(ast::Statement const& statement);
 
       private:

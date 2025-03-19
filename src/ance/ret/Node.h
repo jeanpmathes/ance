@@ -17,16 +17,12 @@ namespace ance::core
     class Variable;
 }
 
-/**
- * The resolved element tree (RET) namespace.
- */
+/// The resolved element tree (RET) namespace.
 namespace ance::ret
 {
     class Visitor;
 
-    /**
-     * Base class for all nodes in the RET.
-     */
+    /// Base class for all nodes in the RET.
     struct Node : virtual utility::AbstractNode<Visitor>
     {
         explicit Node(core::Location const& source_location);
@@ -34,18 +30,14 @@ namespace ance::ret
         core::Location location;
     };
 
-    /**
-     * Statement node in the RET.
-     */
+    /// Statement node in the RET.
     struct Statement
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
     };
 
-    /**
-     * Error statement, mostly as pass-through from the AST.
-     */
+    /// Error statement, mostly as pass-through from the AST.
     struct ErrorStatement final
         : Statement
         , utility::ConcreteNode<ErrorStatement, Visitor>
@@ -53,9 +45,7 @@ namespace ance::ret
         explicit ErrorStatement(core::Location const& source_location);
     };
 
-    /**
-     * Block statement, containing multiple statements.
-     */
+    /// Block statement, containing multiple statements.
     struct Block final
         : Statement
         , utility::ConcreteNode<Block, Visitor>
@@ -68,9 +58,7 @@ namespace ance::ret
 
     struct Expression;
 
-    /**
-     * Statement that simply wraps an expression.
-     */
+    /// Statement that simply wraps an expression.
     struct Independent final
         : Statement
         , utility::ConcreteNode<Independent, Visitor>
@@ -80,9 +68,7 @@ namespace ance::ret
         utility::Owned<Expression> expression;
     };
 
-    /**
-     * A let statement declares a variable and can also define its value.
-     */
+    /// A let statement declares a variable and can also define its value.
     struct Let final
         : Statement
         , utility::ConcreteNode<Let, Visitor>
@@ -93,18 +79,14 @@ namespace ance::ret
         utility::Optional<utility::Owned<Expression>> value;
     };
 
-    /**
-     * Expression node in the RET.
-     */
+    /// Expression node in the RET.
     struct Expression
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
     };
 
-    /**
-     * Error expression, mostly as pass-through from the AST.
-     */
+    /// Error expression, mostly as pass-through from the AST.
     struct ErrorExpression final
         : Expression
         , utility::ConcreteNode<ErrorExpression, Visitor>
@@ -112,9 +94,7 @@ namespace ance::ret
         explicit ErrorExpression(core::Location const& source_location);
     };
 
-    /**
-     * Performs a compiler-provided operation like operators or functions.
-     */
+    /// Performs a compiler-provided operation like operators or functions.
     struct Intrinsic final
         : Expression
         , utility::ConcreteNode<Intrinsic, Visitor>
@@ -124,9 +104,7 @@ namespace ance::ret
         core::Intrinsic const& intrinsic;
     };
 
-    /**
-     * Access is an expression that reads the value of a variable.
-     */
+    /// Access is an expression that reads the value of a variable.
     struct Access final
         : Expression
         , utility::ConcreteNode<Access, Visitor>

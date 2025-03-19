@@ -9,9 +9,7 @@ namespace ance::ast
 {
     struct Statement;
 
-    /**
-     * Prints the AST to a stream.
-     */
+    /// Prints the AST to a stream.
     class Printer
     {
       public:

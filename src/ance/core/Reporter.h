@@ -14,46 +14,34 @@ namespace ance::sources
 
 namespace ance::core
 {
-    /**
-     * Serves to report errors and warnings.
-     */
+    /// Serves to report errors and warnings.
     class Reporter
     {
     public:
         Reporter();
         ~Reporter();
 
-        /**
-         * Report a warning.
-         * @param message The message describing the warning.
-         * @param location The location in the source code where the warning occurred.
-         */
+        /// Report a warning.
+        /// \param message The message describing the warning.
+        /// \param location The location in the source code where the warning occurred.
         void warning(std::string const& message, Location const& location);
 
-        /**
-         * Report an error. The error will prevent successful compilation.
-         * @param message The message describing the error.
-         * @param location The location in the source code where the error occurred.
-         */
+        /// Report an error. The error will prevent successful compilation.
+        /// \param message The message describing the error.
+        /// \param location The location in the source code where the error occurred.
         void error(std::string const& message, Location const& location);
 
-        /**
-         * Emit all reported messages.
-         * @param source_tree The source tree to use for source locations.
-         * @param out The stream to emit the messages to.
-         */
+        /// Emit all reported messages.
+        /// \param source_tree The source tree to use for source locations.
+        /// \param out The stream to emit the messages to.
         void emit(sources::SourceTree& source_tree, std::ostream& out) const;
 
-        /**
-         * Get the number of reported errors.
-         * @return The error count.
-         */
+        /// Get the number of reported errors.
+        /// \return The error count.
         [[nodiscard]] size_t errorCount() const;
 
-        /**
-         * Get the number of reported warnings.
-         * @return The warning count.
-         */
+        /// Get the number of reported warnings.
+        /// \return The warning count.
         [[nodiscard]] size_t warningCount() const;
 
     private:

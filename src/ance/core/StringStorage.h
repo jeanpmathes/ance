@@ -7,9 +7,7 @@
 
 namespace ance::core
 {
-    /**
-     * Stores strings and provides views of them. The views are valid as long as the storage exists.
-     */
+    /// Stores strings and provides views of them. The views are valid as long as the storage exists.
     class StringStorage
     {
         StringStorage() = default;
@@ -18,18 +16,14 @@ namespace ance::core
         StringStorage(StringStorage const& storage) = delete;
         StringStorage(StringStorage&& storage)      = delete;
 
-        /**
-         * Get the shared instance of the string storage.
-         * @return The shared instance.
-         */
+        /// Get the shared instance of the string storage.
+        /// \return The shared instance.
         static StringStorage& shared();
 
-        /**
-         * Store a string in storage and get a view of it.
-         * If there is already a string with the same content, a view of the existing string will be returned.
-         * @param string The string of which a copy is stored.
-         * @return A view to a string with same content.
-         */
+        /// Store a string in storage and get a view of it.
+        /// If there is already a string with the same content, a view of the existing string will be returned.
+        /// \param string The string of which a copy is stored.
+        /// \return A view to a string with same content.
         std::string_view store(std::string const& string);
 
       private:

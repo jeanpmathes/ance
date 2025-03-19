@@ -9,16 +9,14 @@
 
 
 
-/**
- * This class defines an abstract visitor for a parse tree
- * produced by anceParser.
- */
+
+/// This class defines an abstract visitor for a parse tree
+/// produced by anceParser.
 class  anceVisitor : public antlr4::tree::AbstractParseTreeVisitor {
 public:
 
-  /**
-   * Visit parse trees produced by anceParser.
-   */
+
+  /// Visit parse trees produced by anceParser.
     virtual std::any visitFile(anceParser::FileContext *context) = 0;
 
     virtual std::any visitBlockStatement(anceParser::BlockStatementContext *context) = 0;

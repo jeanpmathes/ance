@@ -9,9 +9,7 @@ namespace ance::cet
 {
     struct Unit;
 
-    /**
-     * Prints the CET (Compileable Element Tree) to a stream.
-     */
+    /// Prints the CET (Compile-able Element Tree) to a stream.
     class Printer
     {
       public:

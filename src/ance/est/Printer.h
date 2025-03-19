@@ -9,9 +9,7 @@ namespace ance::est
 {
     struct Statement;
 
-    /**
-     * Prints the EST to a stream.
-     */
+    /// Prints the EST to a stream.
     class Printer
     {
       public:

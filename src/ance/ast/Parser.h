@@ -8,20 +8,18 @@ namespace ance::ast
 {
     struct Statement;
 
-    /**
-     * Parses files into ASTs.
-     */
+
+    /// Parses files into ASTs.
     class Parser
     {
       public:
         Parser(sources::SourceTree& source_tree, core::Reporter& reporter);
         ~Parser();
 
-        /**
-         * Reads and parses a passed file into an AST.
-         * @param index The index of the file in the source tree.
-         * @return The parsed AST.
-         */
+
+        /// Reads and parses a passed file into an AST.
+        /// \param index The index of the file in the source tree.
+        /// \return The parsed AST.
         utility::Owned<Statement> parse(size_t index);
 
       private:

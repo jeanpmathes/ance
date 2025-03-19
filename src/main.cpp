@@ -142,7 +142,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: replace all /** doc with /// doc
         // todo: update runner to actually store the values of the variables and provide on access in map, print should print var states
         // todo: add only if control flow statement to grammar and support it in the compiler, requires BB changes
         // todo: test the new resolving, test nested scopes, test re-declaring, test blocking (no use of outer if later declared in inner)

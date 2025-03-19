@@ -8,10 +8,10 @@
 
 namespace ance::utility
 {
-    /**
-     * A custom optional that does not require a non-const copy constructor.
-     * @tparam T The type of the optional.
-     */
+
+    /// A custom optional that does not require a non-const copy constructor.
+    /// @tparam T The type of the optional.
+
     template<Moveable T>
     class Optional
     {

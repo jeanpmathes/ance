@@ -9,9 +9,7 @@ namespace ance::core
 {
     struct Intrinsic;
 
-    /**
-     * Utility to simplify implementing code printers for different trees.
-     */
+    /// Utility to simplify implementing code printers for different trees.
     class Printer
     {
       public:
@@ -19,39 +17,25 @@ namespace ance::core
         virtual ~Printer();
 
       protected:
-        /**
-         * Print a string to the output stream.
-         */
+        /// Print a string to the output stream.
         void print(std::string const& text);
 
-        /**
-         * Print a string to the output stream.
-         */
+        /// Print a string to the output stream.
         void print(char const* text);
 
-        /**
-         * Print an identifier to the output stream.
-         */
+        /// Print an identifier to the output stream.
         void print(Identifier const& identifier);
 
-        /**
-         * Print an intrinsic to the output stream.
-         */
+        /// Print an intrinsic to the output stream.
         void print(Intrinsic const& intrinsic);
 
-        /**
-         * Start a new line.
-         */
+        /// Start a new line.
         void line();
 
-        /**
-         * Enter an indented block.
-         */
+        /// Enter an indented block.
         void enter();
 
-        /**
-         * Exit an indented block.
-         */
+        /// Exit an indented block.
         void exit();
 
       private:

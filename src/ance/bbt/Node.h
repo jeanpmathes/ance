@@ -14,16 +14,12 @@ namespace ance::core
     struct Intrinsic;
 }
 
-/**
- * The basic-block tree (BBT) namespace.
- */
+/// The basic-block tree (BBT) namespace.
 namespace ance::bbt
 {
     class Visitor;
 
-    /**
-   * Base class for all nodes in the BBT.
-   */
+    /// Base class for all nodes in the BBT.
     struct Node : virtual utility::AbstractNode<Visitor>
     {
         explicit Node(core::Location const& source_location);
@@ -33,10 +29,8 @@ namespace ance::bbt
 
     struct Statement;
 
-    /**
-   * A basic block is a sequence of statements that are executed without interruption.
-   * Control flow can be set up between basic blocks.
-   */
+    /// A basic block is a sequence of statements that are executed without interruption.
+    /// Control flow can be set up between basic blocks.
     struct BasicBlock final
         : Node
         , utility::ConcreteNode<BasicBlock, Visitor>
@@ -46,18 +40,14 @@ namespace ance::bbt
         utility::List<utility::Owned<Statement>> statements;
     };
 
-    /**
- * Statement node in the BBT.
- */
+    /// Statement node in the BBT.
     struct Statement
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
     };
 
-    /**
-   * Error statement, mostly as pass-through from the AST.
-   */
+    /// Error statement, mostly as pass-through from the AST.
     struct ErrorStatement final
         : Statement
         , utility::ConcreteNode<ErrorStatement, Visitor>
@@ -67,9 +57,7 @@ namespace ance::bbt
 
     struct Expression;
 
-    /**
-   * Statement that simply wraps an expression.
-   */
+    /// Statement that simply wraps an expression.
     struct Independent final
         : Statement
         , utility::ConcreteNode<Independent, Visitor>
@@ -79,9 +67,7 @@ namespace ance::bbt
         utility::Owned<Expression> expression;
     };
 
-    /**
-   * A let statement declares a variable and can also define its value.
-   */
+    /// A let statement declares a variable and can also define its value.
     struct Let final
         : Statement
         , utility::ConcreteNode<Let, Visitor>
@@ -94,18 +80,14 @@ namespace ance::bbt
         utility::Optional<utility::Owned<Expression>> value;
     };
 
-    /**
-   * Expression node in the BBT.
-   */
+    /// Expression node in the BBT.
     struct Expression
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
     };
 
-    /**
-   * Error expression, mostly as pass-through from the AST.
-   */
+    /// Error expression, mostly as pass-through from the AST.
     struct ErrorExpression final
         : Expression
         , utility::ConcreteNode<ErrorExpression, Visitor>
@@ -113,9 +95,7 @@ namespace ance::bbt
         explicit ErrorExpression(core::Location const& source_location);
     };
 
-    /**
-   * Performs a compiler-provided operation like operators or functions.
-   */
+    /// Performs a compiler-provided operation like operators or functions.
     struct Intrinsic final
         : Expression
         , utility::ConcreteNode<Intrinsic, Visitor>

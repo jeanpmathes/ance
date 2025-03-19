@@ -11,19 +11,15 @@ namespace ance::cet
 
 namespace ance::build
 {
-    /**
-     * Compiles CETs into binaries.
-     */
+    /// Compiles CETs into binaries.
     class Compiler
     {
       public:
         explicit Compiler(core::Reporter& reporter);
         ~Compiler();
 
-        /**
-         * Compile a CET unit.
-         * @param unit The unit to compile.
-         */
+        /// Compile a CET unit.
+        /// \param unit The unit to compile.
         void compile(cet::Unit const& unit);
 
       private:

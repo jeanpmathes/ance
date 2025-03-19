@@ -11,10 +11,8 @@ class Storage;
 
 namespace ance::core
 {
-    /**
-     * Represents a name, written it code. The text is interned.
-     * Every identifier has a code location attached, the location is however ignored for maps and sets.
-     */
+    /// Represents a name, written it code. The text is interned.
+    /// Every identifier has a code location attached, the location is however ignored for maps and sets.
     class Identifier
     {
         Identifier(std::string_view string, Location const& location);
@@ -26,18 +24,14 @@ namespace ance::core
         Identifier& operator=(Identifier const& other) = default;
         Identifier& operator=(Identifier&& other)      = default;
 
-        /**
-         * Create an identifier and intern the string.
-         * @param string The text of the identifier.
-         * @param location The location of the identifier.
-         * @return The identifier.
-         */
+        /// Create an identifier and intern the string.
+        /// \param string The text of the identifier.
+        /// \param location The location of the identifier.
+        /// \return The identifier.
         static Identifier like(std::string const& string, Location location = Location::global());
 
-        /**
-         * Create an empty identifier.
-         * @return The empty identifier.
-         */
+        /// Create an empty identifier.
+        /// \return The empty identifier.
         static Identifier empty();
 
         [[nodiscard]] std::string_view text() const;

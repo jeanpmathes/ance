@@ -5,10 +5,10 @@
 
 namespace ance::utility
 {
-    /**
-     * A list of elements.
-     * @tparam T The type of the elements.
-     */
+
+    /// A list of elements.
+    /// @tparam T The type of the elements.
+
     template<typename T>
     using List = std::vector<T>;
 }

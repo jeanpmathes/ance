@@ -14,25 +14,20 @@ namespace ance::core
     struct Intrinsic;
 }
 
-/**
- * The compile-able entity tree (CET) namespace.
- */
+
+/// The compile-able entity tree (CET) namespace.
 namespace ance::cet
 {
     class Visitor;
 
-    /**
-     * Base class for all nodes in the CET.
-     */
+    /// Base class for all nodes in the CET.
     struct Node : virtual utility::AbstractNode<Visitor> {
         explicit Node(core::Location const& source_location);
 
         core::Location location;
     };
 
-    /**
-     * A unit of compilation.
-     */
+    /// A unit of compilation.
     struct Unit final
         : Node
         , utility::ConcreteNode<Unit, Visitor> {
@@ -43,10 +38,8 @@ namespace ance::cet
 
     struct Statement;
 
-    /**
-     * A basic block is a sequence of statements that are executed without interruption.
-     * Control flow can be set up between basic blocks.
-     */
+    /// A basic block is a sequence of statements that are executed without interruption.
+    /// Control flow can be set up between basic blocks.
     struct BasicBlock final
         : Node
         , utility::ConcreteNode<BasicBlock, Visitor> {
@@ -55,9 +48,8 @@ namespace ance::cet
         utility::List<utility::Owned<Statement>> statements;
     };
 
-    /**
-   * Statement node in the CET.
-   */
+
+    /// Statement node in the CET.
     struct Statement
         : virtual Node
         , virtual utility::AbstractNode<Visitor> {
@@ -65,9 +57,7 @@ namespace ance::cet
 
     struct Expression;
 
-    /**
-     * Statement that simply wraps an expression.
-     */
+    /// Statement that simply wraps an expression.
     struct Independent final
         : Statement
         , utility::ConcreteNode<Independent, Visitor> {
@@ -76,9 +66,7 @@ namespace ance::cet
         utility::Owned<Expression> expression;
     };
 
-    /**
-     * A let statement declares a variable and can also define its value.
-     */
+    /// A let statement declares a variable and can also define its value.
     struct Let final
         : Statement
         , utility::ConcreteNode<Let, Visitor> {
@@ -88,17 +76,13 @@ namespace ance::cet
         utility::Optional<utility::Owned<Expression>> value;
     };
 
-    /**
-     * Expression node in the CET.
-     */
+    /// Expression node in the CET.
     struct Expression
         : virtual Node
         , virtual utility::AbstractNode<Visitor> {
     };
 
-    /**
-     * Performs a compiler-provided operation like operators or functions.
-     */
+    /// Performs a compiler-provided operation like operators or functions.
     struct Intrinsic final
         : Expression
         , utility::ConcreteNode<Intrinsic, Visitor> {
@@ -107,9 +91,7 @@ namespace ance::cet
         core::Intrinsic const& intrinsic;
     };
 
-    /**
-     * Access is an expression that reads the value of a variable.
-     */
+    /// Access is an expression that reads the value of a variable.
     struct Access final
         : Expression
         , utility::ConcreteNode<Access, Visitor> {

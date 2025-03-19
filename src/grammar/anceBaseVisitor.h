@@ -8,10 +8,9 @@
 #include "anceVisitor.h"
 
 
-/**
- * This class provides an empty implementation of anceVisitor, which can be
- * extended to create a visitor which only needs to handle a subset of the available methods.
- */
+
+/// This class provides an empty implementation of anceVisitor, which can be
+/// extended to create a visitor which only needs to handle a subset of the available methods.
 class  anceBaseVisitor : public anceVisitor {
 public:
 
