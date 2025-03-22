@@ -76,6 +76,11 @@ struct ance::build::Compiler::Implementation
             (void) let;// todo: implement
         }
 
+        void visit(cet::Assignment const& assignment) override
+        {
+            (void) assignment;// todo: implement
+        }
+
         void visit(cet::Intrinsic const& intrinsic) override
         {
             intrinsics_.run(intrinsic.intrinsic, intrinsic.location);
@@ -84,6 +89,11 @@ struct ance::build::Compiler::Implementation
         void visit(cet::Access const& access) override
         {
             (void) access;// todo: implement
+        }
+
+        void visit(cet::Constant const& constant) override
+        {
+            (void) constant;// todo: implement
         }
 
     private:

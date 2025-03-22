@@ -37,6 +37,11 @@ struct ance::analyze::Analyzer::Implementation
             }
         }
 
+        void visit(ret::Assignment const& assignment) override
+        {
+            visit(*assignment.value);
+        }
+
         void visit(ret::ErrorExpression const&) override
         {
 
@@ -48,6 +53,11 @@ struct ance::analyze::Analyzer::Implementation
         }
 
         void visit(ret::Access const&) override
+        {
+
+        }
+
+        void visit(ret::Constant const&) override
         {
 
         }

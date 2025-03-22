@@ -55,7 +55,7 @@ struct ance::est::Expander::Implementation
         {
             visit(statement);
 
-            (void)reporter_;//todo: use reporter or remove from expander at some point
+            (void) reporter_;//todo: use reporter or remove from expander at some point
 
             assert(statement_expansion_.hasValue());
 
@@ -77,18 +77,24 @@ struct ance::est::Expander::Implementation
             return result;
         }
 
-        void visit(ast::ErrorStatement const& error_statement) override { setResult(utility::makeOwned<ErrorStatement>(error_statement.location)); }
+        static void append(Statements& target, Statements&& source)
+        {
+            target.insert(target.end(), make_move_iterator(source.begin()), make_move_iterator(source.end()));
+        }
+
+        void visit(ast::ErrorStatement const& error_statement) override
+        {
+            setResult(utility::makeOwned<ErrorStatement>(error_statement.location));
+        }
 
         void visit(ast::Block const& block) override
         {
-            utility::List<utility::Owned<Statement>> statements;
+            Statements statements;
 
             for (auto& statement : block.statements)
             {
                 Statements expanded = expand(*statement);
-                statements.insert(statements.end(),
-                                  make_move_iterator(expanded.begin()),
-                                  make_move_iterator(expanded.end()));
+                append(statements, std::move(expanded));
             }
 
             setResult(utility::makeOwned<Block>(std::move(statements), block.location));
@@ -100,14 +106,9 @@ struct ance::est::Expander::Implementation
 
             Expansion expansion = expand(*independent.expression);
 
-            statements.insert(statements.end(),
-                              make_move_iterator(expansion.before.begin()),
-                              make_move_iterator(expansion.before.end()));
-            statements.emplace_back(
-                utility::makeOwned<Independent>(std::move(expansion.center), independent.location));
-            statements.insert(statements.end(),
-                              make_move_iterator(expansion.after.begin()),
-                              make_move_iterator(expansion.after.end()));
+            append(statements, std::move(expansion.before));
+            statements.emplace_back(utility::makeOwned<Independent>(std::move(expansion.center), independent.location));
+            append(statements, std::move(expansion.after));
 
             setResult(std::move(statements));
         }
@@ -117,28 +118,42 @@ struct ance::est::Expander::Implementation
             Statements statements;
 
             utility::Optional<utility::Owned<Expression>> value;
+            Statements                                    after;
 
             if (let.value.hasValue())
             {
-                auto [before, center, after] = expand(**let.value);
+                Expansion expansion = expand(**let.value);
 
-                statements.insert(statements.end(),
-                                make_move_iterator(before.begin()),
-                                make_move_iterator(before.end()));
+                append(statements, std::move(expansion.before));
 
-                value = std::move(center);
-
-                statements.insert(statements.end(),
-                                make_move_iterator(after.begin()),
-                                make_move_iterator(after.end()));
+                value = std::move(expansion.center);
+                after = std::move(expansion.after);
             }
 
-            statements.emplace_back(utility::makeOwned<Let>(let.variable, std::move(value), let.location));
+            statements.emplace_back(utility::makeOwned<Let>(let.identifier, std::move(value), let.location));
+
+            append(statements, std::move(after));
 
             setResult(std::move(statements));
         }
 
-        void visit(ast::ErrorExpression const& error_expression) override { setResult(utility::makeOwned<ErrorExpression>(error_expression.location)); }
+        void visit(ast::Assignment const& assignment) override
+        {
+            Statements statements;
+
+            Expansion expansion = expand(*assignment.value);
+
+            append(statements, std::move(expansion.before));
+            statements.emplace_back(utility::makeOwned<Assignment>(assignment.identifier, std::move(expansion.center), assignment.location));
+            append(statements, std::move(expansion.after));
+
+            setResult(std::move(statements));
+        }
+
+        void visit(ast::ErrorExpression const& error_expression) override
+        {
+            setResult(utility::makeOwned<ErrorExpression>(error_expression.location));
+        }
 
         void visit(ast::Call const& call) override
         {
@@ -148,6 +163,11 @@ struct ance::est::Expander::Implementation
         void visit(ast::Access const& access) override
         {
             setResult(utility::makeOwned<Access>(access.identifier, access.location));
+        }
+
+        void visit(ast::Literal const& literal) override
+        {
+            setResult(utility::makeOwned<Literal>(literal.value, literal.location));
         }
 
       private:
@@ -168,7 +188,7 @@ struct ance::est::Expander::Implementation
         return utility::makeOwned<Block>(std::move(statements), statement.location);
     }
 
-private:
+  private:
     core::Reporter& reporter_;
 };
 

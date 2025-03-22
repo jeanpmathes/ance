@@ -8,9 +8,10 @@
 #include "anceVisitor.h"
 
 
-
-/// This class provides an empty implementation of anceVisitor, which can be
-/// extended to create a visitor which only needs to handle a subset of the available methods.
+/**
+ * This class provides an empty implementation of anceVisitor, which can be
+ * extended to create a visitor which only needs to handle a subset of the available methods.
+ */
 class  anceBaseVisitor : public anceVisitor {
 public:
 
@@ -30,11 +31,19 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitCall(anceParser::CallContext *ctx) override {
+  virtual std::any visitAssignmentStatement(anceParser::AssignmentStatementContext *ctx) override {
     return visitChildren(ctx);
   }
 
-  virtual std::any visitAccess(anceParser::AccessContext *ctx) override {
+  virtual std::any visitCallExpression(anceParser::CallExpressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitAccessExpression(anceParser::AccessExpressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitLiteralExpression(anceParser::LiteralExpressionContext *ctx) override {
     return visitChildren(ctx);
   }
 
@@ -42,7 +51,23 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitBooleanLiteral(anceParser::BooleanLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitTrue(anceParser::TrueContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitFalse(anceParser::FalseContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitEntity(anceParser::EntityContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitAssigner(anceParser::AssignerContext *ctx) override {
     return visitChildren(ctx);
   }
 

@@ -66,6 +66,14 @@ struct ance::cet::Printer::Implementation
             print(";");
         }
 
+        void visit(Assignment const& assignment) override
+        {
+            print(assignment.variable.identifier());
+            print(" <: ");
+            visit(*assignment.value);
+            print(";");
+        }
+
         void visit(Intrinsic const& intrinsic) override
         {
             print("(");
@@ -77,6 +85,11 @@ struct ance::cet::Printer::Implementation
         void visit(Access const& access) override
         {
             print(access.variable.identifier());
+        }
+
+        void visit(Constant const& constant) override
+        {
+            print(constant.value ? "true" : "false");
         }
     };
 

@@ -73,6 +73,13 @@ struct ance::bbt::Segmenter::Implementation
             statements_.emplace_back(utility::makeOwned<Let>(let.variable, std::move(value), let.location));
         }
 
+        void visit(ret::Assignment const& assignment) override
+        {
+            utility::Owned<Expression> value = segment(*assignment.value);
+
+            statements_.emplace_back(utility::makeOwned<Assignment>(assignment.variable, std::move(value), assignment.location));
+        }
+
         void visit(ret::ErrorExpression const& error_expression) override
         {
             utility::Owned<Expression> expression = utility::makeOwned<ErrorExpression>(error_expression.location);
@@ -92,6 +99,13 @@ struct ance::bbt::Segmenter::Implementation
         void visit(ret::Access const& access) override
         {
             utility::Owned<Expression> expression = utility::makeOwned<Access>(access.variable, access.location);
+
+            setResult(std::move(expression));
+        }
+
+        void visit(ret::Constant const& constant) override
+        {
+            utility::Owned<Expression> expression = utility::makeOwned<Constant>(constant.value, constant.location);
 
             setResult(std::move(expression));
         }

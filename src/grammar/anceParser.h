@@ -12,16 +12,16 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, IDENTIFIER = 4, SEMICOLON = 5, WHITESPACE = 6, 
-    BLOCK_COMMENT = 7, LINE_COMMENT = 8, BRACKET_OPEN = 9, BRACKET_CLOSE = 10, 
-    CURLY_BRACKET_OPEN = 11, CURLY_BRACKET_CLOSE = 12, SQUARE_BRACKET_OPEN = 13, 
-    SQUARE_BRACKET_CLOSE = 14, POINTY_BRACKET_OPEN = 15, POINTY_BRACKET_CLOSE = 16, 
-    ERROR_CHAR = 17
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, IDENTIFIER = 6, SEMICOLON = 7, 
+    WHITESPACE = 8, BLOCK_COMMENT = 9, LINE_COMMENT = 10, BRACKET_OPEN = 11, 
+    BRACKET_CLOSE = 12, CURLY_BRACKET_OPEN = 13, CURLY_BRACKET_CLOSE = 14, 
+    SQUARE_BRACKET_OPEN = 15, SQUARE_BRACKET_CLOSE = 16, POINTY_BRACKET_OPEN = 17, 
+    POINTY_BRACKET_CLOSE = 18, ERROR_CHAR = 19
   };
 
   enum {
     RuleFile = 0, RuleStatement = 1, RuleExpression = 2, RuleArguments = 3, 
-    RuleEntity = 4
+    RuleLiteral = 4, RuleBoolean = 5, RuleEntity = 6, RuleAssigner = 7
   };
 
   explicit anceParser(antlr4::TokenStream *input);
@@ -45,7 +45,10 @@ public:
   class StatementContext;
   class ExpressionContext;
   class ArgumentsContext;
-  class EntityContext; 
+  class LiteralContext;
+  class BooleanContext;
+  class EntityContext;
+  class AssignerContext; 
 
   class  FileContext : public antlr4::ParserRuleContext {
   public:
@@ -72,6 +75,18 @@ public:
     virtual size_t getRuleIndex() const override;
 
    
+  };
+
+  class  AssignmentStatementContext : public StatementContext {
+  public:
+    AssignmentStatementContext(StatementContext *ctx);
+
+    EntityContext *entity();
+    AssignerContext *assigner();
+    ExpressionContext *expression();
+    antlr4::tree::TerminalNode *SEMICOLON();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   class  ExpressionStatementContext : public StatementContext {
@@ -102,6 +117,7 @@ public:
 
     antlr4::tree::TerminalNode *IDENTIFIER();
     antlr4::tree::TerminalNode *SEMICOLON();
+    AssignerContext *assigner();
     ExpressionContext *expression();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -122,23 +138,32 @@ public:
    
   };
 
-  class  CallContext : public ExpressionContext {
+  class  LiteralExpressionContext : public ExpressionContext {
   public:
-    CallContext(ExpressionContext *ctx);
+    LiteralExpressionContext(ExpressionContext *ctx);
+
+    LiteralContext *literal();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  AccessExpressionContext : public ExpressionContext {
+  public:
+    AccessExpressionContext(ExpressionContext *ctx);
+
+    EntityContext *entity();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  CallExpressionContext : public ExpressionContext {
+  public:
+    CallExpressionContext(ExpressionContext *ctx);
 
     EntityContext *entity();
     antlr4::tree::TerminalNode *BRACKET_OPEN();
     ArgumentsContext *arguments();
     antlr4::tree::TerminalNode *BRACKET_CLOSE();
-
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-  };
-
-  class  AccessContext : public ExpressionContext {
-  public:
-    AccessContext(ExpressionContext *ctx);
-
-    EntityContext *entity();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
@@ -159,6 +184,61 @@ public:
 
   ArgumentsContext* arguments();
 
+  class  LiteralContext : public antlr4::ParserRuleContext {
+  public:
+    LiteralContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    LiteralContext() = default;
+    void copyFrom(LiteralContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  BooleanLiteralContext : public LiteralContext {
+  public:
+    BooleanLiteralContext(LiteralContext *ctx);
+
+    BooleanContext *boolean();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  LiteralContext* literal();
+
+  class  BooleanContext : public antlr4::ParserRuleContext {
+  public:
+    BooleanContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    BooleanContext() = default;
+    void copyFrom(BooleanContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  TrueContext : public BooleanContext {
+  public:
+    TrueContext(BooleanContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  FalseContext : public BooleanContext {
+  public:
+    FalseContext(BooleanContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  BooleanContext* boolean();
+
   class  EntityContext : public antlr4::ParserRuleContext {
   public:
     EntityContext(antlr4::ParserRuleContext *parent, size_t invokingState);
@@ -171,6 +251,18 @@ public:
   };
 
   EntityContext* entity();
+
+  class  AssignerContext : public antlr4::ParserRuleContext {
+  public:
+    AssignerContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  AssignerContext* assigner();
 
 
   // By default the static state used to implement the parser is lazily initialized during the first

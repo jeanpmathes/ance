@@ -63,12 +63,25 @@ namespace ance::ast
         : Statement
         , utility::ConcreteNode<Let, Visitor>
     {
-        Let(core::Identifier const&                       identifier,
+        Let(core::Identifier const&                       name,
             utility::Optional<utility::Owned<Expression>> definition,
             core::Location const&                         source_location);
 
-        core::Identifier                              variable;
+        core::Identifier                              identifier;
         utility::Optional<utility::Owned<Expression>> value;
+    };
+
+    /// An assignment statement assigns a value to a variable.
+    struct Assignment final
+        : Statement
+        , utility::ConcreteNode<Assignment, Visitor>
+    {
+        Assignment(core::Identifier const&                        assigned,
+                    utility::Owned<Expression>                    expression,
+                    core::Location const&                         source_location);
+
+        core::Identifier         identifier;
+        utility::Owned<Expression> value;
     };
 
     /// An expression is a piece of code that produces a value.
@@ -107,6 +120,16 @@ namespace ance::ast
         core::Identifier identifier;
     };
 
+    /// A literal value.
+    struct Literal final
+        : Expression
+        , utility::ConcreteNode<Literal, Visitor>
+    {
+        Literal(bool literal, core::Location const& source_location);
+
+        bool value;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -118,10 +141,12 @@ namespace ance::ast
         virtual void visit(Block const& block)             = 0;
         virtual void visit(Independent const& independent) = 0;
         virtual void visit(Let const& let)                 = 0;
+        virtual void visit(Assignment const& assignment)   = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Call const& call)             = 0;
         virtual void visit(Access const& access)         = 0;
+        virtual void visit(Literal const& literal)       = 0;
     };
 }
 

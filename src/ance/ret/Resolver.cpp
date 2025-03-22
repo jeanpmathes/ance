@@ -50,12 +50,18 @@ struct ance::ret::Resolver::Implementation
 
         void visit(est::Let const& let) override
         {
-            declarations.insert(let.variable);
+            declarations.insert(let.identifier);
+        }
+
+        void visit(est::Assignment const& assignment) override
+        {
+            visit(*assignment.value);
         }
 
         void visit(est::ErrorExpression const&) override {}
         void visit(est::Call const&) override {}
         void visit(est::Access const&) override {}
+        void visit(est::Literal const&) override {}
 
     private:
         std::set<core::Identifier> declarations = {};
@@ -151,6 +157,29 @@ struct ance::ret::Resolver::Implementation
 
                     return std::unexpected(error);
                 });
+            }
+
+            [[nodiscard]] core::Variable const* expect(core::Identifier const& identifier, core::Reporter& reporter) const
+            {
+                std::expected<std::reference_wrapper<const core::Variable>, Error> const variable = find(identifier);
+
+                if (variable.has_value())
+                {
+                    return &variable.value().get();
+                }
+
+                switch (variable.error())
+                {
+                    case Error::Unknown:
+                        reporter.error("Cannot resolve name '" + identifier + "'", identifier.location());
+                    break;
+
+                    case Error::Blocked:
+                        reporter.error("Name '" + identifier + "' blocked by later declaration in scope", identifier.location());
+                    break;
+                }
+
+                return nullptr;
             }
 
             static utility::Owned<core::Scope> decompose(utility::Owned<Scope> scope)
@@ -254,13 +283,30 @@ struct ance::ret::Resolver::Implementation
         void visit(est::Let const& let) override
         {
             assert(current_scope_ != nullptr);
-            core::Variable const& variable = current_scope_->declare(let.variable, let.location);
+            core::Variable const& variable = current_scope_->declare(let.identifier, let.location);
 
             utility::Optional<utility::Owned<Expression>> value;
 
             if (let.value.hasValue()) { value = resolve(**let.value); }
 
             setResult(utility::makeOwned<Let>(variable, std::move(value), let.location));
+        }
+
+        void visit(est::Assignment const& assignment) override
+        {
+            assert(current_scope_ != nullptr);
+
+            core::Variable const* variable = current_scope_->expect(assignment.identifier, reporter_);
+            utility::Owned<Expression> value = resolve(*assignment.value);
+
+            if (variable != nullptr)
+            {
+                setResult(utility::makeOwned<Assignment>(*variable, std::move(value), assignment.location));
+            }
+            else
+            {
+                setResult(utility::makeOwned<ErrorStatement>(assignment.location));
+            }
         }
 
         void visit(est::ErrorExpression const& error_expression) override { setResult(utility::makeOwned<ErrorExpression>(error_expression.location)); }
@@ -287,27 +333,21 @@ struct ance::ret::Resolver::Implementation
         {
             assert(current_scope_ != nullptr);
 
-            std::expected<std::reference_wrapper<const core::Variable>, Scope::Error> const variable = current_scope_->find(access.identifier);
+            core::Variable const* variable = current_scope_->expect(access.identifier, reporter_);
 
-            if (variable.has_value())
+            if (variable != nullptr)
             {
-                setResult(utility::makeOwned<Access>(variable.value().get(), access.location));
+                setResult(utility::makeOwned<Access>(*variable, access.location));
             }
             else
             {
-                switch (variable.error())
-                {
-                    case Scope::Error::Unknown:
-                        reporter_.error("Cannot resolve name '" + access.identifier + "'", access.identifier.location());
-                        break;
-
-                    case Scope::Error::Blocked:
-                        reporter_.error("Name '" + access.identifier + "' blocked by later declaration in scope", access.identifier.location());
-                        break;
-                }
-
                 setResult(utility::makeOwned<ErrorExpression>(access.location));
             }
+        }
+
+        void visit(est::Literal const& literal) override
+        {
+            setResult(utility::makeOwned<Constant>(literal.value, literal.location));
         }
 
       private:

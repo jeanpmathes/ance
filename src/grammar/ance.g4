@@ -5,20 +5,35 @@ file : statement EOF ;
 statement
     : '{' ( statement )* '}' # BlockStatement
     | expression ';' # ExpressionStatement
-    | 'let' IDENTIFIER ( '<:' expression )? ';' # LetStatement
+    | 'let' IDENTIFIER ( assigner expression )? ';' # LetStatement
+    | entity assigner expression ';' # AssignmentStatement
     ;
 
 expression
-    : entity '(' arguments ')' # Call
-    | entity # Access
+    : entity '(' arguments ')' # CallExpression
+    | entity # AccessExpression
+    | literal # LiteralExpression
     ;
 
 arguments
     : (expression (',' expression)* )?
     ;
 
+literal
+    : boolean # BooleanLiteral
+    ;
+
+boolean
+    : 'true' # True
+    | 'false' # False
+    ;
+
 entity
     : IDENTIFIER
+    ;
+
+assigner
+    : '<:'
     ;
 
 IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )

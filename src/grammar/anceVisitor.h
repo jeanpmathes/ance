@@ -9,14 +9,16 @@
 
 
 
-
-/// This class defines an abstract visitor for a parse tree
-/// produced by anceParser.
+/**
+ * This class defines an abstract visitor for a parse tree
+ * produced by anceParser.
+ */
 class  anceVisitor : public antlr4::tree::AbstractParseTreeVisitor {
 public:
 
-
-  /// Visit parse trees produced by anceParser.
+  /**
+   * Visit parse trees produced by anceParser.
+   */
     virtual std::any visitFile(anceParser::FileContext *context) = 0;
 
     virtual std::any visitBlockStatement(anceParser::BlockStatementContext *context) = 0;
@@ -25,13 +27,25 @@ public:
 
     virtual std::any visitLetStatement(anceParser::LetStatementContext *context) = 0;
 
-    virtual std::any visitCall(anceParser::CallContext *context) = 0;
+    virtual std::any visitAssignmentStatement(anceParser::AssignmentStatementContext *context) = 0;
 
-    virtual std::any visitAccess(anceParser::AccessContext *context) = 0;
+    virtual std::any visitCallExpression(anceParser::CallExpressionContext *context) = 0;
+
+    virtual std::any visitAccessExpression(anceParser::AccessExpressionContext *context) = 0;
+
+    virtual std::any visitLiteralExpression(anceParser::LiteralExpressionContext *context) = 0;
 
     virtual std::any visitArguments(anceParser::ArgumentsContext *context) = 0;
 
+    virtual std::any visitBooleanLiteral(anceParser::BooleanLiteralContext *context) = 0;
+
+    virtual std::any visitTrue(anceParser::TrueContext *context) = 0;
+
+    virtual std::any visitFalse(anceParser::FalseContext *context) = 0;
+
     virtual std::any visitEntity(anceParser::EntityContext *context) = 0;
+
+    virtual std::any visitAssigner(anceParser::AssignerContext *context) = 0;
 
 
 };

@@ -43,7 +43,7 @@ struct ance::ast::Printer::Implementation
         void visit(Let const& let) override
         {
             print("let ");
-            print(let.variable);
+            print(let.identifier);
 
             if (let.value.hasValue())
             {
@@ -51,6 +51,14 @@ struct ance::ast::Printer::Implementation
                 visit(**let.value);
             }
 
+            print(";");
+        }
+
+        void visit(Assignment const& assignment) override
+        {
+            print(assignment.identifier);
+            print(" <: ");
+            visit(*assignment.value);
             print(";");
         }
 
@@ -65,6 +73,11 @@ struct ance::ast::Printer::Implementation
         void visit(Access const& access) override
         {
             print(access.identifier);
+        }
+
+        void visit(Literal const& literal) override
+        {
+            print(literal.value ? "true" : "false");
         }
     };
 

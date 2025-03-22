@@ -80,6 +80,17 @@ namespace ance::bbt
         utility::Optional<utility::Owned<Expression>> value;
     };
 
+    /// An assignment statement assigns a value to a variable.
+    struct Assignment final
+        : Statement
+        , utility::ConcreteNode<Assignment, Visitor>
+    {
+        Assignment(core::Variable const& assigned, utility::Owned<Expression> expression, core::Location const& source_location);
+
+        core::Variable const& variable;
+        utility::Owned<Expression> value;
+    };
+
     /// Expression node in the BBT.
     struct Expression
         : virtual Node
@@ -115,6 +126,16 @@ namespace ance::bbt
         core::Variable const& variable;
     };
 
+    /// A constant value.
+    struct Constant final
+        : Expression
+        , utility::ConcreteNode<Constant, Visitor>
+    {
+        Constant(bool constant, core::Location const& source_location);
+
+        bool value;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -125,10 +146,12 @@ namespace ance::bbt
         virtual void visit(ErrorStatement const& error_statement) = 0;
         virtual void visit(Independent const& independent)        = 0;
         virtual void visit(Let const& let)                        = 0;
+        virtual void visit(Assignment const& assignment)          = 0;
 
         virtual void visit(ErrorExpression const& error_expression) = 0;
         virtual void visit(Intrinsic const& intrinsic)              = 0;
         virtual void visit(Access const& access)                    = 0;
+        virtual void visit(Constant const& constant)                = 0;
 
         ~Visitor() override = default;
     };

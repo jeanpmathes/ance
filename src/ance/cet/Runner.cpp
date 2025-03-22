@@ -77,6 +77,13 @@ struct ance::cet::Runner::Implementation
             std::cout << "declare " << let.variable.identifier() << std::endl; // todo: remove
         }
 
+        void visit(bbt::Assignment const& assignment) override
+        {
+            visit(*assignment.value);
+
+            std::cout << "assign " << assignment.variable.identifier() << std::endl;// todo: remove
+        }
+
         void visit(bbt::ErrorExpression const& error_expression) override
         {
             reporter_.error("Cannot execute this expression", error_expression.location);
@@ -92,7 +99,12 @@ struct ance::cet::Runner::Implementation
             std::cout << "read " << access.variable.identifier() << std::endl; // todo: remove
         }
 
-    private:
+        void visit(bbt::Constant const& constant) override
+        {
+            std::cout << "constant " << constant.value << std::endl;// todo: remove
+        }
+
+      private:
         core::Reporter& reporter_;
 
         Intrinsics intrinsics_ {reporter_};

@@ -76,6 +76,16 @@ namespace ance::cet
         utility::Optional<utility::Owned<Expression>> value;
     };
 
+    /// Assigns an expression result to a variable.
+    struct Assignment final
+        : Statement
+        , utility::ConcreteNode<Assignment, Visitor> {
+        Assignment(core::Variable const& assigned, utility::Owned<Expression> expression, core::Location const& source_location);
+
+        core::Variable const& variable;
+        utility::Owned<Expression> value;
+    };
+
     /// Expression node in the CET.
     struct Expression
         : virtual Node
@@ -100,6 +110,15 @@ namespace ance::cet
         core::Variable const& variable;
     };
 
+    /// Holds a compile-time value.
+    struct Constant final
+        : Expression
+        , utility::ConcreteNode<Constant, Visitor> {
+        Constant(bool constant, core::Location const& source_location);
+
+        bool value;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -111,9 +130,11 @@ namespace ance::cet
 
         virtual void visit(Independent const& independent) = 0;
         virtual void visit(Let const& let) = 0;
+        virtual void visit(Assignment const& assignment) = 0;
 
         virtual void visit(Intrinsic const& intrinsic) = 0;
         virtual void visit(Access const& access) = 0;
+        virtual void visit(Constant const& constant) = 0;
 
         ~Visitor() override = default;
     };

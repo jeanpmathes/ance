@@ -16,13 +16,22 @@ ance::ast::Independent::Independent(utility::Owned<Expression> independent_expre
     , expression(std::move(independent_expression))
 {}
 
-ance::ast::Let::Let(core::Identifier const&                       identifier,
+ance::ast::Let::Let(core::Identifier const&                       name,
                     utility::Optional<utility::Owned<Expression>> definition,
                     core::Location const&                         source_location)
     : Node(source_location)
     , Statement()
-    , variable(identifier)
+    , identifier(name)
     , value(std::move(definition))
+{}
+
+ance::ast::Assignment::Assignment(core::Identifier const&    assigned,
+                                  utility::Owned<Expression> expression,
+                                  core::Location const&      source_location)
+    : Node(source_location)
+    , Statement()
+    , identifier(assigned)
+    , value(std::move(expression))
 {}
 
 ance::ast::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
@@ -33,4 +42,10 @@ ance::ast::Call::Call(core::Identifier const& callable, core::Location const& so
     , identifier(callable)
 {}
 
-ance::ast::Access::Access(core::Identifier const& accessed, core::Location const& source_location) : Node(source_location), Expression(), identifier(accessed) {}
+ance::ast::Access::Access(core::Identifier const& accessed, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , identifier(accessed)
+{}
+
+ance::ast::Literal::Literal(bool const literal, core::Location const& source_location) : Node(source_location), Expression(), value(literal) {}

@@ -52,6 +52,14 @@ struct ance::bbt::Printer::Implementation
             print(";");
         }
 
+        void visit(Assignment const& assignment) override
+        {
+            print(assignment.variable.identifier());
+            print(" <: ");
+            visit(*assignment.value);
+            print(";");
+        }
+
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Intrinsic const& intrinsic) override
@@ -65,6 +73,11 @@ struct ance::bbt::Printer::Implementation
         void visit(Access const& access) override
         {
             print(access.variable.identifier());
+        }
+
+        void visit(Constant const& constant) override
+        {
+            print(constant.value ? "true" : "false");
         }
     };
 

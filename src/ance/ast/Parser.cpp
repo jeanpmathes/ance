@@ -242,17 +242,26 @@ namespace ance::ast
 
         std::any visitLetStatement(anceParser::LetStatementContext* ctx) override
         {
-            core::Identifier const identifier = this->identifier(ctx->IDENTIFIER());
+            core::Identifier const name = identifier(ctx->IDENTIFIER());
 
             utility::Optional<utility::Owned<Expression>> expression;
 
             if (ctx->expression() != nullptr) expression = expectExpression(ctx->expression());
 
-            Statement* statement = new Let(identifier, std::move(expression), location(ctx));
+            Statement* statement = new Let(name, std::move(expression), location(ctx));
             return statement;
         }
 
-        std::any visitCall(anceParser::CallContext* context) override
+        std::any visitAssignmentStatement(anceParser::AssignmentStatementContext* ctx) override
+        {
+            core::Identifier const assigned = identifier(ctx->entity()->IDENTIFIER());
+            utility::Owned<Expression> value = expectExpression(ctx->expression());
+
+            Statement* statement = new Assignment(assigned, std::move(value), location(ctx));
+            return statement;
+        }
+
+        std::any visitCallExpression(anceParser::CallExpressionContext* context) override
         {
             core::Identifier const callable = identifier(context->entity()->IDENTIFIER());
 
@@ -260,11 +269,23 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitAccess(anceParser::AccessContext* ctx) override
+        std::any visitAccessExpression(anceParser::AccessExpressionContext* ctx) override
         {
             core::Identifier const accessed = identifier(ctx->entity()->IDENTIFIER());
 
             Expression* expression = new Access(accessed, location(ctx));
+            return expression;
+        }
+
+        std::any visitTrue(anceParser::TrueContext* context) override
+        {
+            Expression* expression = new Literal(true, location(context));
+            return expression;
+        }
+
+        std::any visitFalse(anceParser::FalseContext* context) override
+        {
+            Expression* expression = new Literal(false, location(context));
             return expression;
         }
 
