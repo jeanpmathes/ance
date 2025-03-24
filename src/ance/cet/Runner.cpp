@@ -1,6 +1,7 @@
 #include "Runner.h"
 
 #include <iostream>
+#include <map>
 
 #include "ance/core/Intrinsic.h"
 
@@ -32,7 +33,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(core::Print const&) override
         {
-            std::cout << "DEBUG: " << "foo" << std::endl; // todo: remove
+            std::cout << "DEBUG" << std::endl; // todo: remove
         }
 
         void visit(core::NoOp const&) override
@@ -54,11 +55,37 @@ struct ance::cet::Runner::Implementation
         explicit BBT(core::Reporter& reporter) : reporter_(reporter) {}
         ~BBT() override = default;
 
+        void run(bbt::Statement const& statement)
+        {
+            visit(statement);
+        }
+
+        bool run(bbt::Expression const& expression)
+        {
+            assert(!result_.hasValue());
+
+            visit(expression);
+
+            if (!result_.hasValue())
+                return false; // todo: unit type
+
+            bool const result = result_.value();
+            result_ = std::nullopt;
+
+            return result;
+        }
+
+        void setResult(bool const value)
+        {
+            assert(!result_.hasValue());
+            result_ = value;
+        }
+
         void visit(bbt::BasicBlock const& basic_block) override
         {
             for (auto& statement : basic_block.statements)
             {
-                visit(*statement);
+                run(*statement);
             }
         }
 
@@ -69,19 +96,26 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Independent const& independent) override
         {
-            visit(*independent.expression);
+            run(*independent.expression);
         }
 
         void visit(bbt::Let const& let) override
         {
-            std::cout << "declare " << let.variable.identifier() << std::endl; // todo: remove
+            bool value = false;
+
+            if (let.value.hasValue())
+            {
+                value = run(**let.value);
+            }
+
+            state_[&let.variable] = value;
         }
 
         void visit(bbt::Assignment const& assignment) override
         {
-            visit(*assignment.value);
+            bool const value = run(*assignment.value);
 
-            std::cout << "assign " << assignment.variable.identifier() << std::endl;// todo: remove
+            state_[&assignment.variable] = value;
         }
 
         void visit(bbt::ErrorExpression const& error_expression) override
@@ -96,18 +130,23 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Access const& access) override
         {
-            std::cout << "read " << access.variable.identifier() << std::endl; // todo: remove
+            bool const value = state_.at(&access.variable);
+
+            setResult(value);
         }
 
         void visit(bbt::Constant const& constant) override
         {
-            std::cout << "constant " << constant.value << std::endl;// todo: remove
+            setResult(constant.value);
         }
 
       private:
         core::Reporter& reporter_;
 
         Intrinsics intrinsics_ {reporter_};
+
+        std::map<core::Variable const*, bool> state_ = {};
+        utility::Optional<bool> result_ = std::nullopt;
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}

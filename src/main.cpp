@@ -142,7 +142,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: update runner to actually store the values of the variables and provide on access in map, print should print var states
         // todo: add only if control flow statement to grammar and support it in the compiler, requires BB changes
         // todo: add the loop, break and continue statements as well as while
         // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
