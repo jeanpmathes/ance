@@ -18,10 +18,7 @@ struct ance::analyze::Analyzer::Implementation
 
         void visit(ret::Block const& block) override
         {
-            for (auto& statement : block.statements)
-            {
-                visit(*statement);
-            }
+            for (auto& statement : block.statements) { visit(*statement); }
         }
 
         void visit(ret::Independent const& independent) override
@@ -40,6 +37,13 @@ struct ance::analyze::Analyzer::Implementation
         void visit(ret::Assignment const& assignment) override
         {
             visit(*assignment.value);
+        }
+
+        void visit(ret::If const& if_statement) override
+        {
+            visit(*if_statement.condition);
+            visit(*if_statement.true_block);
+            visit(*if_statement.false_block);
         }
 
         void visit(ret::ErrorExpression const&) override

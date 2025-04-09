@@ -90,6 +90,21 @@ namespace ance::ret
         utility::Owned<Expression> value;
     };
 
+    /// An if-statement chooses one of two blocks to execute based on a condition.
+    struct If final
+        : Statement
+        , utility::ConcreteNode<If, Visitor>
+    {
+        If(utility::Owned<Expression> expression,
+           utility::Owned<Statement>      then_block,
+           utility::Owned<Statement>      else_block,
+           core::Location const&      source_location);
+
+        utility::Owned<Expression> condition;
+        utility::Owned<Statement>      true_block;
+        utility::Owned<Statement>      false_block;
+    };
+
     /// Expression node in the RET.
     struct Expression
         : virtual Node
@@ -147,6 +162,7 @@ namespace ance::ret
         virtual void visit(Independent const& independent) = 0;
         virtual void visit(Let const& let)                 = 0;
         virtual void visit(Assignment const& assignment)   = 0;
+        virtual void visit(If const& if_statement)         = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Intrinsic const& intrinsic)   = 0;

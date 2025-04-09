@@ -82,6 +82,22 @@ struct ance::est::Expander::Implementation
             target.insert(target.end(), make_move_iterator(source.begin()), make_move_iterator(source.end()));
         }
 
+        static utility::Owned<Statement> wrap(Statements&& statements)
+        {
+            if (statements.empty()) { return utility::makeOwned<Block>(std::move(statements), core::Location::global()); }
+
+            if (statements.size() == 1 && statements.front()->isCompound())
+            {
+                return std::move(statements.front());
+            }
+
+            core::Location location = statements.front()->location;
+
+            for (auto& statement : statements) { location.extend(statement->location); }
+
+            return utility::makeOwned<Block>(std::move(statements), location);
+        }
+
         void visit(ast::ErrorStatement const& error_statement) override
         {
             setResult(utility::makeOwned<ErrorStatement>(error_statement.location));
@@ -146,6 +162,26 @@ struct ance::est::Expander::Implementation
             append(statements, std::move(expansion.before));
             statements.emplace_back(utility::makeOwned<Assignment>(assignment.identifier, std::move(expansion.center), assignment.location));
             append(statements, std::move(expansion.after));
+
+            setResult(std::move(statements));
+        }
+
+        void visit(ast::If const& if_statement) override
+        {
+            Statements statements;
+
+            Expansion condition_expansion = expand(*if_statement.condition);
+            append(statements, std::move(condition_expansion.before));
+
+            Statements true_statements  = expand(*if_statement.true_part);
+            Statements false_statements = if_statement.false_part.hasValue() ? expand(**if_statement.false_part) : Statements();
+
+            statements.emplace_back(utility::makeOwned<If>(std::move(condition_expansion.center),
+                                                           wrap(std::move(true_statements)),
+                                                           wrap(std::move(false_statements)),
+                                                           if_statement.location));
+
+            append(statements, std::move(condition_expansion.after));
 
             setResult(std::move(statements));
         }

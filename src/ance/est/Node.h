@@ -26,6 +26,8 @@ namespace ance::est
     struct Statement
         : virtual Node
         , virtual utility::AbstractNode<Visitor> {
+        /// Check if the statement is a compound statement, e.g. a block.
+        [[nodiscard]] virtual bool isCompound() const;
     };
 
     /// Error statement, mostly as pass-through from the AST.
@@ -40,6 +42,8 @@ namespace ance::est
         : Statement
         , utility::ConcreteNode<Block, Visitor> {
         Block(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location);
+
+        [[nodiscard]] bool isCompound() const override;
 
         utility::List<utility::Owned<Statement>> statements = {};
     };
@@ -76,6 +80,21 @@ namespace ance::est
 
         core::Identifier         identifier;
         utility::Owned<Expression> value;
+    };
+
+    /// An if-statement chooses one of two blocks to execute based on a condition.
+    struct If final
+        : Statement
+        , utility::ConcreteNode<If, Visitor>
+    {
+        If(utility::Owned<Expression> expression,
+           utility::Owned<Statement>      then_block,
+           utility::Owned<Statement>      else_block,
+           core::Location const&      source_location);
+
+        utility::Owned<Expression> condition;
+        utility::Owned<Statement>      true_block;
+        utility::Owned<Statement>      false_block;
     };
 
     /// Expression node in the EST.
@@ -131,6 +150,7 @@ namespace ance::est
         virtual void visit(Independent const& independent) = 0;
         virtual void visit(Let const& let)                 = 0;
         virtual void visit(Assignment const& assignment)   = 0;
+        virtual void visit(If const& if_statement)         = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Call const& call)             = 0;

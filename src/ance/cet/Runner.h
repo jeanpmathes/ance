@@ -6,7 +6,7 @@
 
 namespace ance::bbt
 {
-    struct BasicBlock;
+    struct Flow;
 }
 
 namespace ance::cet
@@ -22,9 +22,9 @@ namespace ance::cet
 
 
         /// Run the given tree in basic-block form.
-        /// \param block The basic block to run.
+        /// \param flow The flow tree to run.
         /// \return The resulting compile-able unit.
-        utility::Owned<Unit> run(bbt::BasicBlock const& block); // todo: should maybe become bbt::Unit or bbt::Function to allow control flow
+        utility::Owned<Unit> run(bbt::Flow const& flow);
 
     private:
         struct Implementation;

@@ -47,38 +47,43 @@ void anceParserInitialize() {
       "entity", "assigner"
     },
     std::vector<std::string>{
-      "", "'let'", "','", "'true'", "'false'", "'<:'", "", "';'", "", "", 
-      "", "'('", "')'", "'{'", "'}'", "'['", "']'", "'<'", "'>'"
+      "", "'let'", "'if'", "'then'", "'else'", "','", "'true'", "'false'", 
+      "'<:'", "", "';'", "", "", "", "'('", "')'", "'{'", "'}'", "'['", 
+      "']'", "'<'", "'>'"
     },
     std::vector<std::string>{
-      "", "", "", "", "", "", "IDENTIFIER", "SEMICOLON", "WHITESPACE", "BLOCK_COMMENT", 
-      "LINE_COMMENT", "BRACKET_OPEN", "BRACKET_CLOSE", "CURLY_BRACKET_OPEN", 
-      "CURLY_BRACKET_CLOSE", "SQUARE_BRACKET_OPEN", "SQUARE_BRACKET_CLOSE", 
-      "POINTY_BRACKET_OPEN", "POINTY_BRACKET_CLOSE", "ERROR_CHAR"
+      "", "", "", "", "", "", "", "", "", "IDENTIFIER", "SEMICOLON", "WHITESPACE", 
+      "BLOCK_COMMENT", "LINE_COMMENT", "BRACKET_OPEN", "BRACKET_CLOSE", 
+      "CURLY_BRACKET_OPEN", "CURLY_BRACKET_CLOSE", "SQUARE_BRACKET_OPEN", 
+      "SQUARE_BRACKET_CLOSE", "POINTY_BRACKET_OPEN", "POINTY_BRACKET_CLOSE", 
+      "ERROR_CHAR"
     }
   );
   static const int32_t serializedATNSegment[] = {
-  	4,1,19,75,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
+  	4,1,22,83,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,7,
   	7,7,1,0,1,0,1,0,1,1,1,1,5,1,22,8,1,10,1,12,1,25,9,1,1,1,1,1,1,1,1,1,1,
-  	1,1,1,1,1,1,1,1,1,3,1,36,8,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,44,8,1,1,2,1,
-  	2,1,2,1,2,1,2,1,2,1,2,3,2,53,8,2,1,3,1,3,1,3,5,3,58,8,3,10,3,12,3,61,
-  	9,3,3,3,63,8,3,1,4,1,4,1,5,1,5,3,5,69,8,5,1,6,1,6,1,7,1,7,1,7,0,0,8,0,
-  	2,4,6,8,10,12,14,0,0,76,0,16,1,0,0,0,2,43,1,0,0,0,4,52,1,0,0,0,6,62,1,
-  	0,0,0,8,64,1,0,0,0,10,68,1,0,0,0,12,70,1,0,0,0,14,72,1,0,0,0,16,17,3,
-  	2,1,0,17,18,5,0,0,1,18,1,1,0,0,0,19,23,5,13,0,0,20,22,3,2,1,0,21,20,1,
-  	0,0,0,22,25,1,0,0,0,23,21,1,0,0,0,23,24,1,0,0,0,24,26,1,0,0,0,25,23,1,
-  	0,0,0,26,44,5,14,0,0,27,28,3,4,2,0,28,29,5,7,0,0,29,44,1,0,0,0,30,31,
-  	5,1,0,0,31,35,5,6,0,0,32,33,3,14,7,0,33,34,3,4,2,0,34,36,1,0,0,0,35,32,
-  	1,0,0,0,35,36,1,0,0,0,36,37,1,0,0,0,37,44,5,7,0,0,38,39,3,12,6,0,39,40,
-  	3,14,7,0,40,41,3,4,2,0,41,42,5,7,0,0,42,44,1,0,0,0,43,19,1,0,0,0,43,27,
-  	1,0,0,0,43,30,1,0,0,0,43,38,1,0,0,0,44,3,1,0,0,0,45,46,3,12,6,0,46,47,
-  	5,11,0,0,47,48,3,6,3,0,48,49,5,12,0,0,49,53,1,0,0,0,50,53,3,12,6,0,51,
-  	53,3,8,4,0,52,45,1,0,0,0,52,50,1,0,0,0,52,51,1,0,0,0,53,5,1,0,0,0,54,
-  	59,3,4,2,0,55,56,5,2,0,0,56,58,3,4,2,0,57,55,1,0,0,0,58,61,1,0,0,0,59,
-  	57,1,0,0,0,59,60,1,0,0,0,60,63,1,0,0,0,61,59,1,0,0,0,62,54,1,0,0,0,62,
-  	63,1,0,0,0,63,7,1,0,0,0,64,65,3,10,5,0,65,9,1,0,0,0,66,69,5,3,0,0,67,
-  	69,5,4,0,0,68,66,1,0,0,0,68,67,1,0,0,0,69,11,1,0,0,0,70,71,5,6,0,0,71,
-  	13,1,0,0,0,72,73,5,5,0,0,73,15,1,0,0,0,7,23,35,43,52,59,62,68
+  	1,1,1,1,1,1,1,1,1,3,1,36,8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+  	1,1,1,1,3,1,50,8,1,3,1,52,8,1,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,61,8,2,
+  	1,3,1,3,1,3,5,3,66,8,3,10,3,12,3,69,9,3,3,3,71,8,3,1,4,1,4,1,5,1,5,3,
+  	5,77,8,5,1,6,1,6,1,7,1,7,1,7,0,0,8,0,2,4,6,8,10,12,14,0,0,86,0,16,1,0,
+  	0,0,2,51,1,0,0,0,4,60,1,0,0,0,6,70,1,0,0,0,8,72,1,0,0,0,10,76,1,0,0,0,
+  	12,78,1,0,0,0,14,80,1,0,0,0,16,17,3,2,1,0,17,18,5,0,0,1,18,1,1,0,0,0,
+  	19,23,5,16,0,0,20,22,3,2,1,0,21,20,1,0,0,0,22,25,1,0,0,0,23,21,1,0,0,
+  	0,23,24,1,0,0,0,24,26,1,0,0,0,25,23,1,0,0,0,26,52,5,17,0,0,27,28,3,4,
+  	2,0,28,29,5,10,0,0,29,52,1,0,0,0,30,31,5,1,0,0,31,35,5,9,0,0,32,33,3,
+  	14,7,0,33,34,3,4,2,0,34,36,1,0,0,0,35,32,1,0,0,0,35,36,1,0,0,0,36,37,
+  	1,0,0,0,37,52,5,10,0,0,38,39,3,12,6,0,39,40,3,14,7,0,40,41,3,4,2,0,41,
+  	42,5,10,0,0,42,52,1,0,0,0,43,44,5,2,0,0,44,45,3,4,2,0,45,46,5,3,0,0,46,
+  	49,3,2,1,0,47,48,5,4,0,0,48,50,3,2,1,0,49,47,1,0,0,0,49,50,1,0,0,0,50,
+  	52,1,0,0,0,51,19,1,0,0,0,51,27,1,0,0,0,51,30,1,0,0,0,51,38,1,0,0,0,51,
+  	43,1,0,0,0,52,3,1,0,0,0,53,54,3,12,6,0,54,55,5,14,0,0,55,56,3,6,3,0,56,
+  	57,5,15,0,0,57,61,1,0,0,0,58,61,3,12,6,0,59,61,3,8,4,0,60,53,1,0,0,0,
+  	60,58,1,0,0,0,60,59,1,0,0,0,61,5,1,0,0,0,62,67,3,4,2,0,63,64,5,5,0,0,
+  	64,66,3,4,2,0,65,63,1,0,0,0,66,69,1,0,0,0,67,65,1,0,0,0,67,68,1,0,0,0,
+  	68,71,1,0,0,0,69,67,1,0,0,0,70,62,1,0,0,0,70,71,1,0,0,0,71,7,1,0,0,0,
+  	72,73,3,10,5,0,73,9,1,0,0,0,74,77,5,6,0,0,75,77,5,7,0,0,76,74,1,0,0,0,
+  	76,75,1,0,0,0,77,11,1,0,0,0,78,79,5,9,0,0,79,13,1,0,0,0,80,81,5,8,0,0,
+  	81,15,1,0,0,0,8,23,35,49,51,60,67,70,76
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -197,6 +202,29 @@ void anceParser::StatementContext::copyFrom(StatementContext *ctx) {
   ParserRuleContext::copyFrom(ctx);
 }
 
+//----------------- IfStatementContext ------------------------------------------------------------------
+
+anceParser::ExpressionContext* anceParser::IfStatementContext::expression() {
+  return getRuleContext<anceParser::ExpressionContext>(0);
+}
+
+std::vector<anceParser::StatementContext *> anceParser::IfStatementContext::statement() {
+  return getRuleContexts<anceParser::StatementContext>();
+}
+
+anceParser::StatementContext* anceParser::IfStatementContext::statement(size_t i) {
+  return getRuleContext<anceParser::StatementContext>(i);
+}
+
+anceParser::IfStatementContext::IfStatementContext(StatementContext *ctx) { copyFrom(ctx); }
+
+
+std::any anceParser::IfStatementContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
+    return parserVisitor->visitIfStatement(this);
+  else
+    return visitor->visitChildren(this);
+}
 //----------------- AssignmentStatementContext ------------------------------------------------------------------
 
 anceParser::EntityContext* anceParser::AssignmentStatementContext::entity() {
@@ -310,9 +338,9 @@ anceParser::StatementContext* anceParser::statement() {
     exitRule();
   });
   try {
-    setState(43);
+    setState(51);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 2, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 3, _ctx)) {
     case 1: {
       _localctx = _tracker.createInstance<anceParser::BlockStatementContext>(_localctx);
       enterOuterAlt(_localctx, 1);
@@ -323,8 +351,9 @@ anceParser::StatementContext* anceParser::statement() {
       _la = _input->LA(1);
       while ((((_la & ~ 0x3fULL) == 0) &&
         ((1ULL << _la) & ((1ULL << anceParser::T__0)
-        | (1ULL << anceParser::T__2)
-        | (1ULL << anceParser::T__3)
+        | (1ULL << anceParser::T__1)
+        | (1ULL << anceParser::T__5)
+        | (1ULL << anceParser::T__6)
         | (1ULL << anceParser::IDENTIFIER)
         | (1ULL << anceParser::CURLY_BRACKET_OPEN))) != 0)) {
         setState(20);
@@ -359,7 +388,7 @@ anceParser::StatementContext* anceParser::statement() {
       _errHandler->sync(this);
 
       _la = _input->LA(1);
-      if (_la == anceParser::T__4) {
+      if (_la == anceParser::T__7) {
         setState(32);
         assigner();
         setState(33);
@@ -381,6 +410,35 @@ anceParser::StatementContext* anceParser::statement() {
       expression();
       setState(41);
       match(anceParser::SEMICOLON);
+      break;
+    }
+
+    case 5: {
+      _localctx = _tracker.createInstance<anceParser::IfStatementContext>(_localctx);
+      enterOuterAlt(_localctx, 5);
+      setState(43);
+      match(anceParser::T__1);
+      setState(44);
+      expression();
+      setState(45);
+      match(anceParser::T__2);
+      setState(46);
+      antlrcpp::downCast<IfStatementContext *>(_localctx)->trueBlock = statement();
+      setState(49);
+      _errHandler->sync(this);
+
+      switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 2, _ctx)) {
+      case 1: {
+        setState(47);
+        match(anceParser::T__3);
+        setState(48);
+        antlrcpp::downCast<IfStatementContext *>(_localctx)->falseBlock = statement();
+        break;
+      }
+
+      default:
+        break;
+      }
       break;
     }
 
@@ -482,19 +540,19 @@ anceParser::ExpressionContext* anceParser::expression() {
     exitRule();
   });
   try {
-    setState(52);
+    setState(60);
     _errHandler->sync(this);
-    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 3, _ctx)) {
+    switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 4, _ctx)) {
     case 1: {
       _localctx = _tracker.createInstance<anceParser::CallExpressionContext>(_localctx);
       enterOuterAlt(_localctx, 1);
-      setState(45);
+      setState(53);
       entity();
-      setState(46);
+      setState(54);
       match(anceParser::BRACKET_OPEN);
-      setState(47);
+      setState(55);
       arguments();
-      setState(48);
+      setState(56);
       match(anceParser::BRACKET_CLOSE);
       break;
     }
@@ -502,7 +560,7 @@ anceParser::ExpressionContext* anceParser::expression() {
     case 2: {
       _localctx = _tracker.createInstance<anceParser::AccessExpressionContext>(_localctx);
       enterOuterAlt(_localctx, 2);
-      setState(50);
+      setState(58);
       entity();
       break;
     }
@@ -510,7 +568,7 @@ anceParser::ExpressionContext* anceParser::expression() {
     case 3: {
       _localctx = _tracker.createInstance<anceParser::LiteralExpressionContext>(_localctx);
       enterOuterAlt(_localctx, 3);
-      setState(51);
+      setState(59);
       literal();
       break;
     }
@@ -570,25 +628,25 @@ anceParser::ArgumentsContext* anceParser::arguments() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(62);
+    setState(70);
     _errHandler->sync(this);
 
     _la = _input->LA(1);
     if ((((_la & ~ 0x3fULL) == 0) &&
-      ((1ULL << _la) & ((1ULL << anceParser::T__2)
-      | (1ULL << anceParser::T__3)
+      ((1ULL << _la) & ((1ULL << anceParser::T__5)
+      | (1ULL << anceParser::T__6)
       | (1ULL << anceParser::IDENTIFIER))) != 0)) {
-      setState(54);
+      setState(62);
       expression();
-      setState(59);
+      setState(67);
       _errHandler->sync(this);
       _la = _input->LA(1);
-      while (_la == anceParser::T__1) {
-        setState(55);
-        match(anceParser::T__1);
-        setState(56);
+      while (_la == anceParser::T__4) {
+        setState(63);
+        match(anceParser::T__4);
+        setState(64);
         expression();
-        setState(61);
+        setState(69);
         _errHandler->sync(this);
         _la = _input->LA(1);
       }
@@ -648,7 +706,7 @@ anceParser::LiteralContext* anceParser::literal() {
   try {
     _localctx = _tracker.createInstance<anceParser::BooleanLiteralContext>(_localctx);
     enterOuterAlt(_localctx, 1);
-    setState(64);
+    setState(72);
     boolean();
    
   }
@@ -710,22 +768,22 @@ anceParser::BooleanContext* anceParser::boolean() {
     exitRule();
   });
   try {
-    setState(68);
+    setState(76);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
-      case anceParser::T__2: {
+      case anceParser::T__5: {
         _localctx = _tracker.createInstance<anceParser::TrueContext>(_localctx);
         enterOuterAlt(_localctx, 1);
-        setState(66);
-        match(anceParser::T__2);
+        setState(74);
+        match(anceParser::T__5);
         break;
       }
 
-      case anceParser::T__3: {
+      case anceParser::T__6: {
         _localctx = _tracker.createInstance<anceParser::FalseContext>(_localctx);
         enterOuterAlt(_localctx, 2);
-        setState(67);
-        match(anceParser::T__3);
+        setState(75);
+        match(anceParser::T__6);
         break;
       }
 
@@ -779,7 +837,7 @@ anceParser::EntityContext* anceParser::entity() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(70);
+    setState(78);
     match(anceParser::IDENTIFIER);
    
   }
@@ -824,8 +882,8 @@ anceParser::AssignerContext* anceParser::assigner() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(72);
-    match(anceParser::T__4);
+    setState(80);
+    match(anceParser::T__7);
    
   }
   catch (RecognitionException &e) {

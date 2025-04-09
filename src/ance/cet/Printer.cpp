@@ -32,8 +32,12 @@ struct ance::cet::Printer::Implementation
 
         void visit(BasicBlock const& block) override
         {
+            print("block ");
+            print(block.id);
             line();
-            print("block:");
+            enter();
+
+            print("begin");
             line();
             enter();
 
@@ -44,6 +48,36 @@ struct ance::cet::Printer::Implementation
             }
 
             exit();
+
+            print("end");
+            line();
+
+            visit(*block.link);
+
+            exit();
+            line();
+        }
+
+        void visit(Return const&) override
+        {
+            print("return ()");
+        }
+
+        void visit(Branch const& branch_link) override
+        {
+            print("branch (");
+            print(branch_link.true_branch.id);
+            print(", ");
+            print(branch_link.false_branch.id);
+            print(") on ");
+            visit(*branch_link.condition);
+        }
+
+        void visit(Jump const& jump_link) override
+        {
+            print("jump (");
+            print(jump_link.target.id);
+            print(")");
         }
 
         void visit(Independent const& independent) override

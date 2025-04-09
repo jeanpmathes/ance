@@ -26,6 +26,8 @@ namespace ance::ast
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
+        /// Check if the statement is a compound statement, e.g. a block.
+        [[nodiscard]] virtual bool isCompound() const;
     };
 
     /// A statement that could not be parsed correctly.
@@ -42,6 +44,8 @@ namespace ance::ast
         , utility::ConcreteNode<Block, Visitor>
     {
         Block(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location);
+
+        [[nodiscard]] bool isCompound() const override;
 
         utility::List<utility::Owned<Statement>> statements = {};
     };
@@ -82,6 +86,22 @@ namespace ance::ast
 
         core::Identifier         identifier;
         utility::Owned<Expression> value;
+    };
+
+    /// An if-statement chooses one of two statements to execute based on a condition.
+    /// The second statement is optional.
+    struct If final
+        : Statement
+        , utility::ConcreteNode<If, Visitor>
+    {
+        If(utility::Owned<Expression> expression,
+           utility::Owned<Statement>      then_part,
+           utility::Optional<utility::Owned<Statement>>      else_part,
+           core::Location const&      source_location);
+
+        utility::Owned<Expression> condition;
+        utility::Owned<Statement>      true_part;
+        utility::Optional<utility::Owned<Statement>>      false_part;
     };
 
     /// An expression is a piece of code that produces a value.
@@ -142,6 +162,7 @@ namespace ance::ast
         virtual void visit(Independent const& independent) = 0;
         virtual void visit(Let const& let)                 = 0;
         virtual void visit(Assignment const& assignment)   = 0;
+        virtual void visit(If const& if_statement)         = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Call const& call)             = 0;

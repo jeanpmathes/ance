@@ -12,11 +12,11 @@
 class  anceParser : public antlr4::Parser {
 public:
   enum {
-    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, IDENTIFIER = 6, SEMICOLON = 7, 
-    WHITESPACE = 8, BLOCK_COMMENT = 9, LINE_COMMENT = 10, BRACKET_OPEN = 11, 
-    BRACKET_CLOSE = 12, CURLY_BRACKET_OPEN = 13, CURLY_BRACKET_CLOSE = 14, 
-    SQUARE_BRACKET_OPEN = 15, SQUARE_BRACKET_CLOSE = 16, POINTY_BRACKET_OPEN = 17, 
-    POINTY_BRACKET_CLOSE = 18, ERROR_CHAR = 19
+    T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
+    T__7 = 8, IDENTIFIER = 9, SEMICOLON = 10, WHITESPACE = 11, BLOCK_COMMENT = 12, 
+    LINE_COMMENT = 13, BRACKET_OPEN = 14, BRACKET_CLOSE = 15, CURLY_BRACKET_OPEN = 16, 
+    CURLY_BRACKET_CLOSE = 17, SQUARE_BRACKET_OPEN = 18, SQUARE_BRACKET_CLOSE = 19, 
+    POINTY_BRACKET_OPEN = 20, POINTY_BRACKET_CLOSE = 21, ERROR_CHAR = 22
   };
 
   enum {
@@ -75,6 +75,19 @@ public:
     virtual size_t getRuleIndex() const override;
 
    
+  };
+
+  class  IfStatementContext : public StatementContext {
+  public:
+    IfStatementContext(StatementContext *ctx);
+
+    anceParser::StatementContext *trueBlock = nullptr;
+    anceParser::StatementContext *falseBlock = nullptr;
+    ExpressionContext *expression();
+    std::vector<StatementContext *> statement();
+    StatementContext* statement(size_t i);
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   class  AssignmentStatementContext : public StatementContext {

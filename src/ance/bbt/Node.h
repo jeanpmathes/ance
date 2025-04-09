@@ -27,7 +27,21 @@ namespace ance::bbt
         core::Location location;
     };
 
+    struct BasicBlock;
+
+    /// The flow node represents a complete control flow build up by a set of basic blocks.
+    struct Flow final
+        : Node
+        , utility::ConcreteNode<Flow, Visitor>
+    {
+        Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBlock& start, core::Location const& source_location);
+
+        utility::List<utility::Owned<BasicBlock>> blocks;
+        BasicBlock& entry;
+    };
+
     struct Statement;
+    struct Link;
 
     /// A basic block is a sequence of statements that are executed without interruption.
     /// Control flow can be set up between basic blocks.
@@ -35,9 +49,59 @@ namespace ance::bbt
         : Node
         , utility::ConcreteNode<BasicBlock, Visitor>
     {
-        BasicBlock(utility::List<utility::Owned<Statement>> content, core::Location const& source_location);
+        BasicBlock(size_t number, utility::List<utility::Owned<Statement>> content, utility::Owned<Link> connection, core::Location const& source_location);
 
+        size_t id;
         utility::List<utility::Owned<Statement>> statements;
+        utility::Owned<Link>                     link;
+    };
+
+    /// Describes how control flow is passed between basic blocks.
+    struct Link
+        : virtual Node
+        , virtual utility::AbstractNode<Visitor>
+    {
+
+    };
+
+    /// The error link is used to represent an error in the control flow.
+    struct ErrorLink final
+        : Link
+        , utility::ConcreteNode<ErrorLink, Visitor>
+    {
+        explicit ErrorLink(core::Location const& source_location);
+    };
+
+    /// The return link ends the current function, not linking to any other basic block.
+    struct Return final
+        : Link
+        , utility::ConcreteNode<Return, Visitor>
+    {
+        explicit Return(core::Location const& source_location);
+    };
+
+    struct Expression;
+
+    /// Chooses between two branches based on a condition.
+    struct Branch final
+        : Link
+        , utility::ConcreteNode<Branch, Visitor>
+    {
+        Branch(utility::Owned<Expression> expression, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location);
+
+        utility::Owned<Expression> condition;
+        BasicBlock const& true_branch;
+        BasicBlock const& false_branch;
+    };
+
+    /// A simple and direct jump to a block.
+    struct Jump final
+        : Link
+        , utility::ConcreteNode<Jump, Visitor>
+    {
+        Jump(BasicBlock const& link, core::Location const& source_location);
+
+        BasicBlock const& target;
     };
 
     /// Statement node in the BBT.
@@ -54,8 +118,6 @@ namespace ance::bbt
     {
         explicit ErrorStatement(core::Location const& source_location);
     };
-
-    struct Expression;
 
     /// Statement that simply wraps an expression.
     struct Independent final
@@ -141,7 +203,14 @@ namespace ance::bbt
       public:
         using AbstractVisitor::visit;
 
+        virtual void visit(Flow const& flow) = 0;
+
         virtual void visit(BasicBlock const& basic_block) = 0;
+
+        virtual void visit(ErrorLink const& error_link) = 0;
+        virtual void visit(Return const& return_link) = 0;
+        virtual void visit(Branch const& branch_link) = 0;
+        virtual void visit(Jump const& jump_link) = 0;
 
         virtual void visit(ErrorStatement const& error_statement) = 0;
         virtual void visit(Independent const& independent)        = 0;

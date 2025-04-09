@@ -15,9 +15,23 @@ struct ance::bbt::Printer::Implementation
         explicit BBT(std::ostream& out) : Printer(out) {}
         ~BBT() override = default;
 
+        void visit(Flow const& flow) override
+        {
+            for (auto& block : flow.blocks)
+            {
+                visit(*block);
+                line();
+            }
+        }
+
         void visit(BasicBlock const& block) override
         {
-            print("block:");
+            print("block ");
+            print(block.id);
+            line();
+            enter();
+
+            print("begin");
             line();
             enter();
 
@@ -28,6 +42,36 @@ struct ance::bbt::Printer::Implementation
             }
 
             exit();
+
+            print("end");
+            line();
+
+            visit(*block.link);
+
+            exit();
+            line();
+        }
+
+        void visit(Return const&) override
+        {
+            print("return ()");
+        }
+
+        void visit(Branch const& branch_link) override
+        {
+            print("branch (");
+            print(branch_link.true_branch.id);
+            print(", ");
+            print(branch_link.false_branch.id);
+            print(") on ");
+            visit(*branch_link.condition);
+        }
+
+        void visit(Jump const& jump_link) override
+        {
+            print("jump (");
+            print(jump_link.target.id);
+            print(")");
         }
 
         void visit(ErrorStatement const&) override { print("// error"); }
@@ -60,6 +104,11 @@ struct ance::bbt::Printer::Implementation
             print(";");
         }
 
+        void visit(ErrorLink const&) override
+        {
+            print("/* error */");
+        }
+
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Intrinsic const& intrinsic) override
@@ -83,10 +132,10 @@ struct ance::bbt::Printer::Implementation
 
     explicit Implementation(std::ostream& out) : out_(out) {}
 
-    void print(BasicBlock const& block) const
+    void print(Flow const& flow) const
     {
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(out_);
-        bbt->visit(block);
+        bbt->visit(flow);
     }
 
   private:
@@ -96,7 +145,7 @@ struct ance::bbt::Printer::Implementation
 ance::bbt::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
 ance::bbt::Printer::~Printer() = default;
 
-void ance::bbt::Printer::print(BasicBlock const& block) const
+void ance::bbt::Printer::print(Flow const& flow) const
 {
-    implementation_->print(block);
+    implementation_->print(flow);
 }

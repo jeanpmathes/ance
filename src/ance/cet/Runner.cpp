@@ -55,6 +55,16 @@ struct ance::cet::Runner::Implementation
         explicit BBT(core::Reporter& reporter) : reporter_(reporter) {}
         ~BBT() override = default;
 
+        void run(bbt::BasicBlock const& basic_block)
+        {
+            next_ = &basic_block;
+
+            while (next_ != nullptr)
+            {
+                visit(*next_);
+            }
+        }
+
         void run(bbt::Statement const& statement)
         {
             visit(statement);
@@ -81,12 +91,48 @@ struct ance::cet::Runner::Implementation
             result_ = value;
         }
 
+        void visit(bbt::Flow const& flow) override
+        {
+            run(flow.entry);
+        }
+
         void visit(bbt::BasicBlock const& basic_block) override
         {
             for (auto& statement : basic_block.statements)
             {
                 run(*statement);
             }
+
+            visit(*basic_block.link);
+        }
+
+        void visit(bbt::ErrorLink const& error_link) override
+        {
+            reporter_.error("Cannot execute this link", error_link.location);
+
+            next_ = nullptr;
+        }
+
+        void visit(bbt::Return const&) override
+        {
+            next_ = nullptr;
+        }
+
+        void visit(bbt::Branch const& branch_link) override
+        {
+            if (run(*branch_link.condition))
+            {
+                next_ = &branch_link.true_branch;
+            }
+            else
+            {
+                next_ = &branch_link.false_branch;
+            }
+        }
+
+        void visit(bbt::Jump const& jump_link) override
+        {
+            next_ = &jump_link.target;
         }
 
         void visit(bbt::ErrorStatement const& error_statement) override
@@ -147,16 +193,18 @@ struct ance::cet::Runner::Implementation
 
         std::map<core::Variable const*, bool> state_ = {};
         utility::Optional<bool> result_ = std::nullopt;
+
+        bbt::BasicBlock const* next_ = nullptr;
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
-    utility::Owned<Unit> run(bbt::BasicBlock const& block)
+    utility::Owned<Unit> run(bbt::Flow const& flow)
     {
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
 
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(reporter_);
-        bbt->visit(block);
+        bbt->visit(flow);
 
         return unit;
     }
@@ -169,7 +217,7 @@ ance::cet::Runner::Runner(core::Reporter& reporter) : implementation_(utility::m
 
 ance::cet::Runner::~Runner() = default;
 
-ance::utility::Owned<ance::cet::Unit> ance::cet::Runner::run(bbt::BasicBlock const& block)
+ance::utility::Owned<ance::cet::Unit> ance::cet::Runner::run(bbt::Flow const& flow)
 {
-    return implementation_->run(block);
+    return implementation_->run(flow);
 }

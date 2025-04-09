@@ -34,6 +34,17 @@ ance::ret::Assignment::Assignment(core::Variable const& assigned, utility::Owned
     , value(std::move(expression))
 {}
 
+ance::ret::If::If(utility::Owned<Expression> expression,
+                  utility::Owned<Statement>  then_block,
+                  utility::Owned<Statement>  else_block,
+                  core::Location const&      source_location)
+    : Node(source_location)
+    , Statement()
+    , condition(std::move(expression))
+    , true_block(std::move(then_block))
+    , false_block(std::move(else_block))
+{}
+
 ance::ret::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::ret::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location const& source_location)

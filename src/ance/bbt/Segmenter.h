@@ -11,7 +11,7 @@ namespace ance::ret
 
 namespace ance::bbt
 {
-  struct BasicBlock;
+  struct Flow;
 
   /// Segments RETs into BBTs.
   class Segmenter
@@ -20,13 +20,10 @@ namespace ance::bbt
     explicit Segmenter(core::Reporter& reporter);
     ~Segmenter();
 
-    /// Segment a statement into a basic block.
+    /// Segment a statement into a basic block control flow.
     /// \param statement The statement to segment.
-    /// \return The basic block.
-    utility::Owned<BasicBlock> segment(ret::Statement const& statement);
-
-    // todo: think how to do simplification here, maybe internal bb representation first with mutable state
-    // todo: then run simplify on that like in old implementation, only then return the bb nodes
+    /// \return The control flow built from the statement.
+    utility::Owned<Flow> segment(ret::Statement const& statement);
 
   private:
     struct Implementation;

@@ -66,6 +66,21 @@ struct ance::build::Compiler::Implementation
             (void) basic_block;// todo: implement
         }
 
+        void visit(cet::Return const& return_link) override
+        {
+            (void) return_link;// todo: implement
+        }
+
+        void visit(cet::Branch const& branch_link) override
+        {
+            (void) branch_link;// todo: implement
+        }
+
+        void visit(cet::Jump const& jump_link) override
+        {
+            (void) jump_link;// todo: implement
+        }
+
         void visit(cet::Independent const& independent) override
         {
             (void) independent;// todo: implement

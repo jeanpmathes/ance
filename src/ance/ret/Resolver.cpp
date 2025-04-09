@@ -58,6 +58,13 @@ struct ance::ret::Resolver::Implementation
             visit(*assignment.value);
         }
 
+        void visit(est::If const& if_statement) override
+        {
+            visit(*if_statement.condition);
+            visit(*if_statement.true_block);
+            visit(*if_statement.false_block);
+        }
+
         void visit(est::ErrorExpression const&) override {}
         void visit(est::Call const&) override {}
         void visit(est::Access const&) override {}
@@ -307,6 +314,15 @@ struct ance::ret::Resolver::Implementation
             {
                 setResult(utility::makeOwned<ErrorStatement>(assignment.location));
             }
+        }
+
+        void visit(est::If const& if_statement) override
+        {
+            utility::Owned<Expression> condition = resolve(*if_statement.condition);
+            utility::Owned<Statement> true_part = resolve(*if_statement.true_block);
+            utility::Owned<Statement> false_part = resolve(*if_statement.false_block);
+
+            setResult(utility::makeOwned<If>(std::move(condition), std::move(true_part), std::move(false_part), if_statement.location));
         }
 
         void visit(est::ErrorExpression const& error_expression) override { setResult(utility::makeOwned<ErrorExpression>(error_expression.location)); }

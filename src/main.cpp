@@ -127,7 +127,7 @@ namespace ance
         analyzer.analyze(*resolved);
         if (check_for_fail()) return EXIT_FAILURE;
 
-        utility::Owned<bbt::BasicBlock> segmented = segmenter.segment(*resolved);
+        utility::Owned<bbt::Flow> segmented = segmenter.segment(*resolved);
         if (check_for_fail()) return EXIT_FAILURE;
 
         print<bbt::Printer>(*segmented, debug_path, "bbt");
@@ -142,7 +142,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add only if control flow statement to grammar and support it in the compiler, requires BB changes
         // todo: add the loop, break and continue statements as well as while
         // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
         // todo: add intrinsics and function calls with arguments

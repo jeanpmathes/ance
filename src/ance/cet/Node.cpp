@@ -4,11 +4,28 @@ ance::cet::Node::Node(core::Location const& source_location) : location(source_l
 
 ance::cet::Unit::Unit() : Node(core::Location::global()) {}
 
-ance::cet::BasicBlock::BasicBlock(utility::List<utility::Owned<Statement>> content,
-                                  core::Location const&                    source_location)
+ance::cet::BasicBlock::BasicBlock(size_t const number, utility::List<utility::Owned<Statement>> content, utility::Owned<Link> connection, core::Location const& source_location)
     : Node(source_location)
+    , id(number)
     , statements(std::move(content))
+    , link(std::move(connection))
 {}
+
+ance::cet::Return::Return(core::Location const& source_location) : Node(source_location), Link() {}
+
+ance::cet::Branch::Branch(utility::Owned<Expression> expression, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location)
+    : Node(source_location)
+    , Link()
+    , condition(std::move(expression))
+    , true_branch(true_link)
+    , false_branch(false_link)
+{}
+
+ance::cet::Jump::Jump(BasicBlock const& link, core::Location const& source_location)
+    : Node(source_location), Link(), target(link)
+{
+
+}
 
 ance::cet::Independent::Independent(utility::Owned<Expression> independent_expression,
                                     core::Location const&      source_location)

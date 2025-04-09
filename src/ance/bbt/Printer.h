@@ -7,7 +7,7 @@
 
 namespace ance::bbt
 {
-    struct BasicBlock;
+    struct Flow;
 
     /// Prints the BBT (Basic Block Tree) to a stream.
     class Printer
@@ -16,7 +16,7 @@ namespace ance::bbt
         explicit Printer(std::ostream& out);
         ~Printer();
 
-        void print(BasicBlock const& block) const;
+        void print(Flow const& flow) const;
 
       private:
         struct Implementation;

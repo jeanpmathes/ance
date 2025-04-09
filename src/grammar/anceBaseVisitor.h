@@ -35,6 +35,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitIfStatement(anceParser::IfStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitCallExpression(anceParser::CallExpressionContext *ctx) override {
     return visitChildren(ctx);
   }

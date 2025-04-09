@@ -62,6 +62,39 @@ struct ance::ast::Printer::Implementation
             print(";");
         }
 
+        void visit(If const& if_statement) override
+        {
+            print("if ");
+            visit(*if_statement.condition);
+            print(" then ");
+
+            if (if_statement.true_part->isCompound())
+            {
+                line();
+                visit(*if_statement.true_part);
+            }
+            else
+            {
+                visit(*if_statement.true_part);
+            }
+
+            if (if_statement.false_part.hasValue())
+            {
+                line();
+                print("else ");
+
+                if (if_statement.false_part.value()->isCompound())
+                {
+                    line();
+                    visit(**if_statement.false_part);
+                }
+                else
+                {
+                    visit(**if_statement.false_part);
+                }
+            }
+        }
+
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Call const& call) override

@@ -2,10 +2,37 @@
 
 ance::bbt::Node::Node(core::Location const& source_location) : location(source_location) {}
 
-ance::bbt::BasicBlock::BasicBlock(utility::List<utility::Owned<Statement>> content,
+ance::bbt::Flow::Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBlock& start, core::Location const& source_location)
+    : Node(source_location)
+    , blocks(std::move(content))
+    , entry(start)
+{}
+
+ance::bbt::BasicBlock::BasicBlock(size_t const number, utility::List<utility::Owned<Statement>> content,
+utility::Owned<Link> connection,
                                   core::Location const&                    source_location)
     : Node(source_location)
+    , id(number)
     , statements(std::move(content))
+    , link(std::move(connection))
+{}
+
+ance::bbt::ErrorLink::ErrorLink(core::Location const& source_location) : Node(source_location), Link() {}
+
+ance::bbt::Return::Return(core::Location const& source_location) : Node(source_location), Link() {}
+
+ance::bbt::Branch::Branch(utility::Owned<Expression> expression, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location)
+    : Node(source_location)
+    , Link()
+    , condition(std::move(expression))
+    , true_branch(true_link)
+    , false_branch(false_link)
+{}
+
+ance::bbt::Jump::Jump(BasicBlock const& link, core::Location const& source_location)
+    : Node(source_location)
+    , Link()
+    , target(link)
 {}
 
 ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}

@@ -29,6 +29,9 @@ namespace ance::core
         /// Print an intrinsic to the output stream.
         void print(Intrinsic const& intrinsic);
 
+        /// Print a size_t value to the output stream.
+        void print(size_t value);
+
         /// Start a new line.
         void line();
 

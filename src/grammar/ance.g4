@@ -7,6 +7,7 @@ statement
     | expression ';' # ExpressionStatement
     | 'let' IDENTIFIER ( assigner expression )? ';' # LetStatement
     | entity assigner expression ';' # AssignmentStatement
+    | 'if' expression 'then' trueBlock=statement ( 'else' falseBlock=statement )? # IfStatement
     ;
 
 expression

@@ -30,6 +30,12 @@ void ance::core::Printer::print(Intrinsic const& intrinsic)
     out_ << intrinsic;
 }
 
+void ance::core::Printer::print(size_t const value)
+{
+    indent();
+    out_ << value;
+}
+
 void ance::core::Printer::line()
 {
     indent();

@@ -254,10 +254,25 @@ namespace ance::ast
 
         std::any visitAssignmentStatement(anceParser::AssignmentStatementContext* ctx) override
         {
-            core::Identifier const assigned = identifier(ctx->entity()->IDENTIFIER());
-            utility::Owned<Expression> value = expectExpression(ctx->expression());
+            core::Identifier const     assigned = identifier(ctx->entity()->IDENTIFIER());
+            utility::Owned<Expression> value    = expectExpression(ctx->expression());
 
             Statement* statement = new Assignment(assigned, std::move(value), location(ctx));
+            return statement;
+        }
+
+        std::any visitIfStatement(anceParser::IfStatementContext* ctx) override
+        {
+            utility::Owned<Expression> condition = expectExpression(ctx->expression());
+            utility::Owned<Statement> true_part = expectStatement(ctx->trueBlock);
+            
+            utility::Optional<utility::Owned<Statement>> false_part;
+            if (ctx->falseBlock != nullptr)
+            {
+                false_part = expectStatement(ctx->falseBlock);
+            }
+
+            Statement* statement = new If(std::move(condition), std::move(true_part), std::move(false_part), location(ctx));
             return statement;
         }
 

@@ -29,6 +29,8 @@ public:
 
     virtual std::any visitAssignmentStatement(anceParser::AssignmentStatementContext *context) = 0;
 
+    virtual std::any visitIfStatement(anceParser::IfStatementContext *context) = 0;
+
     virtual std::any visitCallExpression(anceParser::CallExpressionContext *context) = 0;
 
     virtual std::any visitAccessExpression(anceParser::AccessExpressionContext *context) = 0;

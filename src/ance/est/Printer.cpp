@@ -61,6 +61,19 @@ struct ance::est::Printer::Implementation
             print(";");
         }
 
+        void visit(If const& if_statement) override
+        {
+            print("if ");
+            visit(*if_statement.condition);
+            print(" then");
+            line();
+            visit(*if_statement.true_block);
+            line();
+            print("else ");
+            line();
+            visit(*if_statement.false_block);
+        }
+
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Call const& call) override
