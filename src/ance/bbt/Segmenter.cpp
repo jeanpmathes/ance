@@ -163,8 +163,8 @@ struct ance::bbt::Segmenter::Implementation
             link(entry, statement_entry);
             link(statement_exit, exit);
 
-            // todo: add the CFG graph printer to check if simplification works, call it grapher, add base class to create two graphers: bbt, cet
-            // todo: implement simplification of BB graph (see old code, but maybe simplify now)
+            // todo: fix the current graph printing - there seem to be a lot of missing edges
+            // todo: implement simplification of BB graph (see old code, but maybe there is easier code now)
 
             utility::List<utility::Owned<BasicBlock>>     basic_blocks;
             utility::List<std::reference_wrapper<BaseBB>> converted;

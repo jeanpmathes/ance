@@ -8,6 +8,7 @@
 namespace ance::cet
 {
     struct Unit;
+    struct BasicBlock;
 
     /// Prints the CET (Compile-able Element Tree) to a stream.
     class Printer
@@ -17,6 +18,7 @@ namespace ance::cet
         ~Printer();
 
         void print(Unit const& unit) const;
+        void print(BasicBlock const& block) const;
 
       private:
         struct Implementation;

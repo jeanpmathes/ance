@@ -138,6 +138,12 @@ struct ance::bbt::Printer::Implementation
         bbt->visit(flow);
     }
 
+    void print(BasicBlock const& block) const
+    {
+        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(out_);
+        bbt->visit(block);
+    }
+
   private:
     std::ostream& out_;
 };
@@ -148,4 +154,9 @@ ance::bbt::Printer::~Printer() = default;
 void ance::bbt::Printer::print(Flow const& flow) const
 {
     implementation_->print(flow);
+}
+
+void ance::bbt::Printer::print(BasicBlock const& block) const
+{
+    implementation_->print(block);
 }

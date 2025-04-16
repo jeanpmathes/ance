@@ -5,7 +5,6 @@
 #include <boost/locale.hpp>
 
 #include "ance/core/Intrinsic.h"
-#include "ance/core/Scope.h"
 
 #include "ance/sources/SourceTree.h"
 
@@ -25,10 +24,12 @@
 
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Printer.h"
+#include "ance/bbt/Grapher.h"
 #include "ance/bbt/Segmenter.h"
 
 #include "ance/cet/Node.h"
 #include "ance/cet/Printer.h"
+#include "ance/cet/Grapher.h"
 #include "ance/cet/Runner.h"
 
 #include "ance/build/Compiler.h"
@@ -43,6 +44,16 @@ namespace ance
 
         Printer printer {out};
         printer.print(tree);
+    }
+
+    template<class Grapher, class Tree>
+    void graph(Tree const& tree, std::filesystem::path const& debug_path, std::string const& tree_name)
+    {
+        std::filesystem::path const tree_path = debug_path / (tree_name + ".gml");
+        std::ofstream               out {tree_path};
+
+        Grapher grapher {out};
+        grapher.graph(tree);
     }
 
     static int program(int const argc, char** argv)
@@ -131,11 +142,13 @@ namespace ance
         if (check_for_fail()) return EXIT_FAILURE;
 
         print<bbt::Printer>(*segmented, debug_path, "bbt");
+        graph<bbt::Grapher>(*segmented, debug_path, "bbt");
 
         utility::Owned<cet::Unit> unit = runner.run(*segmented);
         if (check_for_fail()) return EXIT_FAILURE;
 
         print<cet::Printer>(*unit, debug_path, "cet");
+        graph<cet::Grapher>(*unit, debug_path, "cet");
 
         compiler.compile(*unit);
         if (check_for_fail()) return EXIT_FAILURE;

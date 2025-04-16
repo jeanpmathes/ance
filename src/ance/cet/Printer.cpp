@@ -135,6 +135,12 @@ struct ance::cet::Printer::Implementation
         cet->visit(unit);
     }
 
+    void print(BasicBlock const& block) const
+    {
+        utility::Owned<CET> cet = utility::makeOwned<CET>(out_);
+        cet->visit(block);
+    }
+
   private:
     std::ostream& out_;
 };
@@ -145,4 +151,9 @@ ance::cet::Printer::~Printer() = default;
 void ance::cet::Printer::print(Unit const& unit) const
 {
     implementation_->print(unit);
+}
+
+void ance::cet::Printer::print(BasicBlock const& block) const
+{
+    implementation_->print(block);
 }
