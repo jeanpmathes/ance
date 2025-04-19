@@ -55,7 +55,43 @@ struct ance::bbt::Segmenter::Implementation
             return id_ - 1;
         }
 
-        [[nodiscard]] virtual utility::List<std::reference_wrapper<BaseBB>> next() const = 0;
+        [[nodiscard]] virtual std::set<BaseBB*> next() const = 0;
+
+        std::tuple<BaseBB*, std::set<BaseBB*>> simplify()
+        {
+            std::set<BaseBB*> outgoing = next();// todo: as seen in old code, unreachability handling might be needed here
+            BaseBB*           result   = this;
+
+            if (outgoing.size() == 1)
+            {
+                BaseBB& target = **outgoing.begin();
+
+                // We can only simplify if this is the only block entering the next (real) block, or if this block is unnecessary, we can simplify.
+
+                if (target.incoming_.size() == 1 || statements_.empty())
+                {
+                    result = &target;
+
+                    for (auto& incoming : incoming_) { incoming->swap(std::ref(*this), std::ref(target)); }
+
+                    target.statements_.insert(target.statements_.begin(),
+                                              std::make_move_iterator(statements_.begin()),
+                                              std::make_move_iterator(statements_.end()));
+                    statements_.clear();
+
+                    target.incoming_.erase(this);
+                    target.incoming_.insert(incoming_.begin(), incoming_.end());
+                    incoming_.clear();
+
+                    // todo: use virtual method to see if BB has inner code (e.g. condition in branch, match, etc.)
+                    // todo: if such a block is simplified out, warn that the condition is not evaluated
+                }
+            }
+
+            return {result, outgoing};
+        }
+
+        virtual void swap(std::reference_wrapper<BaseBB> original, std::reference_wrapper<BaseBB> replacement) = 0;
 
       private:
         std::set<BaseBB*>                        incoming_;
@@ -85,18 +121,26 @@ struct ance::bbt::Segmenter::Implementation
 
         [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) override
         {
-            if (next_ == nullptr) { return utility::makeOwned<Return>(core::Location::global()); }
+            if (next_ == nullptr)
+            {
+                return utility::makeOwned<Return>(core::Location::global());// todo: should not be here but in the correct block maybe?
+            }
 
             return utility::makeOwned<Jump>(*blocks[next_->index()], core::Location::global());
         }
 
-        [[nodiscard]] utility::List<std::reference_wrapper<BaseBB>> next() const override
+        [[nodiscard]] std::set<BaseBB*> next() const override
         {
-            utility::List<std::reference_wrapper<BaseBB>> links;
+            std::set<BaseBB*> links;
 
-            if (next_ != nullptr) links.emplace_back(*next_);
+            if (next_ != nullptr) links.emplace(next_);
 
             return links;
+        }
+
+        void swap(std::reference_wrapper<BaseBB> const original, std::reference_wrapper<BaseBB> const replacement) override
+        {
+            if (next_ == &original.get()) { next_ = &replacement.get(); }
         }
 
       private:
@@ -111,29 +155,36 @@ struct ance::bbt::Segmenter::Implementation
 
         BranchBB(utility::Owned<Expression> condition, BaseBB& true_bb, BaseBB& false_bb) : condition_(std::move(condition)), true_(true_bb), false_(false_bb)
         {
-            true_.enter(*this);
-            false_.enter(*this);
+            true_.get().enter(*this);
+            false_.get().enter(*this);
         }
 
         [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) override
         {
-            return utility::makeOwned<Branch>(std::move(condition_), *blocks[true_.index()], *blocks[false_.index()], core::Location::global());
+            return utility::makeOwned<Branch>(std::move(condition_), *blocks[true_.get().index()], *blocks[false_.get().index()], core::Location::global());
         }
 
-        [[nodiscard]] utility::List<std::reference_wrapper<BaseBB>> next() const override
+        [[nodiscard]] std::set<BaseBB*> next() const override
         {
-            utility::List<std::reference_wrapper<BaseBB>> links;
+            std::set<BaseBB*> links;
 
-            links.emplace_back(true_);
-            links.emplace_back(false_);
+            links.emplace(&true_.get());
+            links.emplace(&false_.get());
 
             return links;
         }
 
+        void swap(std::reference_wrapper<BaseBB> const original, std::reference_wrapper<BaseBB> const replacement) override
+        {
+            if (&true_.get() == &original.get()) { true_ = replacement; }
+
+            if (&false_.get() == &original.get()) { false_ = replacement; }
+        }
+
       private:
         utility::Owned<Expression> condition_;
-        BaseBB&                    true_;
-        BaseBB&                    false_;
+        std::reference_wrapper<BaseBB>                    true_;
+        std::reference_wrapper<BaseBB>                    false_;
     };
 
     class RET final : public ret::Visitor
@@ -149,7 +200,7 @@ struct ance::bbt::Segmenter::Implementation
             assert(bbs_.empty());
 
             utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const entry       = *entry_block;
+            std::reference_wrapper       entry       = *entry_block;
 
             current_entry_bb_ = entry_block.get();
             current_exit_bb_  = current_entry_bb_;
@@ -163,14 +214,35 @@ struct ance::bbt::Segmenter::Implementation
             link(entry, statement_entry);
             link(statement_exit, exit);
 
-            // todo: fix the current graph printing - there seem to be a lot of missing edges
-            // todo: implement simplification of BB graph (see old code, but maybe there is easier code now)
+            std::set<BaseBB*> simplified;
+            std::stack<std::reference_wrapper<BaseBB>> to_simplify;
+            to_simplify.emplace(entry);
+
+            std::reference_wrapper<BaseBB> current_entry = entry;
+
+            while (!to_simplify.empty())
+            {
+                BaseBB& current = to_simplify.top();
+                to_simplify.pop();
+
+                if (simplified.contains(&current)) continue;
+                simplified.insert(&current);
+
+                auto [result, next] = current.simplify();
+
+                if (&current == &current_entry.get()) { current_entry = *result; }
+
+                for (auto& next_block : next)
+                {
+                    if (!simplified.contains(next_block)) { to_simplify.emplace(*next_block); }
+                }
+            }
 
             utility::List<utility::Owned<BasicBlock>>     basic_blocks;
             utility::List<std::reference_wrapper<BaseBB>> converted;
 
             std::stack<std::reference_wrapper<BaseBB>> unconverted;
-            unconverted.emplace(entry);
+            unconverted.emplace(current_entry);
 
             while (!unconverted.empty())
             {
@@ -184,7 +256,7 @@ struct ance::bbt::Segmenter::Implementation
 
                 for (auto& next : current.next())
                 {
-                    if (!next.get().isCreated()) { unconverted.emplace(next); }
+                    if (!next->isCreated()) { unconverted.emplace(*next); }
                 }
             }
 
@@ -196,7 +268,7 @@ struct ance::bbt::Segmenter::Implementation
                 basic_blocks[index]->link = std::move(link);
             }
 
-            BasicBlock& first_block = *basic_blocks.front();
+            BasicBlock& first_block = *basic_blocks[current_entry.get().index()];
 
             return utility::makeOwned<Flow>(std::move(basic_blocks), first_block, statement.location);
         }
