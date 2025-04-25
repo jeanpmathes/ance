@@ -63,6 +63,9 @@ struct ance::cet::Runner::Implementation
             {
                 visit(*next_);
             }
+
+            // todo: when creating new basic blocks here, also implement simplification / already output simplified blocks for compilation
+            // todo: maybe simplification code should be shared in some way?
         }
 
         void run(bbt::Statement const& statement)

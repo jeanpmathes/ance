@@ -13,10 +13,11 @@ class  anceParser : public antlr4::Parser {
 public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
-    T__7 = 8, IDENTIFIER = 9, SEMICOLON = 10, WHITESPACE = 11, BLOCK_COMMENT = 12, 
-    LINE_COMMENT = 13, BRACKET_OPEN = 14, BRACKET_CLOSE = 15, CURLY_BRACKET_OPEN = 16, 
-    CURLY_BRACKET_CLOSE = 17, SQUARE_BRACKET_OPEN = 18, SQUARE_BRACKET_CLOSE = 19, 
-    POINTY_BRACKET_OPEN = 20, POINTY_BRACKET_CLOSE = 21, ERROR_CHAR = 22
+    T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, IDENTIFIER = 12, SEMICOLON = 13, 
+    WHITESPACE = 14, BLOCK_COMMENT = 15, LINE_COMMENT = 16, BRACKET_OPEN = 17, 
+    BRACKET_CLOSE = 18, CURLY_BRACKET_OPEN = 19, CURLY_BRACKET_CLOSE = 20, 
+    SQUARE_BRACKET_OPEN = 21, SQUARE_BRACKET_CLOSE = 22, POINTY_BRACKET_OPEN = 23, 
+    POINTY_BRACKET_CLOSE = 24, ERROR_CHAR = 25
   };
 
   enum {
@@ -77,6 +78,15 @@ public:
    
   };
 
+  class  BreakStatementContext : public StatementContext {
+  public:
+    BreakStatementContext(StatementContext *ctx);
+
+    antlr4::tree::TerminalNode *SEMICOLON();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   class  IfStatementContext : public StatementContext {
   public:
     IfStatementContext(StatementContext *ctx);
@@ -124,6 +134,15 @@ public:
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
+  class  LoopStatementContext : public StatementContext {
+  public:
+    LoopStatementContext(StatementContext *ctx);
+
+    StatementContext *statement();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
   class  LetStatementContext : public StatementContext {
   public:
     LetStatementContext(StatementContext *ctx);
@@ -132,6 +151,15 @@ public:
     antlr4::tree::TerminalNode *SEMICOLON();
     AssignerContext *assigner();
     ExpressionContext *expression();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  ContinueStatementContext : public StatementContext {
+  public:
+    ContinueStatementContext(StatementContext *ctx);
+
+    antlr4::tree::TerminalNode *SEMICOLON();
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };

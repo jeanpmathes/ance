@@ -104,6 +104,33 @@ namespace ance::ast
         utility::Optional<utility::Owned<Statement>>      false_part;
     };
 
+    /// Unconditionally repeats a statement.
+    struct Loop final
+        : Statement
+        , utility::ConcreteNode<Loop, Visitor>
+    {
+        Loop(utility::Owned<Statement>  statement,
+             core::Location const&      source_location);
+
+        utility::Owned<Statement> body;
+    };
+
+    /// Breaks out of the innermost containing loop.
+    struct Break final
+        : Statement
+        , utility::ConcreteNode<Break, Visitor>
+    {
+        explicit Break(core::Location const& source_location);
+    };
+
+    /// Begins a new iteration of the innermost containing loop.
+    struct Continue final
+        : Statement
+        , utility::ConcreteNode<Continue, Visitor>
+    {
+        explicit Continue(core::Location const& source_location);
+    };
+
     /// An expression is a piece of code that produces a value.
     struct Expression
         : virtual Node
@@ -163,6 +190,9 @@ namespace ance::ast
         virtual void visit(Let const& let)                 = 0;
         virtual void visit(Assignment const& assignment)   = 0;
         virtual void visit(If const& if_statement)         = 0;
+        virtual void visit(Loop const& loop)               = 0;
+        virtual void visit(Break const& break_statement)   = 0;
+        virtual void visit(Continue const& continue_statement) = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Call const& call)             = 0;

@@ -45,6 +45,16 @@ ance::ret::If::If(utility::Owned<Expression> expression,
     , false_block(std::move(else_block))
 {}
 
+ance::ret::Loop::Loop(utility::Owned<Statement> statement, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , body(std::move(statement))
+{}
+
+ance::ret::Break::Break(core::Location const& source_location) : Node(source_location), Statement() {}
+
+ance::ret::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
+
 ance::ret::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::ret::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location const& source_location)

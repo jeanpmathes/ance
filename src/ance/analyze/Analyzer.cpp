@@ -46,6 +46,21 @@ struct ance::analyze::Analyzer::Implementation
             visit(*if_statement.false_block);
         }
 
+        void visit(ret::Loop const& loop) override
+        {
+            visit(*loop.body);
+        }
+
+        void visit(ret::Break const&) override
+        {
+
+        }
+
+        void visit(ret::Continue const&) override
+        {
+
+        }
+
         void visit(ret::ErrorExpression const&) override
         {
 

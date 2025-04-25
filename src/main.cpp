@@ -155,7 +155,8 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add the loop, break and continue statements as well as while
+        // todo: add the unreachable code warning, do all the related todos in segmenter
+        // todo: while statement (syntactic sugar using loop, break and continue)
         // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
         // todo: add intrinsics and function calls with arguments
         // todo: add all expressions (both value and control flow) to grammar and support them in the compiler - needs types - do simpler types without the definition bridge, type expressions
@@ -169,6 +170,7 @@ namespace ance
         // todo: add intrinsic functions to include another file, running the cmp code in there too
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
         // todo: add unordered scopes, have them as default at file top-level - maybe make distinction explicit in compiler code
+        // todo: when adding destructors, do not forget that break/continue can also cause them to be called
 
         out << "ance: Success";
 

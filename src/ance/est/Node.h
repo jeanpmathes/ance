@@ -88,13 +88,40 @@ namespace ance::est
         , utility::ConcreteNode<If, Visitor>
     {
         If(utility::Owned<Expression> expression,
-           utility::Owned<Statement>      then_block,
-           utility::Owned<Statement>      else_block,
+           utility::Owned<Statement>  then_block,
+           utility::Owned<Statement>  else_block,
            core::Location const&      source_location);
 
         utility::Owned<Expression> condition;
         utility::Owned<Statement>      true_block;
         utility::Owned<Statement>      false_block;
+    };
+
+    /// A loop statement executes a block of code repeatedly and unconditionally.
+    struct Loop final
+        : Statement
+        , utility::ConcreteNode<Loop, Visitor>
+    {
+        Loop(utility::Owned<Statement>  statement,
+             core::Location const&      source_location);
+        
+        utility::Owned<Statement>      body;
+    };
+
+    /// Break statement exits the nearest enclosing loop.
+    struct Break final
+        : Statement
+        , utility::ConcreteNode<Break, Visitor>
+    {
+        explicit Break(core::Location const& source_location);
+    };
+
+    /// Continue statement continues the nearest enclosing loop.
+    struct Continue final
+        : Statement
+        , utility::ConcreteNode<Continue, Visitor>
+    {
+        explicit Continue(core::Location const& source_location);
     };
 
     /// Expression node in the EST.
@@ -151,6 +178,9 @@ namespace ance::est
         virtual void visit(Let const& let)                 = 0;
         virtual void visit(Assignment const& assignment)   = 0;
         virtual void visit(If const& if_statement)         = 0;
+        virtual void visit(Loop const& loop)               = 0;
+        virtual void visit(Break const& break_statement)   = 0;
+        virtual void visit(Continue const& continue_statement) = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Call const& call)             = 0;

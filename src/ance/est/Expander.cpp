@@ -186,6 +186,35 @@ struct ance::est::Expander::Implementation
             setResult(std::move(statements));
         }
 
+        void visit(ast::Loop const& loop) override
+        {
+            Statements statements;
+
+            Statements block = expand(*loop.body);
+
+            statements.emplace_back(utility::makeOwned<Loop>(wrap(std::move(block)), loop.location));
+
+            setResult(std::move(statements));
+        }
+
+        void visit(ast::Break const& break_statement) override
+        {
+            Statements statements;
+
+            statements.emplace_back(utility::makeOwned<Break>(break_statement.location));
+
+            setResult(std::move(statements));
+        }
+
+        void visit(ast::Continue const& continue_statement) override
+        {
+            Statements statements;
+
+            statements.emplace_back(utility::makeOwned<Continue>(continue_statement.location));
+
+            setResult(std::move(statements));
+        }
+
         void visit(ast::ErrorExpression const& error_expression) override
         {
             setResult(utility::makeOwned<ErrorExpression>(error_expression.location));

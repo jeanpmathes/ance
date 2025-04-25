@@ -101,8 +101,35 @@ namespace ance::ret
            core::Location const&      source_location);
 
         utility::Owned<Expression> condition;
-        utility::Owned<Statement>      true_block;
-        utility::Owned<Statement>      false_block;
+        utility::Owned<Statement>  true_block;
+        utility::Owned<Statement>  false_block;
+    };
+
+    /// Unconditionally loops over a block of statements.
+    struct Loop final
+        : Statement
+        , utility::ConcreteNode<Loop, Visitor>
+    {
+        Loop(utility::Owned<Statement>  statement,
+             core::Location const&      source_location);
+        
+        utility::Owned<Statement>  body;
+    };
+
+    /// Breaks out of the current loop.
+    struct Break final
+        : Statement
+        , utility::ConcreteNode<Break, Visitor>
+    {
+        explicit Break(core::Location const& source_location);
+    };
+
+    /// Continues to the next iteration of the current loop.
+    struct Continue final
+        : Statement
+        , utility::ConcreteNode<Continue, Visitor>
+    {
+        explicit Continue(core::Location const& source_location);
     };
 
     /// Expression node in the RET.
@@ -163,6 +190,9 @@ namespace ance::ret
         virtual void visit(Let const& let)                 = 0;
         virtual void visit(Assignment const& assignment)   = 0;
         virtual void visit(If const& if_statement)         = 0;
+        virtual void visit(Loop const& loop)               = 0;
+        virtual void visit(Break const& break_statement)   = 0;
+        virtual void visit(Continue const& continue_statement) = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Intrinsic const& intrinsic)   = 0;

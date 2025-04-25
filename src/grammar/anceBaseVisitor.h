@@ -39,6 +39,18 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitLoopStatement(anceParser::LoopStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitBreakStatement(anceParser::BreakStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitContinueStatement(anceParser::ContinueStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitCallExpression(anceParser::CallExpressionContext *ctx) override {
     return visitChildren(ctx);
   }

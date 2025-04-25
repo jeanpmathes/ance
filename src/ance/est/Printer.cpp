@@ -74,6 +74,24 @@ struct ance::est::Printer::Implementation
             visit(*if_statement.false_block);
         }
 
+        void visit(Loop const& loop) override
+        {
+            print("loop ");
+            if (loop.body->isCompound())
+            {
+                line();
+                visit(*loop.body);
+            }
+            else
+            {
+                visit(*loop.body);
+            }
+        }
+
+        void visit(Break const&) override { print("break;"); }
+
+        void visit(Continue const&) override { print("continue;"); }
+
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Call const& call) override

@@ -85,6 +85,7 @@ struct ance::bbt::Segmenter::Implementation
 
                     // todo: use virtual method to see if BB has inner code (e.g. condition in branch, match, etc.)
                     // todo: if such a block is simplified out, warn that the condition is not evaluated
+                    // todo: this can happen if a match has only a default case
                 }
             }
 
@@ -268,6 +269,8 @@ struct ance::bbt::Segmenter::Implementation
                 basic_blocks[index]->link = std::move(link);
             }
 
+            // todo: detect if end is not reachable and warn about it with special warning if no unreachable code warning would occur
+
             BasicBlock& first_block = *basic_blocks[current_entry.get().index()];
 
             return utility::makeOwned<Flow>(std::move(basic_blocks), first_block, statement.location);
@@ -423,6 +426,65 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
+        void visit(ret::Loop const& loop) override
+        {
+            utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
+            std::reference_wrapper const entry       = *entry_block;
+
+            utility::Owned<SimpleBB>     exit_block = utility::makeOwned<SimpleBB>();
+            std::reference_wrapper const exit       = *exit_block;
+
+            loops_.emplace(Loop {.entry = entry, .exit = exit});
+
+            auto [loop_entry, loop_exit] = segment(*loop.body);
+
+            loops_.pop();
+
+            link(entry, loop_entry);
+            link(loop_exit, entry);
+
+            utility::List<utility::Owned<BaseBB>> blocks;
+            blocks.emplace_back(std::move(entry_block));
+            blocks.emplace_back(std::move(exit_block));
+            setResult(std::move(blocks), entry, exit);
+        }
+
+        void visit(ret::Break const& break_statement) override
+        {
+            if (loops_.empty()) { reporter_.error("Break statement outside of loop", break_statement.location); }
+
+            utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
+            std::reference_wrapper const entry       = *entry_block;
+
+            utility::Owned<SimpleBB>     exit_block = utility::makeOwned<SimpleBB>();
+            std::reference_wrapper const exit       = *exit_block;
+
+            link(entry, loops_.top().exit);
+
+            utility::List<utility::Owned<BaseBB>> blocks;
+            blocks.emplace_back(std::move(entry_block));
+            blocks.emplace_back(std::move(exit_block));
+            setResult(std::move(blocks), entry, exit);
+        }
+
+        void visit(ret::Continue const& continue_statement) override
+        {
+            if (loops_.empty()) { reporter_.error("Continue statement outside of loop", continue_statement.location); }
+
+            utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
+            std::reference_wrapper const entry       = *entry_block;
+
+            utility::Owned<SimpleBB>     exit_block = utility::makeOwned<SimpleBB>();
+            std::reference_wrapper const exit       = *exit_block;
+
+            link(entry, loops_.top().entry);
+
+            utility::List<utility::Owned<BaseBB>> blocks;
+            blocks.emplace_back(std::move(entry_block));
+            blocks.emplace_back(std::move(exit_block));
+            setResult(std::move(blocks), entry, exit);
+        }
+
         void visit(ret::ErrorExpression const& error_expression) override
         {
             utility::Owned<Expression> expression = utility::makeOwned<ErrorExpression>(error_expression.location);
@@ -435,8 +497,6 @@ struct ance::bbt::Segmenter::Implementation
             utility::Owned<Expression> expression = utility::makeOwned<Intrinsic>(intrinsic.intrinsic, intrinsic.location);
 
             setResult(std::move(expression));
-
-            (void)reporter_; // todo: use it or remove it
         }
 
         void visit(ret::Access const& access) override
@@ -453,11 +513,19 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(expression));
         }
 
+        struct Loop
+        {
+            std::reference_wrapper<SimpleBB> entry;
+            std::reference_wrapper<SimpleBB> exit;
+        };
+
       private:
         utility::List<utility::Owned<BaseBB>> bbs_;
 
         SimpleBB* current_entry_bb_ = nullptr;
         SimpleBB* current_exit_bb_  = nullptr;
+
+        std::stack<Loop> loops_;
 
         utility::Optional<utility::Owned<Expression>> segmented_expression_;
 

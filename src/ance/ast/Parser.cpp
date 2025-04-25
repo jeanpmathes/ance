@@ -276,6 +276,26 @@ namespace ance::ast
             return statement;
         }
 
+        std::any visitLoopStatement(anceParser::LoopStatementContext* context) override
+        {
+            utility::Owned<Statement> body = expectStatement(context->statement());
+
+            Statement* statement = new Loop(std::move(body), location(context));
+            return statement;
+        }
+
+        std::any visitBreakStatement(anceParser::BreakStatementContext* context) override
+        {
+            Statement* statement = new Break(location(context));
+            return statement;
+        }
+
+        std::any visitContinueStatement(anceParser::ContinueStatementContext* context) override
+        {
+            Statement* statement = new Continue(location(context));
+            return statement;
+        }
+
         std::any visitCallExpression(anceParser::CallExpressionContext* context) override
         {
             core::Identifier const callable = identifier(context->entity()->IDENTIFIER());

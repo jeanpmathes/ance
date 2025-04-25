@@ -8,6 +8,9 @@ statement
     | 'let' IDENTIFIER ( assigner expression )? ';' # LetStatement
     | entity assigner expression ';' # AssignmentStatement
     | 'if' expression 'then' trueBlock=statement ( 'else' falseBlock=statement )? # IfStatement
+    | 'loop' statement # LoopStatement
+    | 'break' ';' # BreakStatement
+    | 'continue' ';' # ContinueStatement
     ;
 
 expression

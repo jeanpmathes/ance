@@ -40,16 +40,26 @@ ance::ast::Assignment::Assignment(core::Identifier const& assigned, utility::Own
     , value(std::move(expression))
 {}
 
-ance::ast::If::If(utility::Owned<Expression> expression,
-                  utility::Owned<Statement>      then_part,
-                  utility::Optional<utility::Owned<Statement>>      else_part,
-                  core::Location const&      source_location)
+ance::ast::If::If(utility::Owned<Expression>                   expression,
+                  utility::Owned<Statement>                    then_part,
+                  utility::Optional<utility::Owned<Statement>> else_part,
+                  core::Location const&                        source_location)
     : Node(source_location)
     , Statement()
     , condition(std::move(expression))
     , true_part(std::move(then_part))
     , false_part(std::move(else_part))
 {}
+
+ance::ast::Loop::Loop(utility::Owned<Statement> statement, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , body(std::move(statement))
+{}
+
+ance::ast::Break::Break(core::Location const& source_location) : Node(source_location), Statement() {}
+
+ance::ast::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
 ance::ast::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 

@@ -53,6 +53,16 @@ ance::est::If::If(utility::Owned<Expression> expression,
     , false_block(std::move(else_block))
 {}
 
+ance::est::Loop::Loop(utility::Owned<Statement> statement, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , body(std::move(statement))
+{}
+
+ance::est::Break::Break(core::Location const& source_location) : Node(source_location), Statement() {}
+
+ance::est::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
+
 ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::est::Call::Call(core::Identifier const& callable, core::Location const& source_location)
