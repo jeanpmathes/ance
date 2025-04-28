@@ -41,7 +41,6 @@ namespace ance::core
         /// \return The last column number. Can be equal to column for single character locations.
         [[nodiscard]] size_t columnEnd() const;
 
-
         /// Get the file index of this location.
         /// \return The file index.
         [[nodiscard]] size_t file() const;
@@ -60,7 +59,7 @@ namespace ance::core
 
         /// Get the first location of two locations.
         /// If any of the locations is global, the other location is returned.
-        /// If the locations are in different files, the location a is returned.
+        /// If the locations are in different files, the first argument is returned.
         /// \return The first location.
         static Location getFirst(Location a, Location b);
 

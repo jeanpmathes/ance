@@ -93,16 +93,19 @@ namespace ance
         core::Reporter      reporter;
 
         auto check_for_fail = [&source_tree, &reporter, &out]() {
+            reporter.emit(source_tree, out);
+
             if (reporter.errorCount() > 0 || (warnings_as_errors && reporter.warningCount() > 0))
             {
-                reporter.emit(source_tree, out);
-
+                out << "ance: " << reporter.errorCount() << " errors, " << reporter.warningCount() << " warnings" << std::endl;
                 out << "ance: Failed";
 
                 if (reporter.errorCount() == 0) out << " (by warning)";
 
                 return true;
             }
+
+            reporter.clear();
 
             return false;
         };
@@ -155,7 +158,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add the unreachable code warning, do all the related todos in segmenter
         // todo: while statement (syntactic sugar using loop, break and continue)
         // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
         // todo: add intrinsics and function calls with arguments
@@ -172,6 +174,7 @@ namespace ance
         // todo: add unordered scopes, have them as default at file top-level - maybe make distinction explicit in compiler code
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called
 
+        out << "ance: " << reporter.warningCount() << " warnings" << std::endl;
         out << "ance: Success";
 
         return EXIT_SUCCESS;

@@ -36,6 +36,9 @@ namespace ance::core
         /// \param out The stream to emit the messages to.
         void emit(sources::SourceTree& source_tree, std::ostream& out) const;
 
+        /// Clear all reported messages.
+        void clear();
+
         /// Get the number of reported errors.
         /// \return The error count.
         [[nodiscard]] size_t errorCount() const;

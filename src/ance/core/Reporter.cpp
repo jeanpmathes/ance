@@ -96,8 +96,6 @@ struct ance::core::Reporter::Implementation {
 
     void emit(sources::SourceTree& source_tree, std::ostream& out) const
     {
-        out << "ance: " << warningCount() << " warnings, " << errorCount() << " errors" << std::endl;
-
         for (auto& entry : entries_)
         {
             size_t start = 0;
@@ -149,6 +147,13 @@ struct ance::core::Reporter::Implementation {
         }
     }
 
+    void clear()
+    {
+        entries_.clear();
+        error_count_   = 0;
+        warning_count_ = 0;
+    }
+
     [[nodiscard]] size_t errorCount() const { return error_count_; }
     [[nodiscard]] size_t warningCount() const { return warning_count_; }
 
@@ -176,6 +181,11 @@ void ance::core::Reporter::error(std::string const& message, Location const& loc
 void ance::core::Reporter::emit(sources::SourceTree& source_tree, std::ostream& out) const
 {
     implementation_->emit(source_tree, out);
+}
+
+void ance::core::Reporter::clear()
+{
+    implementation_->clear();
 }
 
 size_t ance::core::Reporter::errorCount() const

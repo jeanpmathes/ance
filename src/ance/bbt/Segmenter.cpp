@@ -31,16 +31,7 @@ struct ance::bbt::Segmenter::Implementation
 
             id_ = id;
 
-            core::Location location = core::Location::global();
-
-            if (!statements_.empty())
-            {
-                location = statements_[0]->location;
-
-                for (auto const& statement : statements_) { location.extend(statement->location); }
-            }
-
-            return utility::makeOwned<BasicBlock>(id, std::move(statements_), utility::makeOwned<ErrorLink>(core::Location::global()), location);
+            return utility::makeOwned<BasicBlock>(id, std::move(statements_), utility::makeOwned<ErrorLink>(core::Location::global()), location());
         }
 
         [[nodiscard]] virtual utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) = 0;
@@ -55,11 +46,30 @@ struct ance::bbt::Segmenter::Implementation
             return id_ - 1;
         }
 
+        [[nodiscard]] bool hasCode() const
+        {
+            return !statements_.empty();
+        }
+
+        [[nodiscard]] core::Location location() const
+        {
+            core::Location location = core::Location::global();
+
+            if (!statements_.empty())
+            {
+                location = statements_[0]->location;
+
+                for (auto const& statement : statements_) { location.extend(statement->location); }
+            }
+
+            return location;
+        }
+
         [[nodiscard]] virtual std::set<BaseBB*> next() const = 0;
 
         std::tuple<BaseBB*, std::set<BaseBB*>> simplify()
         {
-            std::set<BaseBB*> outgoing = next();// todo: as seen in old code, unreachability handling might be needed here
+            std::set<BaseBB*> outgoing = next();
             BaseBB*           result   = this;
 
             if (outgoing.size() == 1)
@@ -215,29 +225,7 @@ struct ance::bbt::Segmenter::Implementation
             link(entry, statement_entry);
             link(statement_exit, exit);
 
-            std::set<BaseBB*> simplified;
-            std::stack<std::reference_wrapper<BaseBB>> to_simplify;
-            to_simplify.emplace(entry);
-
-            std::reference_wrapper<BaseBB> current_entry = entry;
-
-            while (!to_simplify.empty())
-            {
-                BaseBB& current = to_simplify.top();
-                to_simplify.pop();
-
-                if (simplified.contains(&current)) continue;
-                simplified.insert(&current);
-
-                auto [result, next] = current.simplify();
-
-                if (&current == &current_entry.get()) { current_entry = *result; }
-
-                for (auto& next_block : next)
-                {
-                    if (!simplified.contains(next_block)) { to_simplify.emplace(*next_block); }
-                }
-            }
+            std::reference_wrapper<BaseBB> const current_entry = simplify(entry);
 
             utility::List<utility::Owned<BasicBlock>>     basic_blocks;
             utility::List<std::reference_wrapper<BaseBB>> converted;
@@ -269,11 +257,55 @@ struct ance::bbt::Segmenter::Implementation
                 basic_blocks[index]->link = std::move(link);
             }
 
-            // todo: detect if end is not reachable and warn about it with special warning if no unreachable code warning would occur
-
             BasicBlock& first_block = *basic_blocks[current_entry.get().index()];
 
             return utility::makeOwned<Flow>(std::move(basic_blocks), first_block, statement.location);
+        }
+
+        std::reference_wrapper<BaseBB> simplify(std::reference_wrapper<BaseBB> entry)
+        {
+            std::set<BaseBB*> simplified;
+            std::stack<std::reference_wrapper<BaseBB>> to_simplify;
+            to_simplify.emplace(entry);
+
+            std::reference_wrapper<BaseBB> current_entry = entry;
+
+            while (!to_simplify.empty())
+            {
+                BaseBB& current = to_simplify.top();
+                to_simplify.pop();
+
+                if (simplified.contains(&current)) continue;
+                simplified.insert(&current);
+
+                auto [result, next] = current.simplify();
+
+                if (&current == &current_entry.get()) { current_entry = *result; }
+
+                for (auto& next_block : next)
+                {
+                    if (!simplified.contains(next_block)) { to_simplify.emplace(*next_block); }
+                }
+            }
+
+            bool has_unreachable_code = false;
+            core::Location first_unreachable_location = core::Location::global();
+
+            for (auto& block : bbs_)
+            {
+                if (block.get()->hasCode() && !simplified.contains(block.get()))
+                {
+                    has_unreachable_code = true;
+                    first_unreachable_location = core::Location::getFirst(first_unreachable_location, block.get()->location());
+                }
+            }
+
+            if (has_unreachable_code)
+            {
+                reporter_.warning("Unreachable code", first_unreachable_location);
+            }
+
+            return current_entry;
         }
 
         static void link(std::reference_wrapper<SimpleBB> const from, std::reference_wrapper<BaseBB> const to)
