@@ -11,6 +11,7 @@ statement
     | 'loop' statement # LoopStatement
     | 'break' ';' # BreakStatement
     | 'continue' ';' # ContinueStatement
+    | 'while' expression 'do' statement # WhileStatement
     ;
 
 expression

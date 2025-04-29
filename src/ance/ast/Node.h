@@ -131,6 +131,19 @@ namespace ance::ast
         explicit Continue(core::Location const& source_location);
     };
 
+    /// Loops as long as the condition is true.
+    struct While final
+        : Statement
+        , utility::ConcreteNode<While, Visitor>
+    {
+        While(utility::Owned<Expression> expression,
+              utility::Owned<Statement>  statement,
+              core::Location const&      source_location);
+
+        utility::Owned<Expression> condition;
+        utility::Owned<Statement>  body;
+    };
+
     /// An expression is a piece of code that produces a value.
     struct Expression
         : virtual Node
@@ -193,6 +206,7 @@ namespace ance::ast
         virtual void visit(Loop const& loop)               = 0;
         virtual void visit(Break const& break_statement)   = 0;
         virtual void visit(Continue const& continue_statement) = 0;
+        virtual void visit(While const& while_statement)   = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Call const& call)             = 0;

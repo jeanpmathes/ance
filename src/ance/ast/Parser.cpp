@@ -296,6 +296,15 @@ namespace ance::ast
             return statement;
         }
 
+        std::any visitWhileStatement(anceParser::WhileStatementContext* context) override
+        {
+            utility::Owned<Expression> condition = expectExpression(context->expression());
+            utility::Owned<Statement> body = expectStatement(context->statement());
+
+            Statement* statement = new While(std::move(condition), std::move(body), location(context));
+            return statement;
+        }
+
         std::any visitCallExpression(anceParser::CallExpressionContext* context) override
         {
             core::Identifier const callable = identifier(context->entity()->IDENTIFIER());

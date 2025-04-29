@@ -37,6 +37,8 @@ public:
 
     virtual std::any visitContinueStatement(anceParser::ContinueStatementContext *context) = 0;
 
+    virtual std::any visitWhileStatement(anceParser::WhileStatementContext *context) = 0;
+
     virtual std::any visitCallExpression(anceParser::CallExpressionContext *context) = 0;
 
     virtual std::any visitAccessExpression(anceParser::AccessExpressionContext *context) = 0;

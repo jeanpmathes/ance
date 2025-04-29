@@ -191,7 +191,6 @@ struct ance::est::Expander::Implementation
             Statements statements;
 
             Statements block = expand(*loop.body);
-
             statements.emplace_back(utility::makeOwned<Loop>(wrap(std::move(block)), loop.location));
 
             setResult(std::move(statements));
@@ -200,18 +199,38 @@ struct ance::est::Expander::Implementation
         void visit(ast::Break const& break_statement) override
         {
             Statements statements;
-
             statements.emplace_back(utility::makeOwned<Break>(break_statement.location));
-
             setResult(std::move(statements));
         }
 
         void visit(ast::Continue const& continue_statement) override
         {
             Statements statements;
-
             statements.emplace_back(utility::makeOwned<Continue>(continue_statement.location));
+            setResult(std::move(statements));
+        }
 
+        void visit(ast::While const& while_statement) override
+        {
+            core::Identifier const tmp = core::Identifier::from(while_statement.location);
+
+            Statements loop_body;
+
+            Expansion condition = expand(*while_statement.condition);
+            append(loop_body, std::move(condition.before));
+            loop_body.emplace_back(utility::makeOwned<Let>(tmp, std::move(condition.center), while_statement.location));
+            append(loop_body, std::move(condition.after));
+
+            loop_body.emplace_back(utility::makeOwned<If>(utility::makeOwned<Access>(tmp, while_statement.location),
+                                                            utility::makeOwned<Block>(Statements(), while_statement.location),
+                                                            utility::makeOwned<Break>(while_statement.location),
+                                                            while_statement.location));
+
+            Statements inner_body = expand(*while_statement.body);
+            append(loop_body, std::move(inner_body));
+
+            Statements statements;
+            statements.emplace_back(utility::makeOwned<Loop>(wrap(std::move(loop_body)), while_statement.location));
             setResult(std::move(statements));
         }
 

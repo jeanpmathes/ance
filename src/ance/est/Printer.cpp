@@ -19,6 +19,12 @@ struct ance::est::Printer::Implementation
 
         void visit(Block const& block) override
         {
+            if (block.statements.empty())
+            {
+                print("{}");
+                return;
+            }
+
             print("{");
             line();
             enter();
@@ -66,12 +72,26 @@ struct ance::est::Printer::Implementation
             print("if ");
             visit(*if_statement.condition);
             print(" then");
-            line();
-            visit(*if_statement.true_block);
+            if (if_statement.true_block->isCompound())
+            {
+                line();
+                visit(*if_statement.true_block);
+            }
+            else
+            {
+                visit(*if_statement.true_block);
+            }
             line();
             print("else ");
-            line();
-            visit(*if_statement.false_block);
+            if (if_statement.false_block->isCompound())
+            {
+                line();
+                visit(*if_statement.false_block);
+            }
+            else
+            {
+                visit(*if_statement.false_block);
+            }
         }
 
         void visit(Loop const& loop) override

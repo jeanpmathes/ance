@@ -51,6 +51,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitWhileStatement(anceParser::WhileStatementContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitCallExpression(anceParser::CallExpressionContext *ctx) override {
     return visitChildren(ctx);
   }

@@ -61,6 +61,13 @@ ance::ast::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::ast::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::ast::While::While(utility::Owned<Expression> expression, utility::Owned<Statement> statement, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , condition(std::move(expression))
+    , body(std::move(statement))
+{}
+
 ance::ast::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::ast::Call::Call(core::Identifier const& callable, core::Location const& source_location)

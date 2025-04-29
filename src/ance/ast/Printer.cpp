@@ -113,6 +113,23 @@ struct ance::ast::Printer::Implementation
 
         void visit(Continue const&) override { print("continue;"); }
 
+        void visit(While const& while_statement) override
+        {
+            print("while ");
+            visit(*while_statement.condition);
+            print(" do ");
+
+            if (while_statement.body->isCompound())
+            {
+                line();
+                visit(*while_statement.body);
+            }
+            else
+            {
+                visit(*while_statement.body);
+            }
+        }
+
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Call const& call) override

@@ -158,7 +158,7 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: while statement (syntactic sugar using loop, break and continue)
+        // todo: add unary operator (only not for now, but copy the enum thing) and flip the break in the while expansion
         // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
         // todo: add intrinsics and function calls with arguments
         // todo: add all expressions (both value and control flow) to grammar and support them in the compiler - needs types - do simpler types without the definition bridge, type expressions
