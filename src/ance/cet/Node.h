@@ -4,6 +4,7 @@
 #include "ance/core/Identifier.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/Variable.h"
+#include "ance/core/UnaryOperator.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -159,6 +160,17 @@ namespace ance::cet
         bool value;
     };
 
+    /// Applies an operation to an operand.
+    struct UnaryOperation final
+        : Expression
+        , utility::ConcreteNode<UnaryOperation, Visitor>
+    {
+        UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location);
+
+        core::UnaryOperator op;
+        utility::Owned<Expression> operand;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -179,6 +191,7 @@ namespace ance::cet
         virtual void visit(Intrinsic const& intrinsic) = 0;
         virtual void visit(Access const& access) = 0;
         virtual void visit(Constant const& constant) = 0;
+        virtual void visit(UnaryOperation const& unary_operation) = 0;
 
         ~Visitor() override = default;
     };

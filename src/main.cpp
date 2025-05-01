@@ -158,18 +158,18 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add unary operator (only not for now, but copy the enum thing) and flip the break in the while expansion
-        // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction and the resolver then decides whether to place an intrinsic or call node
-        // todo: add intrinsics and function calls with arguments
-        // todo: add all expressions (both value and control flow) to grammar and support them in the compiler - needs types - do simpler types without the definition bridge, type expressions
+        // todo: in ret the call should not always be replaced with an intrinsic - add call nodes to the later stages, also remove the add method from resolver, instead add addFunction and addIntrinsicAsFunction (takes signature) and the resolver then decides whether to place an intrinsic or call node - print should become function, no intrinsics for now
+        // todo: add intrinsics and function calls with arguments - print var for now, no overloading
+        // todo: add all expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler - needs types - do simpler types without the definition bridge, type expressions
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper
         //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
         //      todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
         //      todo: for blockers, scopes (internal class of runner and ance type) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
         //      todo: remove the scope and variable classes from core
-        //      todo: for expanding with temporaries, use three new nodes in EST: DeclareTemporary, ReadTemporary, WriteTemporary (the last two have a reference to the declaration)
+        //      todo: for expanding with temporaries, use three new nodes in EST: DeclareTemporary, ReadTemporary, WriteTemporary (the last two have a reference to the declaration) - remove the ugly code to create identifier from location
         // todo: add intrinsic functions to include another file, running the cmp code in there too
+        // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
         // todo: add unordered scopes, have them as default at file top-level - maybe make distinction explicit in compiler code
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called

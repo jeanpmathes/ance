@@ -51,6 +51,14 @@ struct ance::est::Expander::Implementation
             expression_expansion_ = {.before = {}, .center = std::move(expression), .after = {}};
         }
 
+        void setResult(Expansion expansion)
+        {
+            assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+
+            statement_expansion_  = std::nullopt;
+            expression_expansion_ = std::move(expansion);
+        }
+
         Statements expand(ast::Statement const& statement)
         {
             visit(statement);
@@ -221,10 +229,11 @@ struct ance::est::Expander::Implementation
             loop_body.emplace_back(utility::makeOwned<Let>(tmp, std::move(condition.center), while_statement.location));
             append(loop_body, std::move(condition.after));
 
-            loop_body.emplace_back(utility::makeOwned<If>(utility::makeOwned<Access>(tmp, while_statement.location),
-                                                            utility::makeOwned<Block>(Statements(), while_statement.location),
-                                                            utility::makeOwned<Break>(while_statement.location),
-                                                            while_statement.location));
+            loop_body.emplace_back(
+                utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, utility::makeOwned<Access>(tmp, while_statement.location), while_statement.location),
+                     utility::makeOwned<Break>(while_statement.location),
+                     utility::makeOwned<Block>(Statements(), while_statement.location),
+                     while_statement.location));
 
             Statements inner_body = expand(*while_statement.body);
             append(loop_body, std::move(inner_body));
@@ -252,6 +261,17 @@ struct ance::est::Expander::Implementation
         void visit(ast::Literal const& literal) override
         {
             setResult(utility::makeOwned<Literal>(literal.value, literal.location));
+        }
+
+        void visit(ast::UnaryOperation const& unary_operation) override
+        {
+            Expansion operand = expand(*unary_operation.operand);
+
+            setResult({
+                .before = std::move(operand.before),
+                .center = utility::makeOwned<UnaryOperation>(unary_operation.op, std::move(operand.center), unary_operation.location),
+                .after  = std::move(operand.after),
+            });
         }
 
       private:

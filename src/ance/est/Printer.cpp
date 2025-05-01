@@ -71,7 +71,7 @@ struct ance::est::Printer::Implementation
         {
             print("if ");
             visit(*if_statement.condition);
-            print(" then");
+            print(" then ");
             if (if_statement.true_block->isCompound())
             {
                 line();
@@ -128,6 +128,13 @@ struct ance::est::Printer::Implementation
         void visit(Literal const& literal) override
         {
             print(literal.value ? "true" : "false");
+        }
+
+        void visit(UnaryOperation const& unary_operation) override
+        {
+            print(unary_operation.op.toString());
+            print(" ");
+            visit(*unary_operation.operand);
         }
     };
 

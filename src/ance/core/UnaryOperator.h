@@ -1,32 +1,18 @@
-#ifndef ANCE_SRC_LANG_UNARYOPERATOR_H_
-#define ANCE_SRC_LANG_UNARYOPERATOR_H_
+#ifndef ANCE_CORE_UNARYOPERATOR_H_
+#define ANCE_CORE_UNARYOPERATOR_H_
 
 #include <string>
 
-namespace lang
+namespace ance::core
 {
-    /**
-    * Any unary operator.
-    */
+    /// Any unary operator.
     class UnaryOperator
     {
-      public:
+    public:
         enum Value
         {
-            /**
-             * The logical not operator.
-             */
+            /// The logical not operator.
             NOT,
-
-            /**
-             * The bitwise not operator.
-             */
-            BITWISE_NOT,
-
-            /**
-             * The unary minus operator.
-             */
-            NEGATION,
         };
 
         UnaryOperator() = default;
@@ -37,7 +23,7 @@ namespace lang
 
         [[nodiscard]] std::string toString() const;
 
-      private:
+    private:
         Value value_;
     };
 }

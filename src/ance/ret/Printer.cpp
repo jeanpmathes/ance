@@ -104,6 +104,13 @@ struct ance::ret::Printer::Implementation
         {
             print(constant.value ? "true" : "false");
         }
+
+        void visit(UnaryOperation const& unary_operation) override
+        {
+            print(unary_operation.op.toString());
+            print(" ");
+            visit(*unary_operation.operand);
+        }
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}

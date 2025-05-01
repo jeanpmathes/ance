@@ -11,6 +11,8 @@
 #include "anceParser.h"
 
 #include "ance/core/Identifier.h"
+#include "ance/core/UnaryOperator.h"
+
 #include "ance/sources/SourceFile.h"
 #include "ance/sources/SourceTree.h"
 
@@ -319,6 +321,20 @@ namespace ance::ast
 
             Expression* expression = new Access(accessed, location(ctx));
             return expression;
+        }
+
+        std::any visitUnaryOperationExpression(anceParser::UnaryOperationExpressionContext* context) override
+        {
+            core::UnaryOperator const op = std::any_cast<core::UnaryOperator>(visit(context->unary()));
+            utility::Owned<Expression> operand = expectExpression(context->expression());
+
+            Expression* expression = new UnaryOperation(op, std::move(operand), location(context));
+            return expression;
+        }
+
+        std::any visitUnaryNot(anceParser::UnaryNotContext*) override
+        {
+            return core::UnaryOperator::NOT;
         }
 
         std::any visitTrue(anceParser::TrueContext* context) override

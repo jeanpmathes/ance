@@ -111,6 +111,11 @@ struct ance::build::Compiler::Implementation
             (void) constant;// todo: implement
         }
 
+        void visit(cet::UnaryOperation const& unary_operation) override
+        {
+            (void) unary_operation;// todo: implement
+        }
+
     private:
         core::Reporter& reporter_;
 

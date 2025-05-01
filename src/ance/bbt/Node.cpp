@@ -68,4 +68,11 @@ ance::bbt::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location cons
 
 ance::bbt::Access::Access(core::Variable const& accessed, core::Location const& source_location) : Node(source_location), Expression(), variable(accessed) {}
 
-ance::bbt::Constant::Constant(bool constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
+ance::bbt::Constant::Constant(bool const constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
+
+ance::bbt::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , op(kind)
+    , operand(std::move(expression))
+{}

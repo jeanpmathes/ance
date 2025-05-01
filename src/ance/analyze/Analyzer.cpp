@@ -81,6 +81,11 @@ struct ance::analyze::Analyzer::Implementation
 
         }
 
+        void visit(ret::UnaryOperation const&) override
+        {
+
+        }
+
     private:
         core::Reporter& reporter_;
     };

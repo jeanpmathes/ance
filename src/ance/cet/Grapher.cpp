@@ -95,6 +95,11 @@ struct ance::cet::Grapher::Implementation
 
         }
 
+        void visit(UnaryOperation const&) override
+        {
+
+        }
+
         size_t current_id_ = 0;
     };
 

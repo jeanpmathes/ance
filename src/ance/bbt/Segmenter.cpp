@@ -519,30 +519,29 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(ret::ErrorExpression const& error_expression) override
         {
-            utility::Owned<Expression> expression = utility::makeOwned<ErrorExpression>(error_expression.location);
-
-            setResult(std::move(expression));
+            setResult(utility::makeOwned<ErrorExpression>(error_expression.location));
         }
 
         void visit(ret::Intrinsic const& intrinsic) override
         {
-            utility::Owned<Expression> expression = utility::makeOwned<Intrinsic>(intrinsic.intrinsic, intrinsic.location);
-
-            setResult(std::move(expression));
+            setResult(utility::makeOwned<Intrinsic>(intrinsic.intrinsic, intrinsic.location));
         }
 
         void visit(ret::Access const& access) override
         {
-            utility::Owned<Expression> expression = utility::makeOwned<Access>(access.variable, access.location);
-
-            setResult(std::move(expression));
+            setResult(utility::makeOwned<Access>(access.variable, access.location));
         }
 
         void visit(ret::Constant const& constant) override
         {
-            utility::Owned<Expression> expression = utility::makeOwned<Constant>(constant.value, constant.location);
+            setResult(utility::makeOwned<Constant>(constant.value, constant.location));
+        }
 
-            setResult(std::move(expression));
+        void visit(ret::UnaryOperation const& unary_operation) override
+        {
+            utility::Owned<Expression> operand = segment(*unary_operation.operand);
+
+            setResult(utility::makeOwned<UnaryOperation>(unary_operation.op, std::move(operand), unary_operation.location));
         }
 
         struct Loop

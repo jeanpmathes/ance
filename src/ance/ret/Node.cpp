@@ -65,8 +65,11 @@ ance::ret::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location cons
 
 ance::ret::Access::Access(core::Variable const& accessed, core::Location const& source_location) : Node(source_location), Expression(), variable(accessed) {}
 
-ance::ret::Constant::Constant(bool const constant, core::Location const& source_location)
+ance::ret::Constant::Constant(bool const constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
+
+ance::ret::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
     , Expression()
-    , value(constant)
+    , op(kind)
+    , operand(std::move(expression))
 {}

@@ -75,6 +75,11 @@ struct ance::ret::Resolver::Implementation
         void visit(est::Access const&) override {}
         void visit(est::Literal const&) override {}
 
+        void visit(est::UnaryOperation const& unary_operation) override
+        {
+            visit(*unary_operation.operand);
+        }
+
     private:
         std::set<core::Identifier> declarations = {};
         size_t                     depth        = 0;
@@ -380,6 +385,11 @@ struct ance::ret::Resolver::Implementation
         void visit(est::Literal const& literal) override
         {
             setResult(utility::makeOwned<Constant>(literal.value, literal.location));
+        }
+
+        void visit(est::UnaryOperation const& unary_operation) override
+        {
+            setResult(utility::makeOwned<UnaryOperation>(unary_operation.op, resolve(*unary_operation.operand), unary_operation.location));
         }
 
       private:

@@ -83,3 +83,10 @@ ance::ast::Access::Access(core::Identifier const& accessed, core::Location const
 {}
 
 ance::ast::Literal::Literal(bool const literal, core::Location const& source_location) : Node(source_location), Expression(), value(literal) {}
+
+ance::ast::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , op(kind)
+    , operand(std::move(expression))
+{}

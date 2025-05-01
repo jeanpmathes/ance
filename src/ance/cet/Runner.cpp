@@ -189,6 +189,18 @@ struct ance::cet::Runner::Implementation
             setResult(constant.value);
         }
 
+        void visit(bbt::UnaryOperation const& unary_operation) override
+        {
+            bool const value = run(*unary_operation.operand);
+
+            switch (unary_operation.op)
+            {
+                case core::UnaryOperator::NOT:
+                    setResult(!value);
+                    break;
+            }
+        }
+
       private:
         core::Reporter& reporter_;
 
