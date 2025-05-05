@@ -13,6 +13,8 @@
 namespace ance::core
 {
     struct Intrinsic;
+
+    class Function;
 }
 
 
@@ -142,6 +144,16 @@ namespace ance::cet
         core::Intrinsic const& intrinsic;
     };
 
+    /// Calls a function.
+    struct Call final
+        : Expression
+        , utility::ConcreteNode<Call, Visitor>
+    {
+        Call(core::Function const& function, core::Location const& source_location);
+
+        core::Function const& called;
+    };
+
     /// Access is an expression that reads the value of a variable.
     struct Access final
         : Expression
@@ -189,6 +201,7 @@ namespace ance::cet
         virtual void visit(Assignment const& assignment) = 0;
 
         virtual void visit(Intrinsic const& intrinsic) = 0;
+        virtual void visit(Call const& call) = 0;
         virtual void visit(Access const& access) = 0;
         virtual void visit(Constant const& constant) = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;

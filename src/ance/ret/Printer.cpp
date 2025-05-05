@@ -94,6 +94,14 @@ struct ance::ret::Printer::Implementation
             print(intrinsic.intrinsic);
             print(")");
         }
+
+        void visit(Call const& call) override
+        {
+            print("(");
+            print("call ");
+            print(call.called);
+            print(")");
+        }
         
         void visit(Access const& access) override
         {

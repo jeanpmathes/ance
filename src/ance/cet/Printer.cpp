@@ -116,6 +116,14 @@ struct ance::cet::Printer::Implementation
             print(")");
         }
 
+        void visit(Call const& call) override
+        {
+            print("(");
+            print("call ");
+            print(call.called);
+            print(")");
+        }
+
         void visit(Access const& access) override
         {
             print(access.variable.identifier());

@@ -71,6 +71,11 @@ struct ance::analyze::Analyzer::Implementation
             (void)reporter_; //todo: use it here
         }
 
+        void visit(ret::Call const&) override
+        {
+
+        }
+
         void visit(ret::Access const&) override
         {
 

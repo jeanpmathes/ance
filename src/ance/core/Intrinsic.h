@@ -15,8 +15,6 @@ namespace ance::core
     {
         ~Intrinsic() override = default;
 
-        static struct Print const& print();
-
         /// Get the identifier of this intrinsic.
         /// \return The identifier.
         [[nodiscard]] virtual Identifier const& identifier() const = 0;
@@ -25,7 +23,6 @@ namespace ance::core
         /// \param os The output stream to display to.
         virtual void display(std::ostream& os) const = 0;
     };
-
 
     /// Dynamic intrinsic that can be identified by name.
     struct Dynamic final
@@ -60,15 +57,6 @@ namespace ance::core
     };
 
 
-    /// Print intrinsic.
-    struct Print final : Static<Print>// todo: remove this, rather have a log_info/log_warning/log_error intrinsic
-    {
-        ~Print() override = default;
-
-        static constexpr auto name = "print";
-    };
-
-
     /// This intrinsic does nothing.
     struct NoOp final : Static<NoOp>
     {
@@ -85,7 +73,6 @@ namespace ance::core
         ~IntrinsicVisitor() override = default;
 
         virtual void visit(Dynamic const& dynamic) = 0;
-        virtual void visit(Print const& print)     = 0;
         virtual void visit(NoOp const& no_op)      = 0;
     };
 }

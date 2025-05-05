@@ -9,6 +9,8 @@ namespace ance::core
 {
     struct Intrinsic;
 
+    class Function;
+
     /// Utility to simplify implementing code printers for different trees.
     class Printer
     {
@@ -28,6 +30,9 @@ namespace ance::core
 
         /// Print an intrinsic to the output stream.
         void print(Intrinsic const& intrinsic);
+
+        /// Print a function to the output stream.
+        void print(Function const& function);
 
         /// Print a size_t value to the output stream.
         void print(size_t value);

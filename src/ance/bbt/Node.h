@@ -13,6 +13,8 @@
 namespace ance::core
 {
     struct Intrinsic;
+
+    class Function;
 }
 
 /// The basic-block tree (BBT) namespace.
@@ -189,6 +191,16 @@ namespace ance::bbt
         core::Variable const& variable;
     };
 
+    /// Calls a function.
+    struct Call final
+        : Expression
+        , utility::ConcreteNode<Call, Visitor>
+    {
+        Call(core::Function const& function, core::Location const& source_location);
+
+        core::Function const& called;
+    };
+
     /// A constant value.
     struct Constant final
         : Expression
@@ -231,6 +243,7 @@ namespace ance::bbt
 
         virtual void visit(ErrorExpression const& error_expression) = 0;
         virtual void visit(Intrinsic const& intrinsic)              = 0;
+        virtual void visit(Call const& call)                        = 0;
         virtual void visit(Access const& access)                    = 0;
         virtual void visit(Constant const& constant)                = 0;
         virtual void visit(UnaryOperation const& unary_operation)   = 0;

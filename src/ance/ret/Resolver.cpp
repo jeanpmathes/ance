@@ -4,7 +4,7 @@
 #include <set>
 #include <expected>
 
-#include "ance/core/Intrinsic.h"
+#include "ance/core/Function.h"
 #include "ance/core/Scope.h"
 
 #include "ance/est/Node.h"
@@ -92,10 +92,9 @@ struct ance::ret::Resolver::Implementation
       public:
         using Visitor::visit;
 
-        EST(core::Reporter&                                                                  reporter,
-            std::map<core::Identifier, std::reference_wrapper<core::Intrinsic const>> const& intrinsics)
+        EST(core::Reporter&                                                                  reporter, std::map<core::Identifier, std::reference_wrapper<core::Function const>> const& functions)
             : reporter_(reporter)
-            , intrinsics_(intrinsics)
+            , functions_(functions)
         {}
         ~EST() override = default;
 
@@ -350,17 +349,15 @@ struct ance::ret::Resolver::Implementation
 
         void visit(est::Call const& call) override
         {
-            // todo: when using resolving for intrinsics, instead of adding a global scope, the find method should take a list of providers to use when top of the scope chain is reached
-            // todo: also when adding the functions then also add an entity base class for function and variable and scopes should hold entities only
+            // todo: when using resolving for intrinsics/functions, instead of adding a global scope, the find method should take a list of providers to use when top of the scope chain is reached
+            // todo: when adding the functions then also add a Value base class for function and variable and scopes should hold Values only
+            // todo: essentially resolving of functions / values should use the same logic - a resolve intrinsic, and intrinsics are placed inside function when they should be part of resolution
             // todo: the nodes should hold the correct type - meaning that this type checking is done in the resolver
 
-            if (intrinsics_.contains(call.identifier))
-            {
-                setResult(utility::makeOwned<Intrinsic>(intrinsics_.at(call.identifier).get(), call.location));
-            }
+            if (functions_.contains(call.identifier)) { setResult(utility::makeOwned<Call>(functions_.at(call.identifier).get(), call.location)); }
             else
             {
-                reporter_.error("Unknown intrinsic '" + call.identifier + "'", call.identifier.location());
+                reporter_.error("Unknown function '" + call.identifier + "'", call.identifier.location());
 
                 setResult(utility::makeOwned<ErrorExpression>(call.location));
             }
@@ -394,7 +391,7 @@ struct ance::ret::Resolver::Implementation
 
       private:
         core::Reporter&                                                                  reporter_;
-        std::map<core::Identifier, std::reference_wrapper<core::Intrinsic const>> const& intrinsics_;
+        std::map<core::Identifier, std::reference_wrapper<core::Function const>> const& functions_;
 
         Scope* current_scope_ = nullptr;
 
@@ -404,11 +401,14 @@ struct ance::ret::Resolver::Implementation
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
-    void add(core::Intrinsic const& intrinsic) { intrinsics_.emplace(intrinsic.identifier(), std::cref(intrinsic)); }
+    void add(core::Function const& function)
+    {
+        functions_.emplace(function.name(), std::cref(function));
+    }
 
     utility::Owned<Statement> resolve(est::Statement const& statement)
     {
-        utility::Owned<EST> est = utility::makeOwned<EST>(reporter_, intrinsics_);
+        utility::Owned<EST> est = utility::makeOwned<EST>(reporter_, functions_);
 
         return est->resolve(statement);
     }
@@ -416,7 +416,7 @@ struct ance::ret::Resolver::Implementation
   private:
     core::Reporter& reporter_;
 
-    std::map<core::Identifier, std::reference_wrapper<core::Intrinsic const>> intrinsics_ = {};
+    std::map<core::Identifier, std::reference_wrapper<core::Function const>> functions_ = {};
 };
 
 ance::ret::Resolver::Resolver(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter))
@@ -424,9 +424,9 @@ ance::ret::Resolver::Resolver(core::Reporter& reporter) : implementation_(utilit
 
 ance::ret::Resolver::~Resolver() = default;
 
-void ance::ret::Resolver::add(core::Intrinsic const& intrinsic)
+void ance::ret::Resolver::add(core::Function const& function)
 {
-    implementation_->add(intrinsic);
+    implementation_->add(function);
 }
 
 ance::utility::Owned<ance::ret::Statement> ance::ret::Resolver::resolve(est::Statement const& statement)

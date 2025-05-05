@@ -6,9 +6,8 @@
 
 namespace ance::core
 {
-    struct Intrinsic;
-
     class Scope;
+    class Function;
 }
 
 namespace ance::est
@@ -27,9 +26,9 @@ namespace ance::ret
         explicit Resolver(core::Reporter& reporter);
         ~Resolver();
 
-        /// Register an intrinsic.
-        /// \param intrinsic The intrinsic to register.
-        void add(core::Intrinsic const& intrinsic);
+        /// Register a function.
+        /// \param function The function to register.
+        void add(core::Function const& function);
 
         /// Resolve a statement.
         /// \param statement The statement to resolve.

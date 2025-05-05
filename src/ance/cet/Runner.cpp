@@ -4,6 +4,7 @@
 #include <map>
 
 #include "ance/core/Intrinsic.h"
+#include "ance/core/Function.h"
 
 #include "ance/bbt/Node.h"
 #include "ance/cet/Node.h"
@@ -29,11 +30,6 @@ struct ance::cet::Runner::Implementation
         void visit(core::Dynamic const& dynamic) override
         {
             reporter_.error("Unsupported intrinsic '" + dynamic.identifier() + "'", location_);
-        }
-
-        void visit(core::Print const&) override
-        {
-            std::cout << "DEBUG" << std::endl; // todo: remove
         }
 
         void visit(core::NoOp const&) override
@@ -175,6 +171,11 @@ struct ance::cet::Runner::Implementation
         void visit(bbt::Intrinsic const& intrinsic) override
         {
             intrinsics_.run(intrinsic.intrinsic, intrinsic.location);
+        }
+
+        void visit(bbt::Call const& call) override
+        {
+            call.called.run(); // todo: do this
         }
 
         void visit(bbt::Access const& access) override

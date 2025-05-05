@@ -1,11 +1,5 @@
 #include "Intrinsic.h"
 
-ance::core::Print const& ance::core::Intrinsic::print()
-{
-    static Print const instance;
-    return instance;
-}
-
 ance::core::Dynamic::Dynamic(Identifier const& identifier)
         : identifier_(identifier)
 {}

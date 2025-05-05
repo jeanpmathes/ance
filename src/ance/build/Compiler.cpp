@@ -32,11 +32,6 @@ struct ance::build::Compiler::Implementation
             unsupported(dynamic);
         }
 
-        void visit(core::Print const& print) override
-        {
-            unsupported(print);
-        }
-
         void visit(core::NoOp const&) override
         {
             // Do nothing.
@@ -99,6 +94,11 @@ struct ance::build::Compiler::Implementation
         void visit(cet::Intrinsic const& intrinsic) override
         {
             intrinsics_.run(intrinsic.intrinsic, intrinsic.location);
+        }
+
+        void visit(cet::Call const& call) override
+        {
+            (void) call;// todo: implement
         }
 
         void visit(cet::Access const& access) override

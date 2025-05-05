@@ -46,9 +46,9 @@ ance::cet::Assignment::Assignment(core::Variable const& assigned, utility::Owned
     , value(std::move(expression))
 {}
 
-ance::cet::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location const& source_location)
-    : Node(source_location), Expression(), intrinsic(used)
-{}
+ance::cet::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location const& source_location) : Node(source_location), Expression(), intrinsic(used) {}
+
+ance::cet::Call::Call(core::Function const& function, core::Location const& source_location) : Node(source_location), Expression(), called(function) {}
 
 ance::cet::Access::Access(core::Variable const& accessed, core::Location const& source_location) : Node(source_location), Expression(), variable(accessed) {}
 

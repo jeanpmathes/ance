@@ -527,6 +527,11 @@ struct ance::bbt::Segmenter::Implementation
             setResult(utility::makeOwned<Intrinsic>(intrinsic.intrinsic, intrinsic.location));
         }
 
+        void visit(ret::Call const& call) override
+        {
+            setResult(utility::makeOwned<Call>(call.called, call.location));
+        }
+
         void visit(ret::Access const& access) override
         {
             setResult(utility::makeOwned<Access>(access.variable, access.location));

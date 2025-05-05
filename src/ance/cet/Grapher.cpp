@@ -85,6 +85,11 @@ struct ance::cet::Grapher::Implementation
 
         }
 
+        void visit(Call const& ) override
+        {
+
+        }
+
         void visit(Access const& ) override
         {
 

@@ -1,6 +1,7 @@
 #include "Printer.h"
 
 #include "ance/core/Intrinsic.h"
+#include "ance/core/Function.h"
 
 ance::core::Printer::Printer(std::ostream& out) : out_(out) {}
 
@@ -28,6 +29,12 @@ void ance::core::Printer::print(Intrinsic const& intrinsic)
 {
     indent();
     out_ << intrinsic;
+}
+
+void ance::core::Printer::print(Function const& function)
+{
+    indent();
+    out_ << function;
 }
 
 void ance::core::Printer::print(size_t const value)

@@ -16,6 +16,7 @@ namespace ance::core
 
     class Scope;
     class Variable;
+    class Function;
 }
 
 /// The resolved element tree (RET) namespace.
@@ -158,6 +159,16 @@ namespace ance::ret
         core::Intrinsic const& intrinsic;
     };
 
+    /// Calls a function.
+    struct Call final
+        : Expression
+        , utility::ConcreteNode<Call, Visitor>
+    {
+        Call(core::Function const& function, core::Location const& source_location);
+
+        core::Function const& called;
+    };
+
     /// Access is an expression that reads the value of a variable.
     struct Access final
         : Expression
@@ -208,6 +219,7 @@ namespace ance::ret
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Intrinsic const& intrinsic)   = 0;
+        virtual void visit(Call const& call)             = 0;
         virtual void visit(Access const& access)         = 0;
         virtual void visit(Constant const& constant)     = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
