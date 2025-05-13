@@ -4,6 +4,8 @@
 #include <ostream>
 
 #include "ance/core/Identifier.h"
+#include "ance/core/Signature.h"
+
 #include "ance/utility/Node.h"
 
 namespace ance::core
@@ -13,7 +15,12 @@ namespace ance::core
     /// Base class for all intrinsics.
     struct Intrinsic : virtual utility::AbstractNode<IntrinsicVisitor>
     {
+        explicit Intrinsic(Signature const& signature);
         ~Intrinsic() override = default;
+
+        /// Get the signature of this intrinsic.
+        /// \return The signature.
+        [[nodiscard]] Signature const& signature() const;
 
         /// Get the identifier of this intrinsic.
         /// \return The identifier.
@@ -22,22 +29,22 @@ namespace ance::core
         /// Display this intrinsic to the given output stream.
         /// \param os The output stream to display to.
         virtual void display(std::ostream& os) const = 0;
+
+    private:
+        Signature signature_;
     };
 
-    /// Dynamic intrinsic that can be identified by name.
+    /// Dynamic intrinsic that is identified by a name.
     struct Dynamic final
         : Intrinsic
         , utility::ConcreteNode<Dynamic, IntrinsicVisitor>
     {
-        explicit Dynamic(Identifier const& identifier);
+        explicit Dynamic(Signature const& signature);
         ~Dynamic() override = default;
 
         [[nodiscard]] Identifier const& identifier() const override;
 
         void display(std::ostream& os) const override;
-
-      private:
-        Identifier identifier_;
     };
 
     template<class T>
@@ -45,6 +52,7 @@ namespace ance::core
         : Intrinsic
         , utility::ConcreteNode<T, IntrinsicVisitor>
     {
+        explicit Static(Signature const& signature) : Intrinsic(signature) {}
         ~Static() override = default;
 
         [[nodiscard]] Identifier const& identifier() const override
@@ -53,9 +61,11 @@ namespace ance::core
             return identifier;
         }
 
-        void display(std::ostream& os) const override { os << T::name; }
+        void display(std::ostream& os) const override
+        {
+            os << T::name;
+        }
     };
-
 
     /// This intrinsic does nothing.
     struct NoOp final : Static<NoOp>

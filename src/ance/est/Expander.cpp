@@ -250,7 +250,24 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Call const& call) override
         {
-            setResult(utility::makeOwned<Call>(call.identifier, call.location));
+            Statements before;
+            utility::List<utility::Owned<Expression>> arguments;
+            Statements after;
+
+            for (auto& argument : call.arguments)
+            {
+                Expansion expansion = expand(*argument);
+
+                append(before, std::move(expansion.before));
+                arguments.emplace_back(std::move(expansion.center));
+                append(after, std::move(expansion.after)); // todo: maybe prepend?
+            }
+
+            setResult({
+                .before = std::move(before),
+                .center = utility::makeOwned<Call>(call.identifier, std::move(arguments), call.location),
+                .after  = std::move(after),
+            });
         }
 
         void visit(ast::Access const& access) override

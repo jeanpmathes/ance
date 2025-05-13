@@ -70,10 +70,11 @@ ance::ast::While::While(utility::Owned<Expression> expression, utility::Owned<St
 
 ance::ast::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
-ance::ast::Call::Call(core::Identifier const& callable, core::Location const& source_location)
+ance::ast::Call::Call(core::Identifier const& callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
     : Node(source_location)
     , Expression()
     , identifier(callable)
+    , arguments(std::move(expressions))
 {}
 
 ance::ast::Access::Access(core::Identifier const& accessed, core::Location const& source_location)

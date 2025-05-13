@@ -176,9 +176,10 @@ namespace ance::bbt
         : Expression
         , utility::ConcreteNode<Intrinsic, Visitor>
     {
-        Intrinsic(core::Intrinsic const& used, core::Location const& source_location);
+        Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
         core::Intrinsic const& intrinsic;
+        utility::List<utility::Owned<Expression>> arguments;
     };
 
     /// Accesses a variable.
@@ -196,9 +197,10 @@ namespace ance::bbt
         : Expression
         , utility::ConcreteNode<Call, Visitor>
     {
-        Call(core::Function const& function, core::Location const& source_location);
+        Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
         core::Function const& called;
+        utility::List<utility::Owned<Expression>> arguments;
     };
 
     /// A constant value.

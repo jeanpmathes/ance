@@ -1,17 +1,23 @@
 #include "Intrinsic.h"
 
-ance::core::Dynamic::Dynamic(Identifier const& identifier)
-        : identifier_(identifier)
-{}
+ance::core::Intrinsic::Intrinsic(Signature const& signature) : signature_(signature) {}
 
+ance::core::Signature const& ance::core::Intrinsic::signature() const
+{
+    return signature_;
+}
+
+ance::core::Dynamic::Dynamic(Signature const& signature)
+    : Intrinsic(signature)
+{}
 ance::core::Identifier const& ance::core::Dynamic::identifier() const
 {
-    return identifier_;
+    return signature().name();
 }
 
 void ance::core::Dynamic::display(std::ostream& os) const
 {
-    os << "\"" << identifier_ << "\"";
+    os << "\"" << signature().name() << "\"";
 }
 
 std::ostream& operator<<(std::ostream& os, ance::core::Intrinsic const& intrinsic)

@@ -71,10 +71,6 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitArguments(anceParser::ArgumentsContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual std::any visitUnaryNot(anceParser::UnaryNotContext *ctx) override {
     return visitChildren(ctx);
   }

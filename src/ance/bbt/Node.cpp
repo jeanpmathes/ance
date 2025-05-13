@@ -8,8 +8,9 @@ ance::bbt::Flow::Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBl
     , entry(start)
 {}
 
-ance::bbt::BasicBlock::BasicBlock(size_t const number, utility::List<utility::Owned<Statement>> content,
-utility::Owned<Link> connection,
+ance::bbt::BasicBlock::BasicBlock(size_t const                             number,
+                                  utility::List<utility::Owned<Statement>> content,
+                                  utility::Owned<Link>                     connection,
                                   core::Location const&                    source_location)
     : Node(source_location)
     , id(number)
@@ -21,7 +22,10 @@ ance::bbt::ErrorLink::ErrorLink(core::Location const& source_location) : Node(so
 
 ance::bbt::Return::Return(core::Location const& source_location) : Node(source_location), Link() {}
 
-ance::bbt::Branch::Branch(utility::Owned<Expression> expression, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location)
+ance::bbt::Branch::Branch(utility::Owned<Expression> expression,
+                          BasicBlock const&          true_link,
+                          BasicBlock const&          false_link,
+                          core::Location const&      source_location)
     : Node(source_location)
     , Link()
     , condition(std::move(expression))
@@ -29,16 +33,11 @@ ance::bbt::Branch::Branch(utility::Owned<Expression> expression, BasicBlock cons
     , false_branch(false_link)
 {}
 
-ance::bbt::Jump::Jump(BasicBlock const& link, core::Location const& source_location)
-    : Node(source_location)
-    , Link()
-    , target(link)
-{}
+ance::bbt::Jump::Jump(BasicBlock const& link, core::Location const& source_location) : Node(source_location), Link(), target(link) {}
 
 ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}
 
-ance::bbt::Independent::Independent(utility::Owned<Expression> independent_expression,
-                                    core::Location const&      source_location)
+ance::bbt::Independent::Independent(utility::Owned<Expression> independent_expression, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , expression(std::move(independent_expression))
@@ -60,15 +59,17 @@ ance::bbt::Assignment::Assignment(core::Variable const& assigned, utility::Owned
 
 ance::bbt::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
-ance::bbt::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location const& source_location)
-    : Node(source_location)
-    , Expression()
-    , intrinsic(used)
-{}
+ance::bbt::Intrinsic::Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
+: Node(source_location), Expression(), intrinsic(used) , arguments(std::move(expressions)) {}
 
 ance::bbt::Access::Access(core::Variable const& accessed, core::Location const& source_location) : Node(source_location), Expression(), variable(accessed) {}
 
-ance::bbt::Call::Call(core::Function const& function, core::Location const& source_location) : Node(source_location), Expression(), called(function) {}
+ance::bbt::Call::Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , called(function)
+    , arguments(std::move(expressions))
+{}
 
 ance::bbt::Constant::Constant(bool const constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
 

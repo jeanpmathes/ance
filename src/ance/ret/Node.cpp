@@ -57,9 +57,11 @@ ance::ret::Continue::Continue(core::Location const& source_location) : Node(sour
 
 ance::ret::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
-ance::ret::Intrinsic::Intrinsic(core::Intrinsic const& used, core::Location const& source_location) : Node(source_location), Expression(), intrinsic(used) {}
+ance::ret::Intrinsic::Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
+: Node(source_location), Expression(), intrinsic(used), arguments(std::move(expressions)) {}
 
-ance::ret::Call::Call(core::Function const& function, core::Location const& source_location) : Node(source_location), Expression(), called(function) {}
+ance::ret::Call::Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
+: Node(source_location), Expression(), called(function), arguments(std::move(expressions)) {}
 
 ance::ret::Access::Access(core::Variable const& accessed, core::Location const& source_location) : Node(source_location), Expression(), variable(accessed) {}
 

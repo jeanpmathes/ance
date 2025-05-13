@@ -119,8 +119,11 @@ namespace ance
         cet::Runner       runner {reporter};
         build::Compiler   compiler {reporter};
 
-        core::Function const print_fn(core::Identifier::like("print"), [] { std::cout << "DEBUG" << std::endl; });
+        core::Function const print_fn(core::Signature::like("print"), [](auto&) { std::cout << "PRINT[]" << std::endl; });
         resolver.add(print_fn);// todo: remove
+        core::Function const print_var_fn(core::Signature::like("print_var", 1),
+                                          [](auto& args) { std::cout << "PRINT[" << std::to_string(args[0]) << "]" << std::endl; });
+        resolver.add(print_var_fn);// todo: remove
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
         if (check_for_fail()) return EXIT_FAILURE;
@@ -160,15 +163,15 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add intrinsics and function calls with arguments - print var for now, no overloading, add signature class
-        // todo: add minimal types (nothing user created yet), simpler types without the definition bridge
+        // todo: add minimal types (nothing user created yet, nothing parametrized), simpler types without the definition bridge (do it singleton style for now) - just Bool, Unit, Size (make both uppercase) and allow easy adding of new types like Identifier and Callable - not a new class per type needed, no type conversions yet
+        // todo: functions and intrinsics should have a return type and return values should work
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper
         //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
         //      todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
         //      todo: for blockers, scopes (internal class of runner and ance type) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
         //      todo: remove the scope and variable classes from core
-        //      todo: for expanding with temporaries, use three new nodes in EST: DeclareTemporary, ReadTemporary, WriteTemporary (the last two have a reference to the declaration) - remove the ugly code to create identifier from location
+        //      todo: for expanding with temporaries, use three new nodes in EST: DeclareTemporary, ReadTemporary, WriteTemporary, EraseTemporary (the last three have a reference to the declaration) - remove the ugly code to create identifier from location
         // todo: add types and type expressions
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
         // todo: add intrinsic functions to include another file, running the cmp code in there too
@@ -176,6 +179,7 @@ namespace ance
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
         // todo: add unordered scopes, have them as default at file top-level - maybe make distinction explicit in compiler code
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called
+        // todo: when adding erase, check where it is used in expansion, add here to and maybe add to more expansions
 
         out << "ance: " << reporter.warningCount() << " warnings" << std::endl;
         out << "ance: Success";

@@ -71,7 +71,12 @@ struct ance::ret::Resolver::Implementation
         void visit(est::Continue const&) override {}
 
         void visit(est::ErrorExpression const&) override {}
-        void visit(est::Call const&) override {}
+
+        void visit(est::Call const& call) override
+        {
+            for (auto& argument : call.arguments) { visit(*argument); }
+        }
+
         void visit(est::Access const&) override {}
         void visit(est::Literal const&) override {}
 
@@ -354,7 +359,15 @@ struct ance::ret::Resolver::Implementation
             // todo: essentially resolving of functions / values should use the same logic - a resolve intrinsic, and intrinsics are placed inside function when they should be part of resolution
             // todo: the nodes should hold the correct type - meaning that this type checking is done in the resolver
 
-            if (functions_.contains(call.identifier)) { setResult(utility::makeOwned<Call>(functions_.at(call.identifier).get(), call.location)); }
+            if (functions_.contains(call.identifier))
+            {
+                utility::List<utility::Owned<Expression>> arguments;
+                for (auto& argument : call.arguments)
+                {
+                    arguments.emplace_back(resolve(*argument));
+                }
+                setResult(utility::makeOwned<Call>(functions_.at(call.identifier).get(), std::move(arguments), call.location));
+            }
             else
             {
                 reporter_.error("Unknown function '" + call.identifier + "'", call.identifier.location());

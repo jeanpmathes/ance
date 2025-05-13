@@ -18,13 +18,15 @@ struct ance::cet::Runner::Implementation
 
         explicit Intrinsics(core::Reporter& reporter) : reporter_(reporter) {}
 
-        void run(core::Intrinsic const& intrinsic, core::Location const& location)
+        void run(core::Intrinsic const& intrinsic, utility::List<bool> const& arguments, core::Location const& location)
         {
             location_ = location;
+            arguments_ = &arguments;
 
             this->visit(intrinsic);
 
             location_ = core::Location::global();
+            arguments_ = nullptr;
         }
 
         void visit(core::Dynamic const& dynamic) override
@@ -41,6 +43,7 @@ struct ance::cet::Runner::Implementation
         core::Reporter& reporter_;
 
         core::Location location_ = core::Location::global();
+        utility::List<bool> const* arguments_ = nullptr;
     };
 
     class BBT final : public bbt::Visitor
@@ -170,12 +173,24 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Intrinsic const& intrinsic) override
         {
-            intrinsics_.run(intrinsic.intrinsic, intrinsic.location);
+            utility::List<bool> arguments = {};
+            for (auto& argument : intrinsic.arguments)
+            {
+                arguments.push_back(run(*argument));
+            }
+
+            intrinsics_.run(intrinsic.intrinsic, arguments, intrinsic.location);
         }
 
         void visit(bbt::Call const& call) override
         {
-            call.called.run(); // todo: do this
+            utility::List<bool> arguments = {};
+            for (auto& argument : call.arguments)
+            {
+                arguments.push_back(run(*argument));
+            }
+
+            call.called.run(arguments);
         }
 
         void visit(bbt::Access const& access) override

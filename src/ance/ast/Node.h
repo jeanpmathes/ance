@@ -166,9 +166,10 @@ namespace ance::ast
         : Expression
         , utility::ConcreteNode<Call, Visitor>
     {
-        explicit Call(core::Identifier const& callable, core::Location const& source_location);
+        Call(core::Identifier const& callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
         core::Identifier identifier;
+        utility::List<utility::Owned<Expression>> arguments;
     };
 
     /// Access is an expression that reads the value of a named entity.

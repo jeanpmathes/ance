@@ -135,7 +135,13 @@ struct ance::ast::Printer::Implementation
         void visit(Call const& call) override
         {
             print(call.identifier);
-            print("()");
+            print("(");
+            for (size_t i = 0; i < call.arguments.size(); ++i)
+            {
+                visit(*call.arguments[i]);
+                if (i + 1 < call.arguments.size()) print(", ");
+            }
+            print(")");
         }
 
         void visit(Access const& access) override

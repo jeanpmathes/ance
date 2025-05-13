@@ -2,16 +2,24 @@
 
 #include <utility>
 
-ance::core::Function::Function(Identifier const& name, std::function<void()> function) : name_(name), function_(std::move(function)) {}
-
-void ance::core::Function::run() const
+ance::core::Function::Function(Signature const& signature, std::function<void(utility::List<bool> const&)> function)
+    : signature_(signature), function_(std::move(function))
 {
-    function_();
+
+}
+void ance::core::Function::run(utility::List<bool> const& arguments) const
+{
+    function_(arguments);
 }
 
 ance::core::Identifier const& ance::core::Function::name() const
 {
-    return name_;
+    return signature_.name();
+}
+
+ance::core::Signature const& ance::core::Function::signature() const
+{
+    return signature_;
 }
 
 std::ostream& operator<<(std::ostream& out, ance::core::Function const& function)

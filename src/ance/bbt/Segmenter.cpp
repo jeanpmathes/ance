@@ -524,12 +524,24 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(ret::Intrinsic const& intrinsic) override
         {
-            setResult(utility::makeOwned<Intrinsic>(intrinsic.intrinsic, intrinsic.location));
+            utility::List<utility::Owned<Expression>> arguments;
+            for (auto& argument : intrinsic.arguments)
+            {
+                arguments.emplace_back(segment(*argument));
+            }
+
+            setResult(utility::makeOwned<Intrinsic>(intrinsic.intrinsic, std::move(arguments), intrinsic.location));
         }
 
         void visit(ret::Call const& call) override
         {
-            setResult(utility::makeOwned<Call>(call.called, call.location));
+            utility::List<utility::Owned<Expression>> arguments;
+            for (auto& argument : call.arguments)
+            {
+                arguments.emplace_back(segment(*argument));
+            }
+
+            setResult(utility::makeOwned<Call>(call.called, std::move(arguments), call.location));
         }
 
         void visit(ret::Access const& access) override

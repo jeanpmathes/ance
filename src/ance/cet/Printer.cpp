@@ -110,17 +110,25 @@ struct ance::cet::Printer::Implementation
 
         void visit(Intrinsic const& intrinsic) override
         {
-            print("(");
-            print("call ");
+            print("intrinsic(");
             print(intrinsic.intrinsic);
+            for (const auto& argument : intrinsic.arguments)
+            {
+                print(", ");
+                visit(*argument);
+            }
             print(")");
         }
 
         void visit(Call const& call) override
         {
-            print("(");
-            print("call ");
             print(call.called);
+            print("(");
+            for (size_t i = 0; i < call.arguments.size(); ++i)
+            {
+                visit(*call.arguments[i]);
+                if (i + 1 < call.arguments.size()) print(", ");
+            }
             print(")");
         }
 

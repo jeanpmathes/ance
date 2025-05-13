@@ -311,7 +311,13 @@ namespace ance::ast
         {
             core::Identifier const callable = identifier(context->entity()->IDENTIFIER());
 
-            Expression* expression = new Call(callable, location(context));
+            utility::List<utility::Owned<Expression>> arguments;
+            for (anceParser::ExpressionContext* expression : context->expression())
+            {
+                arguments.push_back(expectExpression(expression));
+            }
+
+            Expression* expression = new Call(callable, std::move(arguments), location(context));
             return expression;
         }
 

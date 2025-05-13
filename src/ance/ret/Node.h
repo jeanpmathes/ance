@@ -149,14 +149,15 @@ namespace ance::ret
         explicit ErrorExpression(core::Location const& source_location);
     };
 
-    /// Performs a compiler-provided operation like operators or functions.
+    /// Performs a compiler-provided operation like operators.
     struct Intrinsic final
         : Expression
         , utility::ConcreteNode<Intrinsic, Visitor>
     {
-        Intrinsic(core::Intrinsic const& used, core::Location const& source_location);
+        Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
         core::Intrinsic const& intrinsic;
+        utility::List<utility::Owned<Expression>> arguments;
     };
 
     /// Calls a function.
@@ -164,9 +165,10 @@ namespace ance::ret
         : Expression
         , utility::ConcreteNode<Call, Visitor>
     {
-        Call(core::Function const& function, core::Location const& source_location);
+        Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
         core::Function const& called;
+        utility::List<utility::Owned<Expression>> arguments;
     };
 
     /// Access is an expression that reads the value of a variable.

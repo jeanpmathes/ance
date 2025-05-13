@@ -1,5 +1,8 @@
 #include "Analyzer.h"
 
+#include "ance/core/Intrinsic.h"
+#include "ance/core/Function.h"
+
 #include "ance/ret/Node.h"
 
 struct ance::analyze::Analyzer::Implementation
@@ -11,6 +14,20 @@ struct ance::analyze::Analyzer::Implementation
 
         explicit RET(core::Reporter& reporter) : reporter_(reporter) {}
         ~RET() override = default;
+
+        void analyzeCall(core::Signature const& signature, utility::List<utility::Owned<ret::Expression>> const& arguments, core::Location const& location) const
+        {
+            size_t const arity = signature.arity();
+            size_t const argument_count = arguments.size();
+
+            if (arity != argument_count)
+            {
+                reporter_.error("Call to '" + signature.name() + "' with wrong number of arguments: " +
+                                " expected " + std::to_string(arity) +
+                                " but got " + std::to_string(argument_count),
+                                location);
+            }
+        }
 
         void visit(ret::ErrorStatement const&) override
         {
@@ -66,14 +83,24 @@ struct ance::analyze::Analyzer::Implementation
 
         }
 
-        void visit(ret::Intrinsic const&) override
+        void visit(ret::Intrinsic const& intrinsic) override
         {
-            (void)reporter_; //todo: use it here
+            for (auto& argument : intrinsic.arguments)
+            {
+                visit(*argument);
+            }
+
+            analyzeCall(intrinsic.intrinsic.signature(), intrinsic.arguments, intrinsic.location);
         }
 
-        void visit(ret::Call const&) override
+        void visit(ret::Call const& call) override
         {
+            for (auto& argument : call.arguments)
+            {
+                visit(*argument);
+            }
 
+            analyzeCall(call.called.signature(), call.arguments, call.location);
         }
 
         void visit(ret::Access const&) override
@@ -86,9 +113,9 @@ struct ance::analyze::Analyzer::Implementation
 
         }
 
-        void visit(ret::UnaryOperation const&) override
+        void visit(ret::UnaryOperation const& unary_operation) override
         {
-
+            visit(*unary_operation.operand);
         }
 
     private:

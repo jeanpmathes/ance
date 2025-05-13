@@ -65,10 +65,11 @@ ance::est::Continue::Continue(core::Location const& source_location) : Node(sour
 
 ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
-ance::est::Call::Call(core::Identifier const& callable, core::Location const& source_location)
+ance::est::Call::Call(core::Identifier const& callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
     : Node(source_location)
     , Expression()
     , identifier(callable)
+    , arguments(std::move(expressions))
 {}
 
 ance::est::Access::Access(core::Identifier const& accessed, core::Location const& source_location)

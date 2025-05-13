@@ -15,14 +15,10 @@ statement
     ;
 
 expression
-    : entity '(' arguments ')' # CallExpression
+    : entity '(' (expression (',' expression)* )? ')' # CallExpression
     | entity # AccessExpression
     | literal # LiteralExpression
     | unary expression # UnaryOperationExpression
-    ;
-
-arguments
-    : (expression (',' expression)* )?
     ;
 
 unary

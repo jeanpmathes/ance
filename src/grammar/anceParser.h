@@ -21,8 +21,8 @@ public:
   };
 
   enum {
-    RuleFile = 0, RuleStatement = 1, RuleExpression = 2, RuleArguments = 3, 
-    RuleUnary = 4, RuleLiteral = 5, RuleBoolean = 6, RuleEntity = 7, RuleAssigner = 8
+    RuleFile = 0, RuleStatement = 1, RuleExpression = 2, RuleUnary = 3, 
+    RuleLiteral = 4, RuleBoolean = 5, RuleEntity = 6, RuleAssigner = 7
   };
 
   explicit anceParser(antlr4::TokenStream *input);
@@ -45,7 +45,6 @@ public:
   class FileContext;
   class StatementContext;
   class ExpressionContext;
-  class ArgumentsContext;
   class UnaryContext;
   class LiteralContext;
   class BooleanContext;
@@ -224,27 +223,14 @@ public:
 
     EntityContext *entity();
     antlr4::tree::TerminalNode *BRACKET_OPEN();
-    ArgumentsContext *arguments();
     antlr4::tree::TerminalNode *BRACKET_CLOSE();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   ExpressionContext* expression();
-
-  class  ArgumentsContext : public antlr4::ParserRuleContext {
-  public:
-    ArgumentsContext(antlr4::ParserRuleContext *parent, size_t invokingState);
-    virtual size_t getRuleIndex() const override;
-    std::vector<ExpressionContext *> expression();
-    ExpressionContext* expression(size_t i);
-
-
-    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
-  };
-
-  ArgumentsContext* arguments();
 
   class  UnaryContext : public antlr4::ParserRuleContext {
   public:
