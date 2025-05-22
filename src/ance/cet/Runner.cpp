@@ -8,6 +8,7 @@
 
 #include "ance/bbt/Node.h"
 #include "ance/cet/Node.h"
+#include "ance/core/Value.h"
 
 struct ance::cet::Runner::Implementation
 {
@@ -18,7 +19,7 @@ struct ance::cet::Runner::Implementation
 
         explicit Intrinsics(core::Reporter& reporter) : reporter_(reporter) {}
 
-        void run(core::Intrinsic const& intrinsic, utility::List<bool> const& arguments, core::Location const& location)
+        void run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<core::Value>> const& arguments, core::Location const& location)
         {
             location_ = location;
             arguments_ = &arguments;
@@ -43,7 +44,7 @@ struct ance::cet::Runner::Implementation
         core::Reporter& reporter_;
 
         core::Location location_ = core::Location::global();
-        utility::List<bool> const* arguments_ = nullptr;
+        utility::List<utility::Shared<core::Value>> const* arguments_ = nullptr;
     };
 
     class BBT final : public bbt::Visitor
@@ -72,22 +73,22 @@ struct ance::cet::Runner::Implementation
             visit(statement);
         }
 
-        bool run(bbt::Expression const& expression)
+        utility::Shared<core::Value> run(bbt::Expression const& expression)
         {
             assert(!result_.hasValue());
 
             visit(expression);
 
             if (!result_.hasValue())
-                return false; // todo: unit type
+                return core::Value::makeUnit();
 
-            bool const result = result_.value();
+            utility::Shared<core::Value> result = result_.value();
             result_ = std::nullopt;
 
             return result;
         }
 
-        void setResult(bool const value)
+        void setResult(utility::Shared<core::Value> value)
         {
             assert(!result_.hasValue());
             result_ = value;
@@ -122,7 +123,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Branch const& branch_link) override
         {
-            if (run(*branch_link.condition))
+            if (run(*branch_link.condition)->getBool())
             {
                 next_ = &branch_link.true_branch;
             }
@@ -149,21 +150,19 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Let const& let) override
         {
-            bool value = false;
+            utility::Shared<core::Value> value = core::Value::makeDefault(let.variable.type());
 
             if (let.value.hasValue())
             {
                 value = run(**let.value);
             }
 
-            state_[&let.variable] = value;
+            state_.insert_or_assign(&let.variable, value);
         }
 
         void visit(bbt::Assignment const& assignment) override
         {
-            bool const value = run(*assignment.value);
-
-            state_[&assignment.variable] = value;
+            state_.insert_or_assign(&assignment.variable, run(*assignment.value));
         }
 
         void visit(bbt::ErrorExpression const& error_expression) override
@@ -173,7 +172,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Intrinsic const& intrinsic) override
         {
-            utility::List<bool> arguments = {};
+            utility::List<utility::Shared<core::Value>> arguments = {};
             for (auto& argument : intrinsic.arguments)
             {
                 arguments.push_back(run(*argument));
@@ -184,7 +183,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Call const& call) override
         {
-            utility::List<bool> arguments = {};
+            utility::List<utility::Shared<core::Value>> arguments = {};
             for (auto& argument : call.arguments)
             {
                 arguments.push_back(run(*argument));
@@ -195,24 +194,24 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Access const& access) override
         {
-            bool const value = state_.at(&access.variable);
+            utility::Shared<core::Value> value = state_.at(&access.variable);
 
             setResult(value);
         }
 
         void visit(bbt::Constant const& constant) override
         {
-            setResult(constant.value);
+            setResult(constant.value->clone());
         }
 
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
-            bool const value = run(*unary_operation.operand);
+            utility::Shared<core::Value> value = run(*unary_operation.operand);
 
             switch (unary_operation.op)
             {
                 case core::UnaryOperator::NOT:
-                    setResult(!value);
+                    setResult(core::Value::makeBool(!value->getBool()));
                     break;
             }
         }
@@ -222,8 +221,8 @@ struct ance::cet::Runner::Implementation
 
         Intrinsics intrinsics_ {reporter_};
 
-        std::map<core::Variable const*, bool> state_ = {};
-        utility::Optional<bool> result_ = std::nullopt;
+        std::map<core::Variable const*, utility::Shared<core::Value>> state_ = {};
+        utility::Optional<utility::Shared<core::Value>> result_ = std::nullopt;
 
         bbt::BasicBlock const* next_ = nullptr;
     };

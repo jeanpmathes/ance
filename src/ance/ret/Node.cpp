@@ -1,6 +1,10 @@
 #include "Node.h"
 
 #include "ance/core/Scope.h"
+#include "ance/core/Type.h"
+#include "ance/core/Intrinsic.h"
+#include "ance/core/Function.h"
+#include "ance/core/Value.h"
 
 ance::ret::Node::Node(core::Location const& source_location) : location(source_location) {}
 
@@ -55,17 +59,50 @@ ance::ret::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::ret::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::core::Type const& ance::ret::Expression::type() const
+{
+    return core::Type::Unit();
+}
+
 ance::ret::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::ret::Intrinsic::Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
-: Node(source_location), Expression(), intrinsic(used), arguments(std::move(expressions)) {}
+    : Node(source_location)
+    , Expression()
+    , intrinsic(used)
+    , arguments(std::move(expressions))
+{}
+
+ance::core::Type const& ance::ret::Intrinsic::type() const
+{
+    return intrinsic.returnType();
+}
 
 ance::ret::Call::Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
-: Node(source_location), Expression(), called(function), arguments(std::move(expressions)) {}
+    : Node(source_location)
+    , Expression()
+    , called(function)
+    , arguments(std::move(expressions))
+{}
+
+ance::core::Type const& ance::ret::Call::type() const
+{
+    return called.returnType();
+}
 
 ance::ret::Access::Access(core::Variable const& accessed, core::Location const& source_location) : Node(source_location), Expression(), variable(accessed) {}
 
-ance::ret::Constant::Constant(bool const constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
+ance::core::Type const& ance::ret::Access::type() const
+{
+    return variable.type();
+}
+
+ance::ret::Constant::Constant(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(constant)) {}
+
+ance::core::Type const& ance::ret::Constant::type() const
+{
+    return value->type();
+}
 
 ance::ret::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
@@ -73,3 +110,8 @@ ance::ret::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , op(kind)
     , operand(std::move(expression))
 {}
+
+ance::core::Type const& ance::ret::UnaryOperation::type() const
+{
+    return core::Type::Bool();
+}

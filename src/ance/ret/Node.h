@@ -17,6 +17,8 @@ namespace ance::core
     class Scope;
     class Variable;
     class Function;
+    class Type;
+    class Value;
 }
 
 /// The resolved element tree (RET) namespace.
@@ -139,6 +141,8 @@ namespace ance::ret
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
+        /// Get the return type of the expression.
+        virtual core::Type const& type() const;
     };
 
     /// Error expression, mostly as pass-through from the AST.
@@ -156,6 +160,8 @@ namespace ance::ret
     {
         Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
+        core::Type const& type() const override;
+
         core::Intrinsic const& intrinsic;
         utility::List<utility::Owned<Expression>> arguments;
     };
@@ -166,6 +172,8 @@ namespace ance::ret
         , utility::ConcreteNode<Call, Visitor>
     {
         Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
+
+        core::Type const& type() const override;
 
         core::Function const& called;
         utility::List<utility::Owned<Expression>> arguments;
@@ -178,6 +186,8 @@ namespace ance::ret
     {
         Access(core::Variable const& accessed, core::Location const& source_location);
 
+        core::Type const& type() const override;
+
         core::Variable const& variable;
     };
 
@@ -186,9 +196,11 @@ namespace ance::ret
         : Expression
         , utility::ConcreteNode<Constant, Visitor>
     {
-        Constant(bool constant, core::Location const& source_location);
+        Constant(utility::Shared<core::Value> constant, core::Location const& source_location);
 
-        bool value;
+        core::Type const& type() const override;
+
+        utility::Shared<core::Value> value;
     };
 
     /// Applies an operation to an operand.
@@ -197,6 +209,8 @@ namespace ance::ret
         , utility::ConcreteNode<UnaryOperation, Visitor>
     {
         UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location);
+
+        core::Type const& type() const override;
 
         core::UnaryOperator op;
         utility::Owned<Expression> operand;

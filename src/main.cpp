@@ -34,6 +34,7 @@
 #include "ance/cet/Runner.h"
 
 #include "ance/build/Compiler.h"
+#include "ance/core/Type.h"
 
 namespace ance
 {
@@ -119,10 +120,11 @@ namespace ance
         cet::Runner       runner {reporter};
         build::Compiler   compiler {reporter};
 
-        core::Function const print_fn(core::Signature::like("print"), [](auto&) { std::cout << "PRINT[]" << std::endl; });
+        core::Function const print_fn(core::Signature::like("print"), core::Type::Unit(), [](auto&) { std::cout << "PRINT[]" << std::endl; });
         resolver.add(print_fn);// todo: remove
-        core::Function const print_var_fn(core::Signature::like("print_var", 1),
-                                          [](auto& args) { std::cout << "PRINT[" << std::to_string(args[0]) << "]" << std::endl; });
+        core::Function const print_var_fn(core::Signature::like("print_bool", core::Type::Bool()), core::Type::Unit(), [](auto& args) {
+            std::cout << "PRINT[" << args[0]->toString() << "]" << std::endl;
+        });
         resolver.add(print_var_fn);// todo: remove
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
@@ -163,8 +165,7 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add minimal types (nothing user created yet, nothing parametrized), simpler types without the definition bridge (do it singleton style for now) - just Bool, Unit, Size (make both uppercase) and allow easy adding of new types like Identifier and Callable - not a new class per type needed, no type conversions yet
-        // todo: functions and intrinsics should have a return type and return values should work
+        // todo: add size literals, unit literals, test type checks
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper
         //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
@@ -172,7 +173,8 @@ namespace ance
         //      todo: for blockers, scopes (internal class of runner and ance type) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
         //      todo: remove the scope and variable classes from core
         //      todo: for expanding with temporaries, use three new nodes in EST: DeclareTemporary, ReadTemporary, WriteTemporary, EraseTemporary (the last three have a reference to the declaration) - remove the ugly code to create identifier from location
-        // todo: add types and type expressions
+        //      todo: a more general system instead of the phases might be needed where parts of the tree go through phases independently as needed
+        // todo: add types and type expressions, type checks might need to move from analyzer to runner but maybe not - maybe the type method on expressions could return a type expression instead of the direct type - check what I wrote in type expression note, complete runs might not be possible so type checks could stay in analyzer but it has to run some parts before analyzing others
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
         // todo: add intrinsic functions to include another file, running the cmp code in there too
         // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)

@@ -14,15 +14,16 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
-    IDENTIFIER = 15, SEMICOLON = 16, WHITESPACE = 17, BLOCK_COMMENT = 18, 
-    LINE_COMMENT = 19, BRACKET_OPEN = 20, BRACKET_CLOSE = 21, CURLY_BRACKET_OPEN = 22, 
-    CURLY_BRACKET_CLOSE = 23, SQUARE_BRACKET_OPEN = 24, SQUARE_BRACKET_CLOSE = 25, 
-    POINTY_BRACKET_OPEN = 26, POINTY_BRACKET_CLOSE = 27, ERROR_CHAR = 28
+    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, IDENTIFIER = 19, SEMICOLON = 20, 
+    WHITESPACE = 21, BLOCK_COMMENT = 22, LINE_COMMENT = 23, BRACKET_OPEN = 24, 
+    BRACKET_CLOSE = 25, CURLY_BRACKET_OPEN = 26, CURLY_BRACKET_CLOSE = 27, 
+    SQUARE_BRACKET_OPEN = 28, SQUARE_BRACKET_CLOSE = 29, POINTY_BRACKET_OPEN = 30, 
+    POINTY_BRACKET_CLOSE = 31, ERROR_CHAR = 32
   };
 
   enum {
-    RuleFile = 0, RuleStatement = 1, RuleExpression = 2, RuleUnary = 3, 
-    RuleLiteral = 4, RuleBoolean = 5, RuleEntity = 6, RuleAssigner = 7
+    RuleFile = 0, RuleStatement = 1, RuleExpression = 2, RuleType = 3, RuleUnary = 4, 
+    RuleLiteral = 5, RuleBoolean = 6, RuleEntity = 7, RuleAssigner = 8
   };
 
   explicit anceParser(antlr4::TokenStream *input);
@@ -45,6 +46,7 @@ public:
   class FileContext;
   class StatementContext;
   class ExpressionContext;
+  class TypeContext;
   class UnaryContext;
   class LiteralContext;
   class BooleanContext;
@@ -158,6 +160,7 @@ public:
     LetStatementContext(StatementContext *ctx);
 
     antlr4::tree::TerminalNode *IDENTIFIER();
+    TypeContext *type();
     antlr4::tree::TerminalNode *SEMICOLON();
     AssignerContext *assigner();
     ExpressionContext *expression();
@@ -231,6 +234,45 @@ public:
   };
 
   ExpressionContext* expression();
+
+  class  TypeContext : public antlr4::ParserRuleContext {
+  public:
+    TypeContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    TypeContext() = default;
+    void copyFrom(TypeContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  BoolTypeContext : public TypeContext {
+  public:
+    BoolTypeContext(TypeContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  UnitTypeContext : public TypeContext {
+  public:
+    UnitTypeContext(TypeContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  SizeTypeContext : public TypeContext {
+  public:
+    SizeTypeContext(TypeContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  TypeContext* type();
 
   class  UnaryContext : public antlr4::ParserRuleContext {
   public:

@@ -43,6 +43,8 @@ struct ance::ret::Printer::Implementation
         {
             print("let ");
             print(let.variable.identifier());
+            print(": ");
+            print(let.variable.type());
 
             if (let.value.hasValue())
             {
@@ -118,7 +120,7 @@ struct ance::ret::Printer::Implementation
 
         void visit(Constant const& constant) override
         {
-            print(constant.value ? "true" : "false");
+            print(constant.value);
         }
 
         void visit(UnaryOperation const& unary_operation) override

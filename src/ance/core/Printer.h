@@ -3,6 +3,8 @@
 
 #include <ostream>
 
+#include "ance/utility/Owners.h"
+
 #include "ance/core/Identifier.h"
 
 namespace ance::core
@@ -10,6 +12,8 @@ namespace ance::core
     struct Intrinsic;
 
     class Function;
+    class Type;
+    class Value;
 
     /// Utility to simplify implementing code printers for different trees.
     class Printer
@@ -33,6 +37,12 @@ namespace ance::core
 
         /// Print a function to the output stream.
         void print(Function const& function);
+
+        /// Print a type to the output stream.
+        void print(Type const& type);
+
+        /// Print a value to the output stream.
+        void print(utility::Shared<Value> const& value);
 
         /// Print a size_t value to the output stream.
         void print(size_t value);

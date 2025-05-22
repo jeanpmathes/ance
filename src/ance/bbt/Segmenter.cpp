@@ -5,6 +5,7 @@
 #include <stack>
 
 #include "ance/bbt/Node.h"
+#include "ance/core/Value.h"
 #include "ance/ret/Node.h"
 
 struct ance::bbt::Segmenter::Implementation
@@ -551,7 +552,7 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(ret::Constant const& constant) override
         {
-            setResult(utility::makeOwned<Constant>(constant.value, constant.location));
+            setResult(utility::makeOwned<Constant>(constant.value->clone(), constant.location));
         }
 
         void visit(ret::UnaryOperation const& unary_operation) override

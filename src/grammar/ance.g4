@@ -5,7 +5,7 @@ file : statement EOF ;
 statement
     : '{' ( statement )* '}' # BlockStatement
     | expression ';' # ExpressionStatement
-    | 'let' IDENTIFIER ( assigner expression )? ';' # LetStatement
+    | 'let' IDENTIFIER ':' type ( assigner expression )? ';' # LetStatement // todo: type inference - maybe before doing real type inference just do expansion to typeof(expression) if no type is set
     | entity assigner expression ';' # AssignmentStatement
     | 'if' expression 'then' trueBlock=statement ( 'else' falseBlock=statement )? # IfStatement
     | 'loop' statement # LoopStatement
@@ -19,6 +19,12 @@ expression
     | entity # AccessExpression
     | literal # LiteralExpression
     | unary expression # UnaryOperationExpression
+    ;
+
+type // todo: make this a normal expression as any other
+    : 'Bool' # BoolType
+    | 'Unit' # UnitType
+    | 'Size' # SizeType
     ;
 
 unary

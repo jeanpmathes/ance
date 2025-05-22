@@ -1,6 +1,7 @@
 #include "Expander.h"
 
 #include "ance/core/Scope.h"
+#include "ance/core/Type.h"
 
 #include "ance/ast/Node.h"
 #include "ance/est/Node.h"
@@ -154,7 +155,7 @@ struct ance::est::Expander::Implementation
                 after = std::move(expansion.after);
             }
 
-            statements.emplace_back(utility::makeOwned<Let>(let.identifier, std::move(value), let.location));
+            statements.emplace_back(utility::makeOwned<Let>(let.identifier, std::move(value), let.type, let.location));
 
             append(statements, std::move(after));
 
@@ -226,7 +227,7 @@ struct ance::est::Expander::Implementation
 
             Expansion condition = expand(*while_statement.condition);
             append(loop_body, std::move(condition.before));
-            loop_body.emplace_back(utility::makeOwned<Let>(tmp, std::move(condition.center), while_statement.location));
+            loop_body.emplace_back(utility::makeOwned<Let>(tmp, std::move(condition.center), core::Type::Bool(), while_statement.location));
             append(loop_body, std::move(condition.after));
 
             loop_body.emplace_back(
@@ -277,7 +278,7 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Literal const& literal) override
         {
-            setResult(utility::makeOwned<Literal>(literal.value, literal.location));
+            setResult(utility::makeOwned<Literal>(literal.value->clone(), literal.location));
         }
 
         void visit(ast::UnaryOperation const& unary_operation) override

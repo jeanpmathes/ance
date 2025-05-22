@@ -3,11 +3,17 @@
 
 #include "ance/core/Identifier.h"
 #include "ance/core/Reporter.h"
+#include "ance/core/Value.h"
 #include "ance/core/UnaryOperator.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
+
+namespace ance::core
+{
+    class Type;
+}
 
 /// The abstract syntax tree (AST) namespace.
 namespace ance::ast
@@ -69,10 +75,12 @@ namespace ance::ast
         , utility::ConcreteNode<Let, Visitor>
     {
         Let(core::Identifier const&                       name,
+        core::Type const&                             t,
             utility::Optional<utility::Owned<Expression>> definition,
             core::Location const&                         source_location);
 
         core::Identifier                              identifier;
+        core::Type const& type;
         utility::Optional<utility::Owned<Expression>> value;
     };
 
@@ -187,9 +195,9 @@ namespace ance::ast
         : Expression
         , utility::ConcreteNode<Literal, Visitor>
     {
-        Literal(bool literal, core::Location const& source_location);
+        Literal(utility::Shared<core::Value> literal, core::Location const& source_location);
 
-        bool value;
+        utility::Shared<core::Value> value;
     };
 
     /// Applies an operation to an operand.

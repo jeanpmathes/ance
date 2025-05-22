@@ -1,10 +1,17 @@
 #include "Intrinsic.h"
 
+#include "Type.h"
+
 ance::core::Intrinsic::Intrinsic(Signature const& signature) : signature_(signature) {}
 
 ance::core::Signature const& ance::core::Intrinsic::signature() const
 {
     return signature_;
+}
+
+ance::core::Type const& ance::core::Intrinsic::returnType() const
+{
+    return Type::Unit();
 }
 
 ance::core::Dynamic::Dynamic(Signature const& signature)

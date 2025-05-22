@@ -71,7 +71,7 @@ ance::bbt::Call::Call(core::Function const& function, utility::List<utility::Own
     , arguments(std::move(expressions))
 {}
 
-ance::bbt::Constant::Constant(bool const constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
+ance::bbt::Constant::Constant(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(constant)) {}
 
 ance::bbt::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)

@@ -1,6 +1,12 @@
 #include "Signature.h"
 
-ance::core::Signature::Signature(Identifier const& name, size_t const arity) : name_(name), arity_(arity) {}
+#include <utility>
+
+ance::core::Signature::Signature(Identifier const& name, utility::List<std::reference_wrapper<Type const>> types)
+    : name_(name), types_(std::move(types))
+{
+
+}
 
 ance::core::Identifier const& ance::core::Signature::name() const
 {
@@ -9,10 +15,10 @@ ance::core::Identifier const& ance::core::Signature::name() const
 
 size_t ance::core::Signature::arity() const
 {
-    return arity_;
+    return types_.size();
 }
 
-ance::core::Signature ance::core::Signature::like(std::string const& name, size_t arity)
+ance::utility::List<std::reference_wrapper<ance::core::Type const>> const& ance::core::Signature::types() const
 {
-    return { Identifier::like(name), arity };
+    return types_;
 }

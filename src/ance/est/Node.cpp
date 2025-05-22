@@ -28,10 +28,12 @@ ance::est::Independent::Independent(utility::Owned<Expression> independent_expre
 
 ance::est::Let::Let(core::Identifier const&                       name,
                     utility::Optional<utility::Owned<Expression>> definition,
+                    core::Type const& t,
                     core::Location const&                         source_location)
     : Node(source_location)
     , Statement()
     , identifier(name)
+    , type(t)
     , value(std::move(definition))
 {}
 
@@ -78,7 +80,7 @@ ance::est::Access::Access(core::Identifier const& accessed, core::Location const
     , identifier(accessed)
 {}
 
-ance::est::Literal::Literal(bool const constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
+ance::est::Literal::Literal(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(constant)) {}
 
 ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)

@@ -12,6 +12,7 @@
 
 #include "ance/core/Identifier.h"
 #include "ance/core/UnaryOperator.h"
+#include "ance/core/Type.h"
 
 #include "ance/sources/SourceFile.h"
 #include "ance/sources/SourceTree.h"
@@ -34,7 +35,7 @@ namespace ance::ast
         {}
 
       private:
-        class LexerErrorListener : public antlr4::BaseErrorListener
+        class LexerErrorListener final : public antlr4::BaseErrorListener
         {
           public:
             explicit LexerErrorListener(ErrorHandler& parent) : parent_(parent) {}
@@ -52,7 +53,7 @@ namespace ance::ast
             ErrorHandler& parent_;
         };
 
-        class ParserErrorListener : public antlr4::BaseErrorListener
+        class ParserErrorListener final : public antlr4::BaseErrorListener
         {
           public:
             explicit ParserErrorListener(ErrorHandler& parent) : parent_(parent) {}
@@ -215,6 +216,16 @@ namespace ance::ast
             return utility::makeOwned<ErrorExpression>(location(ctx));
         }
 
+        core::Type const& expectType(anceParser::TypeContext* ctx)
+        {
+            if (ctx == nullptr)
+                return core::Type::Unit();
+
+            std::any const result = visit(ctx);
+            auto const     type = std::any_cast<core::Type const*>(result);
+            return *type;
+        }
+
     protected:
         std::any visitFile(anceParser::FileContext* context) override
         {
@@ -245,12 +256,13 @@ namespace ance::ast
         std::any visitLetStatement(anceParser::LetStatementContext* ctx) override
         {
             core::Identifier const name = identifier(ctx->IDENTIFIER());
+            core::Type const&    type = expectType(ctx->type());
 
             utility::Optional<utility::Owned<Expression>> expression;
 
             if (ctx->expression() != nullptr) expression = expectExpression(ctx->expression());
 
-            Statement* statement = new Let(name, std::move(expression), location(ctx));
+            Statement* statement = new Let(name, type, std::move(expression), location(ctx));
             return statement;
         }
 
@@ -345,16 +357,32 @@ namespace ance::ast
 
         std::any visitTrue(anceParser::TrueContext* context) override
         {
-            Expression* expression = new Literal(true, location(context));
+            Expression* expression = new Literal(core::Value::makeBool(true), location(context));
             return expression;
         }
 
         std::any visitFalse(anceParser::FalseContext* context) override
         {
-            Expression* expression = new Literal(false, location(context));
+            Expression* expression = new Literal(core::Value::makeBool(false), location(context));
             return expression;
         }
 
+        std::any visitBoolType(anceParser::BoolTypeContext*) override
+        {
+            return &core::Type::Bool();
+        }
+
+        std::any visitUnitType(anceParser::UnitTypeContext*) override
+        {
+            return &core::Type::Unit();
+        }
+
+        std::any visitSizeType(anceParser::SizeTypeContext*) override
+        {
+            return &core::Type::Size();
+        }
+
+      protected:
         std::any visitTerminal(antlr4::tree::TerminalNode*) override
         {
             assert(false);// Indicates a missing implementation of a node.

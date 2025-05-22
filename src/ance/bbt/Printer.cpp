@@ -142,7 +142,7 @@ struct ance::bbt::Printer::Implementation
 
         void visit(Constant const& constant) override
         {
-            print(constant.value ? "true" : "false");
+            print(constant.value);
         }
 
         void visit(UnaryOperation const& unary_operation) override

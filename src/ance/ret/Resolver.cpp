@@ -153,9 +153,9 @@ struct ance::ret::Resolver::Implementation
 
             core::Scope& scope() { return *scope_; }
 
-            core::Variable const& declare(core::Identifier const& identifier, core::Location const& location)
+            core::Variable const& declare(core::Identifier const& identifier, core::Type const& type, core::Location const& location)
             {
-                core::Variable const& variable = scope_->addVariable(identifier, location);
+                core::Variable const& variable = scope_->addVariable(identifier, type, location);
 
                 onDeclare(variable);
 
@@ -304,7 +304,7 @@ struct ance::ret::Resolver::Implementation
         void visit(est::Let const& let) override
         {
             assert(current_scope_ != nullptr);
-            core::Variable const& variable = current_scope_->declare(let.identifier, let.location);
+            core::Variable const& variable = current_scope_->declare(let.identifier, let.type, let.location);
 
             utility::Optional<utility::Owned<Expression>> value;
 
@@ -394,7 +394,7 @@ struct ance::ret::Resolver::Implementation
 
         void visit(est::Literal const& literal) override
         {
-            setResult(utility::makeOwned<Constant>(literal.value, literal.location));
+            setResult(utility::makeOwned<Constant>(literal.value->clone(), literal.location));
         }
 
         void visit(est::UnaryOperation const& unary_operation) override

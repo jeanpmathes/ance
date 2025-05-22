@@ -71,6 +71,18 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitBoolType(anceParser::BoolTypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitUnitType(anceParser::UnitTypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitSizeType(anceParser::SizeTypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitUnaryNot(anceParser::UnaryNotContext *ctx) override {
     return visitChildren(ctx);
   }

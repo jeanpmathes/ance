@@ -9,6 +9,12 @@
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
+namespace ance::core
+{
+    class Type;
+    class Value;
+}
+
 /// The expanded syntax tree (EST) namespace.
 /// The EST is similar to the AST, but without syntactic sugar.
 namespace ance::est
@@ -63,9 +69,10 @@ namespace ance::est
     struct Let final
         : Statement
         , utility::ConcreteNode<Let, Visitor> {
-        Let(core::Identifier const& name, utility::Optional<utility::Owned<Expression>> definition, core::Location const& source_location);
+        Let(core::Identifier const& name, utility::Optional<utility::Owned<Expression>> definition, core::Type const& t, core::Location const& source_location);
 
         core::Identifier identifier;
+        core::Type const& type;
         utility::Optional<utility::Owned<Expression>> value;
     };
 
@@ -161,9 +168,9 @@ namespace ance::est
         : Expression
         , utility::ConcreteNode<Literal, Visitor>
     {
-        Literal(bool constant, core::Location const& source_location);
+        Literal(utility::Shared<core::Value> constant, core::Location const& source_location);
 
-        bool value;
+        utility::Shared<core::Value> value;
     };
 
     /// Applies an operation to an operand.

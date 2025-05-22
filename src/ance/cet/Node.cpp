@@ -56,7 +56,7 @@ ance::cet::Call::Call(core::Function const& function, utility::List<utility::Own
 
 ance::cet::Access::Access(core::Variable const& accessed, core::Location const& source_location) : Node(source_location), Expression(), variable(accessed) {}
 
-ance::cet::Constant::Constant(bool const constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
+ance::cet::Constant::Constant(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
 
 ance::cet::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location), Expression(), op(kind), operand(std::move(expression))

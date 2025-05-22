@@ -15,6 +15,7 @@ namespace ance::core
     struct Intrinsic;
 
     class Function;
+    class Value;
 }
 
 /// The basic-block tree (BBT) namespace.
@@ -208,9 +209,9 @@ namespace ance::bbt
         : Expression
         , utility::ConcreteNode<Constant, Visitor>
     {
-        Constant(bool constant, core::Location const& source_location);
+        Constant(utility::Shared<core::Value> constant, core::Location const& source_location);
 
-        bool value;
+        utility::Shared<core::Value> value;
     };
 
     /// Applies an operation to an operand.

@@ -12,6 +12,8 @@ namespace ance::core
 {
     class IntrinsicVisitor;
 
+    class Type;
+
     /// Base class for all intrinsics.
     struct Intrinsic : virtual utility::AbstractNode<IntrinsicVisitor>
     {
@@ -21,6 +23,9 @@ namespace ance::core
         /// Get the signature of this intrinsic.
         /// \return The signature.
         [[nodiscard]] Signature const& signature() const;
+
+        /// Get the return type of this intrinsic.
+        [[nodiscard]] Type const& returnType() const;
 
         /// Get the identifier of this intrinsic.
         /// \return The identifier.
