@@ -91,6 +91,14 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitSizeLiteral(anceParser::SizeLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitUnitLiteral(anceParser::UnitLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitTrue(anceParser::TrueContext *ctx) override {
     return visitChildren(ctx);
   }

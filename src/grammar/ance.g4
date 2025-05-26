@@ -33,6 +33,8 @@ unary
 
 literal
     : boolean # BooleanLiteral
+    | INTEGER # SizeLiteral
+    | '(' ')' # UnitLiteral
     ;
 
 boolean
@@ -50,6 +52,8 @@ assigner
 
 IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )
            | [\p{Emoji}] ;
+
+INTEGER : [0-9]+ ;
 
 SEMICOLON : ';' ;
 

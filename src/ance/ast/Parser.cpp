@@ -367,6 +367,21 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitSizeLiteral(anceParser::SizeLiteralContext* context) override
+        {
+            // todo: use llvm::APInt instead of size_t
+            // todo: do all the validation of integer literals and stuff like whether they actually fit into their type
+
+            Expression* expression = new Literal(core::Value::makeSize(std::stoull(context->getText())), location(context));
+            return expression;
+        }
+
+        std::any visitUnitLiteral(anceParser::UnitLiteralContext* context) override
+        {
+            Expression* expression = new Literal(core::Value::makeUnit(), location(context));
+            return expression;
+        }
+
         std::any visitBoolType(anceParser::BoolTypeContext*) override
         {
             return &core::Type::Bool();

@@ -49,50 +49,52 @@ void anceParserInitialize() {
     std::vector<std::string>{
       "", "'let'", "':'", "'if'", "'then'", "'else'", "'loop'", "'break'", 
       "'continue'", "'while'", "'do'", "','", "'Bool'", "'Unit'", "'Size'", 
-      "'not'", "'true'", "'false'", "'<:'", "", "';'", "", "", "", "'('", 
+      "'not'", "'true'", "'false'", "'<:'", "", "", "';'", "", "", "", "'('", 
       "')'", "'{'", "'}'", "'['", "']'", "'<'", "'>'"
     },
     std::vector<std::string>{
       "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", 
-      "", "", "IDENTIFIER", "SEMICOLON", "WHITESPACE", "BLOCK_COMMENT", 
+      "", "", "IDENTIFIER", "INTEGER", "SEMICOLON", "WHITESPACE", "BLOCK_COMMENT", 
       "LINE_COMMENT", "BRACKET_OPEN", "BRACKET_CLOSE", "CURLY_BRACKET_OPEN", 
       "CURLY_BRACKET_CLOSE", "SQUARE_BRACKET_OPEN", "SQUARE_BRACKET_CLOSE", 
       "POINTY_BRACKET_OPEN", "POINTY_BRACKET_CLOSE", "ERROR_CHAR"
     }
   );
   static const int32_t serializedATNSegment[] = {
-  	4,1,32,108,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
+  	4,1,33,112,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
   	7,7,7,2,8,7,8,1,0,1,0,1,0,1,1,1,1,5,1,24,8,1,10,1,12,1,27,9,1,1,1,1,1,
   	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,40,8,1,1,1,1,1,1,1,1,1,1,1,1,
   	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,55,8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
   	1,1,1,1,1,1,1,1,3,1,68,8,1,1,2,1,2,1,2,1,2,1,2,5,2,75,8,2,10,2,12,2,78,
   	9,2,3,2,80,8,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,89,8,2,1,3,1,3,1,3,3,3,
-  	94,8,3,1,4,1,4,1,5,1,5,1,6,1,6,3,6,102,8,6,1,7,1,7,1,8,1,8,1,8,0,0,9,
-  	0,2,4,6,8,10,12,14,16,0,0,117,0,18,1,0,0,0,2,67,1,0,0,0,4,88,1,0,0,0,
-  	6,93,1,0,0,0,8,95,1,0,0,0,10,97,1,0,0,0,12,101,1,0,0,0,14,103,1,0,0,0,
-  	16,105,1,0,0,0,18,19,3,2,1,0,19,20,5,0,0,1,20,1,1,0,0,0,21,25,5,26,0,
-  	0,22,24,3,2,1,0,23,22,1,0,0,0,24,27,1,0,0,0,25,23,1,0,0,0,25,26,1,0,0,
-  	0,26,28,1,0,0,0,27,25,1,0,0,0,28,68,5,27,0,0,29,30,3,4,2,0,30,31,5,20,
-  	0,0,31,68,1,0,0,0,32,33,5,1,0,0,33,34,5,19,0,0,34,35,5,2,0,0,35,39,3,
-  	6,3,0,36,37,3,16,8,0,37,38,3,4,2,0,38,40,1,0,0,0,39,36,1,0,0,0,39,40,
-  	1,0,0,0,40,41,1,0,0,0,41,42,5,20,0,0,42,68,1,0,0,0,43,44,3,14,7,0,44,
-  	45,3,16,8,0,45,46,3,4,2,0,46,47,5,20,0,0,47,68,1,0,0,0,48,49,5,3,0,0,
-  	49,50,3,4,2,0,50,51,5,4,0,0,51,54,3,2,1,0,52,53,5,5,0,0,53,55,3,2,1,0,
-  	54,52,1,0,0,0,54,55,1,0,0,0,55,68,1,0,0,0,56,57,5,6,0,0,57,68,3,2,1,0,
-  	58,59,5,7,0,0,59,68,5,20,0,0,60,61,5,8,0,0,61,68,5,20,0,0,62,63,5,9,0,
-  	0,63,64,3,4,2,0,64,65,5,10,0,0,65,66,3,2,1,0,66,68,1,0,0,0,67,21,1,0,
-  	0,0,67,29,1,0,0,0,67,32,1,0,0,0,67,43,1,0,0,0,67,48,1,0,0,0,67,56,1,0,
-  	0,0,67,58,1,0,0,0,67,60,1,0,0,0,67,62,1,0,0,0,68,3,1,0,0,0,69,70,3,14,
-  	7,0,70,79,5,24,0,0,71,76,3,4,2,0,72,73,5,11,0,0,73,75,3,4,2,0,74,72,1,
-  	0,0,0,75,78,1,0,0,0,76,74,1,0,0,0,76,77,1,0,0,0,77,80,1,0,0,0,78,76,1,
-  	0,0,0,79,71,1,0,0,0,79,80,1,0,0,0,80,81,1,0,0,0,81,82,5,25,0,0,82,89,
-  	1,0,0,0,83,89,3,14,7,0,84,89,3,10,5,0,85,86,3,8,4,0,86,87,3,4,2,0,87,
-  	89,1,0,0,0,88,69,1,0,0,0,88,83,1,0,0,0,88,84,1,0,0,0,88,85,1,0,0,0,89,
-  	5,1,0,0,0,90,94,5,12,0,0,91,94,5,13,0,0,92,94,5,14,0,0,93,90,1,0,0,0,
-  	93,91,1,0,0,0,93,92,1,0,0,0,94,7,1,0,0,0,95,96,5,15,0,0,96,9,1,0,0,0,
-  	97,98,3,12,6,0,98,11,1,0,0,0,99,102,5,16,0,0,100,102,5,17,0,0,101,99,
-  	1,0,0,0,101,100,1,0,0,0,102,13,1,0,0,0,103,104,5,19,0,0,104,15,1,0,0,
-  	0,105,106,5,18,0,0,106,17,1,0,0,0,9,25,39,54,67,76,79,88,93,101
+  	94,8,3,1,4,1,4,1,5,1,5,1,5,1,5,3,5,102,8,5,1,6,1,6,3,6,106,8,6,1,7,1,
+  	7,1,8,1,8,1,8,0,0,9,0,2,4,6,8,10,12,14,16,0,0,123,0,18,1,0,0,0,2,67,1,
+  	0,0,0,4,88,1,0,0,0,6,93,1,0,0,0,8,95,1,0,0,0,10,101,1,0,0,0,12,105,1,
+  	0,0,0,14,107,1,0,0,0,16,109,1,0,0,0,18,19,3,2,1,0,19,20,5,0,0,1,20,1,
+  	1,0,0,0,21,25,5,27,0,0,22,24,3,2,1,0,23,22,1,0,0,0,24,27,1,0,0,0,25,23,
+  	1,0,0,0,25,26,1,0,0,0,26,28,1,0,0,0,27,25,1,0,0,0,28,68,5,28,0,0,29,30,
+  	3,4,2,0,30,31,5,21,0,0,31,68,1,0,0,0,32,33,5,1,0,0,33,34,5,19,0,0,34,
+  	35,5,2,0,0,35,39,3,6,3,0,36,37,3,16,8,0,37,38,3,4,2,0,38,40,1,0,0,0,39,
+  	36,1,0,0,0,39,40,1,0,0,0,40,41,1,0,0,0,41,42,5,21,0,0,42,68,1,0,0,0,43,
+  	44,3,14,7,0,44,45,3,16,8,0,45,46,3,4,2,0,46,47,5,21,0,0,47,68,1,0,0,0,
+  	48,49,5,3,0,0,49,50,3,4,2,0,50,51,5,4,0,0,51,54,3,2,1,0,52,53,5,5,0,0,
+  	53,55,3,2,1,0,54,52,1,0,0,0,54,55,1,0,0,0,55,68,1,0,0,0,56,57,5,6,0,0,
+  	57,68,3,2,1,0,58,59,5,7,0,0,59,68,5,21,0,0,60,61,5,8,0,0,61,68,5,21,0,
+  	0,62,63,5,9,0,0,63,64,3,4,2,0,64,65,5,10,0,0,65,66,3,2,1,0,66,68,1,0,
+  	0,0,67,21,1,0,0,0,67,29,1,0,0,0,67,32,1,0,0,0,67,43,1,0,0,0,67,48,1,0,
+  	0,0,67,56,1,0,0,0,67,58,1,0,0,0,67,60,1,0,0,0,67,62,1,0,0,0,68,3,1,0,
+  	0,0,69,70,3,14,7,0,70,79,5,25,0,0,71,76,3,4,2,0,72,73,5,11,0,0,73,75,
+  	3,4,2,0,74,72,1,0,0,0,75,78,1,0,0,0,76,74,1,0,0,0,76,77,1,0,0,0,77,80,
+  	1,0,0,0,78,76,1,0,0,0,79,71,1,0,0,0,79,80,1,0,0,0,80,81,1,0,0,0,81,82,
+  	5,26,0,0,82,89,1,0,0,0,83,89,3,14,7,0,84,89,3,10,5,0,85,86,3,8,4,0,86,
+  	87,3,4,2,0,87,89,1,0,0,0,88,69,1,0,0,0,88,83,1,0,0,0,88,84,1,0,0,0,88,
+  	85,1,0,0,0,89,5,1,0,0,0,90,94,5,12,0,0,91,94,5,13,0,0,92,94,5,14,0,0,
+  	93,90,1,0,0,0,93,91,1,0,0,0,93,92,1,0,0,0,94,7,1,0,0,0,95,96,5,15,0,0,
+  	96,9,1,0,0,0,97,102,3,12,6,0,98,102,5,20,0,0,99,100,5,25,0,0,100,102,
+  	5,26,0,0,101,97,1,0,0,0,101,98,1,0,0,0,101,99,1,0,0,0,102,11,1,0,0,0,
+  	103,106,5,16,0,0,104,106,5,17,0,0,105,103,1,0,0,0,105,104,1,0,0,0,106,
+  	13,1,0,0,0,107,108,5,19,0,0,108,15,1,0,0,0,109,110,5,18,0,0,110,17,1,
+  	0,0,0,10,25,39,54,67,76,79,88,93,101,105
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -437,6 +439,8 @@ anceParser::StatementContext* anceParser::statement() {
         | (1ULL << anceParser::T__15)
         | (1ULL << anceParser::T__16)
         | (1ULL << anceParser::IDENTIFIER)
+        | (1ULL << anceParser::INTEGER)
+        | (1ULL << anceParser::BRACKET_OPEN)
         | (1ULL << anceParser::CURLY_BRACKET_OPEN))) != 0)) {
         setState(22);
         statement();
@@ -712,7 +716,9 @@ anceParser::ExpressionContext* anceParser::expression() {
         ((1ULL << _la) & ((1ULL << anceParser::T__14)
         | (1ULL << anceParser::T__15)
         | (1ULL << anceParser::T__16)
-        | (1ULL << anceParser::IDENTIFIER))) != 0)) {
+        | (1ULL << anceParser::IDENTIFIER)
+        | (1ULL << anceParser::INTEGER)
+        | (1ULL << anceParser::BRACKET_OPEN))) != 0)) {
         setState(71);
         expression();
         setState(76);
@@ -957,6 +963,40 @@ std::any anceParser::BooleanLiteralContext::accept(tree::ParseTreeVisitor *visit
   else
     return visitor->visitChildren(this);
 }
+//----------------- UnitLiteralContext ------------------------------------------------------------------
+
+tree::TerminalNode* anceParser::UnitLiteralContext::BRACKET_OPEN() {
+  return getToken(anceParser::BRACKET_OPEN, 0);
+}
+
+tree::TerminalNode* anceParser::UnitLiteralContext::BRACKET_CLOSE() {
+  return getToken(anceParser::BRACKET_CLOSE, 0);
+}
+
+anceParser::UnitLiteralContext::UnitLiteralContext(LiteralContext *ctx) { copyFrom(ctx); }
+
+
+std::any anceParser::UnitLiteralContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
+    return parserVisitor->visitUnitLiteral(this);
+  else
+    return visitor->visitChildren(this);
+}
+//----------------- SizeLiteralContext ------------------------------------------------------------------
+
+tree::TerminalNode* anceParser::SizeLiteralContext::INTEGER() {
+  return getToken(anceParser::INTEGER, 0);
+}
+
+anceParser::SizeLiteralContext::SizeLiteralContext(LiteralContext *ctx) { copyFrom(ctx); }
+
+
+std::any anceParser::SizeLiteralContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
+    return parserVisitor->visitSizeLiteral(this);
+  else
+    return visitor->visitChildren(this);
+}
 anceParser::LiteralContext* anceParser::literal() {
   LiteralContext *_localctx = _tracker.createInstance<LiteralContext>(_ctx, getState());
   enterRule(_localctx, 10, anceParser::RuleLiteral);
@@ -969,10 +1009,39 @@ anceParser::LiteralContext* anceParser::literal() {
     exitRule();
   });
   try {
-    _localctx = _tracker.createInstance<anceParser::BooleanLiteralContext>(_localctx);
-    enterOuterAlt(_localctx, 1);
-    setState(97);
-    boolean();
+    setState(101);
+    _errHandler->sync(this);
+    switch (_input->LA(1)) {
+      case anceParser::T__15:
+      case anceParser::T__16: {
+        _localctx = _tracker.createInstance<anceParser::BooleanLiteralContext>(_localctx);
+        enterOuterAlt(_localctx, 1);
+        setState(97);
+        boolean();
+        break;
+      }
+
+      case anceParser::INTEGER: {
+        _localctx = _tracker.createInstance<anceParser::SizeLiteralContext>(_localctx);
+        enterOuterAlt(_localctx, 2);
+        setState(98);
+        match(anceParser::INTEGER);
+        break;
+      }
+
+      case anceParser::BRACKET_OPEN: {
+        _localctx = _tracker.createInstance<anceParser::UnitLiteralContext>(_localctx);
+        enterOuterAlt(_localctx, 3);
+        setState(99);
+        match(anceParser::BRACKET_OPEN);
+        setState(100);
+        match(anceParser::BRACKET_CLOSE);
+        break;
+      }
+
+    default:
+      throw NoViableAltException(this);
+    }
    
   }
   catch (RecognitionException &e) {
@@ -1033,13 +1102,13 @@ anceParser::BooleanContext* anceParser::boolean() {
     exitRule();
   });
   try {
-    setState(101);
+    setState(105);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case anceParser::T__15: {
         _localctx = _tracker.createInstance<anceParser::TrueContext>(_localctx);
         enterOuterAlt(_localctx, 1);
-        setState(99);
+        setState(103);
         match(anceParser::T__15);
         break;
       }
@@ -1047,7 +1116,7 @@ anceParser::BooleanContext* anceParser::boolean() {
       case anceParser::T__16: {
         _localctx = _tracker.createInstance<anceParser::FalseContext>(_localctx);
         enterOuterAlt(_localctx, 2);
-        setState(100);
+        setState(104);
         match(anceParser::T__16);
         break;
       }
@@ -1102,7 +1171,7 @@ anceParser::EntityContext* anceParser::entity() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(103);
+    setState(107);
     match(anceParser::IDENTIFIER);
    
   }
@@ -1147,7 +1216,7 @@ anceParser::AssignerContext* anceParser::assigner() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(105);
+    setState(109);
     match(anceParser::T__17);
    
   }

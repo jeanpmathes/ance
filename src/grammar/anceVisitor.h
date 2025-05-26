@@ -57,6 +57,10 @@ public:
 
     virtual std::any visitBooleanLiteral(anceParser::BooleanLiteralContext *context) = 0;
 
+    virtual std::any visitSizeLiteral(anceParser::SizeLiteralContext *context) = 0;
+
+    virtual std::any visitUnitLiteral(anceParser::UnitLiteralContext *context) = 0;
+
     virtual std::any visitTrue(anceParser::TrueContext *context) = 0;
 
     virtual std::any visitFalse(anceParser::FalseContext *context) = 0;

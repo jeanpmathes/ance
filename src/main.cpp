@@ -165,7 +165,7 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add size literals, unit literals, test type checks
+        // todo: plan what step of the below to do first, probably the temporary var stuff and then linearization
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper
         //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
