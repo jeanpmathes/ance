@@ -99,7 +99,19 @@ struct ance::analyze::Analyzer::Implementation
 
         }
 
-        void visit(ret::Continue const&) override
+        void visit(ret::Continue const&) override {}
+
+        void visit(ret::Temporary const&) override
+        {
+
+        }
+
+        void visit(ret::WriteTemporary const& ) override
+        {
+
+        }
+
+        void visit(ret::EraseTemporary const& ) override
         {
 
         }
@@ -149,7 +161,9 @@ struct ance::analyze::Analyzer::Implementation
             }
         }
 
-    private:
+        void visit(ret::ReadTemporary const&) override {}
+
+      private:
         core::Reporter& reporter_;
     };
 

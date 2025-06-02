@@ -1,5 +1,8 @@
 #include "Node.h"
 
+#include <sstream>
+#include <iomanip>
+
 #include "ance/core/Scope.h"
 #include "ance/core/Type.h"
 #include "ance/core/Intrinsic.h"
@@ -59,6 +62,30 @@ ance::ret::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::ret::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::ret::Temporary::Temporary(core::Type const& t, utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , type(t)
+    , definition(std::move(expression))
+{}
+
+std::string ance::ret::Temporary::id() const
+{
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << std::setw(12) << std::setfill('0') << reinterpret_cast<std::uintptr_t>(this);
+    return oss.str();
+}
+
+ance::ret::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , temporary(target)
+    , value(std::move(expression))
+{}
+
+ance::ret::EraseTemporary::EraseTemporary(Temporary const& introduction, core::Location const& source_location)
+    : Node(source_location), Statement(), temporary(introduction) {}
+
 ance::core::Type const& ance::ret::Expression::type() const
 {
     return core::Type::Unit();
@@ -114,4 +141,12 @@ ance::ret::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
 ance::core::Type const& ance::ret::UnaryOperation::type() const
 {
     return core::Type::Bool();
+}
+
+ance::ret::ReadTemporary::ReadTemporary(Temporary const& target, core::Location const& source_location) : Node(source_location), Expression(), temporary(target)
+{}
+
+ance::core::Type const& ance::ret::ReadTemporary::type() const
+{
+    return temporary.type;
 }

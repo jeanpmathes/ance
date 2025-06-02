@@ -30,11 +30,6 @@ namespace ance::core
         /// \return The identifier.
         static Identifier like(std::string const& string, Location location = Location::global());
 
-        /// Create an identifier from a location.
-        /// This guarantees that created identifiers are unique from all other identifiers, including all user-defined identifiers.
-        /// \param location The location to create the identifier from.
-        static Identifier from(Location location);
-
         /// Create an empty identifier.
         /// \return The empty identifier.
         static Identifier empty();

@@ -221,20 +221,23 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::While const& while_statement) override
         {
-            core::Identifier const tmp = core::Identifier::from(while_statement.location);
-
             Statements loop_body;
 
             Expansion condition = expand(*while_statement.condition);
             append(loop_body, std::move(condition.before));
-            loop_body.emplace_back(utility::makeOwned<Let>(tmp, std::move(condition.center), core::Type::Bool(), while_statement.location));
+
+            utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(core::Type::Bool(), std::move(condition.center), while_statement.location);
+            Temporary const& tmp = *temporary;
+            loop_body.emplace_back(std::move(temporary));
             append(loop_body, std::move(condition.after));
 
             loop_body.emplace_back(
-                utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, utility::makeOwned<Access>(tmp, while_statement.location), while_statement.location),
+                utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, utility::makeOwned<ReadTemporary>(tmp, while_statement.location), while_statement.location),
                      utility::makeOwned<Break>(while_statement.location),
                      utility::makeOwned<Block>(Statements(), while_statement.location),
                      while_statement.location));
+
+            loop_body.emplace_back(utility::makeOwned<EraseTemporary>(tmp, while_statement.location));
 
             Statements inner_body = expand(*while_statement.body);
             append(loop_body, std::move(inner_body));

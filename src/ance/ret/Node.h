@@ -136,13 +136,47 @@ namespace ance::ret
         explicit Continue(core::Location const& source_location);
     };
 
+    /// Introduce a temporary variable, which works similar to any other local variable but does not have a name.
+    struct Temporary final
+        : Statement
+        , utility::ConcreteNode<Temporary, Visitor>
+    {
+        Temporary(core::Type const& t, utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
+
+        [[nodiscard]] std::string id() const;
+
+        core::Type const& type;
+        utility::Optional<utility::Owned<Expression>> definition;
+    };
+
+    /// Writes a value to a temporary variable.
+    struct WriteTemporary final
+        : Statement
+        , utility::ConcreteNode<WriteTemporary, Visitor>
+    {
+        WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location);
+
+        Temporary const& temporary;
+        utility::Owned<Expression> value;
+    };
+
+    /// Erase a temporary variable, cleaning it up.
+    struct EraseTemporary final
+        : Statement
+        , utility::ConcreteNode<EraseTemporary, Visitor>
+    {
+        EraseTemporary(Temporary const& introduction, core::Location const& source_location);
+
+        Temporary const& temporary;
+    };
+
     /// Expression node in the RET.
     struct Expression
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
         /// Get the return type of the expression.
-        virtual core::Type const& type() const;
+        [[nodiscard]] virtual core::Type const& type() const;
     };
 
     /// Error expression, mostly as pass-through from the AST.
@@ -160,7 +194,7 @@ namespace ance::ret
     {
         Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
-        core::Type const& type() const override;
+        [[nodiscard]] core::Type const& type() const override;
 
         core::Intrinsic const& intrinsic;
         utility::List<utility::Owned<Expression>> arguments;
@@ -173,7 +207,7 @@ namespace ance::ret
     {
         Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
-        core::Type const& type() const override;
+        [[nodiscard]] core::Type const& type() const override;
 
         core::Function const& called;
         utility::List<utility::Owned<Expression>> arguments;
@@ -186,7 +220,7 @@ namespace ance::ret
     {
         Access(core::Variable const& accessed, core::Location const& source_location);
 
-        core::Type const& type() const override;
+        [[nodiscard]] core::Type const& type() const override;
 
         core::Variable const& variable;
     };
@@ -198,7 +232,7 @@ namespace ance::ret
     {
         Constant(utility::Shared<core::Value> constant, core::Location const& source_location);
 
-        core::Type const& type() const override;
+        [[nodiscard]] core::Type const& type() const override;
 
         utility::Shared<core::Value> value;
     };
@@ -210,10 +244,22 @@ namespace ance::ret
     {
         UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location);
 
-        core::Type const& type() const override;
+        [[nodiscard]] core::Type const& type() const override;
 
         core::UnaryOperator op;
         utility::Owned<Expression> operand;
+    };
+
+    /// Reads the value of a temporary variable.
+    struct ReadTemporary final
+        : Expression
+        , utility::ConcreteNode<ReadTemporary, Visitor>
+    {
+        ReadTemporary(Temporary const& target, core::Location const& source_location);
+
+        [[nodiscard]] core::Type const& type() const override;
+
+        Temporary const& temporary;
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>
@@ -232,6 +278,9 @@ namespace ance::ret
         virtual void visit(Loop const& loop)               = 0;
         virtual void visit(Break const& break_statement)   = 0;
         virtual void visit(Continue const& continue_statement) = 0;
+        virtual void visit(Temporary const& temporary)     = 0;
+        virtual void visit(WriteTemporary const& write)   = 0;
+        virtual void visit(EraseTemporary const& erase)   = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Intrinsic const& intrinsic)   = 0;
@@ -239,6 +288,7 @@ namespace ance::ret
         virtual void visit(Access const& access)         = 0;
         virtual void visit(Constant const& constant)     = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
+        virtual void visit(ReadTemporary const& read_temporary) = 0;
     };
 }
 

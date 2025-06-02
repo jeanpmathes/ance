@@ -131,6 +131,40 @@ namespace ance::est
         explicit Continue(core::Location const& source_location);
     };
 
+    /// Introduce a temporary variable, which works similar to any other local variable but does not have a name.
+    struct Temporary final
+        : Statement
+        , utility::ConcreteNode<Temporary, Visitor>
+    {
+        Temporary(core::Type const& t, utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
+
+        [[nodiscard]] std::string id() const;
+
+        core::Type const& type;
+        utility::Optional<utility::Owned<Expression>> definition;
+    };
+
+    /// Writes a value to a temporary variable.
+    struct WriteTemporary final
+        : Statement
+        , utility::ConcreteNode<WriteTemporary, Visitor>
+    {
+        WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location);
+
+        Temporary const& temporary;
+        utility::Owned<Expression> value;
+    };
+
+    /// Erase a temporary variable, cleaning it up.
+    struct EraseTemporary final
+        : Statement
+        , utility::ConcreteNode<EraseTemporary, Visitor>
+    {
+        EraseTemporary(Temporary const& introduction, core::Location const& source_location);
+
+        Temporary const& temporary;
+    };
+
     /// Expression node in the EST.
     struct Expression
         : virtual Node
@@ -184,6 +218,16 @@ namespace ance::est
         utility::Owned<Expression> operand;
     };
 
+    /// Reads the value of a temporary variable.
+    struct ReadTemporary final
+        : Expression
+        , utility::ConcreteNode<ReadTemporary, Visitor>
+    {
+        ReadTemporary(Temporary const& target, core::Location const& source_location);
+
+        Temporary const& temporary;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -200,12 +244,16 @@ namespace ance::est
         virtual void visit(Loop const& loop)               = 0;
         virtual void visit(Break const& break_statement)   = 0;
         virtual void visit(Continue const& continue_statement) = 0;
+        virtual void visit(Temporary const& temporary)     = 0;
+        virtual void visit(WriteTemporary const& write_temporary) = 0;
+        virtual void visit(EraseTemporary const& erase_temporary) = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Call const& call)             = 0;
         virtual void visit(Access const& access)         = 0;
         virtual void visit(Literal const& literal)       = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
+        virtual void visit(ReadTemporary const& read_temporary) = 0;
     };
 }
 

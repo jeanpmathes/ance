@@ -49,6 +49,8 @@ struct ance::bbt::Grapher::Implementation
             visit(*block.link);
         }
 
+        void visit(ErrorLink const&) override {}
+
         void visit(Return const&) override
         {
             // Nothing to link.
@@ -84,10 +86,11 @@ struct ance::bbt::Grapher::Implementation
 
         }
 
-        void visit(ErrorLink const&) override
-        {
+        void visit(Temporary const& ) override {}
 
-        }
+        void visit(WriteTemporary const& ) override {}
+
+        void visit(EraseTemporary const& ) override {}
 
         void visit(ErrorExpression const&) override {  }
 
@@ -111,10 +114,9 @@ struct ance::bbt::Grapher::Implementation
 
         }
 
-        void visit(UnaryOperation const& ) override
-        {
+        void visit(UnaryOperation const&) override {}
 
-        }
+        void visit(ReadTemporary const&) override {}
 
         size_t current_id_ = 0;
     };

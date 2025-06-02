@@ -165,14 +165,16 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: plan what step of the below to do first, probably the temporary var stuff and then linearization
+        // todo: throw exception if not all temporaries are erased at end of execution
+        // todo: in validation throw exception if a temporary does not have exactly one corresponding erase
+
+        // todo: do linearization - for linearization every place where currently an expression is allowed would only allow only temporary (only BBT and CET), expressions would no longer be a thing - normal variables would also be read into temporaries first
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper
         //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
         //      todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
         //      todo: for blockers, scopes (internal class of runner and ance type) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
         //      todo: remove the scope and variable classes from core
-        //      todo: for expanding with temporaries, use three new nodes in EST: DeclareTemporary, ReadTemporary, WriteTemporary, EraseTemporary (the last three have a reference to the declaration) - remove the ugly code to create identifier from location
         //      todo: a more general system instead of the phases might be needed where parts of the tree go through phases independently as needed
         // todo: add types and type expressions, type checks might need to move from analyzer to runner but maybe not - maybe the type method on expressions could return a type expression instead of the direct type - check what I wrote in type expression note, complete runs might not be possible so type checks could stay in analyzer but it has to run some parts before analyzing others
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler

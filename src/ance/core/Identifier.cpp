@@ -13,17 +13,6 @@ ance::core::Identifier ance::core::Identifier::like(std::string const& string, L
     return {view, location};
 }
 
-ance::core::Identifier ance::core::Identifier::from(Location location)
-{
-    if (location.isGlobal())
-        throw std::invalid_argument("Cannot create an identifier from a global location");
-
-    std::string const text = std::format("/* tmp-var \"{}:{}:{}\" */", location.file(), location.line(), location.column());
-    std::string_view const view = StringStorage::shared().store(text);
-
-    return {view, location};
-}
-
 ance::core::Identifier ance::core::Identifier::empty()
 {
     return {std::string_view(), Location::global()};

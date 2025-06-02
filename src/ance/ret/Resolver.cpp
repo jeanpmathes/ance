@@ -70,6 +70,24 @@ struct ance::ret::Resolver::Implementation
         void visit(est::Break const&) override {}
         void visit(est::Continue const&) override {}
 
+        void visit(est::Temporary const& temporary) override
+        {
+            if (temporary.definition.hasValue())
+            {
+                visit(**temporary.definition);
+            }
+        }
+
+        void visit(est::WriteTemporary const& write_temporary) override
+        {
+            visit(*write_temporary.value);
+        }
+
+        void visit(est::EraseTemporary const&) override
+        {
+
+        }
+
         void visit(est::ErrorExpression const&) override {}
 
         void visit(est::Call const& call) override
@@ -84,6 +102,8 @@ struct ance::ret::Resolver::Implementation
         {
             visit(*unary_operation.operand);
         }
+
+        void visit(est::ReadTemporary const&) override {}
 
     private:
         std::set<core::Identifier> declarations = {};
@@ -348,7 +368,32 @@ struct ance::ret::Resolver::Implementation
 
         void visit(est::Break const& break_statement) override { setResult(utility::makeOwned<Break>(break_statement.location)); }
 
-        void visit(est::Continue const& continue_statement) override { setResult(utility::makeOwned<Continue>(continue_statement.location)); }
+        void visit(est::Continue const& continue_statement) override
+        {
+            setResult(utility::makeOwned<Continue>(continue_statement.location));
+        }
+
+        void visit(est::Temporary const& temporary) override
+        {
+            utility::Optional<utility::Owned<Expression>> value;
+
+            if (temporary.definition.hasValue()) { value = resolve(**temporary.definition); }
+
+            auto node = utility::makeOwned<Temporary>(temporary.type, std::move(value), temporary.location);
+            temporaries_.emplace(&temporary, node.get());
+
+            setResult(std::move(node));
+        }
+
+        void visit(est::WriteTemporary const& write_temporary) override
+        {
+            setResult(utility::makeOwned<WriteTemporary>(*temporaries_.at(&write_temporary.temporary), resolve(*write_temporary.value), write_temporary.location));
+        }
+        
+        void visit(est::EraseTemporary const& erase_temporary) override
+        {
+            setResult(utility::makeOwned<EraseTemporary>(*temporaries_.at(&erase_temporary.temporary), erase_temporary.location));
+        }
 
         void visit(est::ErrorExpression const& error_expression) override { setResult(utility::makeOwned<ErrorExpression>(error_expression.location)); }
 
@@ -402,6 +447,11 @@ struct ance::ret::Resolver::Implementation
             setResult(utility::makeOwned<UnaryOperation>(unary_operation.op, resolve(*unary_operation.operand), unary_operation.location));
         }
 
+        void visit(est::ReadTemporary const& read_temporary) override
+        {
+            setResult(utility::makeOwned<ReadTemporary>(*temporaries_.at(&read_temporary.temporary), read_temporary.location));
+        }
+
       private:
         core::Reporter&                                                                  reporter_;
         std::map<core::Identifier, std::reference_wrapper<core::Function const>> const& functions_;
@@ -410,6 +460,8 @@ struct ance::ret::Resolver::Implementation
 
         utility::Optional<utility::Owned<Statement>>  resolved_statement_  = std::nullopt;
         utility::Optional<utility::Owned<Expression>> resolved_expression_ = std::nullopt;
+
+        std::map<est::Temporary const*, Temporary const*> temporaries_ = {};
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}

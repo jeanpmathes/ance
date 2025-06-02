@@ -1,5 +1,8 @@
 #include "Node.h"
 
+#include <sstream>
+#include <iomanip>
+
 ance::cet::Node::Node(core::Location const& source_location) : location(source_location) {}
 
 ance::cet::Unit::Unit() : Node(core::Location::global()) {}
@@ -46,6 +49,33 @@ ance::cet::Assignment::Assignment(core::Variable const& assigned, utility::Owned
     , value(std::move(expression))
 {}
 
+ance::cet::Temporary::Temporary(core::Type const& t, utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , type(t)
+    , definition(std::move(expression))
+{}
+
+std::string ance::cet::Temporary::id() const
+{
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << std::setw(12) << std::setfill('0') << reinterpret_cast<std::uintptr_t>(this);
+    return oss.str();
+}
+
+ance::cet::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , temporary(target)
+    , value(std::move(expression))
+{}
+
+ance::cet::EraseTemporary::EraseTemporary(Temporary const& introduction, core::Location const& source_location)
+    : Node(source_location), Statement(), temporary(introduction)
+{
+
+}
+
 ance::cet::Intrinsic::Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
 : Node(source_location), Expression(), intrinsic(used), arguments(std::move(expressions))
 {}
@@ -59,5 +89,12 @@ ance::cet::Access::Access(core::Variable const& accessed, core::Location const& 
 ance::cet::Constant::Constant(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
 
 ance::cet::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
-    : Node(source_location), Expression(), op(kind), operand(std::move(expression))
+    : Node(source_location)
+    , Expression()
+    , op(kind)
+    , operand(std::move(expression))
+{}
+
+ance::cet::ReadTemporary::ReadTemporary(Temporary const& target, core::Location const& source_location)
+    : Node(source_location), Expression(), temporary(target)
 {}

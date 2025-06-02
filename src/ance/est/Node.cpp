@@ -1,5 +1,8 @@
 #include "Node.h"
 
+#include <sstream>
+#include <iomanip>
+
 #include "ance/core/Scope.h"
 
 ance::est::Node::Node(core::Location const& source_location) : location(source_location) {}
@@ -65,6 +68,32 @@ ance::est::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::est::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::est::Temporary::Temporary(core::Type const&                             t,
+                                                  utility::Optional<utility::Owned<Expression>> expression,
+                                                  core::Location const&                         source_location)
+    : Node(source_location)
+    , Statement()
+    , type(t)
+    , definition(std::move(expression))
+{}
+
+std::string ance::est::Temporary::id() const
+{
+    std::ostringstream oss;
+    oss << std::hex << std::uppercase << std::setw(12) << std::setfill('0') << reinterpret_cast<std::uintptr_t>(this);
+    return oss.str();
+}
+
+ance::est::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , temporary(target)
+    , value(std::move(expression))
+{}
+
+ance::est::EraseTemporary::EraseTemporary(Temporary const& introduction, core::Location const& source_location)
+    : Node(source_location), Statement(), temporary(introduction) {}
+
 ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::est::Call::Call(core::Identifier const& callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
@@ -87,4 +116,10 @@ ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , Expression()
     , op(kind)
     , operand(std::move(expression))
+{}
+
+ance::est::ReadTemporary::ReadTemporary(Temporary const& target, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , temporary(target)
 {}

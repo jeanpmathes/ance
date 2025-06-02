@@ -157,12 +157,35 @@ struct ance::cet::Runner::Implementation
                 value = run(**let.value);
             }
 
-            state_.insert_or_assign(&let.variable, value);
+            variables_.insert_or_assign(&let.variable, value);
         }
 
         void visit(bbt::Assignment const& assignment) override
         {
-            state_.insert_or_assign(&assignment.variable, run(*assignment.value));
+            variables_.insert_or_assign(&assignment.variable, run(*assignment.value));
+        }
+
+        void visit(bbt::Temporary const& temporary) override
+        {
+            utility::Shared<core::Value> value = core::Value::makeDefault(temporary.type);
+
+            if (temporary.definition.hasValue())
+            {
+                value = run(**temporary.definition);
+            }
+
+            temporaries_.insert_or_assign(&temporary, value);
+        }
+
+        void visit(bbt::WriteTemporary const& write_temporary) override
+        {
+            utility::Shared<core::Value> value = run(*write_temporary.value);
+            temporaries_.insert_or_assign(&write_temporary.temporary, value);
+        }
+
+        void visit(bbt::EraseTemporary const& erase_temporary) override
+        {
+            temporaries_.erase(&erase_temporary.temporary);
         }
 
         void visit(bbt::ErrorExpression const& error_expression) override
@@ -194,7 +217,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Access const& access) override
         {
-            utility::Shared<core::Value> value = state_.at(&access.variable);
+            utility::Shared<core::Value> value = variables_.at(&access.variable);
 
             setResult(value);
         }
@@ -216,12 +239,21 @@ struct ance::cet::Runner::Implementation
             }
         }
 
+        void visit(bbt::ReadTemporary const& read_temporary) override
+        {
+            utility::Shared<core::Value> value = temporaries_.at(&read_temporary.temporary);
+
+            setResult(value);
+        }
+
       private:
         core::Reporter& reporter_;
 
         Intrinsics intrinsics_ {reporter_};
 
-        std::map<core::Variable const*, utility::Shared<core::Value>> state_ = {};
+        std::map<core::Variable const*, utility::Shared<core::Value>> variables_ = {};
+        std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
+        
         utility::Optional<utility::Shared<core::Value>> result_ = std::nullopt;
 
         bbt::BasicBlock const* next_ = nullptr;

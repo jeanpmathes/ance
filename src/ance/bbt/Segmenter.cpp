@@ -518,6 +518,33 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
+        void visit(ret::Temporary const& temporary) override
+        {
+            utility::Optional<utility::Owned<Expression>> value;
+
+            if (temporary.definition.hasValue())
+            {
+                value = segment(**temporary.definition);
+            }
+
+            auto node = utility::makeOwned<Temporary>(temporary.type, std::move(value), temporary.location);
+            temporaries_.emplace(&temporary, node.get());
+
+            setResult(std::move(node));
+        }
+
+        void visit(ret::WriteTemporary const& write) override
+        {
+            utility::Owned<Expression> value = segment(*write.value);
+
+            setResult(utility::makeOwned<WriteTemporary>(*temporaries_.at(&write.temporary), std::move(value), write.location));
+        }
+
+        void visit(ret::EraseTemporary const& erase) override
+        {
+            setResult(utility::makeOwned<EraseTemporary>(*temporaries_.at(&erase.temporary), erase.location));
+        }
+
         void visit(ret::ErrorExpression const& error_expression) override
         {
             setResult(utility::makeOwned<ErrorExpression>(error_expression.location));
@@ -562,6 +589,11 @@ struct ance::bbt::Segmenter::Implementation
             setResult(utility::makeOwned<UnaryOperation>(unary_operation.op, std::move(operand), unary_operation.location));
         }
 
+        void visit(ret::ReadTemporary const& read_temporary) override
+        {
+            setResult(utility::makeOwned<ReadTemporary>(*temporaries_.at(&read_temporary.temporary), read_temporary.location));
+        }
+
         struct Loop
         {
             std::reference_wrapper<SimpleBB> entry;
@@ -579,6 +611,8 @@ struct ance::bbt::Segmenter::Implementation
         utility::Optional<utility::Owned<Expression>> segmented_expression_;
 
         core::Reporter& reporter_;
+
+        std::map<ret::Temporary const*, Temporary const*> temporaries_;
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}

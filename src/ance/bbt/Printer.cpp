@@ -52,6 +52,11 @@ struct ance::bbt::Printer::Implementation
             line();
         }
 
+        void visit(ErrorLink const&) override
+        {
+            print("/* error */");
+        }
+
         void visit(Return const&) override
         {
             print("return ()");
@@ -104,9 +109,34 @@ struct ance::bbt::Printer::Implementation
             print(";");
         }
 
-        void visit(ErrorLink const&) override
+        void visit(Temporary const& temporary) override
         {
-            print("/* error */");
+            print("let temporary ");
+            print(temporary.id());
+            print(": ");
+            print(temporary.type);
+            if (temporary.definition.hasValue())
+            {
+                print(" <: ");
+                visit(**temporary.definition);
+            }
+            print(";");
+        }
+
+        void visit(WriteTemporary const& write_temporary) override
+        {
+            print("temporary ");
+            print(write_temporary.temporary.id());
+            print(" <: ");
+            visit(*write_temporary.value);
+            print(");");
+        }
+
+        void visit(EraseTemporary const& erase_temporary) override
+        {
+            print("erase temporary ");
+            print(erase_temporary.temporary.id());
+            print(";");
         }
 
         void visit(ErrorExpression const&) override { print("/* error */"); }
@@ -150,6 +180,13 @@ struct ance::bbt::Printer::Implementation
             print(unary_operation.op.toString());
             print(" ");
             visit(*unary_operation.operand);
+        }
+
+        void visit(ReadTemporary const& read_temporary) override
+        {
+            print("(read temporary ");
+            print(read_temporary.temporary.id());
+            print(")");
         }
     };
 
