@@ -90,8 +90,6 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(WriteTemporary const& ) override {}
 
-        void visit(EraseTemporary const& ) override {}
-
         void visit(ErrorExpression const&) override {  }
 
         void visit(Intrinsic const& ) override

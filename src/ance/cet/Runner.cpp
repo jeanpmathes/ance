@@ -183,11 +183,6 @@ struct ance::cet::Runner::Implementation
             temporaries_.insert_or_assign(&write_temporary.temporary, value);
         }
 
-        void visit(bbt::EraseTemporary const& erase_temporary) override
-        {
-            temporaries_.erase(&erase_temporary.temporary);
-        }
-
         void visit(bbt::ErrorExpression const& error_expression) override
         {
             reporter_.error("Cannot execute this expression", error_expression.location);

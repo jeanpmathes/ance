@@ -154,16 +154,6 @@ namespace ance::cet
         utility::Owned<Expression> value;
     };
 
-    /// Erase a temporary variable, cleaning it up.
-    struct EraseTemporary final
-        : Statement
-        , utility::ConcreteNode<EraseTemporary, Visitor>
-    {
-        EraseTemporary(Temporary const& introduction, core::Location const& source_location);
-
-        Temporary const& temporary;
-    };
-
     /// Expression node in the CET.
     struct Expression
         : virtual Node
@@ -248,7 +238,6 @@ namespace ance::cet
         virtual void visit(Assignment const& assignment) = 0;
         virtual void visit(Temporary const& temporary) = 0;
         virtual void visit(WriteTemporary const& write_temporary) = 0;
-        virtual void visit(EraseTemporary const& erase_temporary) = 0;
 
         virtual void visit(Intrinsic const& intrinsic) = 0;
         virtual void visit(Call const& call) = 0;

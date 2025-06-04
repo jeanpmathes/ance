@@ -111,10 +111,6 @@ struct ance::analyze::Analyzer::Implementation
 
         }
 
-        void visit(ret::EraseTemporary const& ) override
-        {
-
-        }
 
         void visit(ret::ErrorExpression const&) override
         {

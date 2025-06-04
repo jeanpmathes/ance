@@ -165,9 +165,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: throw exception if not all temporaries are erased at end of execution
-        // todo: in validation throw exception if a temporary does not have exactly one corresponding erase
-
         // todo: do linearization - for linearization every place where currently an expression is allowed would only allow only temporary (only BBT and CET), expressions would no longer be a thing - normal variables would also be read into temporaries first
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper
@@ -182,8 +179,9 @@ namespace ance
         // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
         // todo: add unordered scopes, have them as default at file top-level - maybe make distinction explicit in compiler code
-        // todo: when adding destructors, do not forget that break/continue can also cause them to be called
-        // todo: when adding erase, check where it is used in expansion, add here to and maybe add to more expansions
+        // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
+        // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
+        // todo: when adding erase, check where it is used in expansion, instead use scoping
 
         out << "ance: " << reporter.warningCount() << " warnings" << std::endl;
         out << "ance: Success";

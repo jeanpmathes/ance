@@ -83,11 +83,6 @@ struct ance::ret::Resolver::Implementation
             visit(*write_temporary.value);
         }
 
-        void visit(est::EraseTemporary const&) override
-        {
-
-        }
-
         void visit(est::ErrorExpression const&) override {}
 
         void visit(est::Call const& call) override
@@ -388,11 +383,6 @@ struct ance::ret::Resolver::Implementation
         void visit(est::WriteTemporary const& write_temporary) override
         {
             setResult(utility::makeOwned<WriteTemporary>(*temporaries_.at(&write_temporary.temporary), resolve(*write_temporary.value), write_temporary.location));
-        }
-        
-        void visit(est::EraseTemporary const& erase_temporary) override
-        {
-            setResult(utility::makeOwned<EraseTemporary>(*temporaries_.at(&erase_temporary.temporary), erase_temporary.location));
         }
 
         void visit(est::ErrorExpression const& error_expression) override { setResult(utility::makeOwned<ErrorExpression>(error_expression.location)); }

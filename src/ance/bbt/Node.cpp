@@ -81,11 +81,6 @@ ance::bbt::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owne
     , value(std::move(expression))
 {}
 
-ance::bbt::EraseTemporary::EraseTemporary(Temporary const& introduction, core::Location const& source_location)
-    : Node(source_location)
-    , Statement()
-    , temporary(introduction)
-{}
 
 ance::bbt::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 

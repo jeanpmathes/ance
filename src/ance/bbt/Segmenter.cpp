@@ -540,11 +540,6 @@ struct ance::bbt::Segmenter::Implementation
             setResult(utility::makeOwned<WriteTemporary>(*temporaries_.at(&write.temporary), std::move(value), write.location));
         }
 
-        void visit(ret::EraseTemporary const& erase) override
-        {
-            setResult(utility::makeOwned<EraseTemporary>(*temporaries_.at(&erase.temporary), erase.location));
-        }
-
         void visit(ret::ErrorExpression const& error_expression) override
         {
             setResult(utility::makeOwned<ErrorExpression>(error_expression.location));

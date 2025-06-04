@@ -83,9 +83,6 @@ ance::ret::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owne
     , value(std::move(expression))
 {}
 
-ance::ret::EraseTemporary::EraseTemporary(Temporary const& introduction, core::Location const& source_location)
-    : Node(source_location), Statement(), temporary(introduction) {}
-
 ance::core::Type const& ance::ret::Expression::type() const
 {
     return core::Type::Unit();

@@ -101,11 +101,6 @@ struct ance::build::Compiler::Implementation
             (void) write_temporary;// todo: implement
         }
 
-        void visit(cet::EraseTemporary const& erase_temporary) override
-        {
-            (void) erase_temporary;// todo: implement
-        }
-
         void visit(cet::Intrinsic const& intrinsic) override
         {
             intrinsics_.run(intrinsic.intrinsic, intrinsic.location);

@@ -110,13 +110,6 @@ struct ance::ret::Printer::Implementation
             print(");");
         }
 
-        void visit(EraseTemporary const& erase_temporary) override
-        {
-            print("erase temporary ");
-            print(erase_temporary.temporary.id());
-            print(";");
-        }
-
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Intrinsic const& intrinsic) override

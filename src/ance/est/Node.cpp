@@ -91,9 +91,6 @@ ance::est::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owne
     , value(std::move(expression))
 {}
 
-ance::est::EraseTemporary::EraseTemporary(Temporary const& introduction, core::Location const& source_location)
-    : Node(source_location), Statement(), temporary(introduction) {}
-
 ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::est::Call::Call(core::Identifier const& callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)

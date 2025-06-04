@@ -70,12 +70,6 @@ ance::cet::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owne
     , value(std::move(expression))
 {}
 
-ance::cet::EraseTemporary::EraseTemporary(Temporary const& introduction, core::Location const& source_location)
-    : Node(source_location), Statement(), temporary(introduction)
-{
-
-}
-
 ance::cet::Intrinsic::Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
 : Node(source_location), Expression(), intrinsic(used), arguments(std::move(expressions))
 {}
