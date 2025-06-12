@@ -164,8 +164,7 @@ namespace ance::cet
         : Statement
         , utility::ConcreteNode<Call, Visitor>
     {
-        Call(core::Function const& function,
-             utility::List<Temporary const*> args, Temporary const& result, core::Location const& source_location);
+        Call(core::Function const& function, utility::List<Temporary const*> args, Temporary const& result, core::Location const& source_location);
 
         core::Function const&           called;
         utility::List<Temporary const*> arguments;
@@ -198,8 +197,7 @@ namespace ance::cet
         : Statement
         , utility::ConcreteNode<UnaryOperation, Visitor>
     {
-        UnaryOperation(core::UnaryOperator const& kind, Temporary const&            value,
-                       Temporary const& result, core::Location const& source_location);
+        UnaryOperation(core::UnaryOperator const& kind, Temporary const& value, Temporary const& result, core::Location const& source_location);
 
         core::UnaryOperator op;
         Temporary const&    operand;
@@ -225,7 +223,7 @@ namespace ance::cet
         virtual void visit(CopyTemporary const& write_temporary) = 0;
 
         virtual void visit(Intrinsic const& intrinsic)            = 0;
-        virtual void visit(Call const& call) = 0;
+        virtual void visit(Call const& call)                      = 0;
         virtual void visit(Read const& read)                      = 0;
         virtual void visit(Constant const& constant) = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;

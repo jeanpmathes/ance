@@ -102,9 +102,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Branch const& branch_link) override
         {
-            if (temporaries_.at(&branch_link.condition)->getBool()) {
-                next_ = &branch_link.true_branch;
-            }
+            if (temporaries_.at(&branch_link.condition)->getBool()) { next_ = &branch_link.true_branch; }
             else
             {
                 next_ = &branch_link.false_branch;
@@ -159,9 +157,7 @@ struct ance::cet::Runner::Implementation
         void visit(bbt::Call const& call) override
         {
             utility::List<utility::Shared<core::Value>> arguments = {};
-            for (auto argument : call.arguments)
-            {
-                arguments.emplace_back(temporaries_.at(&argument.get())); }
+            for (auto argument : call.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
             call.called.run(arguments);
             temporaries_.insert_or_assign(&call.destination, core::Value::makeUnit());
