@@ -65,21 +65,17 @@ struct ance::cet::Grapher::Implementation
             addEdge(current_id_, jump_link.target.id);
         }
 
-        void visit(Independent const&) override
+
+        void visit(Declare const& ) override
         {
 
         }
 
-        void visit(Let const& ) override
-        {
-
-        }
-
-        void visit(Assignment const&) override {}
+        void visit(Store const&) override {}
 
         void visit(Temporary const& ) override {}
 
-        void visit(WriteTemporary const& ) override {}
+        void visit(CopyTemporary const& ) override {}
 
         void visit(Intrinsic const& ) override
         {
@@ -91,7 +87,7 @@ struct ance::cet::Grapher::Implementation
 
         }
 
-        void visit(Access const& ) override
+        void visit(Read const& ) override
         {
 
         }
@@ -102,8 +98,6 @@ struct ance::cet::Grapher::Implementation
         }
 
         void visit(UnaryOperation const&) override {}
-
-        void visit(ReadTemporary const& ) override {}
 
         size_t current_id_ = 0;
     };

@@ -1,10 +1,11 @@
 #ifndef ANCE_BBT_NODE_H
 #define ANCE_BBT_NODE_H
 
+#include "Node.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/Reporter.h"
-#include "ance/core/Variable.h"
 #include "ance/core/UnaryOperator.h"
+#include "ance/core/Variable.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -84,16 +85,16 @@ namespace ance::bbt
         explicit Return(core::Location const& source_location);
     };
 
-    struct Expression;
+    struct Temporary;
 
     /// Chooses between two branches based on a condition.
     struct Branch final
         : Link
         , utility::ConcreteNode<Branch, Visitor>
     {
-        Branch(utility::Owned<Expression> expression, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location);
+        Branch(Temporary const& temporary, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location);
 
-        utility::Owned<Expression> condition;
+        Temporary const&  condition;
         BasicBlock const& true_branch;
         BasicBlock const& false_branch;
     };
@@ -123,38 +124,26 @@ namespace ance::bbt
         explicit ErrorStatement(core::Location const& source_location);
     };
 
-    /// Statement that simply wraps an expression.
-    struct Independent final
+    /// Declares a variable and can also define its value.
+    struct Declare final
         : Statement
-        , utility::ConcreteNode<Independent, Visitor>
+        , utility::ConcreteNode<Declare, Visitor>
     {
-        Independent(utility::Owned<Expression> independent_expression, core::Location const& source_location);
-
-        utility::Owned<Expression> expression;
-    };
-
-    /// A let statement declares a variable and can also define its value.
-    struct Let final
-        : Statement
-        , utility::ConcreteNode<Let, Visitor>
-    {
-        Let(core::Variable const&                         identifier,
-            utility::Optional<utility::Owned<Expression>> definition,
-            core::Location const&                         source_location);
-
-        core::Variable const&                         variable;
-        utility::Optional<utility::Owned<Expression>> value;
-    };
-
-    /// An assignment statement assigns a value to a variable.
-    struct Assignment final
-        : Statement
-        , utility::ConcreteNode<Assignment, Visitor>
-    {
-        Assignment(core::Variable const& assigned, utility::Owned<Expression> expression, core::Location const& source_location);
+        Declare(core::Variable const& identifier, Temporary const* definition, core::Location const& source_location);
 
         core::Variable const& variable;
-        utility::Owned<Expression> value;
+        Temporary const*      value;
+    };
+
+    /// Stores a value to a variable.
+    struct Store final
+        : Statement
+        , utility::ConcreteNode<Store, Visitor>
+    {
+        Store(core::Variable const& assigned, Temporary const& stored, core::Location const& source_location);
+
+        core::Variable const& variable;
+        Temporary const&      value;
     };
 
     /// Introduce a temporary variable, which works similar to any other local variable but does not have a name.
@@ -162,101 +151,86 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Temporary, Visitor>
     {
-        Temporary(core::Type const& t, utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
+        Temporary(core::Type const& t, core::Location const& source_location);
 
         [[nodiscard]] std::string id() const;
 
         core::Type const& type;
-        utility::Optional<utility::Owned<Expression>> definition;
     };
 
     /// Writes a value to a temporary variable.
-    struct WriteTemporary final
+    struct CopyTemporary final
         : Statement
-        , utility::ConcreteNode<WriteTemporary, Visitor>
+        , utility::ConcreteNode<CopyTemporary, Visitor>
     {
-        WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location);
+        CopyTemporary(Temporary const& target, Temporary const& value, core::Location const& source_location);
 
-        Temporary const& temporary;
-        utility::Owned<Expression> value;
-    };
-
-    /// Expression node in the BBT.
-    struct Expression
-        : virtual Node
-        , virtual utility::AbstractNode<Visitor>
-    {
-    };
-
-    /// Error expression, mostly as pass-through from the AST.
-    struct ErrorExpression final
-        : Expression
-        , utility::ConcreteNode<ErrorExpression, Visitor>
-    {
-        explicit ErrorExpression(core::Location const& source_location);
+        Temporary const& destination;
+        Temporary const& source;
     };
 
     /// Performs a compiler-provided operation like operators or functions.
     struct Intrinsic final
-        : Expression
+        : Statement
         , utility::ConcreteNode<Intrinsic, Visitor>
     {
-        Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
+        Intrinsic(core::Intrinsic const&                                 used,
+                  utility::List<std::reference_wrapper<Temporary const>> args,
+                  Temporary const&                                       result,
+                  core::Location const&                                  source_location);
 
-        core::Intrinsic const& intrinsic;
-        utility::List<utility::Owned<Expression>> arguments;
+        core::Intrinsic const&                                 intrinsic;
+        utility::List<std::reference_wrapper<Temporary const>> arguments;
+        Temporary const&                                       destination;
     };
 
-    /// Accesses a variable.
-    struct Access final
-        : Expression
-        , utility::ConcreteNode<Access, Visitor>
+    /// Reads a variable.
+    struct Read final
+        : Statement
+        , utility::ConcreteNode<Read, Visitor>
     {
-        Access(core::Variable const& accessed, core::Location const& source_location);
+        Read(core::Variable const& accessed, Temporary const& result, core::Location const& source_location);
 
         core::Variable const& variable;
+        Temporary const&      destination;
     };
 
     /// Calls a function.
     struct Call final
-        : Expression
+        : Statement
         , utility::ConcreteNode<Call, Visitor>
     {
-        Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
+        Call(core::Function const&                                  function,
+             utility::List<std::reference_wrapper<Temporary const>> args,
+             Temporary const&                                       result,
+             core::Location const&                                  source_location);
 
-        core::Function const& called;
-        utility::List<utility::Owned<Expression>> arguments;
+        core::Function const&                                  called;
+        utility::List<std::reference_wrapper<Temporary const>> arguments;
+        Temporary const&                                       destination;
     };
 
     /// A constant value.
     struct Constant final
-        : Expression
+        : Statement
         , utility::ConcreteNode<Constant, Visitor>
     {
-        Constant(utility::Shared<core::Value> constant, core::Location const& source_location);
+        Constant(utility::Shared<core::Value> constant, Temporary const& result, core::Location const& source_location);
 
         utility::Shared<core::Value> value;
+        Temporary const&             destination;
     };
 
     /// Applies an operation to an operand.
     struct UnaryOperation final
-        : Expression
+        : Statement
         , utility::ConcreteNode<UnaryOperation, Visitor>
     {
-        UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location);
+        UnaryOperation(core::UnaryOperator const& kind, Temporary const& value, Temporary const& result, core::Location const& source_location);
 
-        core::UnaryOperator op;
-        utility::Owned<Expression> operand;
-    };
-
-    /// Reads the value of a temporary variable.
-    struct ReadTemporary final
-        : Expression
-        , utility::ConcreteNode<ReadTemporary, Visitor>
-    {
-        ReadTemporary(Temporary const& target, core::Location const& source_location);
-
-        Temporary const& temporary;
+        core::UnaryOperator  op;
+        Temporary const&     operand;
+        Temporary const&     destination;
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>
@@ -274,19 +248,16 @@ namespace ance::bbt
         virtual void visit(Jump const& jump_link) = 0;
 
         virtual void visit(ErrorStatement const& error_statement) = 0;
-        virtual void visit(Independent const& independent)        = 0;
-        virtual void visit(Let const& let)                        = 0;
-        virtual void visit(Assignment const& assignment)          = 0;
+        virtual void visit(Declare const& declare)                = 0;
+        virtual void visit(Store const& store)                    = 0;
         virtual void visit(Temporary const& temporary)            = 0;
-        virtual void visit(WriteTemporary const& write_temporary) = 0;
+        virtual void visit(CopyTemporary const& write_temporary) = 0;
 
-        virtual void visit(ErrorExpression const& error_expression) = 0;
         virtual void visit(Intrinsic const& intrinsic)              = 0;
         virtual void visit(Call const& call)                        = 0;
-        virtual void visit(Access const& access)                    = 0;
+        virtual void visit(Read const& read)                        = 0;
         virtual void visit(Constant const& constant)                = 0;
         virtual void visit(UnaryOperation const& unary_operation)   = 0;
-        virtual void visit(ReadTemporary const& read_temporary)     = 0;
 
         ~Visitor() override = default;
     };

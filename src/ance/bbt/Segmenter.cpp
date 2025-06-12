@@ -5,8 +5,12 @@
 #include <stack>
 
 #include "ance/bbt/Node.h"
-#include "ance/core/Value.h"
+#include "ance/core/Function.h"
+#include "ance/core/Intrinsic.h"
 #include "ance/ret/Node.h"
+
+#include "ance/core/Type.h"
+#include "ance/core/Value.h"
 
 struct ance::bbt::Segmenter::Implementation
 {
@@ -165,7 +169,7 @@ struct ance::bbt::Segmenter::Implementation
         BranchBB()           = delete;
         ~BranchBB() override = default;
 
-        BranchBB(utility::Owned<Expression> condition, BaseBB& true_bb, BaseBB& false_bb) : condition_(std::move(condition)), true_(true_bb), false_(false_bb)
+        BranchBB(Temporary const& condition, BaseBB& true_bb, BaseBB& false_bb) : condition_(condition), true_(true_bb), false_(false_bb)
         {
             true_.get().enter(*this);
             false_.get().enter(*this);
@@ -194,7 +198,7 @@ struct ance::bbt::Segmenter::Implementation
         }
 
       private:
-        utility::Owned<Expression> condition_;
+        Temporary const&                                  condition_;
         std::reference_wrapper<BaseBB>                    true_;
         std::reference_wrapper<BaseBB>                    false_;
     };
@@ -337,23 +341,68 @@ struct ance::bbt::Segmenter::Implementation
             return result;
         }
 
-        utility::Owned<Expression> segment(ret::Expression const& expression)
+        std::pair<std::reference_wrapper<SimpleBB>, std::reference_wrapper<SimpleBB>> segment(ret::Expression const& expression, Temporary const& destination)
         {
+            SimpleBB*        previous_entry       = current_entry_bb_;
+            SimpleBB*        previous_exit        = current_exit_bb_;
+            Temporary const* previous_destination = current_destination_;
+
+            current_entry_bb_    = nullptr;
+            current_exit_bb_     = nullptr;
+            current_destination_ = &destination;
+
+            assert(current_destination_ != nullptr);
+
             visit(expression);
 
-            assert(segmented_expression_.hasValue());
+            assert(current_entry_bb_ != nullptr);
+            assert(current_exit_bb_ != nullptr);
 
-            utility::Owned<Expression> result = std::move(*segmented_expression_);
-            segmented_expression_                  = std::nullopt;
+            std::pair<SimpleBB&, SimpleBB&> const result = {*current_entry_bb_, *current_exit_bb_};
+
+            current_entry_bb_    = previous_entry;
+            current_exit_bb_     = previous_exit;
+            current_destination_ = previous_destination;
 
             return result;
         }
 
-        void setResult(utility::Owned<Expression> expression)
+        [[nodiscard]] Temporary const& destination() const
         {
-            assert(!segmented_expression_.hasValue());
+            assert(current_destination_ != nullptr);
+            return *current_destination_;
+        }
 
-            segmented_expression_ = std::move(expression);
+        template<typename T, typename... Args>
+        static std::reference_wrapper<SimpleBB> addBlock(utility::List<utility::Owned<BaseBB>>& blocks, Args&&... args)
+        {
+            utility::Owned<SimpleBB>     block = utility::makeOwned<SimpleBB>(utility::makeOwned<T>(std::forward<Args>(args)...));
+            std::reference_wrapper const ref   = *block;
+            blocks.emplace_back(std::move(block));
+            return ref;
+        }
+
+        template<typename T, typename... Args>
+        static std::tuple<std::reference_wrapper<SimpleBB>, std::reference_wrapper<T>> addBlockAndGetInner(utility::List<utility::Owned<BaseBB>>& blocks,
+                                                                                                           Args&&... args)
+        {
+            utility::Owned<T>               inner_node = utility::makeOwned<T>(std::forward<Args>(args)...);
+            std::reference_wrapper<T> const inner_ref  = *inner_node;
+
+            utility::Owned<SimpleBB>     block = utility::makeOwned<SimpleBB>(std::move(inner_node));
+            std::reference_wrapper const ref   = *block;
+
+            blocks.emplace_back(std::move(block));
+
+            return {ref, inner_ref};
+        }
+
+        static std::reference_wrapper<SimpleBB> addEmptyBlock(utility::List<utility::Owned<BaseBB>>& blocks)
+        {
+            utility::Owned<SimpleBB>     block = utility::makeOwned<SimpleBB>();
+            std::reference_wrapper const ref = *block;
+            blocks.emplace_back(std::move(block));
+            return ref;
         }
 
         void setResult(utility::List<utility::Owned<BaseBB>>&& blocks, SimpleBB& entry, SimpleBB& exit)
@@ -364,27 +413,26 @@ struct ance::bbt::Segmenter::Implementation
             current_exit_bb_  = &exit;
         }
 
-        void setResult(utility::Owned<Statement>&& statement)
-        {
-            utility::Owned<SimpleBB> entry_block = utility::makeOwned<SimpleBB>(std::move(statement));
-            SimpleBB&                entry       = *entry_block;
-
-            utility::List<utility::Owned<BaseBB>> blocks;
-            blocks.emplace_back(std::move(entry_block));
-
-            setResult(std::move(blocks), entry, entry);
-        }
-
         void visit(ret::ErrorStatement const& error_statement) override
         {
-            setResult(utility::makeOwned<ErrorStatement>(error_statement.location));
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            std::reference_wrapper const error = addBlock<ErrorStatement>(blocks, error_statement.location);
+            link(entry, error);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(error, exit);
+
+            setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::Block const& block) override
         {
-            utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const entry       = *entry_block;
+            utility::List<utility::Owned<BaseBB>> blocks;
 
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
             std::reference_wrapper current = entry;
 
             for (auto& statement : block.statements)
@@ -395,77 +443,113 @@ struct ance::bbt::Segmenter::Implementation
                 current = statement_exit;
             }
 
-            utility::Owned<SimpleBB> exit_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper   exit       = *exit_block;
-
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(current, exit);
 
-            utility::List<utility::Owned<BaseBB>> blocks;
-            blocks.emplace_back(std::move(entry_block));
-            blocks.emplace_back(std::move(exit_block));
             setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::Independent const& independent) override
         {
-            utility::Owned<Expression> expression = segment(*independent.expression);
+            utility::List<utility::Owned<BaseBB>> blocks;
+            std::reference_wrapper const          entry = addEmptyBlock(blocks);
 
-            setResult(utility::makeOwned<Independent>(std::move(expression), independent.location));
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, independent.expression->type(), independent.location);
+            link(entry, temporary);
+
+            auto [expression_entry, expression_exit] = segment(*independent.expression, value.get());
+            link(temporary, expression_entry);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(expression_exit, exit);
+
+            setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::Let const& let) override
         {
-            utility::Optional<utility::Owned<Expression>> value;
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            Temporary const*       value    = nullptr;
+            std::reference_wrapper incoming = entry;
 
             if (let.value.hasValue())
             {
-                value = segment(**let.value);
+                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, let.variable.type(), let.location);
+                link(incoming, temporary);
+                incoming = temporary;
+                value    = &temporary_node.get();
+
+                auto [expression_entry, expression_exit] = segment(**let.value, *value);
+                link(incoming, expression_entry);
+                incoming = expression_exit;
             }
 
-            setResult(utility::makeOwned<Let>(let.variable, std::move(value), let.location));
+            std::reference_wrapper const declare = addBlock<Declare>(blocks, let.variable, value, let.location);
+            link(incoming, declare);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(declare, exit);
+
+            setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::Assignment const& assignment) override
         {
-            utility::Owned<Expression> value = segment(*assignment.value);
+            utility::List<utility::Owned<BaseBB>> blocks;
 
-            setResult(utility::makeOwned<Assignment>(assignment.variable, std::move(value), assignment.location));
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, assignment.variable.type(), assignment.location);
+            link(entry, temporary);
+
+            auto [expression_entry, expression_exit] = segment(*assignment.value, value.get());
+            link(temporary, expression_entry);
+
+            std::reference_wrapper const store = addBlock<Store>(blocks, assignment.variable, value.get(), assignment.location);
+            link(expression_exit, store);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(store, exit);
+
+            setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::If const& if_statement) override
         {
-            utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const entry       = *entry_block;
+            utility::List<utility::Owned<BaseBB>> blocks;
 
-            utility::Owned<Expression> condition = segment(*if_statement.condition);
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, core::Type::Bool(), if_statement.condition->location);
+            link(entry, temporary);
+
+            auto [condition_entry, condition_exit] = segment(*if_statement.condition, value.get());
+            link(temporary, condition_entry);
 
             auto [true_entry, true_exit]   = segment(*if_statement.true_block);
             auto [false_entry, false_exit] = segment(*if_statement.false_block);
 
-            utility::Owned<BranchBB> branch_block = utility::makeOwned<BranchBB>(std::move(condition), true_entry, false_entry);
+            utility::Owned<BranchBB> branch_block = utility::makeOwned<BranchBB>(value.get(), true_entry, false_entry);
             std::reference_wrapper   branch       = *branch_block;
+            blocks.emplace_back(std::move(branch_block));
+            link(condition_exit, branch);
 
-            utility::Owned<SimpleBB> exit_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper   exit       = *exit_block;
-
-            link(entry, branch);
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(true_exit, exit);
             link(false_exit, exit);
 
-            utility::List<utility::Owned<BaseBB>> blocks;
-            blocks.emplace_back(std::move(entry_block));
-            blocks.emplace_back(std::move(branch_block));
-            blocks.emplace_back(std::move(exit_block));
             setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::Loop const& loop) override
         {
-            utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const entry       = *entry_block;
+            utility::List<utility::Owned<BaseBB>> blocks;
 
-            utility::Owned<SimpleBB>     exit_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const exit       = *exit_block;
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+            std::reference_wrapper const exit  = addEmptyBlock(blocks);
 
             loops_.emplace(Loop {.entry = entry, .exit = exit});
 
@@ -476,9 +560,6 @@ struct ance::bbt::Segmenter::Implementation
             link(entry, loop_entry);
             link(loop_exit, entry);
 
-            utility::List<utility::Owned<BaseBB>> blocks;
-            blocks.emplace_back(std::move(entry_block));
-            blocks.emplace_back(std::move(exit_block));
             setResult(std::move(blocks), entry, exit);
         }
 
@@ -486,17 +567,13 @@ struct ance::bbt::Segmenter::Implementation
         {
             if (loops_.empty()) { reporter_.error("Break statement outside of loop", break_statement.location); }
 
-            utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const entry       = *entry_block;
+            utility::List<utility::Owned<BaseBB>> blocks;
 
-            utility::Owned<SimpleBB>     exit_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const exit       = *exit_block;
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+            std::reference_wrapper const exit  = addEmptyBlock(blocks);
 
             link(entry, loops_.top().exit);
 
-            utility::List<utility::Owned<BaseBB>> blocks;
-            blocks.emplace_back(std::move(entry_block));
-            blocks.emplace_back(std::move(exit_block));
             setResult(std::move(blocks), entry, exit);
         }
 
@@ -504,89 +581,183 @@ struct ance::bbt::Segmenter::Implementation
         {
             if (loops_.empty()) { reporter_.error("Continue statement outside of loop", continue_statement.location); }
 
-            utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const entry       = *entry_block;
+            utility::List<utility::Owned<BaseBB>> blocks;
 
-            utility::Owned<SimpleBB>     exit_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const exit       = *exit_block;
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+            std::reference_wrapper const exit  = addEmptyBlock(blocks);
 
             link(entry, loops_.top().entry);
 
-            utility::List<utility::Owned<BaseBB>> blocks;
-            blocks.emplace_back(std::move(entry_block));
-            blocks.emplace_back(std::move(exit_block));
             setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::Temporary const& temporary) override
         {
-            utility::Optional<utility::Owned<Expression>> value;
+            utility::List<utility::Owned<BaseBB>> blocks;
 
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            auto [t, value] = addBlockAndGetInner<Temporary>(blocks, temporary.type, temporary.location);
+            temporaries_.emplace(&temporary, &value.get());
+            link(entry, t);
+
+            std::reference_wrapper incoming = t;
             if (temporary.definition.hasValue())
             {
-                value = segment(**temporary.definition);
+                auto [definition_entry, definition_exit] = segment(**temporary.definition, value.get());
+                link(incoming, definition_entry);
+                incoming = definition_exit;
             }
 
-            auto node = utility::makeOwned<Temporary>(temporary.type, std::move(value), temporary.location);
-            temporaries_.emplace(&temporary, node.get());
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(incoming, exit);
 
-            setResult(std::move(node));
+            setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::WriteTemporary const& write) override
         {
-            utility::Owned<Expression> value = segment(*write.value);
+            Temporary const& destination = *temporaries_.at(&write.temporary);
 
-            setResult(utility::makeOwned<WriteTemporary>(*temporaries_.at(&write.temporary), std::move(value), write.location));
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            auto [expression_entry, expression_exit] = segment(*write.value, destination);
+            link(entry, expression_entry);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(expression_exit, exit);
+
+            setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::ErrorExpression const& error_expression) override
+        void visit(ret::ErrorExpression const& error) override
         {
-            setResult(utility::makeOwned<ErrorExpression>(error_expression.location));
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const inner = addBlock<ErrorStatement>(blocks, error.location);
+
+            setResult(std::move(blocks), inner, inner);
         }
 
         void visit(ret::Intrinsic const& intrinsic) override
         {
-            utility::List<utility::Owned<Expression>> arguments;
-            for (auto& argument : intrinsic.arguments)
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const entry    = addEmptyBlock(blocks);
+            std::reference_wrapper       incoming = entry;
+
+            utility::List<std::reference_wrapper<Temporary const>> arguments;
+            for (size_t index = 0; index < intrinsic.arguments.size(); index++)
             {
-                arguments.emplace_back(segment(*argument));
+                core::Type const& type = intrinsic.intrinsic.signature().types()[index];
+
+                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, type, intrinsic.location);
+                link(incoming, argument);
+                incoming = argument;
+
+                auto [expression_entry, expression_exit] = segment(*intrinsic.arguments[index], arguments[index]);
+                link(incoming, expression_entry);
+                incoming = expression_exit;
+
+                arguments.emplace_back(value.get());
             }
 
-            setResult(utility::makeOwned<Intrinsic>(intrinsic.intrinsic, std::move(arguments), intrinsic.location));
+            std::reference_wrapper const inner = addBlock<Intrinsic>(blocks, intrinsic.intrinsic, std::move(arguments), destination(), intrinsic.location);
+            link(incoming, inner);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(inner, exit);
+
+            setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::Call const& call) override
         {
-            utility::List<utility::Owned<Expression>> arguments;
-            for (auto& argument : call.arguments)
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const entry    = addEmptyBlock(blocks);
+            std::reference_wrapper       incoming = entry;
+
+            utility::List<std::reference_wrapper<Temporary const>> arguments;
+            for (size_t index = 0; index < call.arguments.size(); index++)
             {
-                arguments.emplace_back(segment(*argument));
+                core::Type const& type = call.called.signature().types()[index];
+
+                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, type, call.location);
+                link(incoming, argument);
+                incoming = argument;
+
+                auto [expression_entry, expression_exit] = segment(*call.arguments[index], value.get());
+                link(incoming, expression_entry);
+                incoming = expression_exit;
+
+                arguments.emplace_back(value.get());
             }
 
-            setResult(utility::makeOwned<Call>(call.called, std::move(arguments), call.location));
+            std::reference_wrapper const inner = addBlock<Call>(blocks, call.called, std::move(arguments), destination(), call.location);
+            link(incoming, inner);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(inner, exit);
+
+            setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::Access const& access) override
         {
-            setResult(utility::makeOwned<Access>(access.variable, access.location));
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const inner = addBlock<Read>(blocks, access.variable, destination(), access.location);
+
+            setResult(std::move(blocks), inner, inner);
         }
 
         void visit(ret::Constant const& constant) override
         {
-            setResult(utility::makeOwned<Constant>(constant.value->clone(), constant.location));
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, constant.value->clone(), destination(), constant.location);
+
+            setResult(std::move(blocks), inner, inner);
         }
 
         void visit(ret::UnaryOperation const& unary_operation) override
         {
-            utility::Owned<Expression> operand = segment(*unary_operation.operand);
+            utility::List<utility::Owned<BaseBB>> blocks;
 
-            setResult(utility::makeOwned<UnaryOperation>(unary_operation.op, std::move(operand), unary_operation.location));
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, unary_operation.type(), unary_operation.location);
+            link(entry, temporary);
+
+            auto [expression_entry, expression_exit] = segment(*unary_operation.operand, value.get());
+            link(temporary, expression_entry);
+
+            std::reference_wrapper const inner = addBlock<UnaryOperation>(blocks, unary_operation.op, value.get(), destination(), unary_operation.location);
+            link(expression_exit, inner);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(inner, exit);
+
+            setResult(std::move(blocks), entry, exit);
         }
 
         void visit(ret::ReadTemporary const& read_temporary) override
         {
-            setResult(utility::makeOwned<ReadTemporary>(*temporaries_.at(&read_temporary.temporary), read_temporary.location));
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            std::reference_wrapper const inner =
+                addBlock<CopyTemporary>(blocks, destination(), *temporaries_.at(&read_temporary.temporary), read_temporary.location);
+            link(entry, inner);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(inner, exit);
+
+            setResult(std::move(blocks), entry, exit);
         }
 
         struct Loop
@@ -600,10 +771,9 @@ struct ance::bbt::Segmenter::Implementation
 
         SimpleBB* current_entry_bb_ = nullptr;
         SimpleBB* current_exit_bb_  = nullptr;
+        Temporary const* current_destination_ = nullptr;
 
         std::stack<Loop> loops_;
-
-        utility::Optional<utility::Owned<Expression>> segmented_expression_;
 
         core::Reporter& reporter_;
 

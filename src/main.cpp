@@ -165,15 +165,17 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: do linearization - for linearization every place where currently an expression is allowed would only allow only temporary (only BBT and CET), expressions would no longer be a thing - normal variables would also be read into temporaries first
+        // todo: add a type type and allow values to store types, move type checks to the runner and delete the analyzer, maybe already add basic type expression and typeof but only if really needed
+
         // todo: rethink resolution - it should be done using intrinsics by the runner
-        //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper
+        //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper, find a way to preserve scoping in BBT and CET, best way would be to have special scope enter / exit blocks but think how to correctly place them even with breaks and such - see how old code does it
+        //            maybe the RET can be removed completely and the scoping part can be done in the BBT too by assigning each block a scope depth
         //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
         //      todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
         //      todo: for blockers, scopes (internal class of runner and ance type) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
         //      todo: remove the scope and variable classes from core
         //      todo: a more general system instead of the phases might be needed where parts of the tree go through phases independently as needed
-        // todo: add types and type expressions, type checks might need to move from analyzer to runner but maybe not - maybe the type method on expressions could return a type expression instead of the direct type - check what I wrote in type expression note, complete runs might not be possible so type checks could stay in analyzer but it has to run some parts before analyzing others
+        // todo: type expressions, type checks might need to move from analyzer to runner but maybe not - maybe the type method on expressions could return a type expression instead of the direct type - check what I wrote in type expression note, complete runs might not be possible so type checks could stay in analyzer but it has to run some parts before analyzing others
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
         // todo: add intrinsic functions to include another file, running the cmp code in there too
         // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)
@@ -182,6 +184,8 @@ namespace ance
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
         // todo: when adding erase, check where it is used in expansion, instead use scoping
+        // todo: correctly call copy and move functions for all linearized temporary using nodes in BBT and CET
+        // todo: global variables with non-cmp initializers need an ordering determined using topological sort
 
         out << "ance: " << reporter.warningCount() << " warnings" << std::endl;
         out << "ance: Success";

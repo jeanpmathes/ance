@@ -68,8 +68,8 @@ struct ance::bbt::Printer::Implementation
             print(branch_link.true_branch.id);
             print(", ");
             print(branch_link.false_branch.id);
-            print(") on ");
-            visit(*branch_link.condition);
+            print(") on temporary ");
+            print(branch_link.condition.id());
         }
 
         void visit(Jump const& jump_link) override
@@ -81,31 +81,25 @@ struct ance::bbt::Printer::Implementation
 
         void visit(ErrorStatement const&) override { print("// error"); }
 
-        void visit(Independent const& independent) override
+        void visit(Declare const& declare) override
         {
-            visit(*independent.expression);
-            print(";");
-        }
+            print("declare ");
+            print(declare.variable.identifier());
 
-        void visit(Let const& let) override
-        {
-            print("let ");
-            print(let.variable.identifier());
-
-            if (let.value.hasValue())
+            if (declare.value != nullptr)
             {
-                print(" <: ");
-                visit(**let.value);
+                print(" <: temporary ");
+                print(declare.value->id());
             }
 
             print(";");
         }
 
-        void visit(Assignment const& assignment) override
+        void visit(Store const& store) override
         {
-            print(assignment.variable.identifier());
-            print(" <: ");
-            visit(*assignment.value);
+            print(store.variable.identifier());
+            print(" <: temporary ");
+            print(store.value.id());
             print(";");
         }
 
@@ -115,72 +109,74 @@ struct ance::bbt::Printer::Implementation
             print(temporary.id());
             print(": ");
             print(temporary.type);
-            if (temporary.definition.hasValue())
-            {
-                print(" <: ");
-                visit(**temporary.definition);
-            }
             print(";");
         }
 
-        void visit(WriteTemporary const& write_temporary) override
+        void visit(CopyTemporary const& write_temporary) override
         {
             print("temporary ");
-            print(write_temporary.temporary.id());
-            print(" <: ");
-            visit(*write_temporary.value);
-            print(");");
+            print(write_temporary.destination.id());
+            print(" <: temporary ");
+            print(write_temporary.source.id());
+            print(";");
         }
 
-        void visit(ErrorExpression const&) override { print("/* error */"); }
 
         void visit(Intrinsic const& intrinsic) override
         {
-            print("intrinsic(");
+            print("temporary ");
+            print(intrinsic.destination.id());
+            print(" <- intrinsic(");
             print(intrinsic.intrinsic);
-            for (const auto& argument : intrinsic.arguments)
+            for (auto const argument : intrinsic.arguments)
             {
                 print(", ");
-                visit(*argument);
+                print(argument.get().id());
             }
             print(")");
         }
 
         void visit(Call const& call) override
         {
+            print("temporary ");
+            print(call.destination.id());
+            print(" <- ");
             print(call.called);
             print("(");
             for (size_t i = 0; i < call.arguments.size(); ++i)
             {
-                visit(*call.arguments[i]);
+                print(call.arguments[i].get().id());
                 if (i + 1 < call.arguments.size()) print(", ");
             }
             print(")");
         }
 
-        void visit(Access const& access) override
+        void visit(Read const& read) override
         {
-            print(access.variable.identifier());
+            print("temporary ");
+            print(read.destination.id());
+            print(" <: ");
+            print(read.variable.identifier());
         }
 
         void visit(Constant const& constant) override
         {
+            print("temporary ");
+            print(constant.destination.id());
+            print(" <: ");
             print(constant.value);
         }
 
         void visit(UnaryOperation const& unary_operation) override
         {
+            print("temporary ");
+            print(unary_operation.destination.id());
+            print(" <- ");
             print(unary_operation.op.toString());
             print(" ");
-            visit(*unary_operation.operand);
+            print(unary_operation.operand.id());
         }
 
-        void visit(ReadTemporary const& read_temporary) override
-        {
-            print("(read temporary ");
-            print(read_temporary.temporary.id());
-            print(")");
-        }
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}

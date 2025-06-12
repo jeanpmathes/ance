@@ -1,13 +1,16 @@
 #include "Node.h"
 
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 ance::cet::Node::Node(core::Location const& source_location) : location(source_location) {}
 
 ance::cet::Unit::Unit() : Node(core::Location::global()) {}
 
-ance::cet::BasicBlock::BasicBlock(size_t const number, utility::List<utility::Owned<Statement>> content, utility::Owned<Link> connection, core::Location const& source_location)
+ance::cet::BasicBlock::BasicBlock(size_t const                             number,
+                                  utility::List<utility::Owned<Statement>> content,
+                                  utility::Owned<Link>                     connection,
+                                  core::Location const&                    source_location)
     : Node(source_location)
     , id(number)
     , statements(std::move(content))
@@ -16,45 +19,31 @@ ance::cet::BasicBlock::BasicBlock(size_t const number, utility::List<utility::Ow
 
 ance::cet::Return::Return(core::Location const& source_location) : Node(source_location), Link() {}
 
-ance::cet::Branch::Branch(utility::Owned<Expression> expression, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location)
+ance::cet::Branch::Branch(Temporary const& temporary, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location)
     : Node(source_location)
     , Link()
-    , condition(std::move(expression))
+    , condition(temporary)
     , true_branch(true_link)
     , false_branch(false_link)
 {}
 
-ance::cet::Jump::Jump(BasicBlock const& link, core::Location const& source_location)
-    : Node(source_location), Link(), target(link)
-{
+ance::cet::Jump::Jump(BasicBlock const& link, core::Location const& source_location) : Node(source_location), Link(), target(link) {}
 
-}
-
-ance::cet::Independent::Independent(utility::Owned<Expression> independent_expression,
-                                    core::Location const&      source_location)
-    : Node(source_location), Statement(), expression(std::move(independent_expression))
-{}
-
-ance::cet::Let::Let(core::Variable const& identifier, utility::Optional<utility::Owned<Expression>> definition, core::Location const& source_location)
+ance::cet::Declare::Declare(core::Variable const& identifier, Temporary const* definition, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , variable(identifier)
-    , value(std::move(definition))
+    , value(definition)
 {}
 
-ance::cet::Assignment::Assignment(core::Variable const& assigned, utility::Owned<Expression> expression, core::Location const& source_location)
+ance::cet::Store::Store(core::Variable const& assigned, Temporary const& stored, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , variable(assigned)
-    , value(std::move(expression))
+    , value(stored)
 {}
 
-ance::cet::Temporary::Temporary(core::Type const& t, utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
-    : Node(source_location)
-    , Statement()
-    , type(t)
-    , definition(std::move(expression))
-{}
+ance::cet::Temporary::Temporary(core::Type const& t, core::Location const& source_location) : Node(source_location), Statement(), type(t) {}
 
 std::string ance::cet::Temporary::id() const
 {
@@ -63,32 +52,53 @@ std::string ance::cet::Temporary::id() const
     return oss.str();
 }
 
-ance::cet::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location)
+ance::cet::CopyTemporary::CopyTemporary(Temporary const& target, Temporary const& value, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , temporary(target)
-    , value(std::move(expression))
+    , destination(target)
+    , source(value)
 {}
 
-ance::cet::Intrinsic::Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
-: Node(source_location), Expression(), intrinsic(used), arguments(std::move(expressions))
-{}
-
-ance::cet::Call::Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
-: Node(source_location), Expression(), called(function), arguments(std::move(expressions))
-{}
-
-ance::cet::Access::Access(core::Variable const& accessed, core::Location const& source_location) : Node(source_location), Expression(), variable(accessed) {}
-
-ance::cet::Constant::Constant(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(constant) {}
-
-ance::cet::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
+ance::cet::Intrinsic::Intrinsic(core::Intrinsic const&          used,
+                                utility::List<Temporary const*> args,
+                                Temporary const&                result,
+                                core::Location const&           source_location)
     : Node(source_location)
-    , Expression()
-    , op(kind)
-    , operand(std::move(expression))
+    , Statement()
+    , intrinsic(used)
+    , arguments(std::move(args))
+    , destination(result)
 {}
 
-ance::cet::ReadTemporary::ReadTemporary(Temporary const& target, core::Location const& source_location)
-    : Node(source_location), Expression(), temporary(target)
+ance::cet::Call::Call(core::Function const& function, utility::List<Temporary const*> args, Temporary const& result, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , called(function)
+    , arguments(std::move(args))
+    , destination(result)
+{}
+
+ance::cet::Read::Read(core::Variable const& accessed, Temporary const& result, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , variable(accessed)
+    , destination(result)
+{}
+
+ance::cet::Constant::Constant(utility::Shared<core::Value> constant, Temporary const& result, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , value(constant)
+    , destination(result)
+{}
+
+ance::cet::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind,
+                                          Temporary const&           value,
+                                          Temporary const&           result,
+                                          core::Location const&      source_location)
+    : Node(source_location)
+    , Statement()
+    , op(kind)
+    , operand(value)
+    , destination(result)
 {}

@@ -76,19 +76,14 @@ struct ance::build::Compiler::Implementation
             (void) jump_link;// todo: implement
         }
 
-        void visit(cet::Independent const& independent) override
+        void visit(cet::Declare const& declare) override
         {
-            (void) independent;// todo: implement
+            (void) declare;// todo: implement
         }
 
-        void visit(cet::Let const& let) override
+        void visit(cet::Store const& store) override
         {
-            (void) let;// todo: implement
-        }
-
-        void visit(cet::Assignment const& assignment) override
-        {
-            (void) assignment;// todo: implement
+            (void) store;// todo: implement
         }
 
         void visit(cet::Temporary const& temporary) override
@@ -96,7 +91,7 @@ struct ance::build::Compiler::Implementation
             (void) temporary;// todo: implement
         }
 
-        void visit(cet::WriteTemporary const& write_temporary) override
+        void visit(cet::CopyTemporary const& write_temporary) override
         {
             (void) write_temporary;// todo: implement
         }
@@ -111,9 +106,9 @@ struct ance::build::Compiler::Implementation
             (void) call;// todo: implement
         }
 
-        void visit(cet::Access const& access) override
+        void visit(cet::Read const& read) override
         {
-            (void) access;// todo: implement
+            (void) read;// todo: implement
         }
 
         void visit(cet::Constant const& constant) override
@@ -124,11 +119,6 @@ struct ance::build::Compiler::Implementation
         void visit(cet::UnaryOperation const& unary_operation) override
         {
             (void) unary_operation;// todo: implement
-        }
-
-        void visit(cet::ReadTemporary const& read_temporary) override
-        {
-            (void) read_temporary;// todo: implement
         }
 
       private:

@@ -73,27 +73,6 @@ struct ance::cet::Runner::Implementation
             visit(statement);
         }
 
-        utility::Shared<core::Value> run(bbt::Expression const& expression)
-        {
-            assert(!result_.hasValue());
-
-            visit(expression);
-
-            if (!result_.hasValue())
-                return core::Value::makeUnit();
-
-            utility::Shared<core::Value> result = result_.value();
-            result_ = std::nullopt;
-
-            return result;
-        }
-
-        void setResult(utility::Shared<core::Value> value)
-        {
-            assert(!result_.hasValue());
-            result_ = value;
-        }
-
         void visit(bbt::Flow const& flow) override
         {
             run(flow.entry);
@@ -123,8 +102,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Branch const& branch_link) override
         {
-            if (run(*branch_link.condition)->getBool())
-            {
+            if (temporaries_.at(&branch_link.condition)->getBool()) {
                 next_ = &branch_link.true_branch;
             }
             else
@@ -143,102 +121,74 @@ struct ance::cet::Runner::Implementation
             reporter_.error("Cannot execute this statement", error_statement.location);
         }
 
-        void visit(bbt::Independent const& independent) override
+        void visit(bbt::Declare const& declare) override
         {
-            run(*independent.expression);
+            utility::Shared<core::Value> value = core::Value::makeDefault(declare.variable.type());
+
+            if (declare.value != nullptr) { value = temporaries_.at(declare.value); }
+
+            variables_.insert_or_assign(&declare.variable, value);
         }
 
-        void visit(bbt::Let const& let) override
+        void visit(bbt::Store const& store) override
         {
-            utility::Shared<core::Value> value = core::Value::makeDefault(let.variable.type());
-
-            if (let.value.hasValue())
-            {
-                value = run(**let.value);
-            }
-
-            variables_.insert_or_assign(&let.variable, value);
-        }
-
-        void visit(bbt::Assignment const& assignment) override
-        {
-            variables_.insert_or_assign(&assignment.variable, run(*assignment.value));
+            variables_.insert_or_assign(&store.variable, temporaries_.at(&store.value));
         }
 
         void visit(bbt::Temporary const& temporary) override
         {
             utility::Shared<core::Value> value = core::Value::makeDefault(temporary.type);
-
-            if (temporary.definition.hasValue())
-            {
-                value = run(**temporary.definition);
-            }
-
             temporaries_.insert_or_assign(&temporary, value);
         }
 
-        void visit(bbt::WriteTemporary const& write_temporary) override
+        void visit(bbt::CopyTemporary const& write_temporary) override
         {
-            utility::Shared<core::Value> value = run(*write_temporary.value);
-            temporaries_.insert_or_assign(&write_temporary.temporary, value);
-        }
-
-        void visit(bbt::ErrorExpression const& error_expression) override
-        {
-            reporter_.error("Cannot execute this expression", error_expression.location);
+            utility::Shared<core::Value> value = temporaries_.at(&write_temporary.source);
+            temporaries_.insert_or_assign(&write_temporary.destination, value);
         }
 
         void visit(bbt::Intrinsic const& intrinsic) override
         {
             utility::List<utility::Shared<core::Value>> arguments = {};
-            for (auto& argument : intrinsic.arguments)
-            {
-                arguments.push_back(run(*argument));
-            }
+            for (auto argument : intrinsic.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
             intrinsics_.run(intrinsic.intrinsic, arguments, intrinsic.location);
+            temporaries_.insert_or_assign(&intrinsic.destination, core::Value::makeUnit());
         }
 
         void visit(bbt::Call const& call) override
         {
             utility::List<utility::Shared<core::Value>> arguments = {};
-            for (auto& argument : call.arguments)
+            for (auto argument : call.arguments)
             {
-                arguments.push_back(run(*argument));
-            }
+                arguments.emplace_back(temporaries_.at(&argument.get())); }
 
             call.called.run(arguments);
+            temporaries_.insert_or_assign(&call.destination, core::Value::makeUnit());
         }
 
-        void visit(bbt::Access const& access) override
+        void visit(bbt::Read const& read) override
         {
-            utility::Shared<core::Value> value = variables_.at(&access.variable);
+            utility::Shared<core::Value> value = variables_.at(&read.variable);
 
-            setResult(value);
+            temporaries_.insert_or_assign(&read.destination, value);
         }
 
         void visit(bbt::Constant const& constant) override
         {
-            setResult(constant.value->clone());
+            temporaries_.insert_or_assign(&constant.destination, constant.value->clone());
         }
 
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
-            utility::Shared<core::Value> value = run(*unary_operation.operand);
+            utility::Shared<core::Value> value = temporaries_.at(&unary_operation.operand);
 
             switch (unary_operation.op)
             {
                 case core::UnaryOperator::NOT:
-                    setResult(core::Value::makeBool(!value->getBool()));
+                    temporaries_.insert_or_assign(&unary_operation.destination, core::Value::makeBool(!value->getBool()));
                     break;
             }
-        }
-
-        void visit(bbt::ReadTemporary const& read_temporary) override
-        {
-            utility::Shared<core::Value> value = temporaries_.at(&read_temporary.temporary);
-
-            setResult(value);
         }
 
       private:
@@ -249,7 +199,6 @@ struct ance::cet::Runner::Implementation
         std::map<core::Variable const*, utility::Shared<core::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
         
-        utility::Optional<utility::Shared<core::Value>> result_ = std::nullopt;
 
         bbt::BasicBlock const* next_ = nullptr;
     };
