@@ -77,9 +77,10 @@ namespace ance::ret
         : Statement
         , utility::ConcreteNode<Let, Visitor>
     {
-        Let(core::Variable const& identifier, utility::Optional<utility::Owned<Expression>> definition, core::Location const& source_location);
+        Let(core::Variable const& identifier, utility::Owned<Expression> t, utility::Optional<utility::Owned<Expression>> definition, core::Location const& source_location);
 
         core::Variable const& variable;
+        utility::Owned<Expression> type;
         utility::Optional<utility::Owned<Expression>> value;
     };
 
@@ -141,11 +142,10 @@ namespace ance::ret
         : Statement
         , utility::ConcreteNode<Temporary, Visitor>
     {
-        Temporary(core::Type const& t, utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
+        Temporary(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
 
         [[nodiscard]] std::string id() const;
 
-        core::Type const& type;
         utility::Optional<utility::Owned<Expression>> definition;
     };
 
@@ -165,8 +165,6 @@ namespace ance::ret
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
-        /// Get the return type of the expression.
-        [[nodiscard]] virtual core::Type const& type() const;
     };
 
     /// Error expression, mostly as pass-through from the AST.
@@ -184,8 +182,6 @@ namespace ance::ret
     {
         Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
-        [[nodiscard]] core::Type const& type() const override;
-
         core::Intrinsic const& intrinsic;
         utility::List<utility::Owned<Expression>> arguments;
     };
@@ -196,8 +192,6 @@ namespace ance::ret
         , utility::ConcreteNode<Call, Visitor>
     {
         Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
-
-        [[nodiscard]] core::Type const& type() const override;
 
         core::Function const& called;
         utility::List<utility::Owned<Expression>> arguments;
@@ -210,8 +204,6 @@ namespace ance::ret
     {
         Access(core::Variable const& accessed, core::Location const& source_location);
 
-        [[nodiscard]] core::Type const& type() const override;
-
         core::Variable const& variable;
     };
 
@@ -222,8 +214,6 @@ namespace ance::ret
     {
         Constant(utility::Shared<core::Value> constant, core::Location const& source_location);
 
-        [[nodiscard]] core::Type const& type() const override;
-
         utility::Shared<core::Value> value;
     };
 
@@ -233,8 +223,6 @@ namespace ance::ret
         , utility::ConcreteNode<UnaryOperation, Visitor>
     {
         UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location);
-
-        [[nodiscard]] core::Type const& type() const override;
 
         core::UnaryOperator op;
         utility::Owned<Expression> operand;
@@ -247,9 +235,17 @@ namespace ance::ret
     {
         ReadTemporary(Temporary const& target, core::Location const& source_location);
 
-        [[nodiscard]] core::Type const& type() const override;
-
         Temporary const& temporary;
+    };
+
+    /// Gives the type of the value produced by an expression - the expression WILL BE evaluated.
+    struct TypeOf final
+        : Expression
+        , utility::ConcreteNode<TypeOf, Visitor>
+    {
+        TypeOf(utility::Owned<Expression> expr, core::Location const& source_location);
+
+        utility::Owned<Expression> expression;
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>
@@ -278,6 +274,7 @@ namespace ance::ret
         virtual void visit(Constant const& constant)     = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
         virtual void visit(ReadTemporary const& read_temporary) = 0;
+        virtual void visit(TypeOf const& type_of)       = 0;
     };
 }
 

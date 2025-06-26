@@ -55,6 +55,53 @@ struct ance::cet::Runner::Implementation
         explicit BBT(core::Reporter& reporter) : reporter_(reporter) {}
         ~BBT() override = default;
 
+        [[nodiscard]] bool requireType(core::Type const& expected, core::Type const& actual, core::Location const& location) const
+        {
+            bool ok = true;
+
+            if (expected != actual)
+            {
+                reporter_.error("Expected type '" + expected.name() + "' but got '" + actual.name() + "'", location);
+                ok = false;
+            }
+
+            return ok;
+        }
+
+        [[nodiscard]] bool requireSignature(core::Signature const& signature, utility::List<std::reference_wrapper<bbt::Temporary const>> const& arguments, core::Location const& location) const
+        {
+            bool ok = true;
+
+            size_t const arity = signature.types().size();
+            size_t const argument_count = arguments.size();
+
+            if (arity != argument_count)
+            {
+                reporter_.error("Call to '" + signature.name() + "' with wrong number of arguments: " +
+                                " expected " + std::to_string(arity) +
+                                " but got " + std::to_string(argument_count),
+                                location);
+                ok = false;
+            }
+
+            for (size_t i = 0; i < argument_count; ++i)
+            {
+                auto const& argument = arguments[i];
+                auto const& argument_value = temporaries_.at(&argument.get());
+                auto const& type = signature.types()[i].get();
+
+                ok &= requireType(type, argument_value->type(), argument.get().location);
+            }
+
+            return ok;
+        }
+
+        void abort()
+        {
+            encountered_error_ = true;
+            next_ = nullptr;
+        }
+
         void run(bbt::BasicBlock const& basic_block)
         {
             next_ = &basic_block;
@@ -83,6 +130,9 @@ struct ance::cet::Runner::Implementation
             for (auto& statement : basic_block.statements)
             {
                 run(*statement);
+
+                if (encountered_error_)
+                    return;
             }
 
             visit(*basic_block.link);
@@ -92,7 +142,7 @@ struct ance::cet::Runner::Implementation
         {
             reporter_.error("Cannot execute this link", error_link.location);
 
-            next_ = nullptr;
+            abort();
         }
 
         void visit(bbt::Return const&) override
@@ -102,7 +152,18 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Branch const& branch_link) override
         {
-            if (temporaries_.at(&branch_link.condition)->getBool()) { next_ = &branch_link.true_branch; }
+            utility::Shared<core::Value> condition = temporaries_.at(&branch_link.condition);
+
+            if (!requireType(core::Type::Bool(), condition->type(), branch_link.condition.location))
+            {
+                abort();
+                return;
+            }
+
+            if (condition->getBool())
+            {
+                next_ = &branch_link.true_branch;
+            }
             else
             {
                 next_ = &branch_link.false_branch;
@@ -117,25 +178,56 @@ struct ance::cet::Runner::Implementation
         void visit(bbt::ErrorStatement const& error_statement) override
         {
             reporter_.error("Cannot execute this statement", error_statement.location);
+
+            abort();
         }
 
         void visit(bbt::Declare const& declare) override
         {
-            utility::Shared<core::Value> value = core::Value::makeDefault(declare.variable.type());
+            utility::Shared<core::Value> type = temporaries_.at(&declare.type);
 
-            if (declare.value != nullptr) { value = temporaries_.at(declare.value); }
+            if (!requireType(core::Type::Self(), type->type(), declare.type.location))
+            {
+                abort();
+                return;
+            }
+
+            utility::Shared<core::Value> value = core::Value::makeDefault(type->getType());
+
+            if (declare.value != nullptr)
+            {
+                utility::Shared<core::Value> assigned = temporaries_.at(declare.value);
+
+                if (!requireType(type->getType(), assigned->type(), declare.value->location))
+                {
+                    abort();
+                    return;
+                }
+
+                value = assigned;
+            }
 
             variables_.insert_or_assign(&declare.variable, value);
+            variable_types_.insert_or_assign(&declare.variable, &type->getType());
         }
 
         void visit(bbt::Store const& store) override
         {
-            variables_.insert_or_assign(&store.variable, temporaries_.at(&store.value));
+            utility::Shared<core::Value> value = temporaries_.at(&store.value);
+            core::Type const& type = *variable_types_.at(&store.variable);
+
+            if (!requireType(type, value->type(), store.value.location))
+            {
+                abort();
+                return;
+            }
+
+            variables_.insert_or_assign(&store.variable, value);
         }
 
         void visit(bbt::Temporary const& temporary) override
         {
-            utility::Shared<core::Value> value = core::Value::makeDefault(temporary.type);
+            utility::Shared<core::Value> value = core::Value::makeUnit();
             temporaries_.insert_or_assign(&temporary, value);
         }
 
@@ -147,6 +239,12 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Intrinsic const& intrinsic) override
         {
+            if (!requireSignature(intrinsic.intrinsic.signature(), intrinsic.arguments, intrinsic.location))
+            {
+                abort();
+                return;
+            }
+
             utility::List<utility::Shared<core::Value>> arguments = {};
             for (auto argument : intrinsic.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
@@ -156,6 +254,12 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Call const& call) override
         {
+            if (!requireSignature(call.called.signature(), call.arguments, call.location))
+            {
+                abort();
+                return;
+            }
+
             utility::List<utility::Shared<core::Value>> arguments = {};
             for (auto argument : call.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
@@ -166,7 +270,6 @@ struct ance::cet::Runner::Implementation
         void visit(bbt::Read const& read) override
         {
             utility::Shared<core::Value> value = variables_.at(&read.variable);
-
             temporaries_.insert_or_assign(&read.destination, value);
         }
 
@@ -178,6 +281,12 @@ struct ance::cet::Runner::Implementation
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
             utility::Shared<core::Value> value = temporaries_.at(&unary_operation.operand);
+
+            if (!requireType(core::Type::Bool(), value->type(), unary_operation.operand.location))
+            {
+                abort();
+                return;
+            }
 
             switch (unary_operation.op)
             {
@@ -193,10 +302,12 @@ struct ance::cet::Runner::Implementation
         Intrinsics intrinsics_ {reporter_};
 
         std::map<core::Variable const*, utility::Shared<core::Value>> variables_ = {};
+        std::map<core::Variable const*, core::Type const*> variable_types_ = {};
+
         std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
-        
 
         bbt::BasicBlock const* next_ = nullptr;
+        bool encountered_error_ = false;
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}

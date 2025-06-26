@@ -1,29 +1,44 @@
 #include "Value.h"
 
-#include "Type.h"
-
 namespace ance::core
 {
-    Value::Value(Type const& type, size_t const value) : type_(type), value_(value) {}
+    Value::Value(Type const& type, Storage const storage) : type_(type), storage_(storage) {}
 
     utility::Shared<Value> Value::makeBool(bool const value)
     {
-        return utility::makeShared<Value>(Type::Bool(), value ? 1z : 0z);
+        Storage storage;
+        storage.boolean = value;
+
+        return utility::makeShared<Value>(Type::Bool(), storage);
     }
 
     utility::Shared<Value> Value::makeUnit()
     {
-        return utility::makeShared<Value>(Type::Unit(), 0z);
+        Storage storage;
+        storage.size = 0; // Just to initialize the union, as it will not be used.
+
+        return utility::makeShared<Value>(Type::Unit(), storage);
     }
 
     utility::Shared<Value> Value::makeSize(size_t value)
     {
-        return utility::makeShared<Value>(Type::Size(), value);
+        Storage storage;
+        storage.size = value;
+
+        return utility::makeShared<Value>(Type::Size(), storage);
+    }
+
+    utility::Shared<Value> Value::makeType(Type const& type)
+    {
+        Storage storage;
+        storage.type_id = type.id();
+
+        return utility::makeShared<Value>(Type::Self(), storage);
     }
 
     utility::Shared<Value> Value::makeDefault(Type const& type)
     {
-        return utility::makeShared<Value>(type, 0);
+        return utility::makeShared<Value>(type, Storage {});
     }
 
     Type const& Value::type() const
@@ -33,28 +48,38 @@ namespace ance::core
 
     std::string Value::toString() const
     {
-        if (type_ == Type::Bool()) { return value_ ? "true" : "false"; }
+        if (type_ == Type::Bool()) { return storage_.boolean ? "true" : "false"; }
 
         if (type_ == Type::Unit()) { return "()"; }
 
-        if (type_ == Type::Size()) { return std::to_string(value_); }
+        if (type_ == Type::Size()) { return std::to_string(storage_.size); }
+
+        if (type_ == Type::Self())
+        {
+            return std::string(Type::byID(storage_.type_id).name().text());
+        }
 
         return "unknown";
     }
 
     bool Value::getBool() const
     {
-        return value_ != 0;
+        return storage_.boolean;
     }
 
     size_t Value::getSize() const
     {
-        return value_;
+        return storage_.size;
+    }
+
+    Type const& Value::getType() const
+    {
+        return Type::byID(storage_.type_id);
     }
 
     utility::Shared<Value> Value::clone() const
     {
-        return utility::makeShared<Value>(type_, value_);
+        return utility::makeShared<Value>(type_, storage_);
     }
 }
 

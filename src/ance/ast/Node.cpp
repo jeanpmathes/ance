@@ -27,13 +27,13 @@ ance::ast::Independent::Independent(utility::Owned<Expression> independent_expre
 {}
 
 ance::ast::Let::Let(core::Identifier const&                       name,
-                    core::Type const&                             t,
+                    utility::Owned<Expression>                           t,
                     utility::Optional<utility::Owned<Expression>> definition,
                     core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , identifier(name)
-    , type(t)
+    , type(std::move(t))
     , value(std::move(definition))
 {}
 

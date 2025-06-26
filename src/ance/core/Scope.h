@@ -30,9 +30,8 @@ namespace ance::core
 
         /// Add a variable to the scope.
         /// \param identifier The identifier of the variable.
-        /// \param type The type of the variable.
         /// \param location The location where the variable was defined.
-        Variable const& addVariable(Identifier const& identifier, Type const& type, Location const& location);
+        Variable const& addVariable(Identifier const& identifier, Location const& location);
 
     private:
         struct Implementation;

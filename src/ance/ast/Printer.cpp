@@ -45,7 +45,7 @@ struct ance::ast::Printer::Implementation
             print("let ");
             print(let.identifier);
             print(": ");
-            print(let.type);
+            visit(*let.type);
 
             if (let.value.hasValue())
             {

@@ -69,10 +69,10 @@ namespace ance::est
     struct Let final
         : Statement
         , utility::ConcreteNode<Let, Visitor> {
-        Let(core::Identifier const& name, utility::Optional<utility::Owned<Expression>> definition, core::Type const& t, core::Location const& source_location);
+        Let(core::Identifier const& name, utility::Optional<utility::Owned<Expression>> definition, utility::Owned<Expression> t, core::Location const& source_location);
 
         core::Identifier identifier;
-        core::Type const& type;
+        utility::Owned<Expression> type;
         utility::Optional<utility::Owned<Expression>> value;
     };
 
@@ -136,11 +136,10 @@ namespace ance::est
         : Statement
         , utility::ConcreteNode<Temporary, Visitor>
     {
-        Temporary(core::Type const& t, utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
+        Temporary(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
 
         [[nodiscard]] std::string id() const;
 
-        core::Type const& type;
         utility::Optional<utility::Owned<Expression>> definition;
     };
 
@@ -218,6 +217,16 @@ namespace ance::est
         Temporary const& temporary;
     };
 
+    /// Gives the type of the value produced by an expression - the expression WILL BE evaluated.
+    struct TypeOf final
+        : Expression
+        , utility::ConcreteNode<TypeOf, Visitor>
+    {
+        TypeOf(utility::Owned<Expression> e, core::Location const& source_location);
+
+        utility::Owned<Expression> expression;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -243,6 +252,7 @@ namespace ance::est
         virtual void visit(Literal const& literal)       = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
         virtual void visit(ReadTemporary const& read_temporary) = 0;
+        virtual void visit(TypeOf const& type_of)       = 0;
     };
 }
 

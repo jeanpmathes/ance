@@ -4,7 +4,6 @@
 #include <iomanip>
 
 #include "ance/core/Scope.h"
-#include "ance/core/Type.h"
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Function.h"
 #include "ance/core/Value.h"
@@ -27,10 +26,11 @@ ance::ret::Independent::Independent(utility::Owned<Expression> independent_expre
     , expression(std::move(independent_expression))
 {}
 
-ance::ret::Let::Let(core::Variable const& identifier, utility::Optional<utility::Owned<Expression>> definition, core::Location const& source_location)
+ance::ret::Let::Let(core::Variable const& identifier, utility::Owned<Expression> t, utility::Optional<utility::Owned<Expression>> definition, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , variable(identifier)
+    , type(std::move(t))
     , value(std::move(definition))
 {}
 
@@ -62,10 +62,9 @@ ance::ret::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::ret::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
-ance::ret::Temporary::Temporary(core::Type const& t, utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
+ance::ret::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , type(t)
     , definition(std::move(expression))
 {}
 
@@ -83,11 +82,6 @@ ance::ret::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owne
     , value(std::move(expression))
 {}
 
-ance::core::Type const& ance::ret::Expression::type() const
-{
-    return core::Type::Unit();
-}
-
 ance::ret::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::ret::Intrinsic::Intrinsic(core::Intrinsic const& used, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
@@ -97,11 +91,6 @@ ance::ret::Intrinsic::Intrinsic(core::Intrinsic const& used, utility::List<utili
     , arguments(std::move(expressions))
 {}
 
-ance::core::Type const& ance::ret::Intrinsic::type() const
-{
-    return intrinsic.returnType();
-}
-
 ance::ret::Call::Call(core::Function const& function, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
     : Node(source_location)
     , Expression()
@@ -109,24 +98,9 @@ ance::ret::Call::Call(core::Function const& function, utility::List<utility::Own
     , arguments(std::move(expressions))
 {}
 
-ance::core::Type const& ance::ret::Call::type() const
-{
-    return called.returnType();
-}
-
 ance::ret::Access::Access(core::Variable const& accessed, core::Location const& source_location) : Node(source_location), Expression(), variable(accessed) {}
 
-ance::core::Type const& ance::ret::Access::type() const
-{
-    return variable.type();
-}
-
 ance::ret::Constant::Constant(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(constant)) {}
-
-ance::core::Type const& ance::ret::Constant::type() const
-{
-    return value->type();
-}
 
 ance::ret::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
@@ -135,15 +109,8 @@ ance::ret::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , operand(std::move(expression))
 {}
 
-ance::core::Type const& ance::ret::UnaryOperation::type() const
-{
-    return core::Type::Bool();
-}
-
 ance::ret::ReadTemporary::ReadTemporary(Temporary const& target, core::Location const& source_location) : Node(source_location), Expression(), temporary(target)
 {}
 
-ance::core::Type const& ance::ret::ReadTemporary::type() const
-{
-    return temporary.type;
-}
+ance::ret::TypeOf::TypeOf(utility::Owned<Expression> expr, core::Location const& source_location)
+    : Node(source_location), Expression(), expression(std::move(expr)) {}

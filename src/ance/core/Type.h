@@ -5,6 +5,12 @@
 
 namespace ance::core
 {
+    /// Unique identifier for a type, allowing more compact referencing.
+    struct TypeID
+    {
+        uint32_t app;
+        uint32_t id;
+    };
     /// Represents a type.
     class Type
     {
@@ -25,11 +31,21 @@ namespace ance::core
         /// Get the size type, which has a platform-dependent size.
         static Type const& Size();
 
+        /// Get the type-type - the type of all types.
+        static Type const& Self();
+
+        /// Get a type by its ID.
+        [[nodiscard]] static Type const& byID(TypeID const& id) ;
+
+        /// Get the ID of this type.
+        [[nodiscard]] TypeID id() const;
+
         bool operator==(Type const& other) const;
         bool operator!=(Type const& other) const;
 
       private:
         Identifier identifier_;
+        uint32_t index_;
     };
 }
 

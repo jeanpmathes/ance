@@ -100,6 +100,8 @@ struct ance::ret::Resolver::Implementation
 
         void visit(est::ReadTemporary const&) override {}
 
+        void visit(est::TypeOf const&) override {}
+
     private:
         std::set<core::Identifier> declarations = {};
         size_t                     depth        = 0;
@@ -168,9 +170,9 @@ struct ance::ret::Resolver::Implementation
 
             core::Scope& scope() { return *scope_; }
 
-            core::Variable const& declare(core::Identifier const& identifier, core::Type const& type, core::Location const& location)
+            core::Variable const& declare(core::Identifier const& identifier, core::Location const& location)
             {
-                core::Variable const& variable = scope_->addVariable(identifier, type, location);
+                core::Variable const& variable = scope_->addVariable(identifier, location);
 
                 onDeclare(variable);
 
@@ -318,14 +320,16 @@ struct ance::ret::Resolver::Implementation
 
         void visit(est::Let const& let) override
         {
+            utility::Owned<Expression> type = resolve(*let.type);
+
             assert(current_scope_ != nullptr);
-            core::Variable const& variable = current_scope_->declare(let.identifier, let.type, let.location);
+            core::Variable const& variable = current_scope_->declare(let.identifier, let.location);
 
             utility::Optional<utility::Owned<Expression>> value;
 
             if (let.value.hasValue()) { value = resolve(**let.value); }
 
-            setResult(utility::makeOwned<Let>(variable, std::move(value), let.location));
+            setResult(utility::makeOwned<Let>(variable, std::move(type), std::move(value), let.location));
         }
 
         void visit(est::Assignment const& assignment) override
@@ -374,7 +378,7 @@ struct ance::ret::Resolver::Implementation
 
             if (temporary.definition.hasValue()) { value = resolve(**temporary.definition); }
 
-            auto node = utility::makeOwned<Temporary>(temporary.type, std::move(value), temporary.location);
+            auto node = utility::makeOwned<Temporary>(std::move(value), temporary.location);
             temporaries_.emplace(&temporary, node.get());
 
             setResult(std::move(node));
@@ -440,6 +444,11 @@ struct ance::ret::Resolver::Implementation
         void visit(est::ReadTemporary const& read_temporary) override
         {
             setResult(utility::makeOwned<ReadTemporary>(*temporaries_.at(&read_temporary.temporary), read_temporary.location));
+        }
+
+        void visit(est::TypeOf const& type_of) override
+        {
+            setResult(utility::makeOwned<TypeOf>(resolve(*type_of.expression), type_of.location));
         }
 
       private:

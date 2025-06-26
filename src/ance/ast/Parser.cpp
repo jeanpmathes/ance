@@ -216,16 +216,6 @@ namespace ance::ast
             return utility::makeOwned<ErrorExpression>(location(ctx));
         }
 
-        core::Type const& expectType(anceParser::TypeContext* ctx)
-        {
-            if (ctx == nullptr)
-                return core::Type::Unit();
-
-            std::any const result = visit(ctx);
-            auto const     type = std::any_cast<core::Type const*>(result);
-            return *type;
-        }
-
     protected:
         std::any visitFile(anceParser::FileContext* context) override
         {
@@ -256,13 +246,13 @@ namespace ance::ast
         std::any visitLetStatement(anceParser::LetStatementContext* ctx) override
         {
             core::Identifier const name = identifier(ctx->IDENTIFIER());
-            core::Type const&    type = expectType(ctx->type());
 
             utility::Optional<utility::Owned<Expression>> expression;
+            utility::Owned<Expression> type = expectExpression(ctx->varType);
 
-            if (ctx->expression() != nullptr) expression = expectExpression(ctx->expression());
+            if (ctx->assigned != nullptr) expression = expectExpression(ctx->assigned);
 
-            Statement* statement = new Let(name, type, std::move(expression), location(ctx));
+            Statement* statement = new Let(name, std::move(type), std::move(expression), location(ctx));
             return statement;
         }
 
@@ -382,19 +372,28 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitBoolType(anceParser::BoolTypeContext*) override
+        std::any visitBoolType(anceParser::BoolTypeContext* context) override
         {
-            return &core::Type::Bool();
+            Expression* expression = new Literal(core::Value::makeType(core::Type::Bool()), location(context));
+            return expression;
         }
 
-        std::any visitUnitType(anceParser::UnitTypeContext*) override
+        std::any visitUnitType(anceParser::UnitTypeContext* context) override
         {
-            return &core::Type::Unit();
+            Expression* expression = new Literal(core::Value::makeType(core::Type::Unit()), location(context));
+            return expression;
         }
 
-        std::any visitSizeType(anceParser::SizeTypeContext*) override
+        std::any visitSizeType(anceParser::SizeTypeContext* context) override
         {
-            return &core::Type::Size();
+            Expression* expression = new Literal(core::Value::makeType(core::Type::Size()), location(context));
+            return expression;
+        }
+
+        std::any visitTypeType(anceParser::TypeTypeContext* context) override
+        {
+            Expression* expression = new Literal(core::Value::makeType(core::Type::Self()), location(context));
+            return expression;
         }
 
       protected:

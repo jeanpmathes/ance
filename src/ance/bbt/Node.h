@@ -129,9 +129,10 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Declare, Visitor>
     {
-        Declare(core::Variable const& identifier, Temporary const* definition, core::Location const& source_location);
+        Declare(core::Variable const& var, Temporary const& t, Temporary const* definition, core::Location const& source_location);
 
         core::Variable const& variable;
+        Temporary const&      type;
         Temporary const*      value;
     };
 
@@ -151,11 +152,9 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Temporary, Visitor>
     {
-        Temporary(core::Type const& t, core::Location const& source_location);
+        explicit Temporary(core::Location const& source_location);
 
         [[nodiscard]] std::string id() const;
-
-        core::Type const& type;
     };
 
     /// Writes a value to a temporary variable.
@@ -231,6 +230,18 @@ namespace ance::bbt
         core::UnaryOperator  op;
         Temporary const&     operand;
         Temporary const&     destination;
+    };
+
+    /// Stores the type of the value produced by an expression into the destination temporary variable.
+    /// The expression WILL BE evaluated.
+    struct TypeOf final
+        : Statement
+        , utility::ConcreteNode<TypeOf, Visitor>
+    {
+        TypeOf(Temporary const& expr, Temporary const& result, core::Location const& source_location);
+
+        Temporary const& expression;
+        Temporary const& destination;
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>

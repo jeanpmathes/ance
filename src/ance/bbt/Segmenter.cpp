@@ -454,7 +454,7 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<utility::Owned<BaseBB>> blocks;
             std::reference_wrapper const          entry = addEmptyBlock(blocks);
 
-            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, independent.expression->type(), independent.location);
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, independent.location);
             link(entry, temporary);
 
             auto [expression_entry, expression_exit] = segment(*independent.expression, value.get());
@@ -471,13 +471,24 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
-
-            Temporary const*       value    = nullptr;
             std::reference_wrapper incoming = entry;
 
+            Temporary const* type;
+            {
+                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, let.location);
+                link(incoming, temporary);
+                incoming = temporary;
+                type    = &temporary_node.get();
+
+                auto [expression_entry, expression_exit] = segment(*let.type, *type);
+                link(incoming, expression_entry);
+                incoming = expression_exit;
+            }
+
+            Temporary const*       value    = nullptr;
             if (let.value.hasValue())
             {
-                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, let.variable.type(), let.location);
+                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, let.location);
                 link(incoming, temporary);
                 incoming = temporary;
                 value    = &temporary_node.get();
@@ -487,7 +498,7 @@ struct ance::bbt::Segmenter::Implementation
                 incoming = expression_exit;
             }
 
-            std::reference_wrapper const declare = addBlock<Declare>(blocks, let.variable, value, let.location);
+            std::reference_wrapper const declare = addBlock<Declare>(blocks, let.variable, *type, value, let.location);
             link(incoming, declare);
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
@@ -502,7 +513,7 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, assignment.variable.type(), assignment.location);
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, assignment.location);
             link(entry, temporary);
 
             auto [expression_entry, expression_exit] = segment(*assignment.value, value.get());
@@ -523,7 +534,7 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, core::Type::Bool(), if_statement.condition->location);
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, if_statement.condition->location);
             link(entry, temporary);
 
             auto [condition_entry, condition_exit] = segment(*if_statement.condition, value.get());
@@ -597,7 +608,7 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            auto [t, value] = addBlockAndGetInner<Temporary>(blocks, temporary.type, temporary.location);
+            auto [t, value] = addBlockAndGetInner<Temporary>(blocks, temporary.location);
             temporaries_.emplace(&temporary, &value.get());
             link(entry, t);
 
@@ -651,9 +662,7 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (size_t index = 0; index < intrinsic.arguments.size(); index++)
             {
-                core::Type const& type = intrinsic.intrinsic.signature().types()[index];
-
-                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, type, intrinsic.location);
+                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, intrinsic.location);
                 link(incoming, argument);
                 incoming = argument;
 
@@ -683,9 +692,7 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (size_t index = 0; index < call.arguments.size(); index++)
             {
-                core::Type const& type = call.called.signature().types()[index];
-
-                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, type, call.location);
+                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, call.location);
                 link(incoming, argument);
                 incoming = argument;
 
@@ -729,7 +736,7 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, unary_operation.type(), unary_operation.location);
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, unary_operation.location);
             link(entry, temporary);
 
             auto [expression_entry, expression_exit] = segment(*unary_operation.operand, value.get());
@@ -753,6 +760,27 @@ struct ance::bbt::Segmenter::Implementation
             std::reference_wrapper const inner =
                 addBlock<CopyTemporary>(blocks, destination(), *temporaries_.at(&read_temporary.temporary), read_temporary.location);
             link(entry, inner);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(inner, exit);
+
+            setResult(std::move(blocks), entry, exit);
+        }
+
+        void visit(ret::TypeOf const& type_of) override
+        {
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, type_of.location);
+            link(entry, temporary);
+
+            auto [expression_entry, expression_exit] = segment(*type_of.expression, value.get());
+            link(temporary, expression_entry);
+
+            std::reference_wrapper const inner = addBlock<TypeOf>(blocks, value.get(), destination(), type_of.location);
+            link(expression_exit, inner);
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(inner, exit);

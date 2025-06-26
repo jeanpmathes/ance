@@ -75,12 +75,12 @@ namespace ance::ast
         , utility::ConcreteNode<Let, Visitor>
     {
         Let(core::Identifier const&                       name,
-        core::Type const&                             t,
+        utility::Owned<Expression> t,
             utility::Optional<utility::Owned<Expression>> definition,
             core::Location const&                         source_location);
 
         core::Identifier                              identifier;
-        core::Type const& type;
+        utility::Owned<Expression> type;
         utility::Optional<utility::Owned<Expression>> value;
     };
 

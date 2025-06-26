@@ -37,11 +37,11 @@ ance::bbt::Jump::Jump(BasicBlock const& link, core::Location const& source_locat
 
 ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}
 
-
-ance::bbt::Declare::Declare(core::Variable const& identifier, Temporary const* definition, core::Location const& source_location)
+ance::bbt::Declare::Declare(core::Variable const& var, Temporary const& t, Temporary const* definition, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , variable(identifier)
+    , variable(var)
+    , type(t)
     , value(definition)
 {}
 
@@ -52,7 +52,7 @@ ance::bbt::Store::Store(core::Variable const& assigned, Temporary const& stored,
     , value(stored)
 {}
 
-ance::bbt::Temporary::Temporary(core::Type const& t, core::Location const& source_location) : Node(source_location), Statement(), type(t) {}
+ance::bbt::Temporary::Temporary(core::Location const& source_location) : Node(source_location), Statement() {}
 
 std::string ance::bbt::Temporary::id() const
 {
@@ -108,9 +108,16 @@ ance::bbt::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind,
                                           Temporary const&           value,
                                           Temporary const&           result,
                                           core::Location const&      source_location)
-    : Node(source_location), Statement()
+    : Node(source_location)
+    , Statement()
     , op(kind)
     , operand(value)
     , destination(result)
 {}
+
+ance::bbt::TypeOf::TypeOf(Temporary const& expr, Temporary const& result, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , expression(expr)
+    , destination(result) {}
 

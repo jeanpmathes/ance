@@ -21,8 +21,6 @@
 #include "ance/ret/Printer.h"
 #include "ance/ret/Resolver.h"
 
-#include "ance/analyze/Analyzer.h"
-
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Printer.h"
 #include "ance/bbt/Grapher.h"
@@ -115,7 +113,6 @@ namespace ance
         ast::Parser       parser {source_tree, reporter};
         est::Expander     expander {reporter};
         ret::Resolver     resolver {reporter};
-        analyze::Analyzer analyzer {reporter};
         bbt::Segmenter    segmenter {reporter};
         cet::Runner       runner {reporter};
         build::Compiler   compiler {reporter};
@@ -145,9 +142,6 @@ namespace ance
 
         print<ret::Printer>(*resolved, debug_path, "ret");
 
-        analyzer.analyze(*resolved);
-        if (check_for_fail()) return EXIT_FAILURE;
-
         utility::Owned<bbt::Flow> segmented = segmenter.segment(*resolved);
         if (check_for_fail()) return EXIT_FAILURE;
 
@@ -165,7 +159,10 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add a type type and allow values to store types, move type checks to the runner and delete the analyzer, maybe already add basic type expression and typeof but only if really needed
+        // todo: check all printing results
+        // todo: go through all visit methods in runner, cause there type checks to fail and check if debug location is correct
+        //       -----> maybe a different temporary style instead of destination style could be needed
+        //       -----> for the case of while, currently the type of the temporary is used but that no longer works - remove type from the temporary node and find other way
 
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper, find a way to preserve scoping in BBT and CET, best way would be to have special scope enter / exit blocks but think how to correctly place them even with breaks and such - see how old code does it
@@ -173,7 +170,7 @@ namespace ance
         //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
         //      todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
         //      todo: for blockers, scopes (internal class of runner and ance type) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
-        //      todo: remove the scope and variable classes from core
+        //      todo: remove the scope and variable classes from core, maybe even remove variable completely
         //      todo: a more general system instead of the phases might be needed where parts of the tree go through phases independently as needed
         // todo: type expressions, type checks might need to move from analyzer to runner but maybe not - maybe the type method on expressions could return a type expression instead of the direct type - check what I wrote in type expression note, complete runs might not be possible so type checks could stay in analyzer but it has to run some parts before analyzing others
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
@@ -186,6 +183,7 @@ namespace ance
         // todo: when adding erase, check where it is used in expansion, instead use scoping
         // todo: correctly call copy and move functions for all linearized temporary using nodes in BBT and CET
         // todo: global variables with non-cmp initializers need an ordering determined using topological sort
+        // todo: think about making the typeof node an intrinsic, would either require an any type or something else for the argument like overloading
 
         out << "ance: " << reporter.warningCount() << " warnings" << std::endl;
         out << "ance: Success";

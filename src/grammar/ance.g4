@@ -5,7 +5,7 @@ file : statement EOF ;
 statement
     : '{' ( statement )* '}' # BlockStatement
     | expression ';' # ExpressionStatement
-    | 'let' IDENTIFIER ':' type ( assigner expression )? ';' # LetStatement // todo: type inference - maybe before doing real type inference just do expansion to typeof(expression) if no type is set
+    | 'let' IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # LetStatement // todo: type inference - maybe before doing real type inference just do expansion to typeof(expression) if no type is set
     | entity assigner expression ';' # AssignmentStatement
     | 'if' expression 'then' trueBlock=statement ( 'else' falseBlock=statement )? # IfStatement
     | 'loop' statement # LoopStatement
@@ -21,12 +21,6 @@ expression
     | unary expression # UnaryOperationExpression
     ;
 
-type // todo: make this a normal expression as any other
-    : 'Bool' # BoolType
-    | 'Unit' # UnitType
-    | 'Size' # SizeType
-    ;
-
 unary
     : 'not' # UnaryNot
     ;
@@ -35,6 +29,14 @@ literal
     : boolean # BooleanLiteral
     | INTEGER # SizeLiteral
     | '(' ')' # UnitLiteral
+    | type # TypeLiteral
+    ;
+
+type
+    : 'Bool' # BoolType
+    | 'Unit' # UnitType
+    | 'Size' # SizeType
+    | 'Type' # TypeType
     ;
 
 boolean

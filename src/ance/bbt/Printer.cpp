@@ -107,8 +107,6 @@ struct ance::bbt::Printer::Implementation
         {
             print("let temporary ");
             print(temporary.id());
-            print(": ");
-            print(temporary.type);
             print(";");
         }
 
@@ -120,7 +118,6 @@ struct ance::bbt::Printer::Implementation
             print(write_temporary.source.id());
             print(";");
         }
-
 
         void visit(Intrinsic const& intrinsic) override
         {

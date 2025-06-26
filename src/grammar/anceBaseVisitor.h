@@ -71,18 +71,6 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitBoolType(anceParser::BoolTypeContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual std::any visitUnitType(anceParser::UnitTypeContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
-  virtual std::any visitSizeType(anceParser::SizeTypeContext *ctx) override {
-    return visitChildren(ctx);
-  }
-
   virtual std::any visitUnaryNot(anceParser::UnaryNotContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -96,6 +84,26 @@ public:
   }
 
   virtual std::any visitUnitLiteral(anceParser::UnitLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitTypeLiteral(anceParser::TypeLiteralContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitBoolType(anceParser::BoolTypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitUnitType(anceParser::UnitTypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitSizeType(anceParser::SizeTypeContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitTypeType(anceParser::TypeTypeContext *ctx) override {
     return visitChildren(ctx);
   }
 

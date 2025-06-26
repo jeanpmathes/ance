@@ -18,9 +18,9 @@ struct ance::core::Scope::Implementation
         return child;
     }
 
-    Variable const& addVariable(Identifier const& identifier, Type const& type, Location const& location)
+    Variable const& addVariable(Identifier const& identifier, Location const& location)
     {
-        return *variables_.emplace_back(utility::makeOwned<Variable>(identifier, type, location));
+        return *variables_.emplace_back(utility::makeOwned<Variable>(identifier, location));
     }
 
     explicit Implementation(Scope* parent) : parent_(parent)
@@ -47,7 +47,7 @@ ance::utility::Owned<ance::core::Scope> ance::core::Scope::createChild()
     return implementation_->createChild(*this);
 }
 
-ance::core::Variable const& ance::core::Scope::addVariable(Identifier const& identifier, Type const& type, Location const& location)
+ance::core::Variable const& ance::core::Scope::addVariable(Identifier const& identifier, Location const& location)
 {
-    return implementation_->addVariable(identifier, type, location);
+    return implementation_->addVariable(identifier, location);
 }

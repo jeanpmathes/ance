@@ -142,6 +142,10 @@ struct ance::est::Expander::Implementation
         {
             Statements statements;
 
+            Expansion type_expansion = expand(*let.type);
+
+            append(statements, std::move(type_expansion.before));
+
             utility::Optional<utility::Owned<Expression>> value;
             Statements                                    after;
 
@@ -155,9 +159,10 @@ struct ance::est::Expander::Implementation
                 after = std::move(expansion.after);
             }
 
-            statements.emplace_back(utility::makeOwned<Let>(let.identifier, std::move(value), let.type, let.location));
+            statements.emplace_back(utility::makeOwned<Let>(let.identifier, std::move(value), std::move(type_expansion.center), let.location));
 
             append(statements, std::move(after));
+            append(statements, std::move(type_expansion.after));
 
             setResult(std::move(statements));
         }
@@ -228,12 +233,12 @@ struct ance::est::Expander::Implementation
             Statements exit_body;
 
             append(exit_body, std::move(condition.before));
-            utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(core::Type::Bool(), std::move(condition.center), while_statement.location);
+            utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(std::move(condition.center), while_statement.location);
             Temporary const& tmp = *temporary;
             exit_body.emplace_back(std::move(temporary));
             append(exit_body, std::move(condition.after));
 
-            exit_body.emplace_back(utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, utility::makeOwned<ReadTemporary>(tmp, while_statement.location), while_statement.location),
+            exit_body.emplace_back(utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, utility::makeOwned<ReadTemporary>(tmp, while_statement.condition->location), while_statement.location),
                      utility::makeOwned<Break>(while_statement.location),
                      utility::makeOwned<Block>(Statements(), while_statement.location),
                      while_statement.location));

@@ -31,12 +31,12 @@ ance::est::Independent::Independent(utility::Owned<Expression> independent_expre
 
 ance::est::Let::Let(core::Identifier const&                       name,
                     utility::Optional<utility::Owned<Expression>> definition,
-                    core::Type const& t,
+                    utility::Owned<Expression> t,
                     core::Location const&                         source_location)
     : Node(source_location)
     , Statement()
     , identifier(name)
-    , type(t)
+    , type(std::move(t))
     , value(std::move(definition))
 {}
 
@@ -68,12 +68,10 @@ ance::est::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::est::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
-ance::est::Temporary::Temporary(core::Type const&                             t,
-                                                  utility::Optional<utility::Owned<Expression>> expression,
-                                                  core::Location const&                         source_location)
+ance::est::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> expression,
+                                core::Location const&                         source_location)
     : Node(source_location)
     , Statement()
-    , type(t)
     , definition(std::move(expression))
 {}
 
@@ -115,8 +113,11 @@ ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , operand(std::move(expression))
 {}
 
-ance::est::ReadTemporary::ReadTemporary(Temporary const& target, core::Location const& source_location)
+ance::est::ReadTemporary::ReadTemporary(Temporary const& target, core::Location const& source_location) : Node(source_location), Expression(), temporary(target)
+{}
+
+ance::est::TypeOf::TypeOf(utility::Owned<Expression> e, core::Location const& source_location)
     : Node(source_location)
     , Expression()
-    , temporary(target)
+    , expression(std::move(e))
 {}

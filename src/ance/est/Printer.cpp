@@ -50,7 +50,7 @@ struct ance::est::Printer::Implementation
             print("let ");
             print(let.identifier);
             print(": ");
-            print(let.type);
+            visit(*let.type);
 
             if (let.value.hasValue())
             {
@@ -121,8 +121,6 @@ struct ance::est::Printer::Implementation
         {
             print("let temporary ");
             print(temporary.id());
-            print(": ");
-            print(temporary.type);
             if (temporary.definition.hasValue())
             {
                 print(" <: ");
@@ -175,6 +173,13 @@ struct ance::est::Printer::Implementation
         {
             print("(read temporary ");
             print(read_temporary.temporary.id());
+            print(")");
+        }
+
+        void visit(TypeOf const& type_of) override
+        {
+            print("typeof (");
+            visit(*type_of.expression);
             print(")");
         }
     };
