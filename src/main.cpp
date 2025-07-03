@@ -159,7 +159,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: check all printing results
         // todo: go through all visit methods in runner, cause there type checks to fail and check if debug location is correct
         //       -----> maybe a different temporary style instead of destination style could be needed
         //       -----> for the case of while, the type of the temporary was used to force check but that no longer works - remove type from the temporary node and find other way

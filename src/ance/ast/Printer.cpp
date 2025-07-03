@@ -20,6 +20,12 @@ struct ance::ast::Printer::Implementation
 
         void visit(Block const& block) override
         {
+            if (block.statements.empty())
+            {
+                print("{}");
+                return;
+            }
+
             print("{");
             line();
             enter();
