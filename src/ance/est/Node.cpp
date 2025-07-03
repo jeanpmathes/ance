@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "ance/utility/ID.h"
+
 #include "ance/core/Scope.h"
 
 ance::est::Node::Node(core::Location const& source_location) : location(source_location) {}
@@ -77,9 +79,7 @@ ance::est::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> ex
 
 std::string ance::est::Temporary::id() const
 {
-    std::ostringstream oss;
-    oss << std::hex << std::uppercase << std::setw(12) << std::setfill('0') << reinterpret_cast<std::uintptr_t>(this);
-    return oss.str();
+    return utility::id(this);
 }
 
 ance::est::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location)

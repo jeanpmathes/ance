@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iomanip>
 
+#include "ance/utility/ID.h"
+
 #include "ance/core/Scope.h"
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Function.h"
@@ -70,9 +72,7 @@ ance::ret::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> ex
 
 std::string ance::ret::Temporary::id() const
 {
-    std::ostringstream oss;
-    oss << std::hex << std::uppercase << std::setw(12) << std::setfill('0') << reinterpret_cast<std::uintptr_t>(this);
-    return oss.str();
+    return utility::id(this);
 }
 
 ance::ret::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location)

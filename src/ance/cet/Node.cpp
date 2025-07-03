@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include "ance/utility/ID.h"
+
 ance::cet::Node::Node(core::Location const& source_location) : location(source_location) {}
 
 ance::cet::Unit::Unit() : Node(core::Location::global()) {}
@@ -47,9 +49,7 @@ ance::cet::Temporary::Temporary(core::Type const& t, core::Location const& sourc
 
 std::string ance::cet::Temporary::id() const
 {
-    std::ostringstream oss;
-    oss << std::hex << std::uppercase << std::setw(12) << std::setfill('0') << reinterpret_cast<std::uintptr_t>(this);
-    return oss.str();
+    return utility::id(this);
 }
 
 ance::cet::CopyTemporary::CopyTemporary(Temporary const& target, Temporary const& value, core::Location const& source_location)
