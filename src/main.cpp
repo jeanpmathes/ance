@@ -159,9 +159,8 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: go through all visit methods in runner, cause there type checks to fail and check if debug location is correct
-        //       -----> maybe a different temporary style instead of destination style could be needed
-        //       -----> for the case of while, the type of the temporary was used to force check but that no longer works - remove type from the temporary node and find other way
+        // todo: before getting rid of the RET, find a way to preserve scoping information in BBT - add scope entry and exit blocks
+        // todo: as soon as that works, remove the RET and first do the current resolution in the BBT, no resolution intrinsics yet
 
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper, find a way to preserve scoping in BBT and CET, best way would be to have special scope enter / exit blocks but think how to correctly place them even with breaks and such - see how old code does it

@@ -5,6 +5,7 @@
 #include <boost/locale/encoding_utf.hpp>
 #include <boost/locale/boundary/index.hpp>
 #include <boost/regex/v5/unicode_iterator.hpp>
+
 #include <icu.h>
 
 #include "ance/sources/SourceTree.h"
@@ -38,6 +39,9 @@ namespace text
 
     static size_t estimateWidth(std::u32string_view const& str)
     {
+        if (str.empty())
+            return 0;
+
         size_t width = 0;
 
         std::string const utf8_str = boost::locale::conv::utf_to_utf<char>(std::u32string(str));
@@ -51,8 +55,8 @@ namespace text
 
             std::string character = char_it->str();
 
-            boost::u8_to_u32_iterator<std::string::iterator> const code_point_it(character.begin());
-            boost::u8_to_u32_iterator<std::string::iterator> const code_point_end(character.end());
+            boost::u8_to_u32_iterator const code_point_it(character.begin());
+            boost::u8_to_u32_iterator const code_point_end(character.end());
             if (code_point_it == code_point_end) continue;
 
             char32_t const code_point = *code_point_it;

@@ -475,7 +475,7 @@ struct ance::bbt::Segmenter::Implementation
 
             Temporary const* type;
             {
-                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, let.location);
+                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, let.type->location);
                 link(incoming, temporary);
                 incoming = temporary;
                 type    = &temporary_node.get();
@@ -488,7 +488,7 @@ struct ance::bbt::Segmenter::Implementation
             Temporary const*       value    = nullptr;
             if (let.value.hasValue())
             {
-                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, let.location);
+                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, (*let.value)->location);
                 link(incoming, temporary);
                 incoming = temporary;
                 value    = &temporary_node.get();
@@ -513,7 +513,7 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, assignment.location);
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, assignment.value->location);
             link(entry, temporary);
 
             auto [expression_entry, expression_exit] = segment(*assignment.value, value.get());
@@ -662,7 +662,7 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (size_t index = 0; index < intrinsic.arguments.size(); index++)
             {
-                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, intrinsic.location);
+                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, intrinsic.arguments[index]->location);
                 link(incoming, argument);
                 incoming = argument;
 
@@ -692,7 +692,7 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (size_t index = 0; index < call.arguments.size(); index++)
             {
-                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, call.location);
+                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, call.arguments[index]->location);
                 link(incoming, argument);
                 incoming = argument;
 
@@ -736,7 +736,7 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, unary_operation.location);
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, unary_operation.operand->location);
             link(entry, temporary);
 
             auto [expression_entry, expression_exit] = segment(*unary_operation.operand, value.get());
@@ -773,7 +773,7 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, type_of.location);
+            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, type_of.expression->location);
             link(entry, temporary);
 
             auto [expression_entry, expression_exit] = segment(*type_of.expression, value.get());
