@@ -159,10 +159,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: fix the invisible useless basic blocks preventing good simplification
-        // ---> as a result of the break, there is a useless block leading into the block after the else part
-        // ---> that thingy has to be removed (before?) simplification so that simplification reaches a clean result
-
         // todo: add a new noop statement from expansion on that can be used instead of {} in used branches, something like 'pass;'
 
         // todo: remove the RET and first do the current resolution in the BBT, no resolution intrinsics yet

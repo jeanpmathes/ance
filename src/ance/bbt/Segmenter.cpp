@@ -109,6 +109,19 @@ struct ance::bbt::Segmenter::Implementation
             return {result, outgoing};
         }
 
+        void prune()
+        {
+            if (statements_.empty() && incoming_.empty())
+            {
+                std::set<BaseBB*> const outgoing = next();
+
+                for (auto& next : outgoing)
+                {
+                    next->incoming_.erase(this);
+                }
+            }
+        }
+
         virtual void swap(std::reference_wrapper<BaseBB> original, std::reference_wrapper<BaseBB> replacement) = 0;
 
       private:
@@ -273,6 +286,11 @@ struct ance::bbt::Segmenter::Implementation
 
         std::reference_wrapper<BaseBB> simplify(std::reference_wrapper<BaseBB> entry)
         {
+            for (auto& block : bbs_)
+            {
+                block.get()->prune();
+            }
+
             std::set<BaseBB*> simplified;
             std::stack<std::reference_wrapper<BaseBB>> to_simplify;
             to_simplify.emplace(entry);
