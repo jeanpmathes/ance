@@ -296,6 +296,16 @@ struct ance::cet::Runner::Implementation
             }
         }
 
+        void visit(bbt::ScopeEnter const& scope_enter) override
+        {
+            (void)scope_enter; // todo: do something, e.g. creating scope struct in stack
+        }
+
+        void visit(bbt::ScopeExit const& scope_exit) override
+        {
+            (void)scope_exit; // todo: do something, e.g. calling destructors for temporaries and variables
+        }
+
       private:
         core::Reporter& reporter_;
 

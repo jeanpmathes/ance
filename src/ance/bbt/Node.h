@@ -3,7 +3,6 @@
 
 #include "Node.h"
 #include "ance/core/Identifier.h"
-#include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
 #include "ance/core/Variable.h"
 
@@ -17,6 +16,7 @@ namespace ance::core
 
     class Function;
     class Value;
+    class Scope;
 }
 
 /// The basic-block tree (BBT) namespace.
@@ -42,7 +42,7 @@ namespace ance::bbt
         Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBlock& start, core::Location const& source_location);
 
         utility::List<utility::Owned<BasicBlock>> blocks;
-        BasicBlock& entry;
+        BasicBlock&                               entry;
     };
 
     struct Statement;
@@ -56,7 +56,7 @@ namespace ance::bbt
     {
         BasicBlock(size_t number, utility::List<utility::Owned<Statement>> content, utility::Owned<Link> connection, core::Location const& source_location);
 
-        size_t id;
+        size_t                                   id;
         utility::List<utility::Owned<Statement>> statements;
         utility::Owned<Link>                     link;
     };
@@ -66,7 +66,6 @@ namespace ance::bbt
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
-
     };
 
     /// The error link is used to represent an error in the control flow.
@@ -227,9 +226,9 @@ namespace ance::bbt
     {
         UnaryOperation(core::UnaryOperator const& kind, Temporary const& value, Temporary const& result, core::Location const& source_location);
 
-        core::UnaryOperator  op;
-        Temporary const&     operand;
-        Temporary const&     destination;
+        core::UnaryOperator op;
+        Temporary const&    operand;
+        Temporary const&    destination;
     };
 
     /// Stores the type of the value produced by an expression into the destination temporary variable.
@@ -244,6 +243,26 @@ namespace ance::bbt
         Temporary const& destination;
     };
 
+    /// Enters a scope, which is used to manage variable lifetimes and visibility.
+    struct ScopeEnter final
+        : Statement
+        , utility::ConcreteNode<ScopeEnter, Visitor>
+    {
+        ScopeEnter(core::Scope const& s, core::Location const& source_location);
+
+        core::Scope const& scope;
+    };
+
+    /// Exits a scope, which is used to manage variable lifetimes and visibility.
+    struct ScopeExit final
+        : Statement
+        , utility::ConcreteNode<ScopeExit, Visitor>
+    {
+        ScopeExit(core::Scope const& s, core::Location const& source_location);
+
+        core::Scope const& scope;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -254,21 +273,23 @@ namespace ance::bbt
         virtual void visit(BasicBlock const& basic_block) = 0;
 
         virtual void visit(ErrorLink const& error_link) = 0;
-        virtual void visit(Return const& return_link) = 0;
-        virtual void visit(Branch const& branch_link) = 0;
-        virtual void visit(Jump const& jump_link) = 0;
+        virtual void visit(Return const& return_link)   = 0;
+        virtual void visit(Branch const& branch_link)   = 0;
+        virtual void visit(Jump const& jump_link)       = 0;
 
         virtual void visit(ErrorStatement const& error_statement) = 0;
         virtual void visit(Declare const& declare)                = 0;
         virtual void visit(Store const& store)                    = 0;
         virtual void visit(Temporary const& temporary)            = 0;
-        virtual void visit(CopyTemporary const& write_temporary) = 0;
+        virtual void visit(CopyTemporary const& write_temporary)  = 0;
 
-        virtual void visit(Intrinsic const& intrinsic)              = 0;
-        virtual void visit(Call const& call)                        = 0;
-        virtual void visit(Read const& read)                        = 0;
-        virtual void visit(Constant const& constant)                = 0;
-        virtual void visit(UnaryOperation const& unary_operation)   = 0;
+        virtual void visit(Intrinsic const& intrinsic)            = 0;
+        virtual void visit(Call const& call)                      = 0;
+        virtual void visit(Read const& read)                      = 0;
+        virtual void visit(Constant const& constant)              = 0;
+        virtual void visit(UnaryOperation const& unary_operation) = 0;
+        virtual void visit(ScopeEnter const& scope_enter)         = 0;
+        virtual void visit(ScopeExit const& scope_exit)           = 0;
 
         ~Visitor() override = default;
     };

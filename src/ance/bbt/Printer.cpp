@@ -174,6 +174,10 @@ struct ance::bbt::Printer::Implementation
             print(unary_operation.operand.id());
         }
 
+        void visit(ScopeEnter const&) override { print("// enter scope"); }
+
+        void visit(ScopeExit const&) override { print("// exit scope"); }
+
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}

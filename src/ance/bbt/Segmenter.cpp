@@ -3,14 +3,16 @@
 #include <map>
 #include <set>
 #include <stack>
+#include <vector>
 
 #include "ance/bbt/Node.h"
 #include "ance/core/Function.h"
 #include "ance/core/Intrinsic.h"
 #include "ance/ret/Node.h"
 
-#include "ance/core/Type.h"
 #include "ance/core/Value.h"
+
+#include <iostream>
 
 struct ance::bbt::Segmenter::Implementation
 {
@@ -81,7 +83,7 @@ struct ance::bbt::Segmenter::Implementation
             {
                 BaseBB& target = **outgoing.begin();
 
-                // We can only simplify if this is the only block entering the next (real) block, or if this block is unnecessary, we can simplify.
+                // We can only simplify if this is the only block entering the next (real) block, or if this block is unnecessary.
 
                 if (target.incoming_.size() == 1 || statements_.empty())
                 {
@@ -177,7 +179,7 @@ struct ance::bbt::Segmenter::Implementation
 
         [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) override
         {
-            return utility::makeOwned<Branch>(std::move(condition_), *blocks[true_.get().index()], *blocks[false_.get().index()], core::Location::global());
+            return utility::makeOwned<Branch>(condition_, *blocks[true_.get().index()], *blocks[false_.get().index()], core::Location::global());
         }
 
         [[nodiscard]] std::set<BaseBB*> next() const override
@@ -214,6 +216,8 @@ struct ance::bbt::Segmenter::Implementation
         utility::Owned<Flow> apply(ret::Statement const& statement)
         {
             assert(bbs_.empty());
+
+            scopes_.clear();
 
             utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
             std::reference_wrapper       entry       = *entry_block;
@@ -433,7 +437,11 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
-            std::reference_wrapper current = entry;
+
+            std::reference_wrapper const scope_entry = addBlock<ScopeEnter>(blocks, *block.scope, block.location);
+            scopes_.push_back(block.scope.get());
+            link(entry, scope_entry);
+            std::reference_wrapper current = scope_entry;
 
             for (auto& statement : block.statements)
             {
@@ -443,8 +451,12 @@ struct ance::bbt::Segmenter::Implementation
                 current = statement_exit;
             }
 
+            std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *block.scope, block.location);
+            scopes_.pop_back();
+            link(current, scope_exit);
+
             std::reference_wrapper const exit = addEmptyBlock(blocks);
-            link(current, exit);
+            link(scope_exit, exit);
 
             setResult(std::move(blocks), entry, exit);
         }
@@ -562,11 +574,11 @@ struct ance::bbt::Segmenter::Implementation
             std::reference_wrapper const entry = addEmptyBlock(blocks);
             std::reference_wrapper const exit  = addEmptyBlock(blocks);
 
-            loops_.emplace(Loop {.entry = entry, .exit = exit});
+            loops_.emplace_back(Loop {.entry = entry, .exit = exit, .scope_depth = scopes_.size()});
 
             auto [loop_entry, loop_exit] = segment(*loop.body);
 
-            loops_.pop();
+            loops_.pop_back();
 
             link(entry, loop_entry);
             link(loop_exit, entry);
@@ -581,9 +593,19 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
-            std::reference_wrapper const exit  = addEmptyBlock(blocks);
+            std::reference_wrapper       current = entry;
 
-            link(entry, loops_.top().exit);
+            size_t const target_depth = loops_.back().scope_depth;
+            for (size_t i = scopes_.size(); i > target_depth; i--)
+            {
+                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *scopes_[i - 1], break_statement.location);
+                link(current, scope_exit);
+                current = scope_exit;
+            }
+
+            link(current, loops_.back().exit);
+
+            std::reference_wrapper const exit  = addEmptyBlock(blocks);
 
             setResult(std::move(blocks), entry, exit);
         }
@@ -595,9 +617,19 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
-            std::reference_wrapper const exit  = addEmptyBlock(blocks);
+            std::reference_wrapper       current = entry;
 
-            link(entry, loops_.top().entry);
+            size_t const target_depth = loops_.back().scope_depth;
+            for (size_t i = scopes_.size(); i > target_depth; i--)
+            {
+                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *scopes_[i - 1], continue_statement.location);
+                link(current, scope_exit);
+                current = scope_exit;
+            }
+
+            link(current, loops_.back().entry);
+
+            std::reference_wrapper const exit  = addEmptyBlock(blocks);
 
             setResult(std::move(blocks), entry, exit);
         }
@@ -660,13 +692,13 @@ struct ance::bbt::Segmenter::Implementation
             std::reference_wrapper       incoming = entry;
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
-            for (size_t index = 0; index < intrinsic.arguments.size(); index++)
+            for (const auto & index : intrinsic.arguments)
             {
-                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, intrinsic.arguments[index]->location);
+                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, index->location);
                 link(incoming, argument);
                 incoming = argument;
 
-                auto [expression_entry, expression_exit] = segment(*intrinsic.arguments[index], arguments[index]);
+                auto [expression_entry, expression_exit] = segment(*index, value.get());
                 link(incoming, expression_entry);
                 incoming = expression_exit;
 
@@ -690,13 +722,13 @@ struct ance::bbt::Segmenter::Implementation
             std::reference_wrapper       incoming = entry;
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
-            for (size_t index = 0; index < call.arguments.size(); index++)
+            for (const auto & index : call.arguments)
             {
-                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, call.arguments[index]->location);
+                auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, index->location);
                 link(incoming, argument);
                 incoming = argument;
 
-                auto [expression_entry, expression_exit] = segment(*call.arguments[index], value.get());
+                auto [expression_entry, expression_exit] = segment(*index, value.get());
                 link(incoming, expression_entry);
                 incoming = expression_exit;
 
@@ -792,6 +824,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             std::reference_wrapper<SimpleBB> entry;
             std::reference_wrapper<SimpleBB> exit;
+            size_t scope_depth = 0;
         };
 
       private:
@@ -801,7 +834,8 @@ struct ance::bbt::Segmenter::Implementation
         SimpleBB* current_exit_bb_  = nullptr;
         Temporary const* current_destination_ = nullptr;
 
-        std::stack<Loop> loops_;
+        std::vector<Loop> loops_;
+        std::vector<core::Scope const*> scopes_ = {};
 
         core::Reporter& reporter_;
 

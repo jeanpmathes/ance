@@ -109,6 +109,10 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(UnaryOperation const&) override {}
 
+        void visit(ScopeEnter const&) override {}
+
+        void visit(ScopeExit const&) override {}
+
 
         size_t current_id_ = 0;
     };

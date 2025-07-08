@@ -159,8 +159,13 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: before getting rid of the RET, find a way to preserve scoping information in BBT - add scope entry and exit blocks
-        // todo: as soon as that works, remove the RET and first do the current resolution in the BBT, no resolution intrinsics yet
+        // todo: fix the invisible useless basic blocks preventing good simplification
+        // ---> as a result of the break, there is a useless block leading into the block after the else part
+        // ---> that thingy has to be removed (before?) simplification so that simplification reaches a clean result
+
+        // todo: add a new noop statement from expansion on that can be used instead of {} in used branches, something like 'pass;'
+
+        // todo: remove the RET and first do the current resolution in the BBT, no resolution intrinsics yet
 
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper, find a way to preserve scoping in BBT and CET, best way would be to have special scope enter / exit blocks but think how to correctly place them even with breaks and such - see how old code does it

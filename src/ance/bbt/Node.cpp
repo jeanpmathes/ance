@@ -121,3 +121,9 @@ ance::bbt::TypeOf::TypeOf(Temporary const& expr, Temporary const& result, core::
     , expression(expr)
     , destination(result) {}
 
+ance::bbt::ScopeEnter::ScopeEnter(core::Scope const& s, core::Location const& source_location)
+    : Node(source_location), Statement(), scope(s) {}
+
+ance::bbt::ScopeExit::ScopeExit(core::Scope const& s, core::Location const& source_location)
+    : Node(source_location), Statement(), scope(s) {}
+
