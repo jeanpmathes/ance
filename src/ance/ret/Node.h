@@ -49,6 +49,14 @@ namespace ance::ret
         explicit ErrorStatement(core::Location const& source_location);
     };
 
+    /// Pass statement, a no-op.
+    struct Pass final
+        : Statement
+        , utility::ConcreteNode<Pass, Visitor>
+    {
+        explicit Pass(core::Location const& source_location);
+    };
+
     /// Block statement, containing multiple statements.
     struct Block final
         : Statement
@@ -256,6 +264,7 @@ namespace ance::ret
         ~Visitor() override = default;
 
         virtual void visit(ErrorStatement const& error)    = 0;
+        virtual void visit(Pass const& pass_statement)     = 0;
         virtual void visit(Block const& block)             = 0;
         virtual void visit(Independent const& independent) = 0;
         virtual void visit(Let const& let)                 = 0;

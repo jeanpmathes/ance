@@ -17,6 +17,8 @@ struct ance::ret::Printer::Implementation
 
         void visit(ErrorStatement const&) override { print("// error"); }
 
+        void visit(Pass const&) override { print("pass;"); }
+
         void visit(Block const& block) override
         {
             if (block.statements.empty())

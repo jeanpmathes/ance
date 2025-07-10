@@ -93,7 +93,7 @@ struct ance::est::Expander::Implementation
 
         static utility::Owned<Statement> wrap(Statements&& statements)
         {
-            if (statements.empty()) { return utility::makeOwned<Block>(std::move(statements), core::Location::global()); }
+            if (statements.empty()) { return utility::makeOwned<Pass>(core::Location::global()); }
 
             if (statements.size() == 1 && statements.front()->isCompound())
             {
@@ -240,7 +240,7 @@ struct ance::est::Expander::Implementation
 
             exit_body.emplace_back(utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, utility::makeOwned<ReadTemporary>(tmp, while_statement.condition->location), while_statement.location),
                      utility::makeOwned<Break>(while_statement.location),
-                     utility::makeOwned<Block>(Statements(), while_statement.location),
+                     utility::makeOwned<Pass>(while_statement.location),
                      while_statement.location));
 
             loop_body.emplace_back(utility::makeOwned<Block>(std::move(exit_body), while_statement.location));

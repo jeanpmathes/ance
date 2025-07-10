@@ -182,6 +182,11 @@ struct ance::cet::Runner::Implementation
             abort();
         }
 
+        void visit(bbt::Pass const&) override
+        {
+            // Intentionally left empty.
+        }
+
         void visit(bbt::Declare const& declare) override
         {
             utility::Shared<core::Value> type = temporaries_.at(&declare.type);

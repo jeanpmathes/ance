@@ -123,6 +123,14 @@ namespace ance::bbt
         explicit ErrorStatement(core::Location const& source_location);
     };
 
+    /// Pass statement, a no-op.
+    struct Pass final
+        : Statement
+        , utility::ConcreteNode<Pass, Visitor>
+    {
+        explicit Pass(core::Location const& source_location);
+    };
+
     /// Declares a variable and can also define its value.
     struct Declare final
         : Statement
@@ -278,6 +286,7 @@ namespace ance::bbt
         virtual void visit(Jump const& jump_link)       = 0;
 
         virtual void visit(ErrorStatement const& error_statement) = 0;
+        virtual void visit(Pass const& pass_statement)            = 0;
         virtual void visit(Declare const& declare)                = 0;
         virtual void visit(Store const& store)                    = 0;
         virtual void visit(Temporary const& temporary)            = 0;

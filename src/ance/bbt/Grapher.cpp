@@ -71,6 +71,7 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(ErrorStatement const&) override {  }
 
+        void visit(Pass const&) override { }
 
         void visit(Declare const& ) override
         {

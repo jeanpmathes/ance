@@ -81,6 +81,8 @@ struct ance::bbt::Printer::Implementation
 
         void visit(ErrorStatement const&) override { print("// error"); }
 
+        void visit(Pass const&) override { print("pass;"); }
+
         void visit(Declare const& declare) override
         {
             print("declare ");

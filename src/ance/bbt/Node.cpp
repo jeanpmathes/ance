@@ -39,6 +39,8 @@ ance::bbt::Jump::Jump(BasicBlock const& link, core::Location const& source_locat
 
 ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::bbt::Pass::Pass(core::Location const& source_location) : Node(source_location), Statement() {}
+
 ance::bbt::Declare::Declare(core::Variable const& var, Temporary const& t, Temporary const* definition, core::Location const& source_location)
     : Node(source_location)
     , Statement()

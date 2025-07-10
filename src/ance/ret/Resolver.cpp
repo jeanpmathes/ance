@@ -31,6 +31,8 @@ struct ance::ret::Resolver::Implementation
     protected:
         void visit(est::ErrorStatement const&) override {}
 
+        void visit(est::Pass const&) override {}
+
         void visit(est::Block const& block) override
         {
             depth++;
@@ -291,6 +293,11 @@ struct ance::ret::Resolver::Implementation
         }
 
         void visit(est::ErrorStatement const& error_statement) override { setResult(utility::makeOwned<ErrorStatement>(error_statement.location)); }
+
+        void visit(est::Pass const& pass_statement) override
+        {
+            setResult(utility::makeOwned<Pass>(pass_statement.location));
+        }
 
         void visit(est::Block const& block) override
         {

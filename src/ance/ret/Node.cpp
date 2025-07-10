@@ -64,6 +64,8 @@ ance::ret::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::ret::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::ret::Pass::Pass(core::Location const& source_location) : Node(source_location), Statement() {}
+
 ance::ret::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
     : Node(source_location)
     , Statement()

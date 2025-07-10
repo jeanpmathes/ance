@@ -450,6 +450,15 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
+        void visit(ret::Pass const& pass_statement) override
+        {
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const pass  = addBlock<Pass>(blocks, pass_statement.location);
+
+            setResult(std::move(blocks), pass, pass);
+        }
+
         void visit(ret::Block const& block) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;

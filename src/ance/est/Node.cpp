@@ -13,6 +13,8 @@ bool ance::est::Statement::isCompound() const { return false; }
 
 ance::est::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::est::Pass::Pass(core::Location const& source_location) : Node(source_location), Statement() {}
+
 ance::est::Block::Block(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location)
     : Node(source_location)
     , Statement()

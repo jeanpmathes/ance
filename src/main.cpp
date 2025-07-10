@@ -159,13 +159,9 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add a new noop statement from expansion on that can be used instead of {} in used branches, something like 'pass;'
-
         // todo: remove the RET and first do the current resolution in the BBT, no resolution intrinsics yet
 
         // todo: rethink resolution - it should be done using intrinsics by the runner
-        //      todo: rename the RET to SET (scoped element tree) and the resolver to Scoper, find a way to preserve scoping in BBT and CET, best way would be to have special scope enter / exit blocks but think how to correctly place them even with breaks and such - see how old code does it
-        //            maybe the RET can be removed completely and the scoping part can be done in the BBT too by assigning each block a scope depth
         //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
         //      todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
         //      todo: for blockers, scopes (internal class of runner and ance type) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
