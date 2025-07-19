@@ -17,10 +17,6 @@
 #include "ance/est/Node.h"
 #include "ance/est/Printer.h"
 
-#include "ance/ret/Node.h"
-#include "ance/ret/Printer.h"
-#include "ance/ret/Resolver.h"
-
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Printer.h"
 #include "ance/bbt/Grapher.h"
@@ -112,17 +108,16 @@ namespace ance
 
         ast::Parser       parser {source_tree, reporter};
         est::Expander     expander {reporter};
-        ret::Resolver     resolver {reporter};
         bbt::Segmenter    segmenter {reporter};
         cet::Runner       runner {reporter};
         build::Compiler   compiler {reporter};
 
         core::Function const print_fn(core::Signature::like("print"), core::Type::Unit(), [](auto&) { std::cout << "PRINT[]" << std::endl; });
-        resolver.add(print_fn);// todo: remove
+        segmenter.add(print_fn);// todo: remove
         core::Function const print_var_fn(core::Signature::like("print_bool", core::Type::Bool()), core::Type::Unit(), [](auto& args) {
             std::cout << "PRINT[" << args[0]->toString() << "]" << std::endl;
         });
-        resolver.add(print_var_fn);// todo: remove
+        segmenter.add(print_var_fn);// todo: remove
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
         if (check_for_fail()) return EXIT_FAILURE;
@@ -137,12 +132,7 @@ namespace ance
 
         print<est::Printer>(*expanded, debug_path, "est");
 
-        utility::Owned<ret::Statement> resolved = resolver.resolve(*expanded);
-        if (check_for_fail()) return EXIT_FAILURE;
-
-        print<ret::Printer>(*resolved, debug_path, "ret");
-
-        utility::Owned<bbt::Flow> segmented = segmenter.segment(*resolved);
+        utility::Owned<bbt::Flow> segmented = segmenter.segment(*expanded);
         if (check_for_fail()) return EXIT_FAILURE;
 
         print<bbt::Printer>(*segmented, debug_path, "bbt");
@@ -159,15 +149,18 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: remove the RET and first do the current resolution in the BBT, no resolution intrinsics yet
+        // todo: get the current version with removed RET to work (where resolving is moved into segmenter)
+
+        // todo: for blockers, scopes (internal class of runner) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
+        // todo: the declarations visitor must be removed and no longer used
+
+        // todo: move the resolution from Segmenter to Runner, with no intrinsics yet
+        // todo: remove the scope and variable classes from core, maybe even remove variable completely
 
         // todo: rethink resolution - it should be done using intrinsics by the runner
         //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
         //      todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
-        //      todo: for blockers, scopes (internal class of runner and ance type) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
-        //      todo: remove the scope and variable classes from core, maybe even remove variable completely
-        //      todo: a more general system instead of the phases might be needed where parts of the tree go through phases independently as needed
-        // todo: type expressions, type checks might need to move from analyzer to runner but maybe not - maybe the type method on expressions could return a type expression instead of the direct type - check what I wrote in type expression note, complete runs might not be possible so type checks could stay in analyzer but it has to run some parts before analyzing others
+        //      todo: the nested scope classes can be simplified by a lot, for example parent references might not be needed at all
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
         // todo: add intrinsic functions to include another file, running the cmp code in there too
         // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)

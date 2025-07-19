@@ -2,6 +2,7 @@
 #define ANCE_EST_NODE_H
 
 #include "ance/core/Identifier.h"
+#include "ance/core/Intrinsic.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
 
@@ -175,6 +176,16 @@ namespace ance::est
         explicit ErrorExpression(core::Location const& source_location);
     };
 
+    /// An intrinsic expression.
+    struct Intrinsic final
+        : Expression
+        , utility::ConcreteNode<Intrinsic, Visitor> {
+        Intrinsic(core::Intrinsic const& called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
+
+        core::Intrinsic const& intrinsic;
+        utility::List<utility::Owned<Expression>> arguments;
+    };
+
     /// A call expression.
     struct Call final
         : Expression
@@ -256,6 +267,7 @@ namespace ance::est
         virtual void visit(WriteTemporary const& write_temporary) = 0;
 
         virtual void visit(ErrorExpression const& error) = 0;
+        virtual void visit(Intrinsic const& intrinsic)   = 0;
         virtual void visit(Call const& call)             = 0;
         virtual void visit(Access const& access)         = 0;
         virtual void visit(Literal const& literal)       = 0;

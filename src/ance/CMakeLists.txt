@@ -4,7 +4,6 @@ add_subdirectory(sources)
 
 add_subdirectory(ast)
 add_subdirectory(est)
-add_subdirectory(ret)
 add_subdirectory(bbt)
 add_subdirectory(cet)
 add_subdirectory(build)

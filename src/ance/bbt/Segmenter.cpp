@@ -1,5 +1,6 @@
 #include "Segmenter.h"
 
+#include <expected>
 #include <map>
 #include <set>
 #include <stack>
@@ -8,14 +9,226 @@
 #include "ance/bbt/Node.h"
 #include "ance/core/Function.h"
 #include "ance/core/Intrinsic.h"
-#include "ance/ret/Node.h"
-
-#include "ance/core/Value.h"
-
-#include <iostream>
+#include "ance/core/Scope.h"
+#include "ance/est/Node.h"
 
 struct ance::bbt::Segmenter::Implementation
 {
+    class Declarations final : public est::Visitor
+    {
+      public:
+        using Visitor::visit;
+
+        Declarations()           = default;
+        ~Declarations() override = default;
+
+        static std::set<core::Identifier> get(est::Block const& block)
+        {
+            Declarations declarations;
+            declarations.visit(block);
+
+            return declarations.declarations;
+        }
+
+      protected:
+        void visit(est::ErrorStatement const&) override {}
+
+        void visit(est::Pass const&) override {}
+
+        void visit(est::Block const& block) override
+        {
+            depth++;
+
+            if (depth <= MAX_DEPTH)
+            {
+                for (auto& statement : block.statements) { visit(*statement); }
+            }
+
+            depth--;
+        }
+
+        void visit(est::Independent const& independent) override
+        {
+            visit(*independent.expression);
+        }
+
+        void visit(est::Let const& let) override
+        {
+            declarations.insert(let.identifier);
+        }
+
+        void visit(est::Assignment const& assignment) override
+        {
+            visit(*assignment.value);
+        }
+
+        void visit(est::If const& if_statement) override
+        {
+            visit(*if_statement.condition);
+            visit(*if_statement.true_block);
+            visit(*if_statement.false_block);
+        }
+
+        void visit(est::Loop const& loop) override
+        {
+            visit(*loop.body);
+        }
+
+        void visit(est::Break const&) override {}
+        void visit(est::Continue const&) override {}
+
+        void visit(est::Temporary const& temporary) override
+        {
+            if (temporary.definition.hasValue()) { visit(**temporary.definition); }
+        }
+
+        void visit(est::WriteTemporary const& write_temporary) override
+        {
+            visit(*write_temporary.value);
+        }
+
+        void visit(est::ErrorExpression const&) override {}
+
+        void visit(est::Intrinsic const& intrinsic) override
+        {
+            for (auto& argument : intrinsic.arguments) { visit(*argument); }
+        }
+
+        void visit(est::Call const& call) override
+        {
+            for (auto& argument : call.arguments) { visit(*argument); }
+        }
+
+        void visit(est::Access const&) override {}
+        void visit(est::Literal const&) override {}
+
+        void visit(est::UnaryOperation const& unary_operation) override
+        {
+            visit(*unary_operation.operand);
+        }
+
+        void visit(est::ReadTemporary const&) override {}
+
+        void visit(est::TypeOf const&) override {}
+
+      private:
+        std::set<core::Identifier> declarations = {};
+        size_t                     depth        = 0;
+
+        constexpr static size_t MAX_DEPTH = 1;
+    };
+
+    class Scope
+    {
+      protected:
+        Scope(Scope const* parent, ScopeEnter& enter) : parent_(parent), scope_enter_(enter)
+        {
+        }
+
+      public:
+        virtual ~Scope() = default;
+
+        core::Scope& scope() const
+        {
+            return *scope_enter_.scope;
+        }
+
+        core::Variable const& declare(core::Identifier const& identifier, core::Location const& location)
+        {
+            core::Variable const& variable = scope().addVariable(identifier, location);
+
+            onDeclare(variable);
+
+            return variable;
+        }
+
+        enum class Error
+        {
+            Unknown,
+            Blocked
+        };
+
+        [[nodiscard]] std::expected<std::reference_wrapper<core::Variable const>, Error> find(core::Identifier const& identifier) const
+        {
+            // todo: when using resolving for intrinsics/functions, instead of adding a global scope, the find method should take a list of providers to use when top of the scope chain is reached
+            // todo: when adding the functions then also add a Value base class for function and variable and scopes should hold Values only
+            // todo: essentially resolving of functions / values should use the same logic - a resolve intrinsic, and intrinsics are placed inside function when they should be part of resolution
+            // todo: the nodes should hold the correct type - meaning that this type checking is done in the resolver
+
+            return onFind(identifier).or_else([&](Error const error) -> std::expected<std::reference_wrapper<core::Variable const>, Error> {
+                if (error == Error::Unknown && parent_ != nullptr) { return parent_->find(identifier); }
+
+                return std::unexpected(error);
+            });
+        }
+
+        [[nodiscard]] core::Variable const* expect(core::Identifier const& identifier, core::Reporter& reporter) const
+        {
+            std::expected<std::reference_wrapper<core::Variable const>, Error> const variable = find(identifier);
+
+            if (variable.has_value()) { return &variable.value().get(); }
+
+            switch (variable.error())
+            {
+                case Error::Unknown:
+                    reporter.error("Cannot resolve name '" + identifier + "'", identifier.location());
+                    break;
+
+                case Error::Blocked:
+                    reporter.error("Name '" + identifier + "' blocked by later declaration in scope", identifier.location());
+                    break;
+            }
+
+            return nullptr;
+        }
+
+      protected:
+        virtual void                                                                             onDeclare(core::Variable const& variable)        = 0;
+        [[nodiscard]] virtual std::expected<std::reference_wrapper<core::Variable const>, Error> onFind(core::Identifier const& identifier) const = 0;
+
+      private:
+        Scope const*                parent_;
+        ScopeEnter&                 scope_enter_;
+    };
+
+    class OrderedScope final : public Scope
+    {
+      public:
+        OrderedScope(std::set<core::Identifier> declarations, Scope const* parent, ScopeEnter& scope_enter)
+            : Scope(parent, scope_enter)
+            , declarations_(std::move(declarations))
+        {}
+
+        ~OrderedScope() override = default;
+
+      protected:
+        void onDeclare(core::Variable const& variable) override
+        {
+            active_variables_.emplace(variable.identifier(), std::cref(variable));
+        }
+
+        [[nodiscard]] std::expected<std::reference_wrapper<core::Variable const>, Error> onFind(core::Identifier const& identifier) const override
+        {
+            if (active_variables_.contains(identifier)) { return active_variables_.at(identifier); }
+
+            if (declarations_.contains(identifier)) { return std::unexpected(Error::Blocked); }
+
+            return std::unexpected(Error::Unknown);
+        }
+
+      private:
+        std::set<core::Identifier> const declarations_;
+
+        std::map<core::Identifier, std::reference_wrapper<core::Variable const>> active_variables_ = {};
+    };
+
+    static utility::Owned<core::Scope> createScope(utility::Optional<utility::Owned<core::Scope>>& parent)
+    {
+        if (parent.hasValue()) { return (*parent)->createChild(); }
+
+        return utility::makeOwned<core::Scope>();
+    }
+
     class BaseBB
     {
       public:
@@ -115,10 +328,7 @@ struct ance::bbt::Segmenter::Implementation
             {
                 std::set<BaseBB*> const outgoing = next();
 
-                for (auto& next : outgoing)
-                {
-                    next->incoming_.erase(this);
-                }
+                for (auto& next : outgoing) { next->incoming_.erase(this); }
             }
         }
 
@@ -213,27 +423,28 @@ struct ance::bbt::Segmenter::Implementation
         }
 
       private:
-        Temporary const&                                  condition_;
-        std::reference_wrapper<BaseBB>                    true_;
-        std::reference_wrapper<BaseBB>                    false_;
+        Temporary const&               condition_;
+        std::reference_wrapper<BaseBB> true_;
+        std::reference_wrapper<BaseBB> false_;
     };
 
-    class RET final : public ret::Visitor
+    class RET final : public est::Visitor
     {
       public:
         using Visitor::visit;
 
-        explicit RET(core::Reporter& reporter) : reporter_(reporter) {}
+        explicit RET(core::Reporter& reporter, std::map<core::Identifier, std::reference_wrapper<core::Function const>> const& functions)
+            : reporter_(reporter)
+            , functions_(functions)
+        {}
         ~RET() override = default;
 
-        utility::Owned<Flow> apply(ret::Statement const& statement)
+        utility::Owned<Flow> apply(est::Statement const& statement)
         {
             assert(bbs_.empty());
 
-            scopes_.clear();
-
-            utility::Owned<SimpleBB>     entry_block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper       entry       = *entry_block;
+            utility::Owned<SimpleBB> entry_block = utility::makeOwned<SimpleBB>();
+            std::reference_wrapper   entry       = *entry_block;
 
             current_entry_bb_ = entry_block.get();
             current_exit_bb_  = current_entry_bb_;
@@ -286,12 +497,9 @@ struct ance::bbt::Segmenter::Implementation
 
         std::reference_wrapper<BaseBB> simplify(std::reference_wrapper<BaseBB> entry)
         {
-            for (auto& block : bbs_)
-            {
-                block.get()->prune();
-            }
+            for (auto& block : bbs_) { block.get()->prune(); }
 
-            std::set<BaseBB*> simplified;
+            std::set<BaseBB*>                          simplified;
             std::stack<std::reference_wrapper<BaseBB>> to_simplify;
             to_simplify.emplace(entry);
 
@@ -315,22 +523,19 @@ struct ance::bbt::Segmenter::Implementation
                 }
             }
 
-            bool has_unreachable_code = false;
+            bool           has_unreachable_code       = false;
             core::Location first_unreachable_location = core::Location::global();
 
             for (auto& block : bbs_)
             {
                 if (block.get()->hasCode() && !simplified.contains(block.get()))
                 {
-                    has_unreachable_code = true;
+                    has_unreachable_code       = true;
                     first_unreachable_location = core::Location::getFirst(first_unreachable_location, block.get()->location());
                 }
             }
 
-            if (has_unreachable_code)
-            {
-                reporter_.warning("Unreachable code", first_unreachable_location);
-            }
+            if (has_unreachable_code) { reporter_.warning("Unreachable code", first_unreachable_location); }
 
             return current_entry;
         }
@@ -342,7 +547,7 @@ struct ance::bbt::Segmenter::Implementation
             from.get().link(to.get());
         }
 
-        std::pair<std::reference_wrapper<SimpleBB>, std::reference_wrapper<SimpleBB>> segment(ret::Statement const& statement)
+        std::pair<std::reference_wrapper<SimpleBB>, std::reference_wrapper<SimpleBB>> segment(est::Statement const& statement)
         {
             SimpleBB* previous_entry = current_entry_bb_;
             SimpleBB* previous_exit  = current_exit_bb_;
@@ -363,7 +568,7 @@ struct ance::bbt::Segmenter::Implementation
             return result;
         }
 
-        std::pair<std::reference_wrapper<SimpleBB>, std::reference_wrapper<SimpleBB>> segment(ret::Expression const& expression, Temporary const& destination)
+        std::pair<std::reference_wrapper<SimpleBB>, std::reference_wrapper<SimpleBB>> segment(est::Expression const& expression, Temporary const& destination)
         {
             SimpleBB*        previous_entry       = current_entry_bb_;
             SimpleBB*        previous_exit        = current_exit_bb_;
@@ -395,6 +600,13 @@ struct ance::bbt::Segmenter::Implementation
             return *current_destination_;
         }
 
+        [[nodiscard]] Scope* scope() const
+        {
+            if (scopes_.empty()) return nullptr;
+
+            return scopes_.back();
+        }
+
         template<typename T, typename... Args>
         static std::reference_wrapper<SimpleBB> addBlock(utility::List<utility::Owned<BaseBB>>& blocks, Args&&... args)
         {
@@ -422,7 +634,7 @@ struct ance::bbt::Segmenter::Implementation
         static std::reference_wrapper<SimpleBB> addEmptyBlock(utility::List<utility::Owned<BaseBB>>& blocks)
         {
             utility::Owned<SimpleBB>     block = utility::makeOwned<SimpleBB>();
-            std::reference_wrapper const ref = *block;
+            std::reference_wrapper const ref   = *block;
             blocks.emplace_back(std::move(block));
             return ref;
         }
@@ -435,7 +647,7 @@ struct ance::bbt::Segmenter::Implementation
             current_exit_bb_  = &exit;
         }
 
-        void visit(ret::ErrorStatement const& error_statement) override
+        void visit(est::ErrorStatement const& error_statement) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -450,25 +662,34 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Pass const& pass_statement) override
+        void visit(est::Pass const& pass_statement) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const pass  = addBlock<Pass>(blocks, pass_statement.location);
+            std::reference_wrapper const pass = addBlock<Pass>(blocks, pass_statement.location);
 
             setResult(std::move(blocks), pass, pass);
         }
 
-        void visit(ret::Block const& block) override
+        void visit(est::Block const& block) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            std::reference_wrapper const scope_entry = addBlock<ScopeEnter>(blocks, *block.scope, block.location);
-            scopes_.push_back(block.scope.get());
-            link(entry, scope_entry);
-            std::reference_wrapper current = scope_entry;
+            utility::Optional<utility::Owned<core::Scope>> owned_scope;
+
+            if (scopes_.empty()) { owned_scope = utility::makeOwned<core::Scope>(); }
+            else { owned_scope = scopes_.back()->scope().createChild(); }
+
+            core::Scope const& scope = **owned_scope;
+
+            auto [scope_enter, enter] = addBlockAndGetInner<ScopeEnter>(blocks, std::move(owned_scope.value()), block.location);
+            utility::Owned<Scope>        scope_representation =
+                utility::makeOwned<OrderedScope>(Declarations::get(block), scopes_.empty() ? nullptr : scopes_.back(), enter.get());
+            scopes_.emplace_back(scope_representation.get());
+            link(entry, scope_enter);
+            std::reference_wrapper current = scope_enter;
 
             for (auto& statement : block.statements)
             {
@@ -478,7 +699,7 @@ struct ance::bbt::Segmenter::Implementation
                 current = statement_exit;
             }
 
-            std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *block.scope, block.location);
+            std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, scope, block.location);
             scopes_.pop_back();
             link(current, scope_exit);
 
@@ -488,7 +709,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Independent const& independent) override
+        void visit(est::Independent const& independent) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
             std::reference_wrapper const          entry = addEmptyBlock(blocks);
@@ -505,26 +726,26 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Let const& let) override
+        void visit(est::Let const& let) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const entry = addEmptyBlock(blocks);
-            std::reference_wrapper incoming = entry;
+            std::reference_wrapper const entry    = addEmptyBlock(blocks);
+            std::reference_wrapper       incoming = entry;
 
             Temporary const* type;
             {
                 auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, let.type->location);
                 link(incoming, temporary);
                 incoming = temporary;
-                type    = &temporary_node.get();
+                type     = &temporary_node.get();
 
                 auto [expression_entry, expression_exit] = segment(*let.type, *type);
                 link(incoming, expression_entry);
                 incoming = expression_exit;
             }
 
-            Temporary const*       value    = nullptr;
+            Temporary const* value = nullptr;
             if (let.value.hasValue())
             {
                 auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, (*let.value)->location);
@@ -537,7 +758,8 @@ struct ance::bbt::Segmenter::Implementation
                 incoming = expression_exit;
             }
 
-            std::reference_wrapper const declare = addBlock<Declare>(blocks, let.variable, *type, value, let.location);
+            core::Variable const&        variable = scope()->declare(let.identifier, let.location);
+            std::reference_wrapper const declare  = addBlock<Declare>(blocks, variable, *type, value, let.location);
             link(incoming, declare);
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
@@ -546,7 +768,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Assignment const& assignment) override
+        void visit(est::Assignment const& assignment) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -558,16 +780,26 @@ struct ance::bbt::Segmenter::Implementation
             auto [expression_entry, expression_exit] = segment(*assignment.value, value.get());
             link(temporary, expression_entry);
 
-            std::reference_wrapper const store = addBlock<Store>(blocks, assignment.variable, value.get(), assignment.location);
-            link(expression_exit, store);
+            std::reference_wrapper inner    = expression_exit;
+            core::Variable const*  variable = scope()->expect(assignment.identifier, reporter_);
+            if (variable != nullptr)
+            {
+                inner = addBlock<Store>(blocks, *variable, value.get(), assignment.location);
+                link(expression_exit, inner);
+            }
+            else
+            {
+                inner = addBlock<ErrorStatement>(blocks, assignment.location);
+                link(expression_exit, inner);
+            }
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
-            link(store, exit);
+            link(inner, exit);
 
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::If const& if_statement) override
+        void visit(est::If const& if_statement) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -594,7 +826,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Loop const& loop) override
+        void visit(est::Loop const& loop) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -613,55 +845,55 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Break const& break_statement) override
+        void visit(est::Break const& break_statement) override
         {
             if (loops_.empty()) { reporter_.error("Break statement outside of loop", break_statement.location); }
 
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const entry = addEmptyBlock(blocks);
+            std::reference_wrapper const entry   = addEmptyBlock(blocks);
             std::reference_wrapper       current = entry;
 
             size_t const target_depth = loops_.back().scope_depth;
             for (size_t i = scopes_.size(); i > target_depth; i--)
             {
-                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *scopes_[i - 1], break_statement.location);
+                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, scopes_[i - 1]->scope(), break_statement.location);
                 link(current, scope_exit);
                 current = scope_exit;
             }
 
             link(current, loops_.back().exit);
 
-            std::reference_wrapper const exit  = addEmptyBlock(blocks);
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
 
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Continue const& continue_statement) override
+        void visit(est::Continue const& continue_statement) override
         {
             if (loops_.empty()) { reporter_.error("Continue statement outside of loop", continue_statement.location); }
 
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const entry = addEmptyBlock(blocks);
+            std::reference_wrapper const entry   = addEmptyBlock(blocks);
             std::reference_wrapper       current = entry;
 
             size_t const target_depth = loops_.back().scope_depth;
             for (size_t i = scopes_.size(); i > target_depth; i--)
             {
-                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *scopes_[i - 1], continue_statement.location);
+                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, scopes_[i - 1]->scope(), continue_statement.location);
                 link(current, scope_exit);
                 current = scope_exit;
             }
 
             link(current, loops_.back().entry);
 
-            std::reference_wrapper const exit  = addEmptyBlock(blocks);
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
 
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Temporary const& temporary) override
+        void visit(est::Temporary const& temporary) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -685,7 +917,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::WriteTemporary const& write) override
+        void visit(est::WriteTemporary const& write) override
         {
             Temporary const& destination = *temporaries_.at(&write.temporary);
 
@@ -702,7 +934,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::ErrorExpression const& error) override
+        void visit(est::ErrorExpression const& error) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -711,7 +943,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), inner, inner);
         }
 
-        void visit(ret::Intrinsic const& intrinsic) override
+        void visit(est::Intrinsic const& intrinsic) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -719,7 +951,7 @@ struct ance::bbt::Segmenter::Implementation
             std::reference_wrapper       incoming = entry;
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
-            for (const auto & index : intrinsic.arguments)
+            for (auto const& index : intrinsic.arguments)
             {
                 auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, index->location);
                 link(incoming, argument);
@@ -741,7 +973,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Call const& call) override
+        void visit(est::Call const& call) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -749,7 +981,7 @@ struct ance::bbt::Segmenter::Implementation
             std::reference_wrapper       incoming = entry;
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
-            for (const auto & index : call.arguments)
+            for (auto const& index : call.arguments)
             {
                 auto [argument, value] = addBlockAndGetInner<Temporary>(blocks, index->location);
                 link(incoming, argument);
@@ -762,8 +994,19 @@ struct ance::bbt::Segmenter::Implementation
                 arguments.emplace_back(value.get());
             }
 
-            std::reference_wrapper const inner = addBlock<Call>(blocks, call.called, std::move(arguments), destination(), call.location);
-            link(incoming, inner);
+            std::reference_wrapper inner = incoming;
+            if (functions_.contains(call.identifier))
+            {
+                inner = addBlock<Call>(blocks, functions_.at(call.identifier).get(), std::move(arguments), destination(), call.location);
+                link(incoming, inner);
+            }
+            else
+            {
+                reporter_.error("Unknown function '" + call.identifier + "'", call.identifier.location());
+
+                inner = addBlock<ErrorStatement>(blocks, call.location);
+                link(incoming, inner);
+            }
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(inner, exit);
@@ -771,25 +1014,41 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::Access const& access) override
+        void visit(est::Access const& access) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Read>(blocks, access.variable, destination(), access.location);
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+            std::reference_wrapper inner = entry;
+
+            core::Variable const* variable = scope()->expect(access.identifier, reporter_);
+            if (variable != nullptr)
+            {
+                inner = addBlock<Read>(blocks, *variable, destination(), access.location);
+                link(entry, inner);
+            }
+            else
+            {
+                inner = addBlock<ErrorStatement>(blocks, access.location);
+                link(entry, inner);
+            }
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(inner, exit);
+
+            setResult(std::move(blocks), entry, exit);
+        }
+
+        void visit(est::Literal const& literal) override
+        {
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, literal.value->clone(), destination(), literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
 
-        void visit(ret::Constant const& constant) override
-        {
-            utility::List<utility::Owned<BaseBB>> blocks;
-
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, constant.value->clone(), destination(), constant.location);
-
-            setResult(std::move(blocks), inner, inner);
-        }
-
-        void visit(ret::UnaryOperation const& unary_operation) override
+        void visit(est::UnaryOperation const& unary_operation) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -810,7 +1069,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::ReadTemporary const& read_temporary) override
+        void visit(est::ReadTemporary const& read_temporary) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -826,7 +1085,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(ret::TypeOf const& type_of) override
+        void visit(est::TypeOf const& type_of) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
@@ -851,42 +1110,56 @@ struct ance::bbt::Segmenter::Implementation
         {
             std::reference_wrapper<SimpleBB> entry;
             std::reference_wrapper<SimpleBB> exit;
-            size_t scope_depth = 0;
+            size_t                           scope_depth = 0;
         };
 
       private:
         utility::List<utility::Owned<BaseBB>> bbs_;
 
-        SimpleBB* current_entry_bb_ = nullptr;
-        SimpleBB* current_exit_bb_  = nullptr;
+        SimpleBB*        current_entry_bb_    = nullptr;
+        SimpleBB*        current_exit_bb_     = nullptr;
         Temporary const* current_destination_ = nullptr;
 
-        std::vector<Loop> loops_;
-        std::vector<core::Scope const*> scopes_ = {};
+        std::vector<Loop>   loops_  = {};
+        std::vector<Scope*> scopes_ = {};
 
         core::Reporter& reporter_;
 
-        std::map<ret::Temporary const*, Temporary const*> temporaries_;
+        std::map<est::Temporary const*, Temporary const*> temporaries_;
+
+        std::map<core::Identifier, std::reference_wrapper<core::Function const>> const& functions_;
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
-    utility::Owned<Flow> segment(ret::Statement const& statement)
+    void add(core::Function const& function)
     {
-        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
+        functions_.emplace(function.name(), std::cref(function));
+    }
+
+    utility::Owned<Flow> segment(est::Statement const& statement)
+    {
+        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, functions_);
 
         return ret->apply(statement);
     }
 
   private:
     core::Reporter& reporter_;
+
+    std::map<core::Identifier, std::reference_wrapper<core::Function const>> functions_ = {};
 };
 
 ance::bbt::Segmenter::Segmenter(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
 
 ance::bbt::Segmenter::~Segmenter() = default;
 
-ance::utility::Owned<ance::bbt::Flow> ance::bbt::Segmenter::segment(ret::Statement const& statement)
+void ance::bbt::Segmenter::add(core::Function const& function)
+{
+    implementation_->add(function);
+}
+
+ance::utility::Owned<ance::bbt::Flow> ance::bbt::Segmenter::segment(est::Statement const& statement)
 {
     return implementation_->segment(statement);
 }

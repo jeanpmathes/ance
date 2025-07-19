@@ -93,6 +93,13 @@ ance::est::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owne
 
 ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
+ance::est::Intrinsic::Intrinsic(core::Intrinsic const& called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , intrinsic(called)
+    , arguments(std::move(expressions))
+{}
+
 ance::est::Call::Call(core::Identifier const& callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
     : Node(source_location)
     , Expression()

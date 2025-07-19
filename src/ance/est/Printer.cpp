@@ -145,14 +145,26 @@ struct ance::est::Printer::Implementation
 
         void visit(ErrorExpression const&) override { print("/* error */"); }
 
+        void visit(Intrinsic const& intrinsic) override
+        {
+            print("intrinsic(");
+            print(intrinsic.intrinsic);
+            for (size_t i = 0; i < intrinsic.arguments.size(); ++i)
+            {
+                print(", ");
+                visit(*intrinsic.arguments[i]);
+            }
+            print(")");
+        }
+
         void visit(Call const& call) override
         {
             print(call.identifier);
             print("(");
             for (size_t i = 0; i < call.arguments.size(); ++i)
             {
+                if (i > 0) print(", ");
                 visit(*call.arguments[i]);
-                if (i + 1 < call.arguments.size()) print(", ");
             }
             print(")");
         }

@@ -256,9 +256,9 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<ScopeEnter, Visitor>
     {
-        ScopeEnter(core::Scope const& s, core::Location const& source_location);
+        ScopeEnter(utility::Owned<core::Scope> s, core::Location const& source_location);
 
-        core::Scope const& scope;
+        utility::Owned<core::Scope> scope;
     };
 
     /// Exits a scope, which is used to manage variable lifetimes and visibility.
