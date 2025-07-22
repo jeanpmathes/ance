@@ -14,114 +14,10 @@
 
 struct ance::bbt::Segmenter::Implementation
 {
-    class Declarations final : public est::Visitor
-    {
-      public:
-        using Visitor::visit;
-
-        Declarations()           = default;
-        ~Declarations() override = default;
-
-        static std::set<core::Identifier> get(est::Block const& block)
-        {
-            Declarations declarations;
-            declarations.visit(block);
-
-            return declarations.declarations;
-        }
-
-      protected:
-        void visit(est::ErrorStatement const&) override {}
-
-        void visit(est::Pass const&) override {}
-
-        void visit(est::Block const& block) override
-        {
-            depth++;
-
-            if (depth <= MAX_DEPTH)
-            {
-                for (auto& statement : block.statements) { visit(*statement); }
-            }
-
-            depth--;
-        }
-
-        void visit(est::Independent const& independent) override
-        {
-            visit(*independent.expression);
-        }
-
-        void visit(est::Let const& let) override
-        {
-            declarations.insert(let.identifier);
-        }
-
-        void visit(est::Assignment const& assignment) override
-        {
-            visit(*assignment.value);
-        }
-
-        void visit(est::If const& if_statement) override
-        {
-            visit(*if_statement.condition);
-            visit(*if_statement.true_block);
-            visit(*if_statement.false_block);
-        }
-
-        void visit(est::Loop const& loop) override
-        {
-            visit(*loop.body);
-        }
-
-        void visit(est::Break const&) override {}
-        void visit(est::Continue const&) override {}
-
-        void visit(est::Temporary const& temporary) override
-        {
-            if (temporary.definition.hasValue()) { visit(**temporary.definition); }
-        }
-
-        void visit(est::WriteTemporary const& write_temporary) override
-        {
-            visit(*write_temporary.value);
-        }
-
-        void visit(est::ErrorExpression const&) override {}
-
-        void visit(est::Intrinsic const& intrinsic) override
-        {
-            for (auto& argument : intrinsic.arguments) { visit(*argument); }
-        }
-
-        void visit(est::Call const& call) override
-        {
-            for (auto& argument : call.arguments) { visit(*argument); }
-        }
-
-        void visit(est::Access const&) override {}
-        void visit(est::Literal const&) override {}
-
-        void visit(est::UnaryOperation const& unary_operation) override
-        {
-            visit(*unary_operation.operand);
-        }
-
-        void visit(est::ReadTemporary const&) override {}
-
-        void visit(est::TypeOf const&) override {}
-
-      private:
-        std::set<core::Identifier> declarations = {};
-        size_t                     depth        = 0;
-
-        constexpr static size_t MAX_DEPTH = 1;
-    };
-
     class Scope
     {
       protected:
-        Scope(Scope const* parent, ScopeEnter& enter) : parent_(parent), scope_enter_(enter)
+        Scope(Scope * parent, ScopeEnter& enter) : parent_(parent), scope_enter_(enter)
         {
         }
 
@@ -133,22 +29,27 @@ struct ance::bbt::Segmenter::Implementation
             return *scope_enter_.scope;
         }
 
-        core::Variable const& declare(core::Identifier const& identifier, core::Location const& location)
+        core::Variable const* declare(core::Identifier const& identifier, core::Location const& location, core::Reporter& reporter)
         {
+            if (!canDeclare(identifier))
+            {
+                reporter.error("Declaring '" + identifier + "' in this scope would block previous access to outside of the scope", location);
+                return nullptr;
+            }
+
             core::Variable const& variable = scope().addVariable(identifier, location);
 
             onDeclare(variable);
 
-            return variable;
+            return &variable;
         }
 
         enum class Error
         {
-            Unknown,
-            Blocked
+            Unknown
         };
 
-        [[nodiscard]] std::expected<std::reference_wrapper<core::Variable const>, Error> find(core::Identifier const& identifier) const
+        [[nodiscard]] std::expected<std::reference_wrapper<core::Variable const>, Error> find(core::Identifier const& identifier)
         {
             // todo: when using resolving for intrinsics/functions, instead of adding a global scope, the find method should take a list of providers to use when top of the scope chain is reached
             // todo: when adding the functions then also add a Value base class for function and variable and scopes should hold Values only
@@ -162,7 +63,7 @@ struct ance::bbt::Segmenter::Implementation
             });
         }
 
-        [[nodiscard]] core::Variable const* expect(core::Identifier const& identifier, core::Reporter& reporter) const
+        [[nodiscard]] core::Variable const* expect(core::Identifier const& identifier, core::Reporter& reporter)
         {
             std::expected<std::reference_wrapper<core::Variable const>, Error> const variable = find(identifier);
 
@@ -173,53 +74,53 @@ struct ance::bbt::Segmenter::Implementation
                 case Error::Unknown:
                     reporter.error("Cannot resolve name '" + identifier + "'", identifier.location());
                     break;
-
-                case Error::Blocked:
-                    reporter.error("Name '" + identifier + "' blocked by later declaration in scope", identifier.location());
-                    break;
             }
 
             return nullptr;
         }
 
       protected:
-        virtual void                                                                             onDeclare(core::Variable const& variable)        = 0;
-        [[nodiscard]] virtual std::expected<std::reference_wrapper<core::Variable const>, Error> onFind(core::Identifier const& identifier) const = 0;
+        virtual bool                                                                             canDeclare(core::Identifier const& identifier) const = 0;
+        virtual void                                                                             onDeclare(core::Variable const& variable)   = 0;
+        [[nodiscard]] virtual std::expected<std::reference_wrapper<core::Variable const>, Error> onFind(core::Identifier const& identifier)  = 0;
 
       private:
-        Scope const*                parent_;
+        Scope *                parent_;
         ScopeEnter&                 scope_enter_;
     };
 
     class OrderedScope final : public Scope
     {
       public:
-        OrderedScope(std::set<core::Identifier> declarations, Scope const* parent, ScopeEnter& scope_enter)
+        OrderedScope(Scope* parent, ScopeEnter& scope_enter)
             : Scope(parent, scope_enter)
-            , declarations_(std::move(declarations))
         {}
 
         ~OrderedScope() override = default;
 
       protected:
+        bool canDeclare(core::Identifier const& identifier) const override
+        {
+            return !outer_identifiers_.contains(identifier);
+        }
+
         void onDeclare(core::Variable const& variable) override
         {
             active_variables_.emplace(variable.identifier(), std::cref(variable));
         }
 
-        [[nodiscard]] std::expected<std::reference_wrapper<core::Variable const>, Error> onFind(core::Identifier const& identifier) const override
+        [[nodiscard]] std::expected<std::reference_wrapper<core::Variable const>, Error> onFind(core::Identifier const& identifier) override
         {
             if (active_variables_.contains(identifier)) { return active_variables_.at(identifier); }
 
-            if (declarations_.contains(identifier)) { return std::unexpected(Error::Blocked); }
+            outer_identifiers_.insert(identifier);
 
             return std::unexpected(Error::Unknown);
         }
 
       private:
-        std::set<core::Identifier> const declarations_;
-
         std::map<core::Identifier, std::reference_wrapper<core::Variable const>> active_variables_ = {};
+        std::set<core::Identifier> outer_identifiers_ = {};
     };
 
     static utility::Owned<core::Scope> createScope(utility::Optional<utility::Owned<core::Scope>>& parent)
@@ -686,7 +587,7 @@ struct ance::bbt::Segmenter::Implementation
 
             auto [scope_enter, enter] = addBlockAndGetInner<ScopeEnter>(blocks, std::move(owned_scope.value()), block.location);
             utility::Owned<Scope>        scope_representation =
-                utility::makeOwned<OrderedScope>(Declarations::get(block), scopes_.empty() ? nullptr : scopes_.back(), enter.get());
+                utility::makeOwned<OrderedScope>(scopes_.empty() ? nullptr : scopes_.back(), enter.get());
             scopes_.emplace_back(scope_representation.get());
             link(entry, scope_enter);
             std::reference_wrapper current = scope_enter;
@@ -758,12 +659,21 @@ struct ance::bbt::Segmenter::Implementation
                 incoming = expression_exit;
             }
 
-            core::Variable const&        variable = scope()->declare(let.identifier, let.location);
-            std::reference_wrapper const declare  = addBlock<Declare>(blocks, variable, *type, value, let.location);
-            link(incoming, declare);
+            core::Variable const*        variable = scope()->declare(let.identifier, let.location, reporter_);
+            std::reference_wrapper inner = incoming;
+            if (variable != nullptr)
+            {
+                inner = addBlock<Declare>(blocks, *variable, *type, value, let.location);
+                link(incoming, inner);
+            }
+            else
+            {
+                inner = addBlock<ErrorStatement>(blocks, let.location);
+                link(incoming, inner);
+            }
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
-            link(declare, exit);
+            link(inner, exit);
 
             setResult(std::move(blocks), entry, exit);
         }

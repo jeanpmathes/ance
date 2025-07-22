@@ -149,11 +149,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: get the current version with removed RET to work (where resolving is moved into segmenter)
-
-        // todo: for blockers, scopes (internal class of runner) should memorize everything resolved from the outside, if that is declared inside it causes the blocker error
-        // todo: the declarations visitor must be removed and no longer used
-
         // todo: move the resolution from Segmenter to Runner, with no intrinsics yet
         // todo: remove the scope and variable classes from core, maybe even remove variable completely
 
