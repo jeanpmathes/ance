@@ -4,7 +4,6 @@
 #include <iomanip>
 
 #include "ance/utility/ID.h"
-#include "ance/core/Scope.h"
 
 ance::bbt::Node::Node(core::Location const& source_location) : location(source_location) {}
 
@@ -42,18 +41,18 @@ ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location)
 
 ance::bbt::Pass::Pass(core::Location const& source_location) : Node(source_location), Statement() {}
 
-ance::bbt::Declare::Declare(core::Variable const& var, Temporary const& t, Temporary const* definition, core::Location const& source_location)
+ance::bbt::Declare::Declare(core::Identifier const& name, Temporary const& t, Temporary const* definition, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , variable(var)
+    , identifier(name)
     , type(t)
     , value(definition)
 {}
 
-ance::bbt::Store::Store(core::Variable const& assigned, Temporary const& stored, core::Location const& source_location)
+ance::bbt::Store::Store(core::Identifier const& name, Temporary const& stored, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , variable(assigned)
+    , identifier(name)
     , value(stored)
 {}
 
@@ -82,10 +81,10 @@ ance::bbt::Intrinsic::Intrinsic(core::Intrinsic const&                          
     , destination(result)
 {}
 
-ance::bbt::Read::Read(core::Variable const& accessed, Temporary const& result, core::Location const& source_location)
+ance::bbt::Read::Read(core::Identifier const& name, Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , variable(accessed)
+    , identifier(name)
     , destination(result)
 {}
 
@@ -124,9 +123,9 @@ ance::bbt::TypeOf::TypeOf(Temporary const& expr, Temporary const& result, core::
     , expression(expr)
     , destination(result) {}
 
-ance::bbt::ScopeEnter::ScopeEnter(utility::Owned<core::Scope> s, core::Location const& source_location)
-    : Node(source_location), Statement(), scope(std::move(s)) {}
+ance::bbt::ScopeEnter::ScopeEnter(core::Location const& source_location)
+    : Node(source_location), Statement() {}
 
-ance::bbt::ScopeExit::ScopeExit(core::Scope const& s, core::Location const& source_location)
-    : Node(source_location), Statement(), scope(s) {}
+ance::bbt::ScopeExit::ScopeExit(ScopeEnter const& entry, core::Location const& source_location)
+    : Node(source_location), Statement(), enter(entry) {}
 

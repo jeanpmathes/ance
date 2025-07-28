@@ -86,7 +86,7 @@ struct ance::bbt::Printer::Implementation
         void visit(Declare const& declare) override
         {
             print("declare ");
-            print(declare.variable.identifier());
+            print(declare.identifier);
 
             if (declare.value != nullptr)
             {
@@ -99,7 +99,7 @@ struct ance::bbt::Printer::Implementation
 
         void visit(Store const& store) override
         {
-            print(store.variable.identifier());
+            print(store.identifier);
             print(" <: temporary ");
             print(store.value.id());
             print(";");
@@ -155,7 +155,7 @@ struct ance::bbt::Printer::Implementation
             print("temporary ");
             print(read.destination.id());
             print(" <: ");
-            print(read.variable.identifier());
+            print(read.identifier);
         }
 
         void visit(Constant const& constant) override

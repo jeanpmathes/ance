@@ -1,8 +1,5 @@
 #include "Expander.h"
 
-#include "ance/core/Scope.h"
-#include "ance/core/Type.h"
-
 #include "ance/ast/Node.h"
 #include "ance/est/Node.h"
 

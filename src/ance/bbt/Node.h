@@ -136,9 +136,9 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Declare, Visitor>
     {
-        Declare(core::Variable const& var, Temporary const& t, Temporary const* definition, core::Location const& source_location);
+        Declare(core::Identifier const& name, Temporary const& t, Temporary const* definition, core::Location const& source_location);
 
-        core::Variable const& variable;
+        core::Identifier  identifier;
         Temporary const&      type;
         Temporary const*      value;
     };
@@ -148,9 +148,9 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Store, Visitor>
     {
-        Store(core::Variable const& assigned, Temporary const& stored, core::Location const& source_location);
+        Store(core::Identifier const& name, Temporary const& stored, core::Location const& source_location);
 
-        core::Variable const& variable;
+        core::Identifier identifier;
         Temporary const&      value;
     };
 
@@ -195,9 +195,9 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Read, Visitor>
     {
-        Read(core::Variable const& accessed, Temporary const& result, core::Location const& source_location);
+        Read(core::Identifier const& name, Temporary const& result, core::Location const& source_location);
 
-        core::Variable const& variable;
+        core::Identifier identifier;
         Temporary const&      destination;
     };
 
@@ -256,9 +256,7 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<ScopeEnter, Visitor>
     {
-        ScopeEnter(utility::Owned<core::Scope> s, core::Location const& source_location);
-
-        utility::Owned<core::Scope> scope;
+        explicit ScopeEnter(core::Location const& source_location);
     };
 
     /// Exits a scope, which is used to manage variable lifetimes and visibility.
@@ -266,9 +264,9 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<ScopeExit, Visitor>
     {
-        ScopeExit(core::Scope const& s, core::Location const& source_location);
+        ScopeExit(ScopeEnter const& entry, core::Location const& source_location);
 
-        core::Scope const& scope;
+        ScopeEnter const& enter;
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>

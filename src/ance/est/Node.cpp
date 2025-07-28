@@ -5,8 +5,6 @@
 
 #include "ance/utility/ID.h"
 
-#include "ance/core/Scope.h"
-
 ance::est::Node::Node(core::Location const& source_location) : location(source_location) {}
 
 bool ance::est::Statement::isCompound() const { return false; }

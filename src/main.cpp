@@ -149,13 +149,15 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: move the resolution from Segmenter to Runner, with no intrinsics yet
-        // todo: remove the scope and variable classes from core, maybe even remove variable completely
+        // todo: use an intrinsic for resolution, making variables a first class type that can be returned by expressions
+        // todo: do the TODO in Runner::Scope::find
 
-        // todo: rethink resolution - it should be done using intrinsics by the runner
-        //      todo: change the bbt to allow arbitrary stopping and continuation of execution (linearize by pulling out expression, do not use visitor to run)
-        //      todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
-        //      todo: the nested scope classes can be simplified by a lot, for example parent references might not be needed at all
+        // todo: add global variables so that circular dependencies can exist
+
+        // todo: change the runner to allow arbitrary stopping and continuation of execution
+        // todo: it should have a list of run-points and if running one of those stops it continues with the next one
+        // todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
+
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
         // todo: add intrinsic functions to include another file, running the cmp code in there too
         // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)
@@ -164,6 +166,7 @@ namespace ance
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
         // todo: when adding erase, check where it is used in expansion, instead use scoping
+        // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes
         // todo: correctly call copy and move functions for all linearized temporary using nodes in BBT and CET
         // todo: global variables with non-cmp initializers need an ordering determined using topological sort
         // todo: think about making the typeof node an intrinsic, would either require an any type or something else for the argument like overloading

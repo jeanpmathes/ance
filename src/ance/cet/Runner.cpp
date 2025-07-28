@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <map>
+#include <set>
+#include <expected>
 
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Function.h"
@@ -12,6 +14,128 @@
 
 struct ance::cet::Runner::Implementation
 {
+    class Variable
+    {
+    public:
+        Variable(core::Identifier const& identifier, core::Type const& type)
+            : identifier_(identifier), type_(type)
+        {
+        }
+
+        [[nodiscard]] core::Identifier const& identifier() const { return identifier_; }
+        [[nodiscard]] core::Type const& type() const { return type_; }
+
+    private:
+        core::Identifier identifier_;
+        core::Type const& type_;
+    };
+
+    class Scope
+    {
+      protected:
+        explicit Scope(Scope* parent) : parent_(parent)
+        {
+        }
+
+      public:
+        virtual ~Scope() = default;
+
+        utility::Optional<std::reference_wrapper<Variable const>> declare(core::Identifier const& identifier, core::Type const& type, core::Location const& location, core::Reporter& reporter)
+        {
+            if (!canDeclare(identifier))
+            {
+                reporter.error("Declaring '" + identifier + "' in this scope would block previous access to outside of the scope", location);
+                return std::nullopt;
+            }
+
+            utility::Owned<Variable> variable = utility::makeOwned<Variable>(identifier, type);
+            Variable const& variable_ref = *variable;
+
+            onDeclare(std::move(variable));
+
+            return std::cref(variable_ref);
+        }
+
+        enum class Error
+        {
+            Unknown
+        };
+
+        [[nodiscard]] std::expected<std::reference_wrapper<Variable const>, Error> find(core::Identifier const& identifier)
+        {
+            // todo: when using resolving for intrinsics/functions, instead of adding a global scope, the find method should take a list of providers to use when top of the scope chain is reached
+            // todo: when adding the functions then also add a Value base class for function and variable and scopes should hold Values only
+            // todo: essentially resolving of functions / values should use the same logic - a resolve intrinsic, and intrinsics are placed inside function when they should be part of resolution
+            // todo: the nodes should hold the correct type - meaning that this type checking is done in the resolver
+
+            return onFind(identifier).or_else([&](Error const error) -> std::expected<std::reference_wrapper<Variable const>, Error> {
+                if (error == Error::Unknown && parent_ != nullptr) { return parent_->find(identifier); }
+
+                return std::unexpected(error);
+            });
+        }
+
+        [[nodiscard]] Variable const* expect(core::Identifier const& identifier, core::Reporter& reporter)
+        {
+            std::expected<std::reference_wrapper<Variable const>, Error> const variable = find(identifier);
+
+            if (variable.has_value()) { return &variable.value().get(); }
+
+            switch (variable.error())
+            {
+                case Error::Unknown:
+                    reporter.error("Cannot resolve name '" + identifier + "'", identifier.location());
+                    break;
+            }
+
+            return nullptr;
+        }
+
+      protected:
+        [[nodiscard]] virtual bool                                                                             canDeclare(core::Identifier const& identifier) const = 0;
+        virtual void                                                                             onDeclare(utility::Owned<Variable> variable)   = 0;
+        [[nodiscard]] virtual std::expected<std::reference_wrapper<Variable const>, Error> onFind(core::Identifier const& identifier)  = 0;
+
+      private:
+        Scope*           parent_;
+    };
+
+    class OrderedScope final : public Scope
+    {
+      public:
+        explicit OrderedScope(Scope* parent)
+            : Scope(parent)
+        {}
+
+        ~OrderedScope() override = default;
+
+      protected:
+        [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override
+        {
+            return !outer_identifiers_.contains(identifier);
+        }
+
+        void onDeclare(utility::Owned<Variable> variable) override
+        {
+            active_variables_.emplace(variable->identifier(), std::cref(*variable));
+            all_variables_.emplace_back(std::move(variable));
+        }
+
+        [[nodiscard]] std::expected<std::reference_wrapper<Variable const>, Error> onFind(core::Identifier const& identifier) override
+        {
+            if (active_variables_.contains(identifier)) { return active_variables_.at(identifier); }
+
+            outer_identifiers_.insert(identifier);
+
+            return std::unexpected(Error::Unknown);
+        }
+
+      private:
+        std::vector<utility::Owned<Variable>> all_variables_ = {};
+        std::map<core::Identifier, std::reference_wrapper<Variable const>> active_variables_ = {};
+        std::set<core::Identifier> outer_identifiers_ = {};
+    };
+
     class Intrinsics final : core::IntrinsicVisitor
     {
     public:
@@ -120,6 +244,13 @@ struct ance::cet::Runner::Implementation
             visit(statement);
         }
 
+        [[nodiscard]] Scope* scope()
+        {
+            if (scopes_.empty()) return nullptr;
+
+            return scopes_.back().get();
+        }
+
         void visit(bbt::Flow const& flow) override
         {
             run(flow.entry);
@@ -212,14 +343,31 @@ struct ance::cet::Runner::Implementation
                 value = assigned;
             }
 
-            variables_.insert_or_assign(&declare.variable, value);
-            variable_types_.insert_or_assign(&declare.variable, &type->getType());
+            auto variable = scope()->declare(declare.identifier, type->getType(), declare.location, reporter_);
+
+            if (variable.hasValue())
+            {
+                variables_.insert_or_assign(&variable.value().get(), value);
+            }
+            else
+            {
+                abort();
+            }
         }
 
         void visit(bbt::Store const& store) override
         {
             utility::Shared<core::Value> value = temporaries_.at(&store.value);
-            core::Type const& type = *variable_types_.at(&store.variable);
+
+            Variable const* variable = scope()->expect(store.identifier, reporter_);
+
+            if (variable == nullptr)
+            {
+                abort();
+                return;
+            }
+
+            core::Type const& type = variable->type();
 
             if (!requireType(type, value->type(), store.value.location))
             {
@@ -227,7 +375,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            variables_.insert_or_assign(&store.variable, value);
+            variables_.insert_or_assign(variable, value);
         }
 
         void visit(bbt::Temporary const& temporary) override
@@ -274,7 +422,15 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Read const& read) override
         {
-            utility::Shared<core::Value> value = variables_.at(&read.variable);
+            Variable const* variable = scope()->expect(read.identifier, reporter_);
+
+            if (variable == nullptr)
+            {
+                abort();
+                return;
+            }
+
+            utility::Shared<core::Value> value = variables_.at(variable);
             temporaries_.insert_or_assign(&read.destination, value);
         }
 
@@ -301,14 +457,19 @@ struct ance::cet::Runner::Implementation
             }
         }
 
-        void visit(bbt::ScopeEnter const& scope_enter) override
+        void visit(bbt::ScopeEnter const&) override
         {
-            (void)scope_enter; // todo: do something, e.g. creating scope struct in stack
+            utility::Owned<Scope> scope = utility::makeOwned<OrderedScope>(this->scope());
+            scopes_.emplace_back(std::move(scope));
+
+            // todo: make value storage also part of the scope so it is cleaned up when scope exits
         }
 
-        void visit(bbt::ScopeExit const& scope_exit) override
+        void visit(bbt::ScopeExit const&) override
         {
-            (void)scope_exit; // todo: do something, e.g. calling destructors for temporaries and variables
+            scopes_.pop_back();
+
+            // todo: destructors and stuff
         }
 
       private:
@@ -316,10 +477,9 @@ struct ance::cet::Runner::Implementation
 
         Intrinsics intrinsics_ {reporter_};
 
-        std::map<core::Variable const*, utility::Shared<core::Value>> variables_ = {};
-        std::map<core::Variable const*, core::Type const*> variable_types_ = {};
-
+        std::map<Variable const*, utility::Shared<core::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
+        std::vector<utility::Owned<Scope>> scopes_ = {};
 
         bbt::BasicBlock const* next_ = nullptr;
         bool encountered_error_ = false;

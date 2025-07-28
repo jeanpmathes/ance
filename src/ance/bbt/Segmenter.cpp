@@ -9,127 +9,10 @@
 #include "ance/bbt/Node.h"
 #include "ance/core/Function.h"
 #include "ance/core/Intrinsic.h"
-#include "ance/core/Scope.h"
 #include "ance/est/Node.h"
 
 struct ance::bbt::Segmenter::Implementation
 {
-    class Scope
-    {
-      protected:
-        Scope(Scope * parent, ScopeEnter& enter) : parent_(parent), scope_enter_(enter)
-        {
-        }
-
-      public:
-        virtual ~Scope() = default;
-
-        core::Scope& scope() const
-        {
-            return *scope_enter_.scope;
-        }
-
-        core::Variable const* declare(core::Identifier const& identifier, core::Location const& location, core::Reporter& reporter)
-        {
-            if (!canDeclare(identifier))
-            {
-                reporter.error("Declaring '" + identifier + "' in this scope would block previous access to outside of the scope", location);
-                return nullptr;
-            }
-
-            core::Variable const& variable = scope().addVariable(identifier, location);
-
-            onDeclare(variable);
-
-            return &variable;
-        }
-
-        enum class Error
-        {
-            Unknown
-        };
-
-        [[nodiscard]] std::expected<std::reference_wrapper<core::Variable const>, Error> find(core::Identifier const& identifier)
-        {
-            // todo: when using resolving for intrinsics/functions, instead of adding a global scope, the find method should take a list of providers to use when top of the scope chain is reached
-            // todo: when adding the functions then also add a Value base class for function and variable and scopes should hold Values only
-            // todo: essentially resolving of functions / values should use the same logic - a resolve intrinsic, and intrinsics are placed inside function when they should be part of resolution
-            // todo: the nodes should hold the correct type - meaning that this type checking is done in the resolver
-
-            return onFind(identifier).or_else([&](Error const error) -> std::expected<std::reference_wrapper<core::Variable const>, Error> {
-                if (error == Error::Unknown && parent_ != nullptr) { return parent_->find(identifier); }
-
-                return std::unexpected(error);
-            });
-        }
-
-        [[nodiscard]] core::Variable const* expect(core::Identifier const& identifier, core::Reporter& reporter)
-        {
-            std::expected<std::reference_wrapper<core::Variable const>, Error> const variable = find(identifier);
-
-            if (variable.has_value()) { return &variable.value().get(); }
-
-            switch (variable.error())
-            {
-                case Error::Unknown:
-                    reporter.error("Cannot resolve name '" + identifier + "'", identifier.location());
-                    break;
-            }
-
-            return nullptr;
-        }
-
-      protected:
-        virtual bool                                                                             canDeclare(core::Identifier const& identifier) const = 0;
-        virtual void                                                                             onDeclare(core::Variable const& variable)   = 0;
-        [[nodiscard]] virtual std::expected<std::reference_wrapper<core::Variable const>, Error> onFind(core::Identifier const& identifier)  = 0;
-
-      private:
-        Scope *                parent_;
-        ScopeEnter&                 scope_enter_;
-    };
-
-    class OrderedScope final : public Scope
-    {
-      public:
-        OrderedScope(Scope* parent, ScopeEnter& scope_enter)
-            : Scope(parent, scope_enter)
-        {}
-
-        ~OrderedScope() override = default;
-
-      protected:
-        bool canDeclare(core::Identifier const& identifier) const override
-        {
-            return !outer_identifiers_.contains(identifier);
-        }
-
-        void onDeclare(core::Variable const& variable) override
-        {
-            active_variables_.emplace(variable.identifier(), std::cref(variable));
-        }
-
-        [[nodiscard]] std::expected<std::reference_wrapper<core::Variable const>, Error> onFind(core::Identifier const& identifier) override
-        {
-            if (active_variables_.contains(identifier)) { return active_variables_.at(identifier); }
-
-            outer_identifiers_.insert(identifier);
-
-            return std::unexpected(Error::Unknown);
-        }
-
-      private:
-        std::map<core::Identifier, std::reference_wrapper<core::Variable const>> active_variables_ = {};
-        std::set<core::Identifier> outer_identifiers_ = {};
-    };
-
-    static utility::Owned<core::Scope> createScope(utility::Optional<utility::Owned<core::Scope>>& parent)
-    {
-        if (parent.hasValue()) { return (*parent)->createChild(); }
-
-        return utility::makeOwned<core::Scope>();
-    }
-
     class BaseBB
     {
       public:
@@ -501,13 +384,6 @@ struct ance::bbt::Segmenter::Implementation
             return *current_destination_;
         }
 
-        [[nodiscard]] Scope* scope() const
-        {
-            if (scopes_.empty()) return nullptr;
-
-            return scopes_.back();
-        }
-
         template<typename T, typename... Args>
         static std::reference_wrapper<SimpleBB> addBlock(utility::List<utility::Owned<BaseBB>>& blocks, Args&&... args)
         {
@@ -578,17 +454,8 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            utility::Optional<utility::Owned<core::Scope>> owned_scope;
-
-            if (scopes_.empty()) { owned_scope = utility::makeOwned<core::Scope>(); }
-            else { owned_scope = scopes_.back()->scope().createChild(); }
-
-            core::Scope const& scope = **owned_scope;
-
-            auto [scope_enter, enter] = addBlockAndGetInner<ScopeEnter>(blocks, std::move(owned_scope.value()), block.location);
-            utility::Owned<Scope>        scope_representation =
-                utility::makeOwned<OrderedScope>(scopes_.empty() ? nullptr : scopes_.back(), enter.get());
-            scopes_.emplace_back(scope_representation.get());
+            auto [scope_enter, enter] = addBlockAndGetInner<ScopeEnter>(blocks, block.location);
+            scopes_.emplace_back(&enter.get());
             link(entry, scope_enter);
             std::reference_wrapper current = scope_enter;
 
@@ -600,7 +467,7 @@ struct ance::bbt::Segmenter::Implementation
                 current = statement_exit;
             }
 
-            std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, scope, block.location);
+            std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, enter, block.location);
             scopes_.pop_back();
             link(current, scope_exit);
 
@@ -659,18 +526,8 @@ struct ance::bbt::Segmenter::Implementation
                 incoming = expression_exit;
             }
 
-            core::Variable const*        variable = scope()->declare(let.identifier, let.location, reporter_);
-            std::reference_wrapper inner = incoming;
-            if (variable != nullptr)
-            {
-                inner = addBlock<Declare>(blocks, *variable, *type, value, let.location);
-                link(incoming, inner);
-            }
-            else
-            {
-                inner = addBlock<ErrorStatement>(blocks, let.location);
-                link(incoming, inner);
-            }
+            std::reference_wrapper inner = addBlock<Declare>(blocks, let.identifier, *type, value, let.location);
+            link(incoming, inner);
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(inner, exit);
@@ -690,18 +547,8 @@ struct ance::bbt::Segmenter::Implementation
             auto [expression_entry, expression_exit] = segment(*assignment.value, value.get());
             link(temporary, expression_entry);
 
-            std::reference_wrapper inner    = expression_exit;
-            core::Variable const*  variable = scope()->expect(assignment.identifier, reporter_);
-            if (variable != nullptr)
-            {
-                inner = addBlock<Store>(blocks, *variable, value.get(), assignment.location);
-                link(expression_exit, inner);
-            }
-            else
-            {
-                inner = addBlock<ErrorStatement>(blocks, assignment.location);
-                link(expression_exit, inner);
-            }
+            std::reference_wrapper inner = addBlock<Store>(blocks, assignment.identifier, value.get(), assignment.location);
+            link(expression_exit, inner);
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(inner, exit);
@@ -767,7 +614,7 @@ struct ance::bbt::Segmenter::Implementation
             size_t const target_depth = loops_.back().scope_depth;
             for (size_t i = scopes_.size(); i > target_depth; i--)
             {
-                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, scopes_[i - 1]->scope(), break_statement.location);
+                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *scopes_[i - 1], break_statement.location);
                 link(current, scope_exit);
                 current = scope_exit;
             }
@@ -791,7 +638,7 @@ struct ance::bbt::Segmenter::Implementation
             size_t const target_depth = loops_.back().scope_depth;
             for (size_t i = scopes_.size(); i > target_depth; i--)
             {
-                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, scopes_[i - 1]->scope(), continue_statement.location);
+                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *scopes_[i - 1], continue_statement.location);
                 link(current, scope_exit);
                 current = scope_exit;
             }
@@ -929,19 +776,9 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
-            std::reference_wrapper inner = entry;
 
-            core::Variable const* variable = scope()->expect(access.identifier, reporter_);
-            if (variable != nullptr)
-            {
-                inner = addBlock<Read>(blocks, *variable, destination(), access.location);
-                link(entry, inner);
-            }
-            else
-            {
-                inner = addBlock<ErrorStatement>(blocks, access.location);
-                link(entry, inner);
-            }
+            std::reference_wrapper inner = addBlock<Read>(blocks, access.identifier, destination(), access.location);
+            link(entry, inner);
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(inner, exit);
@@ -1031,7 +868,7 @@ struct ance::bbt::Segmenter::Implementation
         Temporary const* current_destination_ = nullptr;
 
         std::vector<Loop>   loops_  = {};
-        std::vector<Scope*> scopes_ = {};
+        std::vector<ScopeEnter const*> scopes_ = {};
 
         core::Reporter& reporter_;
 
