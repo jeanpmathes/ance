@@ -2,6 +2,7 @@
 #define ANCE_CORE_VALUE_H
 
 #include <string>
+#include <variant>
 
 #include "ance/utility/Owners.h"
 #include "ance/core/Type.h"
@@ -9,20 +10,16 @@
 namespace ance::core
 {
     class Type;
-
-    union Storage
-    {
-        bool boolean;
-        size_t size;
-        TypeID type_id;
-    };
+    class Entity;
 
     /// Represents a value.
     class Value // todo: use inheritance-based value class instead of the current switching one (see old code)
     {
     public:
+        using Storage = std::variant<std::monostate, bool, size_t, Entity*, Identifier, TypeID>;
+
         /// Creates a new value.
-        Value(Type const& type, Storage storage);
+        Value(Type const& type, Storage const& value);
 
         /// Create a boolean value.
         static utility::Shared<Value> makeBool(bool value);
@@ -32,6 +29,12 @@ namespace ance::core
 
         /// Create a size value.
         static utility::Shared<Value> makeSize(size_t value);
+
+        /// Create an entity reference value.
+        static utility::Shared<Value> makeEntityRef(Entity& entity);
+
+        /// Create an identifier value.
+        static utility::Shared<Value> makeIdentifier(Identifier const& identifier);
 
         /// Create a type value.
         static utility::Shared<Value> makeType(Type const& type);
@@ -44,13 +47,15 @@ namespace ance::core
 
         [[nodiscard]] bool getBool() const;
         [[nodiscard]] size_t getSize() const;
+        [[nodiscard]] Entity& getEntity() const;
+        [[nodiscard]] Identifier const& getIdentifier() const;
         [[nodiscard]] Type const& getType() const;
 
         [[nodiscard]] utility::Shared<Value> clone() const;
 
       private:
         Type const& type_;
-        Storage storage_;
+        Storage value_;
     };
 }
 

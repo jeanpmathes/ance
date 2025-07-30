@@ -83,7 +83,7 @@ struct ance::cet::Printer::Implementation
         void visit(Declare const& declare) override
         {
             print("declare ");
-            print(declare.variable.identifier());
+            print(declare.variable.name());
 
             if (declare.value != nullptr)
             {
@@ -96,7 +96,7 @@ struct ance::cet::Printer::Implementation
 
         void visit(Store const& store) override
         {
-            print(store.variable.identifier());
+            print(store.variable.name());
             print(" <: temporary ");
             print(store.value.id());
             print(";");
@@ -154,7 +154,7 @@ struct ance::cet::Printer::Implementation
             print("temporary ");
             print(read.destination.id());
             print(" <: ");
-            print(read.variable.identifier());
+            print(read.variable.name());
         }
 
         void visit(Constant const& constant) override

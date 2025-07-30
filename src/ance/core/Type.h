@@ -11,6 +11,7 @@ namespace ance::core
         uint32_t app;
         uint32_t id;
     };
+
     /// Represents a type.
     class Type
     {
@@ -30,6 +31,12 @@ namespace ance::core
 
         /// Get the size type, which has a platform-dependent size.
         static Type const& Size();
+
+        /// Get the entity reference type, which is used to refer to entities.
+        static Type const& EntityRef();
+
+        /// Get the identifier type, which is the type of all identifiers.
+        static Type const& Ident();
 
         /// Get the type-type - the type of all types.
         static Type const& Self();

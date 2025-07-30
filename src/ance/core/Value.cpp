@@ -1,44 +1,45 @@
 #include "Value.h"
 
+#include "Entity.h"
+
 namespace ance::core
 {
-    Value::Value(Type const& type, Storage const storage) : type_(type), storage_(storage) {}
+    Value::Value(Type const& type, Storage const& value) : type_(type), value_(value) {}
 
     utility::Shared<Value> Value::makeBool(bool const value)
     {
-        Storage storage;
-        storage.boolean = value;
-
-        return utility::makeShared<Value>(Type::Bool(), storage);
+        return utility::makeShared<Value>(Type::Bool(), value);
     }
 
     utility::Shared<Value> Value::makeUnit()
     {
-        Storage storage;
-        storage.size = 0; // Just to initialize the union, as it will not be used.
-
-        return utility::makeShared<Value>(Type::Unit(), storage);
+        return utility::makeShared<Value>(Type::Unit(), std::monostate{});
     }
 
     utility::Shared<Value> Value::makeSize(size_t value)
     {
-        Storage storage;
-        storage.size = value;
+        return utility::makeShared<Value>(Type::Size(), value);
+    }
 
-        return utility::makeShared<Value>(Type::Size(), storage);
+    utility::Shared<Value> Value::makeEntityRef(Entity& entity)
+    {
+        return utility::makeShared<Value>(Type::EntityRef(), &entity);
+    }
+
+    utility::Shared<Value> Value::makeIdentifier(Identifier const& identifier)
+    {
+        return utility::makeShared<Value>(Type::Ident(), identifier);
     }
 
     utility::Shared<Value> Value::makeType(Type const& type)
     {
-        Storage storage;
-        storage.type_id = type.id();
-
-        return utility::makeShared<Value>(Type::Self(), storage);
+        return utility::makeShared<Value>(Type::Self(), type.id());
     }
 
     utility::Shared<Value> Value::makeDefault(Type const& type)
     {
-        return utility::makeShared<Value>(type, Storage {});
+        // Use std::monostate for default
+        return utility::makeShared<Value>(type, std::monostate{});
     }
 
     Type const& Value::type() const
@@ -48,38 +49,48 @@ namespace ance::core
 
     std::string Value::toString() const
     {
-        if (type_ == Type::Bool()) { return storage_.boolean ? "true" : "false"; }
-
+        if (type_ == Type::Bool()) { return std::get<bool>(value_) ? "true" : "false"; }
         if (type_ == Type::Unit()) { return "()"; }
-
-        if (type_ == Type::Size()) { return std::to_string(storage_.size); }
-
-        if (type_ == Type::Self())
-        {
-            return std::string(Type::byID(storage_.type_id).name().text());
-        }
-
+        if (type_ == Type::Size()) { return std::to_string(std::get<size_t>(value_)); }
+        if (type_ == Type::EntityRef()) { return "@" + std::string(std::get<Entity*>(value_)->name().text()); }
+        if (type_ == Type::Ident()) { return "#" + std::string(std::get<Identifier>(value_).text()); }
+        if (type_ == Type::Self()) { return std::string(Type::byID(std::get<TypeID>(value_)).name().text()); }
         return "unknown";
     }
 
     bool Value::getBool() const
     {
-        return storage_.boolean;
+        if (!std::holds_alternative<bool>(value_)) throw std::bad_variant_access();
+        return std::get<bool>(value_);
     }
 
     size_t Value::getSize() const
     {
-        return storage_.size;
+        if (!std::holds_alternative<size_t>(value_)) throw std::bad_variant_access();
+        return std::get<size_t>(value_);
+    }
+
+    ance::core::Entity& Value::getEntity() const
+    {
+        if (!std::holds_alternative<Entity*>(value_)) throw std::bad_variant_access();
+        return *std::get<Entity*>(value_);
+    }
+
+    Identifier const& Value::getIdentifier() const
+    {
+        if (!std::holds_alternative<Identifier>(value_)) throw std::bad_variant_access();
+        return std::get<Identifier>(value_);
     }
 
     Type const& Value::getType() const
     {
-        return Type::byID(storage_.type_id);
+        if (!std::holds_alternative<TypeID>(value_)) throw std::bad_variant_access();
+        return Type::byID(std::get<TypeID>(value_));
     }
 
     utility::Shared<Value> Value::clone() const
     {
-        return utility::makeShared<Value>(type_, storage_);
+        return utility::makeShared<Value>(type_, value_);
     }
 }
 

@@ -149,8 +149,13 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: use an intrinsic for resolution, making variables a first class type that can be returned by expressions
+        // todo: use an intrinsic for resolution of both variables and functions, using EntityRef and Identifier types
         // todo: do the TODO in Runner::Scope::find
+
+        // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)
+
+        // todo: add unordered scopes, have them as default at file top-level except for the primary file - maybe make distinction explicit in compiler code
+        // todo: add intrinsic functions to include another file, running the cmp code in there too
 
         // todo: add global variables so that circular dependencies can exist
 
@@ -158,18 +163,22 @@ namespace ance
         // todo: it should have a list of run-points and if running one of those stops it continues with the next one
         // todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
 
+        // todo: remove essentially everything from the CET as it has to be rebuilt anyways
+        // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes (maybe use limited variants in the earlier steps, e.g. type enums for the ast, make current type and value and entity a thing of the bbt)
+
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
-        // todo: add intrinsic functions to include another file, running the cmp code in there too
-        // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)
+
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
-        // todo: add unordered scopes, have them as default at file top-level - maybe make distinction explicit in compiler code
+
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
+
         // todo: when adding erase, check where it is used in expansion, instead use scoping
-        // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes
         // todo: correctly call copy and move functions for all linearized temporary using nodes in BBT and CET
         // todo: global variables with non-cmp initializers need an ordering determined using topological sort
         // todo: think about making the typeof node an intrinsic, would either require an any type or something else for the argument like overloading
+        // todo: the entity_ref type should instead become an entity type and the intrinsic simply returns a reference to that
+        // todo: when inheritance becomes a thing then entity should have subclasses like variable and function -> add that to the inheritance note in planning
 
         out << "ance: " << reporter.warningCount() << " warnings" << std::endl;
         out << "ance: Success";
