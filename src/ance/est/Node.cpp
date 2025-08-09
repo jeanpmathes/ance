@@ -24,28 +24,16 @@ bool ance::est::Block::isCompound() const
     return true;
 }
 
-ance::est::Independent::Independent(utility::Owned<Expression> independent_expression,
-                                    core::Location const&      source_location)
+ance::est::Independent::Independent(utility::Owned<Expression> independent_expression, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , expression(std::move(independent_expression))
 {}
 
-ance::est::Let::Let(core::Identifier const&                       name,
-                    utility::Optional<utility::Owned<Expression>> definition,
-                    utility::Owned<Expression> t,
-                    core::Location const&                         source_location)
+ance::est::Write::Write(utility::Owned<Expression> variable, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , identifier(name)
-    , type(std::move(t))
-    , value(std::move(definition))
-{}
-
-ance::est::Assignment::Assignment(core::Identifier const& assigned, utility::Owned<Expression> expression, core::Location const& source_location)
-    : Node(source_location)
-    , Statement()
-    , identifier(assigned)
+    , target(std::move(variable))
     , value(std::move(expression))
 {}
 
@@ -105,10 +93,10 @@ ance::est::Call::Call(core::Identifier const& callable, utility::List<utility::O
     , arguments(std::move(expressions))
 {}
 
-ance::est::Access::Access(core::Identifier const& accessed, core::Location const& source_location)
+ance::est::Read::Read(utility::Owned<Expression> accessed, core::Location const& source_location)
     : Node(source_location)
     , Expression()
-    , identifier(accessed)
+    , target(std::move(accessed))
 {}
 
 ance::est::Literal::Literal(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(constant)) {}
@@ -123,8 +111,9 @@ ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
 ance::est::ReadTemporary::ReadTemporary(Temporary const& target, core::Location const& source_location) : Node(source_location), Expression(), temporary(target)
 {}
 
-ance::est::TypeOf::TypeOf(utility::Owned<Expression> e, core::Location const& source_location)
-    : Node(source_location)
-    , Expression()
-    , expression(std::move(e))
+ance::est::TypeOf::TypeOf(utility::Owned<Expression> e, core::Location const& source_location) : Node(source_location), Expression(), expression(std::move(e))
+{}
+
+ance::est::IdentifierCapture::IdentifierCapture(core::Identifier const& ident, core::Location const& source_location)
+    : Node(source_location), Expression(), identifier(ident)
 {}

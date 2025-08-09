@@ -41,18 +41,10 @@ ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location)
 
 ance::bbt::Pass::Pass(core::Location const& source_location) : Node(source_location), Statement() {}
 
-ance::bbt::Declare::Declare(core::Identifier const& name, Temporary const& t, Temporary const* definition, core::Location const& source_location)
+ance::bbt::Store::Store(Temporary const& var, Temporary const& stored, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , identifier(name)
-    , type(t)
-    , value(definition)
-{}
-
-ance::bbt::Store::Store(core::Identifier const& name, Temporary const& stored, core::Location const& source_location)
-    : Node(source_location)
-    , Statement()
-    , identifier(name)
+    , target(var)
     , value(stored)
 {}
 
@@ -81,10 +73,10 @@ ance::bbt::Intrinsic::Intrinsic(core::Intrinsic const&                          
     , destination(result)
 {}
 
-ance::bbt::Read::Read(core::Identifier const& name, Temporary const& result, core::Location const& source_location)
+ance::bbt::Read::Read(Temporary const& var, Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , identifier(name)
+    , target(var)
     , destination(result)
 {}
 

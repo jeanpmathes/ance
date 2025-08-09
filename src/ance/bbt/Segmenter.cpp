@@ -494,61 +494,28 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(est::Let const& let) override
-        {
-            utility::List<utility::Owned<BaseBB>> blocks;
-
-            std::reference_wrapper const entry    = addEmptyBlock(blocks);
-            std::reference_wrapper       incoming = entry;
-
-            Temporary const* type;
-            {
-                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, let.type->location);
-                link(incoming, temporary);
-                incoming = temporary;
-                type     = &temporary_node.get();
-
-                auto [expression_entry, expression_exit] = segment(*let.type, *type);
-                link(incoming, expression_entry);
-                incoming = expression_exit;
-            }
-
-            Temporary const* value = nullptr;
-            if (let.value.hasValue())
-            {
-                auto [temporary, temporary_node] = addBlockAndGetInner<Temporary>(blocks, (*let.value)->location);
-                link(incoming, temporary);
-                incoming = temporary;
-                value    = &temporary_node.get();
-
-                auto [expression_entry, expression_exit] = segment(**let.value, *value);
-                link(incoming, expression_entry);
-                incoming = expression_exit;
-            }
-
-            std::reference_wrapper inner = addBlock<Declare>(blocks, let.identifier, *type, value, let.location);
-            link(incoming, inner);
-
-            std::reference_wrapper const exit = addEmptyBlock(blocks);
-            link(inner, exit);
-
-            setResult(std::move(blocks), entry, exit);
-        }
-
-        void visit(est::Assignment const& assignment) override
+        void visit(est::Write const& assignment) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            auto [temporary, value] = addBlockAndGetInner<Temporary>(blocks, assignment.value->location);
-            link(entry, temporary);
+            // todo: think of something to make this code less convoluted, maybe some nice builder or whatever
 
-            auto [expression_entry, expression_exit] = segment(*assignment.value, value.get());
-            link(temporary, expression_entry);
+            auto [temporary_target, target] = addBlockAndGetInner<Temporary>(blocks, assignment.target->location);
+            link(entry, temporary_target);
 
-            std::reference_wrapper inner = addBlock<Store>(blocks, assignment.identifier, value.get(), assignment.location);
-            link(expression_exit, inner);
+            auto [target_expression_entry, target_expression_exit] = segment(*assignment.target, target.get());
+            link(temporary_target, target_expression_entry);
+
+            auto [temporary_value, value] = addBlockAndGetInner<Temporary>(blocks, assignment.value->location);
+            link(target_expression_exit, temporary_value);
+
+            auto [value_expression_entry, value_expression_exit] = segment(*assignment.value, value.get());
+            link(temporary_value, value_expression_entry);
+
+            std::reference_wrapper inner = addBlock<Store>(blocks, target.get(), value.get(), assignment.location);
+            link(value_expression_exit, inner);
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(inner, exit);
@@ -771,14 +738,20 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), entry, exit);
         }
 
-        void visit(est::Access const& access) override
+        void visit(est::Read const& access) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            std::reference_wrapper inner = addBlock<Read>(blocks, access.identifier, destination(), access.location);
-            link(entry, inner);
+            auto [temporary, target] = addBlockAndGetInner<Temporary>(blocks, access.target->location);
+            link(entry, temporary);
+
+            auto [expression_entry, expression_exit] = segment(*access.target, target.get());
+            link(temporary, expression_entry);
+
+            std::reference_wrapper inner = addBlock<Read>(blocks, target.get(), destination(), access.location);
+            link(expression_exit, inner);
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(inner, exit);
@@ -851,6 +824,15 @@ struct ance::bbt::Segmenter::Implementation
             link(inner, exit);
 
             setResult(std::move(blocks), entry, exit);
+        }
+
+        void visit(est::IdentifierCapture const& identifier_capture) override
+        {
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, core::Value::makeIdentifier(identifier_capture.identifier), destination(), identifier_capture.location);
+
+            setResult(std::move(blocks), inner, inner);
         }
 
         struct Loop

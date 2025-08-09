@@ -73,11 +73,6 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(Pass const&) override { }
 
-        void visit(Declare const& ) override
-        {
-
-        }
-
         void visit(Store const& ) override
         {
 
@@ -86,7 +81,6 @@ struct ance::bbt::Grapher::Implementation
         void visit(Temporary const& ) override {}
 
         void visit(CopyTemporary const& ) override {}
-
 
         void visit(Intrinsic const& ) override
         {

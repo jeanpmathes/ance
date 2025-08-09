@@ -37,6 +37,16 @@ struct ance::build::Compiler::Implementation
             // Do nothing.
         }
 
+        void visit(core::Declare const& declare) override
+        {
+            unsupported(declare);
+        }
+
+        void visit(core::Resolve const& resolve) override
+        {
+            unsupported(resolve);
+        }
+
     private:
         core::Reporter& reporter_;
 

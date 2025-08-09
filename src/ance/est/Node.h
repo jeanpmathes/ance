@@ -74,27 +74,16 @@ namespace ance::est
         utility::Owned<Expression> expression;
     };
 
-    /// A let statement declares a variable and can also define its value.
-    struct Let final
+    /// A write statement writes a value to a variable.
+    struct Write final
         : Statement
-        , utility::ConcreteNode<Let, Visitor> {
-        Let(core::Identifier const& name, utility::Optional<utility::Owned<Expression>> definition, utility::Owned<Expression> t, core::Location const& source_location);
-
-        core::Identifier identifier;
-        utility::Owned<Expression> type;
-        utility::Optional<utility::Owned<Expression>> value;
-    };
-
-    /// An assignment statement assigns a value to a variable.
-    struct Assignment final
-        : Statement
-        , utility::ConcreteNode<Assignment, Visitor>
+        , utility::ConcreteNode<Write, Visitor>
     {
-        Assignment(core::Identifier const&                        assigned,
+        Write(utility::Owned<Expression>               variable,
                     utility::Owned<Expression>                    expression,
                     core::Location const&                         source_location);
 
-        core::Identifier         identifier;
+        utility::Owned<Expression> target;
         utility::Owned<Expression> value;
     };
 
@@ -196,13 +185,13 @@ namespace ance::est
         utility::List<utility::Owned<Expression>> arguments;
     };
 
-    /// Access is an expression that reads the value of a variable.
-    struct Access final
+    /// Reads the value of a variable.
+    struct Read final
         : Expression
-        , utility::ConcreteNode<Access, Visitor> {
-        Access(core::Identifier const& accessed, core::Location const& source_location);
+        , utility::ConcreteNode<Read, Visitor> {
+        Read(utility::Owned<Expression> accessed, core::Location const& source_location);
 
-        core::Identifier identifier;
+        utility::Owned<Expression> target;
     };
 
     /// A literal value.
@@ -246,6 +235,16 @@ namespace ance::est
         utility::Owned<Expression> expression;
     };
 
+    /// Captures an identifier and allows it to be used in expressions.
+    struct IdentifierCapture final
+        : Expression
+        , utility::ConcreteNode<IdentifierCapture, Visitor>
+    {
+        IdentifierCapture(core::Identifier const& ident, core::Location const& source_location);
+
+        core::Identifier identifier;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -257,8 +256,7 @@ namespace ance::est
         virtual void visit(Pass const& pass_statement)     = 0;
         virtual void visit(Block const& block)             = 0;
         virtual void visit(Independent const& independent) = 0;
-        virtual void visit(Let const& let)                 = 0;
-        virtual void visit(Assignment const& assignment)   = 0;
+        virtual void visit(Write const& assignment)   = 0;
         virtual void visit(If const& if_statement)         = 0;
         virtual void visit(Loop const& loop)               = 0;
         virtual void visit(Break const& break_statement)   = 0;
@@ -269,11 +267,12 @@ namespace ance::est
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Intrinsic const& intrinsic)   = 0;
         virtual void visit(Call const& call)             = 0;
-        virtual void visit(Access const& access)         = 0;
+        virtual void visit(Read const& access)         = 0;
         virtual void visit(Literal const& literal)       = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
         virtual void visit(ReadTemporary const& read_temporary) = 0;
         virtual void visit(TypeOf const& type_of)       = 0;
+        virtual void visit(IdentifierCapture const& identifier_capture) = 0;
     };
 }
 

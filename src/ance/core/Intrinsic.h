@@ -17,7 +17,7 @@ namespace ance::core
     /// Base class for all intrinsics.
     struct Intrinsic : virtual utility::AbstractNode<IntrinsicVisitor>
     {
-        explicit Intrinsic(Signature const& signature);
+        Intrinsic(Signature signature, Type const& return_type);
         ~Intrinsic() override = default;
 
         /// Get the signature of this intrinsic.
@@ -29,14 +29,15 @@ namespace ance::core
 
         /// Get the identifier of this intrinsic.
         /// \return The identifier.
-        [[nodiscard]] virtual Identifier const& identifier() const = 0;
+        [[nodiscard]] virtual Identifier const& identifier() const;
 
         /// Display this intrinsic to the given output stream.
         /// \param os The output stream to display to.
-        virtual void display(std::ostream& os) const = 0;
+        virtual void display(std::ostream& os) const;
 
     private:
         Signature signature_;
+        Type const& return_type_;
     };
 
     /// Dynamic intrinsic that is identified by a name.
@@ -44,10 +45,8 @@ namespace ance::core
         : Intrinsic
         , utility::ConcreteNode<Dynamic, IntrinsicVisitor>
     {
-        explicit Dynamic(Signature const& signature);
+        Dynamic(Signature signature, Type const& return_type);
         ~Dynamic() override = default;
-
-        [[nodiscard]] Identifier const& identifier() const override;
 
         void display(std::ostream& os) const override;
     };
@@ -57,27 +56,56 @@ namespace ance::core
         : Intrinsic
         , utility::ConcreteNode<T, IntrinsicVisitor>
     {
-        explicit Static(Signature const& signature) : Intrinsic(signature) {}
+        Static(Signature signature, Type const& return_type) : Intrinsic(std::move(signature), return_type) {}
         ~Static() override = default;
-
-        [[nodiscard]] Identifier const& identifier() const override
-        {
-            static Identifier identifier = Identifier::like(T::name);
-            return identifier;
-        }
-
-        void display(std::ostream& os) const override
-        {
-            os << T::name;
-        }
     };
 
     /// This intrinsic does nothing.
     struct NoOp final : Static<NoOp>
     {
+    private:
+        NoOp();
+
+    public:
         ~NoOp() override = default;
 
-        static constexpr auto name = "nop";
+        static NoOp& instance()
+        {
+            static NoOp instance;
+            return instance;
+        }
+    };
+
+    /// This intrinsic declares an entity in the calling scope.
+    struct Declare final : Static<Declare>
+    {
+    private:
+        Declare();
+
+    public:
+        ~Declare() override = default;
+
+        static Declare& instance()
+        {
+            static Declare instance;
+            return instance;
+        }
+    };
+
+    /// This intrinsic resolves an entity in the calling scope.
+    struct Resolve final : Static<Resolve>
+    {
+    private:
+        Resolve();
+
+    public:
+        ~Resolve() override = default;
+
+        static Resolve& instance()
+        {
+            static Resolve instance;
+            return instance;
+        }
     };
 
     /// Visitor for all intrinsics.
@@ -89,6 +117,8 @@ namespace ance::core
 
         virtual void visit(Dynamic const& dynamic) = 0;
         virtual void visit(NoOp const& no_op)      = 0;
+        virtual void visit(Declare const& declare) = 0;
+        virtual void visit(Resolve const& resolve) = 0;
     };
 }
 

@@ -50,27 +50,12 @@ struct ance::est::Printer::Implementation
             print(";");
         }
 
-        void visit(Let const& let) override
+        void visit(Write const& assignment) override
         {
-            print("let ");
-            print(let.identifier);
-            print(": ");
-            visit(*let.type);
-
-            if (let.value.hasValue())
-            {
-                print(" <: ");
-                visit(**let.value);
-            }
-
-            print(";");
-        }
-
-        void visit(Assignment const& assignment) override
-        {
-            print(assignment.identifier);
-            print(" <: ");
+            print("write(<:) ");
             visit(*assignment.value);
+            print(" to ");
+            visit(*assignment.target);
             print(";");
         }
 
@@ -138,7 +123,7 @@ struct ance::est::Printer::Implementation
         {
             print("temporary ");
             print(write_temporary.temporary.id());
-            print(" <: ");
+            print(" <: temporary ");
             visit(*write_temporary.value);
             print(");");
         }
@@ -169,9 +154,10 @@ struct ance::est::Printer::Implementation
             print(")");
         }
 
-        void visit(Access const& access) override
+        void visit(Read const& access) override
         {
-            print(access.identifier);
+            print("read ");
+            visit(*access.target);
         }
 
         void visit(Literal const& literal) override
@@ -198,6 +184,12 @@ struct ance::est::Printer::Implementation
             print("typeof (");
             visit(*type_of.expression);
             print(")");
+        }
+
+        void visit(IdentifierCapture const& identifier_capture) override
+        {
+            print("#");
+            print(identifier_capture.identifier);
         }
     };
 

@@ -28,6 +28,16 @@ namespace ance::utility
 
         Optional<T>& operator=(T value);
 
+        template<typename OtherT>
+        requires ConstCopyConvertible<T, OtherT>
+        explicit(false) Optional(OtherT const& value);
+        template<typename OtherT>
+        requires(!ConstCopyConvertible<T, OtherT> and CopyConvertible<T, OtherT>)
+        explicit(false) Optional(OtherT& value);
+        template<typename OtherT>
+        requires MoveConvertible<T, OtherT>
+        explicit(false) Optional(OtherT&& value);
+
         Optional(Optional<T> const& optional)
             requires ConstCopyable<T>;
         Optional(Optional<T>& optional)
@@ -45,6 +55,10 @@ namespace ance::utility
         template<typename OtherT>
             requires MoveConvertible<T, OtherT>
         explicit(false) Optional(Optional<OtherT>&& optional);
+
+        template<typename OtherT>
+            requires MoveConvertible<T, OtherT>
+        explicit(false) Optional(Optional<OtherT> optional);
 
         Optional<T>& operator=(Optional<T> optional)
             requires Copyable<T>;

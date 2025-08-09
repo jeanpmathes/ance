@@ -29,6 +29,7 @@ namespace ance::core
         [[nodiscard]] Type const&       returnType() const;
 
         Function* asFunction() override;
+        [[nodiscard]] Function const* asFunction() const override;
 
       private:
         Signature signature_;

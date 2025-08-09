@@ -27,7 +27,10 @@ namespace ance::core
         // todo: a type() method - needs function types to be a thing
 
         virtual Function* asFunction();
+        [[nodiscard]] virtual Function const* asFunction() const;
+
         virtual Variable* asVariable();
+        [[nodiscard]] virtual Variable const* asVariable() const;
     };
 }
 

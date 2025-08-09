@@ -16,7 +16,7 @@ namespace ance::core
     class Value // todo: use inheritance-based value class instead of the current switching one (see old code)
     {
     public:
-        using Storage = std::variant<std::monostate, bool, size_t, Entity*, Identifier, TypeID>;
+        using Storage = std::variant<std::monostate, bool, size_t, Entity const*, Identifier, TypeID>;
 
         /// Creates a new value.
         Value(Type const& type, Storage const& value);
@@ -31,7 +31,7 @@ namespace ance::core
         static utility::Shared<Value> makeSize(size_t value);
 
         /// Create an entity reference value.
-        static utility::Shared<Value> makeEntityRef(Entity& entity);
+        static utility::Shared<Value> makeEntityRef(Entity const& entity);
 
         /// Create an identifier value.
         static utility::Shared<Value> makeIdentifier(Identifier const& identifier);
@@ -47,7 +47,7 @@ namespace ance::core
 
         [[nodiscard]] bool getBool() const;
         [[nodiscard]] size_t getSize() const;
-        [[nodiscard]] Entity& getEntity() const;
+        [[nodiscard]] Entity const& getEntity() const;
         [[nodiscard]] Identifier const& getIdentifier() const;
         [[nodiscard]] Type const& getType() const;
 

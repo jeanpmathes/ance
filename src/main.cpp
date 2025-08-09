@@ -149,7 +149,9 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: use an intrinsic for resolution of both variables and functions, using EntityRef and Identifier types
+        // todo: pass scope parameter with new scope type to the intrinsics too, making them essentially static and not referencing current scope from outside
+        // todo: the current scope_ function lambda can thus be removed
+
         // todo: do the TODO in Runner::Scope::find
 
         // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)
@@ -166,12 +168,17 @@ namespace ance
         // todo: remove essentially everything from the CET as it has to be rebuilt anyways
         // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes (maybe use limited variants in the earlier steps, e.g. type enums for the ast, make current type and value and entity a thing of the bbt)
 
+        // todo: instead of passing an allocate lambda to the intrinsics, the entity ref should have a read and write function with validation whether it is allowed, each variable thus stores the value instead of one large variable array
+        // todo: and the variables / entities would be stored in the scope they are delcared in
+
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
 
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
 
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
+
+        // todo: add the # and @ operators to the grammar, # takes an identifier and returns an identifier value, and @ resolves an entity and gives a reference to the entity
 
         // todo: when adding erase, check where it is used in expansion, instead use scoping
         // todo: correctly call copy and move functions for all linearized temporary using nodes in BBT and CET

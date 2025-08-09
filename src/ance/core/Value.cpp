@@ -21,7 +21,7 @@ namespace ance::core
         return utility::makeShared<Value>(Type::Size(), value);
     }
 
-    utility::Shared<Value> Value::makeEntityRef(Entity& entity)
+    utility::Shared<Value> Value::makeEntityRef(Entity const& entity)
     {
         return utility::makeShared<Value>(Type::EntityRef(), &entity);
     }
@@ -52,7 +52,7 @@ namespace ance::core
         if (type_ == Type::Bool()) { return std::get<bool>(value_) ? "true" : "false"; }
         if (type_ == Type::Unit()) { return "()"; }
         if (type_ == Type::Size()) { return std::to_string(std::get<size_t>(value_)); }
-        if (type_ == Type::EntityRef()) { return "@" + std::string(std::get<Entity*>(value_)->name().text()); }
+        if (type_ == Type::EntityRef()) { return "@" + std::string(std::get<Entity const*>(value_)->name().text()); }
         if (type_ == Type::Ident()) { return "#" + std::string(std::get<Identifier>(value_).text()); }
         if (type_ == Type::Self()) { return std::string(Type::byID(std::get<TypeID>(value_)).name().text()); }
         return "unknown";
@@ -70,10 +70,10 @@ namespace ance::core
         return std::get<size_t>(value_);
     }
 
-    ance::core::Entity& Value::getEntity() const
+    Entity const& Value::getEntity() const
     {
-        if (!std::holds_alternative<Entity*>(value_)) throw std::bad_variant_access();
-        return *std::get<Entity*>(value_);
+        if (!std::holds_alternative<Entity const*>(value_)) throw std::bad_variant_access();
+        return *std::get<Entity const*>(value_);
     }
 
     Identifier const& Value::getIdentifier() const

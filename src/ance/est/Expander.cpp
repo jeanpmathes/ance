@@ -143,7 +143,13 @@ struct ance::est::Expander::Implementation
 
             append(statements, std::move(type_expansion.before));
 
-            utility::Optional<utility::Owned<Expression>> value;
+            utility::List<utility::Owned<Expression>> declare_arguments;
+            declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(let.identifier, let.location));
+            declare_arguments.emplace_back(std::move(type_expansion.center));
+            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), let.location), let.location); // todo: the core::Declare feels kinda ugly because it does not show it to be an intrinsic
+            Temporary const& tmp_entity = *temporary_entity;
+            statements.emplace_back(std::move(temporary_entity));
+
             Statements                                    after;
 
             if (let.value.hasValue())
@@ -152,11 +158,10 @@ struct ance::est::Expander::Implementation
 
                 append(statements, std::move(expansion.before));
 
-                value = std::move(expansion.center);
+                statements.emplace_back(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, let.location), std::move(expansion.center), let.location));
+
                 after = std::move(expansion.after);
             }
-
-            statements.emplace_back(utility::makeOwned<Let>(let.identifier, std::move(value), std::move(type_expansion.center), let.location));
 
             append(statements, std::move(after));
             append(statements, std::move(type_expansion.after));
@@ -171,7 +176,15 @@ struct ance::est::Expander::Implementation
             Expansion expansion = expand(*assignment.value);
 
             append(statements, std::move(expansion.before));
-            statements.emplace_back(utility::makeOwned<Assignment>(assignment.identifier, std::move(expansion.center), assignment.location));
+
+            utility::List<utility::Owned<Expression>> resolve_arguments;
+            resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(assignment.identifier, assignment.location));
+            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), assignment.location), assignment.location);
+            Temporary const& tmp_entity = *temporary_entity;
+            statements.emplace_back(std::move(temporary_entity));
+
+            statements.emplace_back(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, assignment.location), std::move(expansion.center), assignment.location));
+
             append(statements, std::move(expansion.after));
 
             setResult(std::move(statements));
@@ -230,12 +243,12 @@ struct ance::est::Expander::Implementation
             Statements exit_body;
 
             append(exit_body, std::move(condition.before));
-            utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(std::move(condition.center), while_statement.location);
-            Temporary const& tmp = *temporary;
-            exit_body.emplace_back(std::move(temporary));
+            utility::Owned<Temporary> temporary_condition = utility::makeOwned<Temporary>(std::move(condition.center), while_statement.location);
+            Temporary const& tmp_condition = *temporary_condition;
+            exit_body.emplace_back(std::move(temporary_condition));
             append(exit_body, std::move(condition.after));
 
-            exit_body.emplace_back(utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, utility::makeOwned<ReadTemporary>(tmp, while_statement.condition->location), while_statement.location),
+            exit_body.emplace_back(utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, utility::makeOwned<ReadTemporary>(tmp_condition, while_statement.condition->location), while_statement.location),
                      utility::makeOwned<Break>(while_statement.location),
                      utility::makeOwned<Pass>(while_statement.location),
                      while_statement.location));
@@ -279,7 +292,21 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Access const& access) override
         {
-            setResult(utility::makeOwned<Access>(access.identifier, access.location));
+            Statements before;
+
+            utility::List<utility::Owned<Expression>> resolve_arguments;
+            resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(access.identifier, access.location));
+            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location), access.location);
+            Temporary const& tmp_entity = *temporary_entity;
+            before.emplace_back(std::move(temporary_entity));
+
+            Statements after;
+
+            setResult({
+                .before = std::move(before),
+                .center = utility::makeOwned<Read>(utility::makeOwned<ReadTemporary>(tmp_entity, access.location), access.location),
+                .after  = std::move(after),
+            });
         }
 
         void visit(ast::Literal const& literal) override

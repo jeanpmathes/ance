@@ -131,27 +131,15 @@ namespace ance::bbt
         explicit Pass(core::Location const& source_location);
     };
 
-    /// Declares a variable and can also define its value.
-    struct Declare final
-        : Statement
-        , utility::ConcreteNode<Declare, Visitor>
-    {
-        Declare(core::Identifier const& name, Temporary const& t, Temporary const* definition, core::Location const& source_location);
-
-        core::Identifier  identifier;
-        Temporary const&      type;
-        Temporary const*      value;
-    };
-
     /// Stores a value to a variable.
     struct Store final
         : Statement
         , utility::ConcreteNode<Store, Visitor>
     {
-        Store(core::Identifier const& name, Temporary const& stored, core::Location const& source_location);
+        Store(Temporary const& var, Temporary const& stored, core::Location const& source_location);
 
-        core::Identifier identifier;
-        Temporary const&      value;
+        Temporary const& target;
+        Temporary const& value;
     };
 
     /// Introduce a temporary variable, which works similar to any other local variable but does not have a name.
@@ -195,10 +183,10 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Read, Visitor>
     {
-        Read(core::Identifier const& name, Temporary const& result, core::Location const& source_location);
+        Read(Temporary const& var, Temporary const& result, core::Location const& source_location);
 
-        core::Identifier identifier;
-        Temporary const&      destination;
+        Temporary const& target;
+        Temporary const& destination;
     };
 
     /// Calls a function.
@@ -285,7 +273,6 @@ namespace ance::bbt
 
         virtual void visit(ErrorStatement const& error_statement) = 0;
         virtual void visit(Pass const& pass_statement)            = 0;
-        virtual void visit(Declare const& declare)                = 0;
         virtual void visit(Store const& store)                    = 0;
         virtual void visit(Temporary const& temporary)            = 0;
         virtual void visit(CopyTemporary const& write_temporary)  = 0;

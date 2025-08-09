@@ -48,6 +48,30 @@ ance::utility::Optional<T>& ance::utility::Optional<T>::operator=(T value)
 }
 
 template<ance::utility::Moveable T>
+template<typename OtherT>
+    requires ance::utility::ConstCopyConvertible<T, OtherT>
+ance::utility::Optional<T>::Optional(OtherT const& value) : has_value_(true)
+{
+    new (storage_.data()) T(value);
+}
+
+template<ance::utility::Moveable T>
+template<typename OtherT>
+    requires(!ance::utility::ConstCopyConvertible<T, OtherT> && ance::utility::CopyConvertible<T, OtherT>)
+ance::utility::Optional<T>::Optional(OtherT& value) : has_value_(true)
+{
+    new (storage_.data()) T(value);
+}
+
+template<ance::utility::Moveable T>
+template<typename OtherT>
+    requires ance::utility::MoveConvertible<T, OtherT>
+ance::utility::Optional<T>::Optional(OtherT&& value) : has_value_(true)
+{
+    new (storage_.data()) T(std::forward<OtherT>(value));
+}
+
+template<ance::utility::Moveable T>
 ance::utility::Optional<T>::Optional(Optional<T> const& optional)
     requires ConstCopyable<T>
     : has_value_(optional.has_value_)
@@ -92,6 +116,17 @@ template<ance::utility::Moveable T>
 template<typename OtherT>
     requires ance::utility::MoveConvertible<T, OtherT>
 ance::utility::Optional<T>::Optional(Optional<OtherT>&& optional) : has_value_(optional.has_value_)
+{
+    if (has_value_) new (storage_.data()) T(std::move(*optional));
+
+    optional.has_value_ = false;
+    optional.storage_   = {};
+}
+
+template<ance::utility::Moveable T>
+template<typename OtherT>
+    requires ance::utility::MoveConvertible<T, OtherT>
+ance::utility::Optional<T>::Optional(Optional<OtherT> optional) : has_value_(optional.has_value_)
 {
     if (has_value_) new (storage_.data()) T(std::move(*optional));
 

@@ -35,6 +35,11 @@ ance::core::Function* ance::core::Function::asFunction()
     return this;
 }
 
+ance::core::Function const* ance::core::Function::asFunction() const
+{
+    return this;
+}
+
 std::ostream& operator<<(std::ostream& out, ance::core::Function const& function)
 {
     out << function.name();
