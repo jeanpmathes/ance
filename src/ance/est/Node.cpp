@@ -117,3 +117,8 @@ ance::est::TypeOf::TypeOf(utility::Owned<Expression> e, core::Location const& so
 ance::est::IdentifierCapture::IdentifierCapture(core::Identifier const& ident, core::Location const& source_location)
     : Node(source_location), Expression(), identifier(ident)
 {}
+
+ance::est::Here::Here(core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+{}

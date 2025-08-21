@@ -119,7 +119,7 @@ struct ance::bbt::Printer::Implementation
                 print(", ");
                 print(argument.get().id());
             }
-            print(")");
+            print(");");
         }
 
         void visit(Call const& call) override
@@ -134,7 +134,7 @@ struct ance::bbt::Printer::Implementation
                 print(call.arguments[i].get().id());
                 if (i + 1 < call.arguments.size()) print(", ");
             }
-            print(")");
+            print(");");
         }
 
         void visit(Read const& read) override
@@ -143,6 +143,7 @@ struct ance::bbt::Printer::Implementation
             print(read.destination.id());
             print(" <: read at ");
             print(read.target.id());
+            print(";");
         }
 
         void visit(Constant const& constant) override
@@ -151,6 +152,14 @@ struct ance::bbt::Printer::Implementation
             print(constant.destination.id());
             print(" <: ");
             print(constant.value);
+            print(";");
+        }
+
+        void visit(Here const& here) override
+        {
+            print("temporary ");
+            print(here.destination.id());
+            print(" <: here;");
         }
 
         void visit(UnaryOperation const& unary_operation) override
@@ -161,6 +170,7 @@ struct ance::bbt::Printer::Implementation
             print(unary_operation.op.toString());
             print(" ");
             print(unary_operation.operand.id());
+            print(";");
         }
 
         void visit(ScopeEnter const&) override { print("// enter scope"); }

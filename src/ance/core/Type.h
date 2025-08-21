@@ -41,6 +41,9 @@ namespace ance::core
         /// Get the type-type - the type of all types.
         static Type const& Self();
 
+        /// Get the scope type, which refers to scope values.
+        static Type const& Scope();
+
         /// Get a type by its ID.
         [[nodiscard]] static Type const& byID(TypeID const& id) ;
 

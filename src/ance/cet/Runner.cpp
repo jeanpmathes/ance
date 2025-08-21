@@ -94,8 +94,8 @@ struct ance::cet::Runner::Implementation
         }
 
       protected:
-        [[nodiscard]] virtual bool                                                                             canDeclare(core::Identifier const& identifier) const = 0;
-        virtual void                                                                             onDeclare(utility::Owned<Variable> variable)   = 0;
+        [[nodiscard]] virtual bool                                                         canDeclare(core::Identifier const& identifier) const = 0;
+        virtual void                                                                       onDeclare(utility::Owned<Variable> variable)   = 0;
         [[nodiscard]] virtual std::expected<std::reference_wrapper<Variable const>, Error> onFind(core::Identifier const& identifier)  = 0;
 
       private:
@@ -143,7 +143,8 @@ struct ance::cet::Runner::Implementation
     public:
         using IntrinsicVisitor::visit;
 
-        explicit Intrinsics(core::Reporter& reporter, std::function<Scope*()> scope, std::function<void(core::Entity const&)> allocate) : reporter_(reporter), scope_(std::move(scope)) , allocate_(std::move(allocate))
+        explicit Intrinsics(core::Reporter& reporter, std::function<void(core::Entity const&)> allocate)
+            : reporter_(reporter), allocate_(std::move(allocate))
         {
         }
 
@@ -175,14 +176,16 @@ struct ance::cet::Runner::Implementation
 
         void visit(core::Declare const&) override
         {
-            assert(arguments_->size() == 2);
-            assert(arguments_->at(0)->type() == core::Type::Ident());
-            assert(arguments_->at(1)->type() == core::Type::Self());
+            assert(arguments_->size() == 3);
+            assert(arguments_->at(0)->type() == core::Type::Scope());
+            assert(arguments_->at(1)->type() == core::Type::Ident());
+            assert(arguments_->at(2)->type() == core::Type::Self());
 
-            core::Identifier const& identifier = arguments_->at(0)->getIdentifier();
-            core::Type const& type = arguments_->at(1)->getType();
+            Scope& scope = *static_cast<Scope*>(arguments_->at(0)->getScope());
+            core::Identifier const& identifier = arguments_->at(1)->getIdentifier();
+            core::Type const& type = arguments_->at(2)->getType();
 
-            auto variable = scope_()->declare(identifier, type, location_, reporter_);
+            auto variable = scope.declare(identifier, type, location_, reporter_);
 
             if (variable.hasValue())
             {
@@ -200,12 +203,14 @@ struct ance::cet::Runner::Implementation
 
         void visit(core::Resolve const&) override
         {
-            assert(arguments_->size() == 1);
-            assert(arguments_->at(0)->type() == core::Type::Ident());
+            assert(arguments_->size() == 2);
+            assert(arguments_->at(0)->type() == core::Type::Scope());
+            assert(arguments_->at(1)->type() == core::Type::Ident());
 
-            core::Identifier const& identifier = arguments_->at(0)->getIdentifier();
+            Scope& scope = *static_cast<Scope*>(arguments_->at(0)->getScope());
+            core::Identifier const& identifier = arguments_->at(1)->getIdentifier();
 
-            Variable const* variable = scope_()->expect(identifier, reporter_);
+            Variable const* variable = scope.expect(identifier, reporter_);
 
             if (variable != nullptr)
             {
@@ -231,7 +236,6 @@ struct ance::cet::Runner::Implementation
         }
 
         core::Reporter& reporter_;
-        std::function<Scope*()> scope_; // todo: get rid of this and instead pass scopes to the intrinsics as parameter
         std::function<void(core::Entity const&)> allocate_;
 
         core::Location location_ = core::Location::global();
@@ -482,6 +486,11 @@ struct ance::cet::Runner::Implementation
             temporaries_.insert_or_assign(&constant.destination, constant.value->clone());
         }
 
+        void visit(bbt::Here const& here) override
+        {
+            temporaries_.insert_or_assign(&here.destination, core::Value::makeScope(this->scope()));
+        }
+
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
             utility::Shared<core::Value> value = temporaries_.at(&unary_operation.operand);
@@ -519,9 +528,6 @@ struct ance::cet::Runner::Implementation
         core::Reporter& reporter_;
 
         Intrinsics intrinsics_ {reporter_,
-            [this]() -> Scope* {
-            return this->scope();
-        },
             [this](core::Entity const& entity) {
             this->variables_.insert_or_assign(&entity, core::Value::makeDefault(entity.asVariable()->type())); // todo: give entity a type method?
         }};

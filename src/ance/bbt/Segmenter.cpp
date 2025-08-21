@@ -835,6 +835,15 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), inner, inner);
         }
 
+        void visit(est::Here const& here) override
+        {
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const inner = addBlock<Here>(blocks, destination(), here.location);
+
+            setResult(std::move(blocks), inner, inner);
+        }
+
         struct Loop
         {
             std::reference_wrapper<SimpleBB> entry;

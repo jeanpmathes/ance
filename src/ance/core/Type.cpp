@@ -65,6 +65,12 @@ namespace ance::core
         return type;
     }
 
+    Type const& Type::Scope()
+    {
+        static Type const type {Identifier::like("Scope")};
+        return type;
+    }
+
     Type const& Type::byID(TypeID const& id)
     {
         return getType(id.id);

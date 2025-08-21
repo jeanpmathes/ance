@@ -38,9 +38,11 @@ void ance::core::Dynamic::display(std::ostream& os) const
 
 ance::core::NoOp::NoOp() : Static(Signature::like("nop"), Type::Unit()) {}
 
-ance::core::Declare::Declare() : Static(Signature::like("declare", Type::Ident(), Type::Self()), Type::EntityRef()) {}
+ance::core::Declare::Declare()
+    : Static(Signature::like("declare", Type::Scope(), Type::Ident(), Type::Self()), Type::EntityRef()) {}
 
-ance::core::Resolve::Resolve() : Static(Signature::like("resolve", Type::Ident()), Type::EntityRef()) {}
+ance::core::Resolve::Resolve()
+    : Static(Signature::like("resolve", Type::Scope(), Type::Ident()), Type::EntityRef()) {}
 
 std::ostream& operator<<(std::ostream& os, ance::core::Intrinsic const& intrinsic)
 {

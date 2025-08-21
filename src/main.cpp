@@ -149,9 +149,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: pass scope parameter with new scope type to the intrinsics too, making them essentially static and not referencing current scope from outside
-        // todo: the current scope_ function lambda can thus be removed
-
         // todo: do the TODO in Runner::Scope::find
 
         // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)

@@ -16,7 +16,6 @@ namespace ance::core
 
     class Function;
     class Value;
-    class Scope;
 }
 
 /// The basic-block tree (BBT) namespace.
@@ -215,6 +214,16 @@ namespace ance::bbt
         Temporary const&             destination;
     };
 
+    /// Writes the current scope to the destination temporary.
+    struct Here final
+        : Statement
+        , utility::ConcreteNode<Here, Visitor>
+    {
+        Here(Temporary const& result, core::Location const& source_location);
+
+        Temporary const& destination;
+    };
+
     /// Applies an operation to an operand.
     struct UnaryOperation final
         : Statement
@@ -281,6 +290,7 @@ namespace ance::bbt
         virtual void visit(Call const& call)                      = 0;
         virtual void visit(Read const& read)                      = 0;
         virtual void visit(Constant const& constant)              = 0;
+        virtual void visit(Here const& here)                      = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
         virtual void visit(ScopeEnter const& scope_enter)         = 0;
         virtual void visit(ScopeExit const& scope_exit)           = 0;

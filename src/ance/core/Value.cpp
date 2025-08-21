@@ -36,6 +36,11 @@ namespace ance::core
         return utility::makeShared<Value>(Type::Self(), type.id());
     }
 
+    utility::Shared<Value> Value::makeScope(void* scope)
+    {
+        return utility::makeShared<Value>(Type::Scope(), scope);
+    }
+
     utility::Shared<Value> Value::makeDefault(Type const& type)
     {
         // Use std::monostate for default
@@ -55,6 +60,7 @@ namespace ance::core
         if (type_ == Type::EntityRef()) { return "@" + std::string(std::get<Entity const*>(value_)->name().text()); }
         if (type_ == Type::Ident()) { return "#" + std::string(std::get<Identifier>(value_).text()); }
         if (type_ == Type::Self()) { return std::string(Type::byID(std::get<TypeID>(value_)).name().text()); }
+        if (type_ == Type::Scope()) { return "<scope>"; }
         return "unknown";
     }
 
@@ -86,6 +92,12 @@ namespace ance::core
     {
         if (!std::holds_alternative<TypeID>(value_)) throw std::bad_variant_access();
         return Type::byID(std::get<TypeID>(value_));
+    }
+
+    void* Value::getScope() const
+    {
+        if (!std::holds_alternative<void*>(value_)) throw std::bad_variant_access();
+        return std::get<void*>(value_);
     }
 
     utility::Shared<Value> Value::clone() const

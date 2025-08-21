@@ -165,6 +165,11 @@ struct ance::est::Printer::Implementation
             print(literal.value);
         }
 
+        void visit(Here const&) override
+        {
+            print("here");
+        }
+
         void visit(UnaryOperation const& unary_operation) override
         {
             print(unary_operation.op.toString());
