@@ -839,7 +839,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Here>(blocks, destination(), here.location);
+            std::reference_wrapper const inner = addBlock<CurrentScope>(blocks, destination(), here.location);
 
             setResult(std::move(blocks), inner, inner);
         }

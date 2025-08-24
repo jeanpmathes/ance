@@ -98,7 +98,7 @@ ance::bbt::Constant::Constant(utility::Shared<core::Value> constant, Temporary c
     , destination(result)
 {}
 
-ance::bbt::Here::Here(Temporary const& result, core::Location const& source_location)
+ance::bbt::CurrentScope::CurrentScope(Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , destination(result)

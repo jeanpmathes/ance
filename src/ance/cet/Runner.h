@@ -13,6 +13,8 @@ namespace ance::cet
 {
     struct Unit;
 
+    class Provider;
+
     /// Runs code in basic-block form (BBT) at compile-time, producing CETs.
     class Runner
     {
@@ -20,6 +22,9 @@ namespace ance::cet
         explicit Runner(core::Reporter& reporter);
         ~Runner();
 
+        /// Add a provider to use during resolution.
+        /// \param provider The provider to add.
+        void add(utility::Owned<Provider> provider);
 
         /// Run the given tree in basic-block form.
         /// \param flow The flow tree to run.

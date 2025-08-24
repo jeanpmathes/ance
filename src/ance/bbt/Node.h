@@ -215,11 +215,11 @@ namespace ance::bbt
     };
 
     /// Writes the current scope to the destination temporary.
-    struct Here final
+    struct CurrentScope final
         : Statement
-        , utility::ConcreteNode<Here, Visitor>
+        , utility::ConcreteNode<CurrentScope, Visitor>
     {
-        Here(Temporary const& result, core::Location const& source_location);
+        CurrentScope(Temporary const& result, core::Location const& source_location);
 
         Temporary const& destination;
     };
@@ -290,7 +290,7 @@ namespace ance::bbt
         virtual void visit(Call const& call)                      = 0;
         virtual void visit(Read const& read)                      = 0;
         virtual void visit(Constant const& constant)              = 0;
-        virtual void visit(Here const& here)                      = 0;
+        virtual void visit(CurrentScope const& current_scope)                      = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
         virtual void visit(ScopeEnter const& scope_enter)         = 0;
         virtual void visit(ScopeExit const& scope_exit)           = 0;

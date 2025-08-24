@@ -9,6 +9,7 @@
 #include "ance/core/Function.h"
 
 #include "ance/bbt/Node.h"
+#include "ance/cet/Provider.h"
 #include "ance/cet/Node.h"
 #include "ance/core/Value.h"
 
@@ -42,7 +43,7 @@ struct ance::cet::Runner::Implementation
       public:
         virtual ~Scope() = default;
 
-        utility::Optional<std::reference_wrapper<Variable const>> declare(core::Identifier const& identifier, core::Type const& type, core::Location const& location, core::Reporter& reporter)
+        utility::Optional<utility::Shared<core::Value>> declare(core::Identifier const& identifier, core::Type const& type, core::Location const& location, std::function<void(core::Entity const&)> allocate, core::Reporter& reporter)
         {
             if (!canDeclare(identifier))
             {
@@ -53,53 +54,51 @@ struct ance::cet::Runner::Implementation
             utility::Owned<Variable> variable = utility::makeOwned<Variable>(identifier, type, location);
             Variable const& variable_ref = *variable;
 
+            allocate(variable_ref.variable());
+
             onDeclare(std::move(variable));
 
-            return std::cref(variable_ref);
+            return core::Value::makeEntityRef(variable_ref.variable());
         }
 
-        enum class Error
+        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> find(core::Identifier const& identifier,
+                                                                           std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> const& provider)
         {
-            Unknown
-        };
+            Variable const* variable = onFind(identifier);
 
-        [[nodiscard]] std::expected<std::reference_wrapper<Variable const>, Error> find(core::Identifier const& identifier)
-        {
-            // todo: when using resolving for intrinsics/functions, instead of adding a global scope, the find method should take a list of providers to use when top of the scope chain is reached
-            // todo: when adding the functions then also add a Value base class for function and variable and scopes should hold Values only
-            // todo: essentially resolving of functions / values should use the same logic - a resolve intrinsic, and intrinsics are placed inside function when they should be part of resolution
-            // todo: the nodes should hold the correct type - meaning that this type checking is done in the resolver
-
-            return onFind(identifier).or_else([&](Error const error) -> std::expected<std::reference_wrapper<Variable const>, Error> {
-                if (error == Error::Unknown && parent_ != nullptr) { return parent_->find(identifier); }
-
-                return std::unexpected(error);
-            });
-        }
-
-        [[nodiscard]] Variable const* expect(core::Identifier const& identifier, core::Reporter& reporter)
-        {
-            std::expected<std::reference_wrapper<Variable const>, Error> const variable = find(identifier);
-
-            if (variable.has_value()) { return &variable.value().get(); }
-
-            switch (variable.error())
+            if (variable != nullptr)
             {
-                case Error::Unknown:
-                    reporter.error("Cannot resolve name '" + identifier + "'", identifier.location());
-                    break;
+                return core::Value::makeEntityRef(variable->variable());
             }
 
-            return nullptr;
+            if (parent_ != nullptr)
+            {
+                return parent_->find(identifier, provider);
+            }
+
+            return provider(identifier);
+        }
+
+        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> expect(core::Identifier const& identifier, std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> const& provider, core::Reporter& reporter)
+        {
+            utility::Optional<utility::Shared<core::Value>> variable = find(identifier, provider);
+
+            if (!variable.hasValue())
+            {
+                reporter.error("Cannot resolve name '" + identifier + "'", identifier.location());
+                return std::nullopt;
+            }
+
+            return variable;
         }
 
       protected:
         [[nodiscard]] virtual bool                                                         canDeclare(core::Identifier const& identifier) const = 0;
         virtual void                                                                       onDeclare(utility::Owned<Variable> variable)   = 0;
-        [[nodiscard]] virtual std::expected<std::reference_wrapper<Variable const>, Error> onFind(core::Identifier const& identifier)  = 0;
+        [[nodiscard]] virtual Variable const* onFind(core::Identifier const& identifier)  = 0;
 
       private:
-        Scope*           parent_;
+        Scope* parent_;
     };
 
     class OrderedScope final : public Scope
@@ -123,13 +122,16 @@ struct ance::cet::Runner::Implementation
             all_variables_.emplace_back(std::move(variable));
         }
 
-        [[nodiscard]] std::expected<std::reference_wrapper<Variable const>, Error> onFind(core::Identifier const& identifier) override
+        [[nodiscard]] Variable const* onFind(core::Identifier const& identifier) override
         {
-            if (active_variables_.contains(identifier)) { return active_variables_.at(identifier); }
+            if (active_variables_.contains(identifier))
+            {
+                return &active_variables_.at(identifier).get();
+            }
 
             outer_identifiers_.insert(identifier);
 
-            return std::unexpected(Error::Unknown);
+            return nullptr;
         }
 
       private:
@@ -143,8 +145,8 @@ struct ance::cet::Runner::Implementation
     public:
         using IntrinsicVisitor::visit;
 
-        explicit Intrinsics(core::Reporter& reporter, std::function<void(core::Entity const&)> allocate)
-            : reporter_(reporter), allocate_(std::move(allocate))
+        explicit Intrinsics(core::Reporter& reporter, std::function<void(core::Entity const&)> allocate, std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide)
+            : reporter_(reporter), allocate_(std::move(allocate)), provide_(std::move(provide))
         {
         }
 
@@ -185,15 +187,11 @@ struct ance::cet::Runner::Implementation
             core::Identifier const& identifier = arguments_->at(1)->getIdentifier();
             core::Type const& type = arguments_->at(2)->getType();
 
-            auto variable = scope.declare(identifier, type, location_, reporter_);
+            auto variable = scope.declare(identifier, type, location_, allocate_, reporter_);
 
             if (variable.hasValue())
             {
-                core::Variable const& variable_ref = variable.value().get().variable();
-
-                allocate_(variable_ref);
-
-                setResult(core::Value::makeEntityRef(variable_ref));
+                setResult(std::move(*variable));
             }
             else
             {
@@ -210,11 +208,11 @@ struct ance::cet::Runner::Implementation
             Scope& scope = *static_cast<Scope*>(arguments_->at(0)->getScope());
             core::Identifier const& identifier = arguments_->at(1)->getIdentifier();
 
-            Variable const* variable = scope.expect(identifier, reporter_);
+            utility::Optional<utility::Shared<core::Value>> variable = scope.expect(identifier, provide_, reporter_);
 
-            if (variable != nullptr)
+            if (variable.hasValue())
             {
-                setResult(core::Value::makeEntityRef(variable->variable()));
+                setResult(std::move(*variable));
             }
             else
             {
@@ -237,6 +235,7 @@ struct ance::cet::Runner::Implementation
 
         core::Reporter& reporter_;
         std::function<void(core::Entity const&)> allocate_;
+        std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide_;
 
         core::Location location_ = core::Location::global();
         utility::List<utility::Shared<core::Value>> const* arguments_ = nullptr;
@@ -250,7 +249,7 @@ struct ance::cet::Runner::Implementation
     public:
         using Visitor::visit;
 
-        explicit BBT(core::Reporter& reporter) : reporter_(reporter) {}
+        BBT(core::Reporter& reporter, utility::List<utility::Owned<Provider>>& providers) : reporter_(reporter), providers_(providers) {}
         ~BBT() override = default;
 
         [[nodiscard]] bool requireType(core::Type const& expected, core::Type const& actual, core::Location const& location) const
@@ -486,7 +485,7 @@ struct ance::cet::Runner::Implementation
             temporaries_.insert_or_assign(&constant.destination, constant.value->clone());
         }
 
-        void visit(bbt::Here const& here) override
+        void visit(bbt::CurrentScope const& here) override
         {
             temporaries_.insert_or_assign(&here.destination, core::Value::makeScope(this->scope()));
         }
@@ -526,10 +525,20 @@ struct ance::cet::Runner::Implementation
 
       private:
         core::Reporter& reporter_;
+        utility::List<utility::Owned<Provider>>& providers_;
 
         Intrinsics intrinsics_ {reporter_,
             [this](core::Entity const& entity) {
             this->variables_.insert_or_assign(&entity, core::Value::makeDefault(entity.asVariable()->type())); // todo: give entity a type method?
+        }, [this](core::Identifier const& identifier) -> utility::Optional<utility::Shared<core::Value>> {
+            for (auto& provider : this->providers_)
+            {
+                core::Entity const* entity = provider->provide(identifier);
+                if (entity != nullptr)
+                    return core::Value::makeEntityRef(*entity);
+            }
+
+            return std::nullopt;
         }};
 
         std::map<core::Entity const*, utility::Shared<core::Value>> variables_ = {};
@@ -546,19 +555,31 @@ struct ance::cet::Runner::Implementation
     {
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
 
-        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(reporter_);
+        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(reporter_, providers_);
         bbt->visit(flow);
 
         return unit;
     }
 
+    void add(utility::Owned<Provider> provider)
+    {
+        providers_.emplace_back(std::move(provider));
+    }
+
 private:
     core::Reporter& reporter_;
+
+    utility::List<utility::Owned<Provider>> providers_ = {};
 };
 
 ance::cet::Runner::Runner(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
 
 ance::cet::Runner::~Runner() = default;
+
+void ance::cet::Runner::add(utility::Owned<Provider> provider)
+{
+    implementation_->add(std::move(provider));
+}
 
 ance::utility::Owned<ance::cet::Unit> ance::cet::Runner::run(bbt::Flow const& flow)
 {

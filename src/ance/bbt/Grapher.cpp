@@ -102,7 +102,7 @@ struct ance::bbt::Grapher::Implementation
 
         }
 
-        void visit(Here const&) override
+        void visit(CurrentScope const&) override
         {
 
         }

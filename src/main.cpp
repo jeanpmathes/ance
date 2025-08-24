@@ -149,9 +149,15 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: do the TODO in Runner::Scope::find
+        // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and a source location parameter)
+        // todo: it cannot be tested for now
+        // todo: it also means that a new source location type is needed
 
-        // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and source from where it was called), remove the current print functions, think for what adding functions to scoper is still needed (but still keep it probably)
+        // todo: use the normal resolution mechanism of variables for functions too meaning call needs a type check and a function type must be added
+        // todo: remove function resolving and definition from segmenter, including the add function, use the lists of the runner instead, but still add a todo remove to both definitions
+        // todo: functions should now be defined in BBT node form directly, meaning that the two print functions can use the log intrinsic
+        // todo: find a way to give the location argument to the log intrinsic, maybe for now explicitly pass it as one of the args of the functions and add a new here expression that takes the source location of the containing statement and use it in code
+        // todo: but also add a variant of the function that does not take the location, and make the intrinsic check if the location argument is set
 
         // todo: add unordered scopes, have them as default at file top-level except for the primary file - maybe make distinction explicit in compiler code
         // todo: add intrinsic functions to include another file, running the cmp code in there too

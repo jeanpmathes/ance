@@ -155,11 +155,11 @@ struct ance::bbt::Printer::Implementation
             print(";");
         }
 
-        void visit(Here const& here) override
+        void visit(CurrentScope const& current_scope) override
         {
             print("temporary ");
-            print(here.destination.id());
-            print(" <: here;");
+            print(current_scope.destination.id());
+            print(" <: scope;");
         }
 
         void visit(UnaryOperation const& unary_operation) override
