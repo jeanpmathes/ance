@@ -6,6 +6,7 @@
 
 #include "ance/utility/Owners.h"
 #include "ance/core/Type.h"
+#include "ance/core/Location.h"
 
 namespace ance::core
 {
@@ -16,7 +17,7 @@ namespace ance::core
     class Value // todo: use inheritance-based value class instead of the current switching one (see old code)
     {
     public:
-        using Storage = std::variant<std::monostate, bool, size_t, Entity const*, Identifier, TypeID, void*>;
+        using Storage = std::variant<std::monostate, bool, size_t, Entity const*, Identifier, TypeID, void*, Location>;
 
         /// Creates a new value.
         Value(Type const& type, Storage const& value);
@@ -42,6 +43,9 @@ namespace ance::core
         /// Create a scope value.
         static utility::Shared<Value> makeScope(void* scope); // todo: when Value becomes part of Runner use the actual scope type here
 
+        /// Create a location value.
+        static utility::Shared<Value> makeLocation(Location const& location);
+
         /// Create a default value of the given type.
         static utility::Shared<Value> makeDefault(Type const& type);
 
@@ -54,6 +58,7 @@ namespace ance::core
         [[nodiscard]] Identifier const& getIdentifier() const;
         [[nodiscard]] Type const& getType() const;
         [[nodiscard]] void* getScope() const;
+        [[nodiscard]] Location const& getLocation() const;
 
         [[nodiscard]] utility::Shared<Value> clone() const;
 

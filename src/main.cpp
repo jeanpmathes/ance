@@ -56,7 +56,7 @@ namespace ance
     {
         if (argc != 2)
         {
-            std::cout << "ance: command: Requires exactly one argument" << std::endl;
+            core::Reporter::print(std::cout, "command", "Requires exactly one argument");
             return EXIT_FAILURE;
         }
 
@@ -68,7 +68,7 @@ namespace ance
         if (file_path.is_relative()) file_path = absolute(file_path);
         if (!exists(file_path))
         {
-            std::cout << "ance: input: File does not exist" << std::endl;
+            core::Reporter::print(std::cout, "input", "File does not exist");
             return EXIT_FAILURE;
         }
 
@@ -112,12 +112,10 @@ namespace ance
         cet::Runner       runner {reporter};
         build::Compiler   compiler {reporter};
 
-        core::Function const print_fn(core::Signature::like("print"), core::Type::Unit(), [](auto&) { std::cout << "PRINT[]" << std::endl; });
-        segmenter.add(print_fn);// todo: remove
-        core::Function const print_var_fn(core::Signature::like("print_bool", core::Type::Bool()), core::Type::Unit(), [](auto& args) {
+        core::Function const print_fn(core::Signature::like("print", core::Type::Bool()), core::Type::Unit(), [](auto& args) {
             std::cout << "PRINT[" << args[0]->toString() << "]" << std::endl;
         });
-        segmenter.add(print_var_fn);// todo: remove
+        segmenter.add(print_fn);// todo: remove
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
         if (check_for_fail()) return EXIT_FAILURE;

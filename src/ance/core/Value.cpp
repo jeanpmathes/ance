@@ -1,5 +1,7 @@
 #include "Value.h"
 
+#include <sstream>
+
 #include "Entity.h"
 
 namespace ance::core
@@ -41,6 +43,11 @@ namespace ance::core
         return utility::makeShared<Value>(Type::Scope(), scope);
     }
 
+    utility::Shared<Value> Value::makeLocation(Location const& location)
+    {
+        return utility::makeShared<Value>(Type::Location(), location);
+    }
+
     utility::Shared<Value> Value::makeDefault(Type const& type)
     {
         // Use std::monostate for default
@@ -61,6 +68,12 @@ namespace ance::core
         if (type_ == Type::Ident()) { return "#" + std::string(std::get<Identifier>(value_).text()); }
         if (type_ == Type::Self()) { return std::string(Type::byID(std::get<TypeID>(value_)).name().text()); }
         if (type_ == Type::Scope()) { return "<scope>"; }
+        if (type_ == Type::Location())
+        {
+            std::stringstream ss;
+            ss << std::get<Location>(value_);
+            return ss.str();
+        }
         return "unknown";
     }
 
@@ -98,6 +111,12 @@ namespace ance::core
     {
         if (!std::holds_alternative<void*>(value_)) throw std::bad_variant_access();
         return std::get<void*>(value_);
+    }
+
+    Location const& Value::getLocation() const
+    {
+        if (!std::holds_alternative<Location>(value_)) throw std::bad_variant_access();
+        return std::get<Location>(value_);
     }
 
     utility::Shared<Value> Value::clone() const

@@ -21,6 +21,11 @@ namespace ance::core
         Reporter();
         ~Reporter();
 
+        /// Report an informational message.
+        /// \param message The message describing the information.
+        /// \param location The location in the source code where the information is relevant.
+        void info(std::string const& message, Location const& location);
+
         /// Report a warning.
         /// \param message The message describing the warning.
         /// \param location The location in the source code where the warning occurred.
@@ -46,6 +51,13 @@ namespace ance::core
         /// Get the number of reported warnings.
         /// \return The warning count.
         [[nodiscard]] size_t warningCount() const;
+
+        /// Print a message to the given output stream with the given prefix.
+        /// It uses the formatting of the reporter.
+        /// \param out The output stream to print to.
+        /// \param prefix The prefix to use, e.g. "info", "command",
+        /// \param message The message to print.
+        static void print(std::ostream& out, std::string const& prefix, std::string const& message);
 
     private:
         struct Implementation;

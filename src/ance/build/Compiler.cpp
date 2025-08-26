@@ -47,6 +47,11 @@ struct ance::build::Compiler::Implementation
             unsupported(resolve);
         }
 
+        void visit(core::Log const& log) override
+        {
+            unsupported(log);
+        }
+
     private:
         core::Reporter& reporter_;
 

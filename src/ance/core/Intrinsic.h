@@ -108,6 +108,22 @@ namespace ance::core
         }
     };
 
+    /// This intrinsic logs a message.
+    struct Log final : Static<Log>
+    {
+    private:
+        Log();
+
+    public:
+        ~Log() override = default;
+
+        static Log& instance()
+        {
+            static Log instance;
+            return instance;
+        }
+    };
+
     /// Visitor for all intrinsics.
     class IntrinsicVisitor : public utility::AbstractVisitor<IntrinsicVisitor>
     {
@@ -119,6 +135,7 @@ namespace ance::core
         virtual void visit(NoOp const& no_op)      = 0;
         virtual void visit(Declare const& declare) = 0;
         virtual void visit(Resolve const& resolve) = 0;
+        virtual void visit(Log const& log)         = 0;
     };
 }
 

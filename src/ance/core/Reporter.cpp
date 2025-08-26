@@ -14,6 +14,7 @@ namespace ansi
 {
     inline auto ColorRed    = "\x1B[31m";
     inline auto ColorYellow = "\x1B[33m";
+    inline auto ColorBlue  = "\x1B[34m";
 
     inline auto ColorReset = "\x1B[0m";
 }
@@ -72,6 +73,7 @@ namespace text
 struct ance::core::Reporter::Implementation {
     enum class Level
     {
+        INFO,
         WARNING,
         ERROR
     };
@@ -113,6 +115,9 @@ struct ance::core::Reporter::Implementation {
                     break;
                 case Level::WARNING:
                     out << ansi::ColorYellow << "warning" << ansi::ColorReset << ": ";
+                    break;
+                case Level::INFO:
+                    out << ansi::ColorBlue << "info" << ansi::ColorReset << ": ";
                     break;
             }
 
@@ -172,6 +177,11 @@ ance::core::Reporter::Reporter() : implementation_(utility::makeOwned<Implementa
 
 ance::core::Reporter::~Reporter() = default;
 
+void ance::core::Reporter::info(std::string const& message, Location const& location)
+{
+    implementation_->report(Implementation::Level::INFO, message, location);
+}
+
 void ance::core::Reporter::warning(std::string const& message, Location const& location)
 {
     implementation_->report(Implementation::Level::WARNING, message, location);
@@ -199,4 +209,9 @@ size_t ance::core::Reporter::errorCount() const
 size_t ance::core::Reporter::warningCount() const
 {
     return implementation_->warningCount();
+}
+
+void ance::core::Reporter::print(std::ostream& out, std::string const& prefix, std::string const& message)
+{
+    out << "ance: " << prefix << ": " << message << std::endl;
 }

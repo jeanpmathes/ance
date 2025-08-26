@@ -44,6 +44,9 @@ namespace ance::core
         /// Get the scope type, which refers to scope values.
         static Type const& Scope();
 
+        /// Get the source location type.
+        static Type const& Location();
+
         /// Get a type by its ID.
         [[nodiscard]] static Type const& byID(TypeID const& id) ;
 

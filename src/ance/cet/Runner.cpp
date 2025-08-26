@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <expected>
+#include <string>
 
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Function.h"
@@ -218,6 +219,20 @@ struct ance::cet::Runner::Implementation
             {
                 abort();
             }
+        }
+
+        void visit(core::Log const&) override
+        {
+            assert(arguments_->size() == 2);
+            assert(arguments_->at(0)->type() == core::Type::Bool());
+            assert(arguments_->at(1)->type() == core::Type::Location());
+
+            bool const value = arguments_->at(0)->getBool();
+            core::Location const&  loc     = arguments_->at(1)->getLocation();
+
+            reporter_.info(std::format("value: {}", value), loc);
+
+            setResult(core::Value::makeUnit());
         }
 
     private:

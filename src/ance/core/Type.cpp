@@ -71,6 +71,12 @@ namespace ance::core
         return type;
     }
 
+    Type const& Type::Location()
+    {
+        static Type const type {Identifier::like("Location")};
+        return type;
+    }
+
     Type const& Type::byID(TypeID const& id)
     {
         return getType(id.id);

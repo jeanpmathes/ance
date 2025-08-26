@@ -44,6 +44,9 @@ ance::core::Declare::Declare()
 ance::core::Resolve::Resolve()
     : Static(Signature::like("resolve", Type::Scope(), Type::Ident()), Type::EntityRef()) {}
 
+ance::core::Log::Log()
+    : Static(Signature::like("log", Type::Bool(), Type::Location()), Type::Unit()) {} // todo: actually make this useful by taking a string or so
+
 std::ostream& operator<<(std::ostream& os, ance::core::Intrinsic const& intrinsic)
 {
     intrinsic.display(os);
