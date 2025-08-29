@@ -149,9 +149,6 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: use the normal resolution mechanism of variables for functions too meaning call needs a type check and a function type must be added
-        // todo: remove function resolving and definition from segmenter, including the add function, use the lists of the runner instead, but still add a todo remove to both definitions
-
         // todo: move the function class from core to bbt
         // todo: functions should now be defined in BBT node form directly, meaning that the two print functions can use the log intrinsic
         // todo: find a way to give the location argument to the log intrinsic, maybe for now explicitly pass it as one of the args of the functions and add a new here expression that takes the source location of the containing statement and use it in code

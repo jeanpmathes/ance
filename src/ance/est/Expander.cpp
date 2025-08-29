@@ -298,21 +298,14 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Access const& access) override
         {
-            Statements before;
-
             utility::List<utility::Owned<Expression>> resolve_arguments;
             resolve_arguments.emplace_back(utility::makeOwned<Here>(access.location));
             resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(access.identifier, access.location));
-            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location), access.location);
-            Temporary const& tmp_entity = *temporary_entity;
-            before.emplace_back(std::move(temporary_entity));
-
-            Statements after;
 
             setResult({
-                .before = std::move(before),
-                .center = utility::makeOwned<Read>(utility::makeOwned<ReadTemporary>(tmp_entity, access.location), access.location),
-                .after  = std::move(after),
+                .before = {},
+                .center = utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location), access.location),
+                .after  = {}
             });
         }
 
