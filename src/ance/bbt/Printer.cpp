@@ -126,9 +126,9 @@ struct ance::bbt::Printer::Implementation
         {
             print("temporary ");
             print(call.destination.id());
-            print(" <- ");
-            print(call.called);
-            print("(");
+            print(" <- temporary ");
+            print(call.called.id());
+            print(" call (");
             for (size_t i = 0; i < call.arguments.size(); ++i)
             {
                 print(call.arguments[i].get().id());

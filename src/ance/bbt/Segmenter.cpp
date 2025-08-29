@@ -217,9 +217,8 @@ struct ance::bbt::Segmenter::Implementation
       public:
         using Visitor::visit;
 
-        explicit RET(core::Reporter& reporter, std::map<core::Identifier, std::reference_wrapper<core::Function const>> const& functions)
+        explicit RET(core::Reporter& reporter)
             : reporter_(reporter)
-            , functions_(functions)
         {}
         ~RET() override = default;
 
@@ -702,7 +701,14 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const entry    = addEmptyBlock(blocks);
-            std::reference_wrapper       incoming = entry;
+
+            auto [called_temporary, called] = addBlockAndGetInner<Temporary>(blocks, call.called->location);
+            link(entry, called_temporary);
+
+            auto [called_entry, called_exit] = segment(*call.called, called.get());
+            link(called_temporary, called_entry);
+
+            std::reference_wrapper incoming = called_exit;
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (auto const& index : call.arguments)
@@ -718,19 +724,8 @@ struct ance::bbt::Segmenter::Implementation
                 arguments.emplace_back(value.get());
             }
 
-            std::reference_wrapper inner = incoming;
-            if (functions_.contains(call.identifier))
-            {
-                inner = addBlock<Call>(blocks, functions_.at(call.identifier).get(), std::move(arguments), destination(), call.location);
-                link(incoming, inner);
-            }
-            else
-            {
-                reporter_.error("Unknown function '" + call.identifier + "'", call.identifier.location());
-
-                inner = addBlock<ErrorStatement>(blocks, call.location);
-                link(incoming, inner);
-            }
+            std::reference_wrapper inner = addBlock<Call>(blocks, called, std::move(arguments), destination(), call.location);
+            link(incoming, inner);
 
             std::reference_wrapper const exit = addEmptyBlock(blocks);
             link(inner, exit);
@@ -864,38 +859,24 @@ struct ance::bbt::Segmenter::Implementation
         core::Reporter& reporter_;
 
         std::map<est::Temporary const*, Temporary const*> temporaries_;
-
-        std::map<core::Identifier, std::reference_wrapper<core::Function const>> const& functions_;
     };
 
     explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
 
-    void add(core::Function const& function)
-    {
-        functions_.emplace(function.name(), std::cref(function));
-    }
-
     utility::Owned<Flow> segment(est::Statement const& statement)
     {
-        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, functions_);
+        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
 
         return ret->apply(statement);
     }
 
   private:
     core::Reporter& reporter_;
-
-    std::map<core::Identifier, std::reference_wrapper<core::Function const>> functions_ = {};
 };
 
 ance::bbt::Segmenter::Segmenter(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
 
 ance::bbt::Segmenter::~Segmenter() = default;
-
-void ance::bbt::Segmenter::add(core::Function const& function)
-{
-    implementation_->add(function);
-}
 
 ance::utility::Owned<ance::bbt::Flow> ance::bbt::Segmenter::segment(est::Statement const& statement)
 {

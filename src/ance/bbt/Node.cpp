@@ -80,7 +80,7 @@ ance::bbt::Read::Read(Temporary const& var, Temporary const& result, core::Locat
     , destination(result)
 {}
 
-ance::bbt::Call::Call(core::Function const&                                  function,
+ance::bbt::Call::Call(Temporary const&                                  function,
                       utility::List<std::reference_wrapper<Temporary const>> args,
                       Temporary const&                                       result,
                       core::Location const&                                  source_location)

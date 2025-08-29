@@ -285,9 +285,13 @@ struct ance::est::Expander::Implementation
                 append(after, std::move(expansion.after)); // todo: maybe prepend?
             }
 
+            utility::List<utility::Owned<Expression>> resolve_arguments;
+            resolve_arguments.emplace_back(utility::makeOwned<Here>(call.location));
+            resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(call.identifier, call.location));
+
             setResult({
                 .before = std::move(before),
-                .center = utility::makeOwned<Call>(call.identifier, std::move(arguments), call.location),
+                .center = utility::makeOwned<Call>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), call.location), std::move(arguments), call.location),
                 .after  = std::move(after),
             });
         }
@@ -295,12 +299,6 @@ struct ance::est::Expander::Implementation
         void visit(ast::Access const& access) override
         {
             Statements before;
-
-            if (access.identifier.text() == "here")
-            {
-                setResult(utility::makeOwned<Here>(access.location));
-                return;
-            }
 
             utility::List<utility::Owned<Expression>> resolve_arguments;
             resolve_arguments.emplace_back(utility::makeOwned<Here>(access.location));

@@ -86,10 +86,10 @@ ance::est::Intrinsic::Intrinsic(core::Intrinsic const& called, utility::List<uti
     , arguments(std::move(expressions))
 {}
 
-ance::est::Call::Call(core::Identifier const& callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
+ance::est::Call::Call(utility::Owned<Expression> callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
     : Node(source_location)
     , Expression()
-    , identifier(callable)
+    , called(std::move(callable))
     , arguments(std::move(expressions))
 {}
 

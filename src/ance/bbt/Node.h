@@ -193,12 +193,12 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Call, Visitor>
     {
-        Call(core::Function const&                                  function,
+        Call(Temporary const&                                  function,
              utility::List<std::reference_wrapper<Temporary const>> args,
              Temporary const&                                       result,
              core::Location const&                                  source_location);
 
-        core::Function const&                                  called;
+        Temporary const& called;
         utility::List<std::reference_wrapper<Temporary const>> arguments;
         Temporary const&                                       destination;
     };

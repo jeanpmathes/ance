@@ -16,7 +16,7 @@ namespace ance::core
     class Type;
 
     /// Represents a function.
-    class Function final : public Entity // todo: should be merge with variable at some point, call becomes just a special operator
+    class Function final : public Entity // todo: should be merge with value (NOT variable like it is now) at some point, call becomes just a special operator
     {
       public:
         Function(Signature signature, Type const& return_type, std::function<void(utility::List<utility::Shared<Value>> const&)> function);

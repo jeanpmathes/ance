@@ -26,6 +26,7 @@
 #include "ance/cet/Printer.h"
 #include "ance/cet/Grapher.h"
 #include "ance/cet/Runner.h"
+#include "ance/cet/Provider.h"
 
 #include "ance/build/Compiler.h"
 #include "ance/core/Type.h"
@@ -112,10 +113,11 @@ namespace ance
         cet::Runner       runner {reporter};
         build::Compiler   compiler {reporter};
 
-        core::Function const print_fn(core::Signature::like("print", core::Type::Bool()), core::Type::Unit(), [](auto& args) {
+        utility::List<utility::Shared<core::Entity>> print_provider; // todo: remove
+        print_provider.emplace_back(utility::makeShared<core::Function>(core::Signature::like("print", core::Type::Bool()), core::Type::Unit(), [](auto& args) {
             std::cout << "PRINT[" << args[0]->toString() << "]" << std::endl;
-        });
-        segmenter.add(print_fn);// todo: remove
+        }));
+        runner.add(cet::Provider::fromList(std::move(print_provider)));
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
         if (check_for_fail()) return EXIT_FAILURE;
@@ -147,15 +149,13 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add intrinsic functions to log (print to console with the ance: info: prefix with new color and a source location parameter)
-        // todo: it cannot be tested for now
-        // todo: it also means that a new source location type is needed
-
         // todo: use the normal resolution mechanism of variables for functions too meaning call needs a type check and a function type must be added
         // todo: remove function resolving and definition from segmenter, including the add function, use the lists of the runner instead, but still add a todo remove to both definitions
+
+        // todo: move the function class from core to bbt
         // todo: functions should now be defined in BBT node form directly, meaning that the two print functions can use the log intrinsic
         // todo: find a way to give the location argument to the log intrinsic, maybe for now explicitly pass it as one of the args of the functions and add a new here expression that takes the source location of the containing statement and use it in code
-        // todo: but also add a variant of the function that does not take the location, and make the intrinsic check if the location argument is set
+        // todo: but also add a variant of the function that does not take the location and uses the global value through constant instead
 
         // todo: add unordered scopes, have them as default at file top-level except for the primary file - maybe make distinction explicit in compiler code
         // todo: add intrinsic functions to include another file, running the cmp code in there too

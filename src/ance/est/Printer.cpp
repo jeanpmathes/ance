@@ -144,7 +144,7 @@ struct ance::est::Printer::Implementation
 
         void visit(Call const& call) override
         {
-            print(call.identifier);
+            visit(*call.called);
             print("(");
             for (size_t i = 0; i < call.arguments.size(); ++i)
             {

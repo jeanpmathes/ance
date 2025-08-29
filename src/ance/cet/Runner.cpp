@@ -419,6 +419,13 @@ struct ance::cet::Runner::Implementation
 
             core::Entity const& entity = target->getEntity();
 
+            if (entity.asVariable() == nullptr)
+            {
+                reporter_.error("Cannot store to non-variable entity '" + entity.name() + "'", store.target.location);
+                abort();
+                return;
+            }
+
             core::Type const& type = entity.asVariable()->type(); // todo: use a type method on Entity to get the type
 
             if (!requireType(type, value->type(), store.value.location))
@@ -466,7 +473,29 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Call const& call) override
         {
-            if (!requireSignature(call.called.signature(), call.arguments, call.location))
+            utility::Shared<core::Value> called = temporaries_.at(&call.called);
+
+            if (!requireType(core::Type::EntityRef(), called->type(), call.called.location))
+            {
+                abort();
+                return;
+            }
+
+            core::Entity const& entity = called->getEntity();
+
+            // todo: this is currently ugly, because having Function and Variable both be Entities is weird
+            // todo: the better way would be to expand calls to be a resolve of a variable, a read from that variable, and then a unary operation call on that value
+
+            if (entity.asFunction() == nullptr)
+            {
+                reporter_.error("Cannot call non-function entity '" + entity.name() + "'", call.called.location);
+                abort();
+                return;
+            }
+
+            core::Function const& function = *entity.asFunction();
+
+            if (!requireSignature(function.signature(), call.arguments, call.location))
             {
                 abort();
                 return;
@@ -475,7 +504,7 @@ struct ance::cet::Runner::Implementation
             utility::List<utility::Shared<core::Value>> arguments = {};
             for (auto argument : call.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
-            call.called.run(arguments);
+            function.run(arguments);
             temporaries_.insert_or_assign(&call.destination, core::Value::makeUnit());
         }
 
@@ -490,6 +519,13 @@ struct ance::cet::Runner::Implementation
             }
 
             core::Entity const& entity = target->getEntity();
+
+            if (entity.asVariable() == nullptr) // todo: this is currently ugly, because having Function and Variable both be Entities is weird
+            {
+                reporter_.error("Cannot read from non-variable entity '" + entity.name() + "'", read.target.location);
+                abort();
+                return;
+            }
 
             utility::Shared<core::Value> value = variables_.at(&entity);
             temporaries_.insert_or_assign(&read.destination, value);

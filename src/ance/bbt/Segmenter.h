@@ -4,11 +4,6 @@
 #include "ance/core/Reporter.h"
 #include "ance/utility/Owners.h"
 
-namespace ance::core
-{
-    class Function;
-}
-
 namespace ance::est
 {
     struct Statement;
@@ -24,10 +19,6 @@ namespace ance::bbt
   public:
     explicit Segmenter(core::Reporter& reporter);
     ~Segmenter();
-
-    /// Register a function.
-    /// \param function The function to register.
-    void add(core::Function const& function);
 
     /// Segment a statement into a basic block control flow.
     /// \param statement The statement to segment.

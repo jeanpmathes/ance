@@ -15,7 +15,7 @@ statement
     ;
 
 expression
-    : entity '(' (expression (',' expression)* )? ')' # CallExpression
+    : entity '(' (expression (',' expression)* )? ')' # CallExpression // todo: should become an operator
     | entity # AccessExpression
     | literal # LiteralExpression
     | unary expression # UnaryOperationExpression
