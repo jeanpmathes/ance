@@ -115,10 +115,9 @@ namespace ance
         build::Compiler   compiler {reporter};
 
         utility::List<utility::Shared<core::Entity>> print_provider; // todo: remove
-
         bbt::FlowBuilder builder (core::Location::global());
-        builder.setActiveBasicBlock(builder.createBasicBlock());
 
+        builder.setActiveBasicBlock(builder.createBasicBlock());
         {
             bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
             bbt::Temporary const& location = builder.pushConstant(core::Value::makeLocation(core::Location::global()));
@@ -129,9 +128,23 @@ namespace ance
             args.emplace_back(location);
             builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
         }
-
         print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1",
                 core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool())), core::Type::Unit(), builder.build()));
+
+        builder.setActiveBasicBlock(builder.createBasicBlock());
+        {
+            bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
+            bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
+
+            bbt::Temporary const& result = builder.pushTemporary();
+            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
+            args.emplace_back(value);
+            args.emplace_back(location);
+            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+        }
+        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2",
+                core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool()),
+                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())), core::Type::Unit(), builder.build()));
 
         runner.add(cet::Provider::fromList(std::move(print_provider)));
 
@@ -165,11 +178,11 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: add a new here expression so that the location can be passed to the print in code
-        // todo: add print2 which takes id and location
+        // todo: add a super simple string type, adapt log to take that instead of bool
+        // todo: add a b2str intrinsic which takes a bool and returns a string, use that to preserve some of the old print functions
 
         // todo: add unordered scopes, have them as default at file top-level except for the primary file - maybe make distinction explicit in compiler code
-        // todo: add intrinsic functions to include another file, running the cmp code in there too
+        // todo: add intrinsic and wrapper function to include another file (use the string), running the cmp code in there too
 
         // todo: add global variables so that circular dependencies can exist
 

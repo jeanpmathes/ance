@@ -309,6 +309,11 @@ struct ance::est::Expander::Implementation
             });
         }
 
+        void visit(ast::Here const& here) override
+        {
+            setResult(utility::makeOwned<Here>(here.location));
+        }
+
         void visit(ast::Literal const& literal) override
         {
             setResult(utility::makeOwned<Literal>(literal.value->clone(), literal.location));

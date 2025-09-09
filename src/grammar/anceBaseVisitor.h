@@ -71,6 +71,10 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitHereExpression(anceParser::HereExpressionContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitUnaryNot(anceParser::UnaryNotContext *ctx) override {
     return visitChildren(ctx);
   }

@@ -157,6 +157,11 @@ struct ance::ast::Printer::Implementation
             print(access.identifier);
         }
 
+        void visit(Here const&) override
+        {
+            print("here");
+        }
+
         void visit(Literal const& literal) override
         {
             print(literal.value);

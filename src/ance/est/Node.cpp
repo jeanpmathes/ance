@@ -101,6 +101,11 @@ ance::est::Read::Read(utility::Owned<Expression> accessed, core::Location const&
 
 ance::est::Literal::Literal(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(constant)) {}
 
+ance::est::Here::Here(core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+{}
+
 ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
     , Expression()

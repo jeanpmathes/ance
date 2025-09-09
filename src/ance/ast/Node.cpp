@@ -90,6 +90,11 @@ ance::ast::Literal::Literal(utility::Shared<core::Value> literal, core::Location
     , value(std::move(literal))
 {}
 
+ance::ast::Here::Here(core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+{}
+
 ance::ast::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
     , Expression()

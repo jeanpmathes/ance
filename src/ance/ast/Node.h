@@ -200,6 +200,14 @@ namespace ance::ast
         utility::Shared<core::Value> value;
     };
 
+    /// An expression that resolves to its own source location.
+    struct Here final
+        : Expression
+        , utility::ConcreteNode<Here, Visitor>
+    {
+        explicit Here(core::Location const& source_location);
+    };
+
     /// Applies an operation to an operand.
     struct UnaryOperation final
         : Expression
@@ -233,6 +241,7 @@ namespace ance::ast
         virtual void visit(Call const& call)             = 0;
         virtual void visit(Access const& access)         = 0;
         virtual void visit(Literal const& literal)       = 0;
+        virtual void visit(Here const& here)             = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
     };
 }

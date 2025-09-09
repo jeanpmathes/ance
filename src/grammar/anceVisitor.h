@@ -47,6 +47,8 @@ public:
 
     virtual std::any visitUnaryOperationExpression(anceParser::UnaryOperationExpressionContext *context) = 0;
 
+    virtual std::any visitHereExpression(anceParser::HereExpressionContext *context) = 0;
+
     virtual std::any visitUnaryNot(anceParser::UnaryNotContext *context) = 0;
 
     virtual std::any visitBooleanLiteral(anceParser::BooleanLiteralContext *context) = 0;

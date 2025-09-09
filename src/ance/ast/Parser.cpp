@@ -331,6 +331,12 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitHereExpression(anceParser::HereExpressionContext* context) override
+        {
+            Expression* expression = new Here(location(context));
+            return expression;
+        }
+
         std::any visitUnaryOperationExpression(anceParser::UnaryOperationExpressionContext* context) override
         {
             core::UnaryOperator const op = std::any_cast<core::UnaryOperator>(visit(context->unary()));

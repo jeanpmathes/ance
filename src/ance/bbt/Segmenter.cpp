@@ -8,6 +8,7 @@
 
 #include "ance/bbt/Node.h"
 #include "ance/core/Intrinsic.h"
+#include "ance/core/Value.h"
 #include "ance/est/Node.h"
 
 struct ance::bbt::Segmenter::Implementation
@@ -758,6 +759,15 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<utility::Owned<BaseBB>> blocks;
 
             std::reference_wrapper const inner = addBlock<Constant>(blocks, literal.value->clone(), destination(), literal.location);
+
+            setResult(std::move(blocks), inner, inner);
+        }
+
+        void visit(est::Here const& here) override
+        {
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, core::Value::makeLocation(here.location), destination(), here.location);
 
             setResult(std::move(blocks), inner, inner);
         }

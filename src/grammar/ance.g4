@@ -19,6 +19,7 @@ expression
     | entity # AccessExpression
     | literal # LiteralExpression
     | unary expression # UnaryOperationExpression
+    | 'here' # HereExpression
     ;
 
 unary

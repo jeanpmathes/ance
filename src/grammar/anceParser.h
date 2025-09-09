@@ -14,11 +14,11 @@ public:
   enum {
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
-    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, IDENTIFIER = 20, 
-    INTEGER = 21, SEMICOLON = 22, WHITESPACE = 23, BLOCK_COMMENT = 24, LINE_COMMENT = 25, 
-    BRACKET_OPEN = 26, BRACKET_CLOSE = 27, CURLY_BRACKET_OPEN = 28, CURLY_BRACKET_CLOSE = 29, 
-    SQUARE_BRACKET_OPEN = 30, SQUARE_BRACKET_CLOSE = 31, POINTY_BRACKET_OPEN = 32, 
-    POINTY_BRACKET_CLOSE = 33, ERROR_CHAR = 34
+    T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
+    IDENTIFIER = 21, INTEGER = 22, SEMICOLON = 23, WHITESPACE = 24, BLOCK_COMMENT = 25, 
+    LINE_COMMENT = 26, BRACKET_OPEN = 27, BRACKET_CLOSE = 28, CURLY_BRACKET_OPEN = 29, 
+    CURLY_BRACKET_CLOSE = 30, SQUARE_BRACKET_OPEN = 31, SQUARE_BRACKET_CLOSE = 32, 
+    POINTY_BRACKET_OPEN = 33, POINTY_BRACKET_CLOSE = 34, ERROR_CHAR = 35
   };
 
   enum {
@@ -231,6 +231,14 @@ public:
     antlr4::tree::TerminalNode *BRACKET_CLOSE();
     std::vector<ExpressionContext *> expression();
     ExpressionContext* expression(size_t i);
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  HereExpressionContext : public ExpressionContext {
+  public:
+    HereExpressionContext(ExpressionContext *ctx);
+
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
