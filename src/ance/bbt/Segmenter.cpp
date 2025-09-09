@@ -829,11 +829,11 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), inner, inner);
         }
 
-        void visit(est::Here const& here) override
+        void visit(est::CurrentScope const& current_scope) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<CurrentScope>(blocks, destination(), here.location);
+            std::reference_wrapper const inner = addBlock<CurrentScope>(blocks, destination(), current_scope.location);
 
             setResult(std::move(blocks), inner, inner);
         }

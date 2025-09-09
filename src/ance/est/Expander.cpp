@@ -144,7 +144,7 @@ struct ance::est::Expander::Implementation
             append(statements, std::move(type_expansion.before));
 
             utility::List<utility::Owned<Expression>> declare_arguments;
-            declare_arguments.emplace_back(utility::makeOwned<Here>(let.location));
+            declare_arguments.emplace_back(utility::makeOwned<CurrentScope>(let.location));
             declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(let.identifier, let.location));
             declare_arguments.emplace_back(std::move(type_expansion.center));
             utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), let.location), let.location); // todo: the core::Declare feels kinda ugly because it does not show it to be an intrinsic
@@ -179,7 +179,7 @@ struct ance::est::Expander::Implementation
             append(statements, std::move(expansion.before));
 
             utility::List<utility::Owned<Expression>> resolve_arguments;
-            resolve_arguments.emplace_back(utility::makeOwned<Here>(assignment.location));
+            resolve_arguments.emplace_back(utility::makeOwned<CurrentScope>(assignment.location));
             resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(assignment.identifier, assignment.location));
             utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), assignment.location), assignment.location);
             Temporary const& tmp_entity = *temporary_entity;
@@ -286,7 +286,7 @@ struct ance::est::Expander::Implementation
             }
 
             utility::List<utility::Owned<Expression>> resolve_arguments;
-            resolve_arguments.emplace_back(utility::makeOwned<Here>(call.location));
+            resolve_arguments.emplace_back(utility::makeOwned<CurrentScope>(call.location));
             resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(call.identifier, call.location));
 
             setResult({
@@ -299,7 +299,7 @@ struct ance::est::Expander::Implementation
         void visit(ast::Access const& access) override
         {
             utility::List<utility::Owned<Expression>> resolve_arguments;
-            resolve_arguments.emplace_back(utility::makeOwned<Here>(access.location));
+            resolve_arguments.emplace_back(utility::makeOwned<CurrentScope>(access.location));
             resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(access.identifier, access.location));
 
             setResult({

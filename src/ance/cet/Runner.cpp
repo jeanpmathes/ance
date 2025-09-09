@@ -560,9 +560,9 @@ struct ance::cet::Runner::Implementation
             temporaries_.insert_or_assign(&constant.destination, constant.value->clone());
         }
 
-        void visit(bbt::CurrentScope const& here) override
+        void visit(bbt::CurrentScope const& current_scope) override
         {
-            temporaries_.insert_or_assign(&here.destination, core::Value::makeScope(this->scope()));
+            temporaries_.insert_or_assign(&current_scope.destination, core::Value::makeScope(this->scope()));
         }
 
         void visit(bbt::UnaryOperation const& unary_operation) override

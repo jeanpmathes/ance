@@ -165,9 +165,9 @@ struct ance::est::Printer::Implementation
             print(literal.value);
         }
 
-        void visit(Here const&) override
+        void visit(CurrentScope const&) override
         {
-            print("here");
+            print("scope");
         }
 
         void visit(UnaryOperation const& unary_operation) override

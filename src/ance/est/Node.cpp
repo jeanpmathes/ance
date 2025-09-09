@@ -118,7 +118,7 @@ ance::est::IdentifierCapture::IdentifierCapture(core::Identifier const& ident, c
     : Node(source_location), Expression(), identifier(ident)
 {}
 
-ance::est::Here::Here(core::Location const& source_location)
+ance::est::CurrentScope::CurrentScope(core::Location const& source_location)
     : Node(source_location)
     , Expression()
 {}

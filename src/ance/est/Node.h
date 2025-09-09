@@ -204,12 +204,12 @@ namespace ance::est
         utility::Shared<core::Value> value;
     };
 
-    /// Expression representing the current scope.
-    struct Here final
+    /// Expression providing the current scope.
+    struct CurrentScope final
         : Expression
-        , utility::ConcreteNode<Here, Visitor>
+        , utility::ConcreteNode<CurrentScope, Visitor>
     {
-        explicit Here(core::Location const& source_location);
+        explicit CurrentScope(core::Location const& source_location);
     };
 
     /// Applies an operation to an operand.
@@ -277,7 +277,7 @@ namespace ance::est
         virtual void visit(Call const& call)             = 0;
         virtual void visit(Read const& access)         = 0;
         virtual void visit(Literal const& literal)       = 0;
-        virtual void visit(Here const& here)              = 0;
+        virtual void visit(CurrentScope const& current_scope)              = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
         virtual void visit(ReadTemporary const& read_temporary) = 0;
         virtual void visit(TypeOf const& type_of)       = 0;
