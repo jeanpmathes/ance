@@ -2,10 +2,11 @@
 
 #include <utility>
 
-ance::core::Signature::Signature(Identifier const& name, utility::List<std::reference_wrapper<Type const>> types)
-    : name_(name), types_(std::move(types))
-{
+ance::core::Signature::Parameter::Parameter(Identifier const& parameter_name, std::reference_wrapper<Type const> const parameter_type) : name(parameter_name), type(parameter_type) {}
 
+ance::core::Signature::Signature(Identifier const& name, utility::List<Parameter> parameters)
+    : name_(name), parameters_(std::move(parameters))
+{
 }
 
 ance::core::Identifier const& ance::core::Signature::name() const
@@ -15,10 +16,10 @@ ance::core::Identifier const& ance::core::Signature::name() const
 
 size_t ance::core::Signature::arity() const
 {
-    return types_.size();
+    return parameters_.size();
 }
 
-ance::utility::List<std::reference_wrapper<ance::core::Type const>> const& ance::core::Signature::types() const
+ance::utility::List<ance::core::Signature::Parameter> const& ance::core::Signature::parameters() const
 {
-    return types_;
+    return parameters_;
 }

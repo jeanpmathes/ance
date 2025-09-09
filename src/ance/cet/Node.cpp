@@ -70,10 +70,9 @@ ance::cet::Intrinsic::Intrinsic(core::Intrinsic const&          used,
     , destination(result)
 {}
 
-ance::cet::Call::Call(core::Function const& function, utility::List<Temporary const*> args, Temporary const& result, core::Location const& source_location)
+ance::cet::Call::Call(utility::List<Temporary const*> args, Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , called(function)
     , arguments(std::move(args))
     , destination(result)
 {}

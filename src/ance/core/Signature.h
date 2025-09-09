@@ -13,7 +13,15 @@ namespace ance::core
     class Signature
     {
     public:
-        Signature(Identifier const& name, utility::List<std::reference_wrapper<const Type>> types);
+        struct Parameter
+        {
+            Identifier name;
+            std::reference_wrapper<Type const> type;
+
+            Parameter(Identifier const& parameter_name, std::reference_wrapper<Type const> parameter_type);
+        };
+
+        Signature(Identifier const& name, utility::List<Parameter> parameters);
 
         /// Get the name of the signature.
         [[nodiscard]] Identifier const& name() const;
@@ -21,18 +29,24 @@ namespace ance::core
         /// Get the arity of the signature, meaning the number of arguments.
         [[nodiscard]] size_t arity() const;
 
-        /// Get the parameter types of the signature.
-        [[nodiscard]] utility::List<std::reference_wrapper<const Type>> const& types() const;
+        /// Get the parameters of the signature.
+        [[nodiscard]] utility::List<Parameter> const& parameters() const;
 
         template<typename... Args>
         static Signature like(std::string const& name, Args&&... args)
         {
-            return { Identifier::like(name), utility::List<std::reference_wrapper<const Type>> { std::forward<Args>(args)... } };
+            return { Identifier::like(name), utility::List<Parameter> { std::forward<Args>(args)... } };
+        }
+
+        template<typename... Args>
+        static Signature likeUnnamed(std::string const& name, Args&&... args)
+        {
+            return { Identifier::like(name), utility::List<Parameter> { Parameter { Identifier::like("arg" + std::to_string(sizeof...(args))), std::forward<Args>(args) }... } };
         }
 
     private:
         Identifier name_;
-        utility::List<std::reference_wrapper<const Type>> types_;
+        utility::List<Parameter> parameters_;
     };
 }
 

@@ -15,7 +15,6 @@ namespace ance::core
 {
     struct Intrinsic;
 
-    class Function;
     class Value;
 }
 
@@ -164,9 +163,8 @@ namespace ance::cet
         : Statement
         , utility::ConcreteNode<Call, Visitor>
     {
-        Call(core::Function const& function, utility::List<Temporary const*> args, Temporary const& result, core::Location const& source_location);
+        Call(utility::List<Temporary const*> args, Temporary const& result, core::Location const& source_location);
 
-        core::Function const&           called;
         utility::List<Temporary const*> arguments;
         Temporary const&                destination;
     };

@@ -5,14 +5,15 @@
 #include <set>
 #include <expected>
 #include <string>
+#include <functional>
 
 #include "ance/core/Intrinsic.h"
-#include "ance/core/Function.h"
-
-#include "ance/bbt/Node.h"
-#include "ance/cet/Provider.h"
-#include "ance/cet/Node.h"
 #include "ance/core/Value.h"
+
+#include "ance/bbt/Function.h"
+#include "ance/bbt/Node.h"
+#include "ance/cet/Node.h"
+#include "ance/cet/Provider.h"
 
 struct ance::cet::Runner::Implementation
 {
@@ -230,7 +231,7 @@ struct ance::cet::Runner::Implementation
             bool const value = arguments_->at(0)->getBool();
             core::Location const&  loc     = arguments_->at(1)->getLocation();
 
-            reporter_.info(std::format("value: {}", value), loc);
+            reporter_.info(std::format("value = {}", value), loc);
 
             setResult(core::Value::makeUnit());
         }
@@ -284,7 +285,7 @@ struct ance::cet::Runner::Implementation
         {
             bool ok = true;
 
-            size_t const arity = signature.types().size();
+            size_t const arity = signature.arity();
             size_t const argument_count = arguments.size();
 
             if (arity != argument_count)
@@ -300,7 +301,7 @@ struct ance::cet::Runner::Implementation
             {
                 auto const& argument = arguments[i];
                 auto const& argument_value = temporaries_.at(&argument.get());
-                auto const& type = signature.types()[i].get();
+                auto const& type = signature.parameters()[i].type.get();
 
                 ok &= requireType(type, argument_value->type(), argument.get().location);
             }
@@ -493,7 +494,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            core::Function const& function = *entity.asFunction();
+            bbt::Function const& function = *static_cast<bbt::Function const*>(entity.asFunction());
 
             if (!requireSignature(function.signature(), call.arguments, call.location))
             {
@@ -504,7 +505,30 @@ struct ance::cet::Runner::Implementation
             utility::List<utility::Shared<core::Value>> arguments = {};
             for (auto argument : call.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
-            function.run(arguments);
+            {
+                Scope& scope = *scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope()));
+
+                for (size_t i = 0; i < function.signature().arity(); ++i)
+                {
+                    core::Signature::Parameter const& parameter = function.signature().parameters()[i];
+                    utility::Shared<core::Value> & argument  = arguments[i];
+
+                    utility::Optional<utility::Shared<core::Value>> variable = scope.declare(parameter.name, parameter.type, core::Location::global(), allocate_, reporter_);
+
+                    if (!variable.hasValue())
+                    {
+                        abort();
+                        return;
+                    }
+
+                    variables_.insert_or_assign(&(*variable)->getEntity(), argument);
+                }
+
+                visit(function.body());
+
+                scopes_.pop_back();
+            }
+
             temporaries_.insert_or_assign(&call.destination, core::Value::makeUnit());
         }
 
@@ -578,10 +602,11 @@ struct ance::cet::Runner::Implementation
         core::Reporter& reporter_;
         utility::List<utility::Owned<Provider>>& providers_;
 
-        Intrinsics intrinsics_ {reporter_,
-            [this](core::Entity const& entity) {
+        std::function<void(core::Entity const&)> allocate_ = [this](core::Entity const& entity) {
             this->variables_.insert_or_assign(&entity, core::Value::makeDefault(entity.asVariable()->type())); // todo: give entity a type method?
-        }, [this](core::Identifier const& identifier) -> utility::Optional<utility::Shared<core::Value>> {
+        };
+
+        std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide_ = [this](core::Identifier const& identifier) -> utility::Optional<utility::Shared<core::Value>> {
             for (auto& provider : this->providers_)
             {
                 core::Entity const* entity = provider->provide(identifier);
@@ -590,7 +615,9 @@ struct ance::cet::Runner::Implementation
             }
 
             return std::nullopt;
-        }};
+        };
+
+        Intrinsics intrinsics_ {reporter_, allocate_, provide_};
 
         std::map<core::Entity const*, utility::Shared<core::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};

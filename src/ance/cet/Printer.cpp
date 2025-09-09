@@ -139,7 +139,7 @@ struct ance::cet::Printer::Implementation
             print("temporary ");
             print(call.destination.id());
             print(" <- ");
-            print(call.called);
+            print("<unknown function>"); // todo: function name
             print("(");
             for (size_t i = 0; i < call.arguments.size(); ++i)
             {

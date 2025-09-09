@@ -1,7 +1,6 @@
 #include "Printer.h"
 
 #include "ance/core/Intrinsic.h"
-#include "ance/core/Function.h"
 #include "ance/core/Type.h"
 #include "ance/core/Value.h"
 
@@ -31,12 +30,6 @@ void ance::core::Printer::print(Intrinsic const& intrinsic)
 {
     indent();
     out_ << intrinsic;
-}
-
-void ance::core::Printer::print(Function const& function)
-{
-    indent();
-    out_ << function;
 }
 
 void ance::core::Printer::print(Type const& type)

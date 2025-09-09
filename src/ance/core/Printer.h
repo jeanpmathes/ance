@@ -4,14 +4,12 @@
 #include <ostream>
 
 #include "ance/utility/Owners.h"
-
 #include "ance/core/Identifier.h"
 
 namespace ance::core
 {
     struct Intrinsic;
 
-    class Function;
     class Type;
     class Value;
 
@@ -34,9 +32,6 @@ namespace ance::core
 
         /// Print an intrinsic to the output stream.
         void print(Intrinsic const& intrinsic);
-
-        /// Print a function to the output stream.
-        void print(Function const& function);
 
         /// Print a type to the output stream.
         void print(Type const& type);

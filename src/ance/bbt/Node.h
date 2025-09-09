@@ -1,8 +1,6 @@
 #ifndef ANCE_BBT_NODE_H
 #define ANCE_BBT_NODE_H
 
-#include "Node.h"
-#include "ance/core/Identifier.h"
 #include "ance/core/UnaryOperator.h"
 #include "ance/core/Variable.h"
 
@@ -14,7 +12,6 @@ namespace ance::core
 {
     struct Intrinsic;
 
-    class Function;
     class Value;
 }
 

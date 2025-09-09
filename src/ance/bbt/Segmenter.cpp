@@ -7,7 +7,6 @@
 #include <vector>
 
 #include "ance/bbt/Node.h"
-#include "ance/core/Function.h"
 #include "ance/core/Intrinsic.h"
 #include "ance/est/Node.h"
 

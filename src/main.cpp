@@ -4,7 +4,6 @@
 
 #include <boost/locale.hpp>
 
-#include "ance/core/Function.h"
 #include "ance/core/Intrinsic.h"
 
 #include "ance/sources/SourceTree.h"
@@ -21,6 +20,8 @@
 #include "ance/bbt/Printer.h"
 #include "ance/bbt/Grapher.h"
 #include "ance/bbt/Segmenter.h"
+#include "ance/bbt/Function.h"
+#include "ance/bbt/FlowBuilder.h"
 
 #include "ance/cet/Node.h"
 #include "ance/cet/Printer.h"
@@ -114,9 +115,24 @@ namespace ance
         build::Compiler   compiler {reporter};
 
         utility::List<utility::Shared<core::Entity>> print_provider; // todo: remove
-        print_provider.emplace_back(utility::makeShared<core::Function>(core::Signature::like("print", core::Type::Bool()), core::Type::Unit(), [](auto& args) {
-            std::cout << "PRINT[" << args[0]->toString() << "]" << std::endl;
-        }));
+
+        bbt::FlowBuilder builder (core::Location::global());
+        builder.setActiveBasicBlock(builder.createBasicBlock());
+
+        {
+            bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
+            bbt::Temporary const& location = builder.pushConstant(core::Value::makeLocation(core::Location::global()));
+
+            bbt::Temporary const& result = builder.pushTemporary();
+            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
+            args.emplace_back(value);
+            args.emplace_back(location);
+            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+        }
+
+        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1",
+                core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool())), core::Type::Unit(), builder.build()));
+
         runner.add(cet::Provider::fromList(std::move(print_provider)));
 
         sources::SourceFile const& primary_file = source_tree.addFile(file_name);
@@ -149,10 +165,8 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // todo: move the function class from core to bbt
-        // todo: functions should now be defined in BBT node form directly, meaning that the two print functions can use the log intrinsic
-        // todo: find a way to give the location argument to the log intrinsic, maybe for now explicitly pass it as one of the args of the functions and add a new here expression that takes the source location of the containing statement and use it in code
-        // todo: but also add a variant of the function that does not take the location and uses the global value through constant instead
+        // todo: add a new here expression so that the location can be passed to the print in code
+        // todo: add print2 which takes id and location
 
         // todo: add unordered scopes, have them as default at file top-level except for the primary file - maybe make distinction explicit in compiler code
         // todo: add intrinsic functions to include another file, running the cmp code in there too

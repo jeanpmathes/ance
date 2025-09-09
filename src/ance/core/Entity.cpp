@@ -1,11 +1,11 @@
 #include "Entity.h"
 
-ance::core::Function* ance::core::Entity::asFunction()
+void* ance::core::Entity::asFunction()
 {
     return nullptr;
 }
 
-ance::core::Function const* ance::core::Entity::asFunction() const
+void const* ance::core::Entity::asFunction() const
 {
     return nullptr;
 }
