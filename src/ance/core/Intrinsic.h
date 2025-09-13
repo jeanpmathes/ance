@@ -108,6 +108,22 @@ namespace ance::core
         }
     };
 
+    /// This intrinsic converts a boolean to a string.
+    struct B2Str final : Static<B2Str>
+    {
+    private:
+        B2Str();
+
+    public:
+        ~B2Str() override = default;
+
+        static B2Str& instance()
+        {
+            static B2Str instance;
+            return instance;
+        }
+    };
+
     /// This intrinsic logs a message.
     struct Log final : Static<Log>
     {
@@ -136,6 +152,7 @@ namespace ance::core
         virtual void visit(Declare const& declare) = 0;
         virtual void visit(Resolve const& resolve) = 0;
         virtual void visit(Log const& log)         = 0;
+        virtual void visit(B2Str const& b2str)     = 0;
     };
 }
 

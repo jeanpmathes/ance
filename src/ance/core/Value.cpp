@@ -1,12 +1,13 @@
 #include "Value.h"
 
 #include <sstream>
+#include <utility>
 
 #include "Entity.h"
 
 namespace ance::core
 {
-    Value::Value(Type const& type, Storage const& value) : type_(type), value_(value) {}
+    Value::Value(Type const& type, Storage  value) : type_(type), value_(std::move(value)) {}
 
     utility::Shared<Value> Value::makeBool(bool const value)
     {
@@ -48,10 +49,24 @@ namespace ance::core
         return utility::makeShared<Value>(Type::Location(), location);
     }
 
+    utility::Shared<Value> Value::makeString(std::string value)
+    {
+        return utility::makeShared<Value>(Type::String(), std::move(value));
+    }
+
     utility::Shared<Value> Value::makeDefault(Type const& type)
     {
-        // Use std::monostate for default
-        return utility::makeShared<Value>(type, std::monostate{});
+        if (type == Type::Bool()) return makeBool(false);
+        if (type == Type::Unit()) return makeUnit();
+        if (type == Type::Size()) return makeSize(0);
+        if (type == Type::EntityRef()) throw std::logic_error("Cannot create default value for EntityRef");
+        if (type == Type::Ident()) throw std::logic_error("Cannot create default value for Ident");
+        if (type == Type::Self()) throw std::logic_error("Cannot create default value for Self");
+        if (type == Type::Scope()) throw std::logic_error("Cannot create default value for Scope");
+        if (type == Type::Location()) return makeLocation(Location::global());
+        if (type == Type::String()) return makeString("");
+
+        throw std::logic_error("Cannot create default value for unknown type!");
     }
 
     Type const& Value::type() const
@@ -68,12 +83,14 @@ namespace ance::core
         if (type_ == Type::Ident()) { return "#" + std::string(std::get<Identifier>(value_).text()); }
         if (type_ == Type::Self()) { return std::string(Type::byID(std::get<TypeID>(value_)).name().text()); }
         if (type_ == Type::Scope()) { return "<scope>"; }
+        if (type_ == Type::String()) { return std::get<std::string>(value_); }
         if (type_ == Type::Location())
         {
             std::stringstream ss;
             ss << std::get<Location>(value_);
             return ss.str();
         }
+
         return "unknown";
     }
 
@@ -117,6 +134,12 @@ namespace ance::core
     {
         if (!std::holds_alternative<Location>(value_)) throw std::bad_variant_access();
         return std::get<Location>(value_);
+    }
+
+    std::string const& Value::getString() const
+    {
+        if (!std::holds_alternative<std::string>(value_)) throw std::bad_variant_access();
+        return std::get<std::string>(value_);
     }
 
     utility::Shared<Value> Value::clone() const

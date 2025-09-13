@@ -120,15 +120,26 @@ namespace ance
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
             bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
+
+            bbt::Temporary const& str_value = builder.pushTemporary();
+            {
+                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
+                args.emplace_back(value);
+                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::B2Str::instance(), std::move(args), str_value, core::Location::global()));
+            }
+
             bbt::Temporary const& location = builder.pushConstant(core::Value::makeLocation(core::Location::global()));
 
             bbt::Temporary const& result = builder.pushTemporary();
-            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-            args.emplace_back(value);
-            args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            {
+                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
+                args.emplace_back(str_value);
+                args.emplace_back(location);
+                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            }
+            (void)result;
         }
-        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1",
+        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1b",
                 core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool())), core::Type::Unit(), builder.build()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
@@ -136,14 +147,60 @@ namespace ance
             bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
             bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
 
+            bbt::Temporary const& str_value = builder.pushTemporary();
+            {
+                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
+                args.emplace_back(value);
+                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::B2Str::instance(), std::move(args), str_value, core::Location::global()));
+            }
+
             bbt::Temporary const& result = builder.pushTemporary();
-            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-            args.emplace_back(value);
-            args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            {
+                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
+                args.emplace_back(str_value);
+                args.emplace_back(location);
+                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            }
+            (void)result;
         }
-        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2",
+        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2b",
                 core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool()),
+                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())), core::Type::Unit(), builder.build()));
+
+        builder.setActiveBasicBlock(builder.createBasicBlock());
+        {
+            bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
+
+            bbt::Temporary const& location = builder.pushConstant(core::Value::makeLocation(core::Location::global()));
+
+            bbt::Temporary const& result = builder.pushTemporary();
+            {
+                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
+                args.emplace_back(value);
+                args.emplace_back(location);
+                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            }
+            (void)result;
+        }
+        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1s",
+                core::Signature::Parameter(core::Identifier::like("value"), core::Type::String())), core::Type::Unit(), builder.build()));
+
+        builder.setActiveBasicBlock(builder.createBasicBlock());
+        {
+            bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
+            bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
+
+            bbt::Temporary const& result = builder.pushTemporary();
+            {
+                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
+                args.emplace_back(value);
+                args.emplace_back(location);
+                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            }
+            (void)result;
+        }
+        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2s",
+                core::Signature::Parameter(core::Identifier::like("value"), core::Type::String()),
                 core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())), core::Type::Unit(), builder.build()));
 
         runner.add(cet::Provider::fromList(std::move(print_provider)));
@@ -177,9 +234,6 @@ namespace ance
         if (check_for_fail()) return EXIT_FAILURE;
 
         reporter.emit(source_tree, out);
-
-        // todo: add a super simple string type, adapt log to take that instead of bool
-        // todo: add a b2str intrinsic which takes a bool and returns a string, use that to preserve some of the old print functions
 
         // todo: add unordered scopes, have them as default at file top-level except for the primary file - maybe make distinction explicit in compiler code
         // todo: add intrinsic and wrapper function to include another file (use the string), running the cmp code in there too

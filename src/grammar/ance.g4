@@ -31,12 +31,14 @@ literal
     | INTEGER # SizeLiteral
     | '(' ')' # UnitLiteral
     | type # TypeLiteral
+    | STRING # StringLiteral
     ;
 
 type
     : 'Bool' # BoolType
     | 'Unit' # UnitType
     | 'Size' # SizeType
+    | 'String' # StringType
     | 'Type' # TypeType
     ;
 
@@ -57,6 +59,7 @@ IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{G
            | [\p{Emoji}] ;
 
 INTEGER : [0-9]+ ;
+STRING : '"' .*? '"' ; // todo: handle escape sequences (see old grammar) - needs code changes to preserve printing and do correct escaping
 
 SEMICOLON : ';' ;
 

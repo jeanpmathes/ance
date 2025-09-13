@@ -59,11 +59,15 @@ public:
 
     virtual std::any visitTypeLiteral(anceParser::TypeLiteralContext *context) = 0;
 
+    virtual std::any visitStringLiteral(anceParser::StringLiteralContext *context) = 0;
+
     virtual std::any visitBoolType(anceParser::BoolTypeContext *context) = 0;
 
     virtual std::any visitUnitType(anceParser::UnitTypeContext *context) = 0;
 
     virtual std::any visitSizeType(anceParser::SizeTypeContext *context) = 0;
+
+    virtual std::any visitStringType(anceParser::StringTypeContext *context) = 0;
 
     virtual std::any visitTypeType(anceParser::TypeTypeContext *context) = 0;
 

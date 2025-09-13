@@ -225,15 +225,25 @@ struct ance::cet::Runner::Implementation
         void visit(core::Log const&) override
         {
             assert(arguments_->size() == 2);
-            assert(arguments_->at(0)->type() == core::Type::Bool());
+            assert(arguments_->at(0)->type() == core::Type::String());
             assert(arguments_->at(1)->type() == core::Type::Location());
 
-            bool const value = arguments_->at(0)->getBool();
-            core::Location const&  loc     = arguments_->at(1)->getLocation();
+            std::string const& value = arguments_->at(0)->getString();
+            core::Location const& loc = arguments_->at(1)->getLocation();
 
-            reporter_.info(std::format("value = {}", value), loc);
+            reporter_.info(value, loc);
 
             setResult(core::Value::makeUnit());
+        }
+
+        void visit(core::B2Str const&) override
+        {
+            assert(arguments_->size() == 1);
+            assert(arguments_->at(0)->type() == core::Type::Bool());
+
+            bool const value = arguments_->at(0)->getBool();
+
+            setResult(core::Value::makeString(value ? "true" : "false"));
         }
 
     private:

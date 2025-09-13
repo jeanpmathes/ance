@@ -32,6 +32,9 @@ namespace ance::core
         /// Get the size type, which has a platform-dependent size.
         static Type const& Size();
 
+        /// Get the string type.
+        static Type const& String();
+
         /// Get the entity reference type, which is used to refer to entities.
         static Type const& EntityRef();
 

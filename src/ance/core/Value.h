@@ -17,10 +17,10 @@ namespace ance::core
     class Value // todo: use inheritance-based value class instead of the current switching one (see old code)
     {
     public:
-        using Storage = std::variant<std::monostate, bool, size_t, Entity const*, Identifier, TypeID, void*, Location>;
+        using Storage = std::variant<std::monostate, bool, size_t, Entity const*, Identifier, TypeID, void*, Location, std::string>;
 
         /// Creates a new value.
-        Value(Type const& type, Storage const& value);
+        Value(Type const& type, Storage  value);
 
         /// Create a boolean value.
         static utility::Shared<Value> makeBool(bool value);
@@ -46,6 +46,9 @@ namespace ance::core
         /// Create a location value.
         static utility::Shared<Value> makeLocation(Location const& location);
 
+        /// Create a string value.
+        static utility::Shared<Value> makeString(std::string value);
+
         /// Create a default value of the given type.
         static utility::Shared<Value> makeDefault(Type const& type);
 
@@ -59,6 +62,7 @@ namespace ance::core
         [[nodiscard]] Type const& getType() const;
         [[nodiscard]] void* getScope() const;
         [[nodiscard]] Location const& getLocation() const;
+        [[nodiscard]] std::string const& getString() const;
 
         [[nodiscard]] utility::Shared<Value> clone() const;
 

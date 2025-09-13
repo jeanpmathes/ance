@@ -47,6 +47,12 @@ namespace ance::core
         return type;
     }
 
+    Type const& Type::String()
+    {
+        static Type const type {Identifier::like("String")};
+        return type;
+    }
+
     Type const& Type::EntityRef()
     {
         static Type const type {Identifier::like("EntityRef")};

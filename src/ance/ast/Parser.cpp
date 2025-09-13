@@ -378,6 +378,15 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitStringLiteral(anceParser::StringLiteralContext* context) override
+        {
+            std::string text = context->getText();
+            text = text.substr(1, text.size() - 2); // Remove quotes.
+
+            Expression* expression = new Literal(core::Value::makeString(text), location(context));
+            return expression;
+        }
+
         std::any visitBoolType(anceParser::BoolTypeContext* context) override
         {
             Expression* expression = new Literal(core::Value::makeType(core::Type::Bool()), location(context));
@@ -399,6 +408,12 @@ namespace ance::ast
         std::any visitTypeType(anceParser::TypeTypeContext* context) override
         {
             Expression* expression = new Literal(core::Value::makeType(core::Type::Self()), location(context));
+            return expression;
+        }
+
+        std::any visitStringType(anceParser::StringTypeContext* context) override
+        {
+            Expression* expression = new Literal(core::Value::makeType(core::Type::String()), location(context));
             return expression;
         }
 

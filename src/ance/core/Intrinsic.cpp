@@ -45,7 +45,10 @@ ance::core::Resolve::Resolve()
     : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::EntityRef()) {}
 
 ance::core::Log::Log()
-    : Static(Signature::likeUnnamed("log", Type::Bool(), Type::Location()), Type::Unit()) {} // todo: actually make this useful by taking a string or so
+    : Static(Signature::likeUnnamed("log", Type::String(), Type::Location()), Type::Unit()) {}
+
+ance::core::B2Str::B2Str()
+    : Static(Signature::likeUnnamed("b2str", Type::Bool()), Type::String()) {}
 
 std::ostream& operator<<(std::ostream& os, ance::core::Intrinsic const& intrinsic)
 {
