@@ -1,10 +1,17 @@
 #include "Expander.h"
 
 #include "ance/ast/Node.h"
+#include "ance/ast/Parser.h"
 #include "ance/est/Node.h"
+
+#include "Printer.h"
 
 struct ance::est::Expander::Implementation
 {
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+        : source_tree_(source_tree), reporter_(reporter), parser_(source_tree, reporter, context), context_(context)
+    {}
+
     using Statements = utility::List<utility::Owned<Statement>>;
 
     struct Expansion
@@ -337,26 +344,37 @@ struct ance::est::Expander::Implementation
         core::Reporter& reporter_;
     };
 
-    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
-
-    utility::Owned<Statement> expand(ast::Statement const& statement)
+    utility::Optional<utility::Owned<Statement>> expand(std::filesystem::path const& file, std::ostream& out)
     {
+        utility::Optional<utility::Owned<ast::Statement>> parsed = parser_.parse(file, out);
+        if (!parsed.hasValue()) return std::nullopt;
+
         utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
+        Statements statements = ast->expand(**parsed);
 
-        Statements statements = ast->expand(statement);
+        if (reporter_.checkForFail(source_tree_, out)) return std::nullopt;
 
-        return utility::makeOwned<Block>(std::move(statements), statement.location);
+        auto block = utility::makeOwned<Block>(std::move(statements), parsed.value()->location);
+
+        context_.print<Printer>(*block, "est");
+
+        return block;
     }
 
   private:
+    sources::SourceTree& source_tree_;
     core::Reporter& reporter_;
+    ast::Parser     parser_;
+    core::Context& context_;
 };
 
-ance::est::Expander::Expander(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
+ance::est::Expander::Expander(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
+{}
 
 ance::est::Expander::~Expander() = default;
 
-ance::utility::Owned<ance::est::Statement> ance::est::Expander::expand(ast::Statement const& statement)
+ance::utility::Optional<ance::utility::Owned<ance::est::Statement>> ance::est::Expander::expand(std::filesystem::path const& file, std::ostream& out)
 {
-    return implementation_->expand(statement);
+    return implementation_->expand(file, out);
 }

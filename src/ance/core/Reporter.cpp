@@ -202,6 +202,27 @@ void ance::core::Reporter::clear()
     implementation_->clear();
 }
 
+bool ance::core::Reporter::checkForFail(sources::SourceTree& source_tree, std::ostream& out)
+{
+    bool const warnings_as_errors = false;// todo: allow setting
+
+    emit(source_tree, out);
+
+    if (errorCount() > 0 || (warnings_as_errors && warningCount() > 0))
+    {
+        out << "ance: " << errorCount() << " errors, " << warningCount() << " warnings" << std::endl;
+        out << "ance: Failed";
+
+        if (errorCount() == 0) out << " (by warning)";
+
+        return true;
+    }
+
+    clear();
+
+    return false;
+}
+
 size_t ance::core::Reporter::errorCount() const
 {
     return implementation_->errorCount();

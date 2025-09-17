@@ -1,12 +1,15 @@
 #ifndef ANCE_EST_EXPANDER_H
 #define ANCE_EST_EXPANDER_H
 
+#include <filesystem>
+
 #include "ance/utility/Owners.h"
 #include "ance/core/Reporter.h"
+#include "ance/core/Context.h"
 
-namespace ance::ast
+namespace ance::sources
 {
-    struct Statement;
+    class SourceTree;
 }
 
 namespace ance::est
@@ -17,13 +20,14 @@ namespace ance::est
     class Expander
     {
       public:
-        explicit Expander(core::Reporter& reporter);
+        Expander(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
         ~Expander();
 
-        /// Expand a statement, removing syntactic sugar.
-        /// \param statement The statement to expand.
+        /// Expand a statement in a file, removing syntactic sugar.
+        /// \param file The path to the file to expand.
+        /// \param out The output stream to report to.
         /// \return The expanded statement.
-        utility::Owned<Statement> expand(ast::Statement const& statement);
+        utility::Optional<utility::Owned<Statement>> expand(std::filesystem::path const& file, std::ostream& out);
 
       private:
         struct Implementation;

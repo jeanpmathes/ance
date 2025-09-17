@@ -1,12 +1,15 @@
 #ifndef ANCE_CET_RUNNER_H
 #define ANCE_CET_RUNNER_H
 
+#include <filesystem>
+
 #include "ance/utility/Owners.h"
 #include "ance/core/Reporter.h"
+#include "ance/core/Context.h"
 
-namespace ance::bbt
+namespace ance::sources
 {
-    struct Flow;
+    class SourceTree;
 }
 
 namespace ance::cet
@@ -19,17 +22,18 @@ namespace ance::cet
     class Runner
     {
     public:
-        explicit Runner(core::Reporter& reporter);
+        Runner(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
         ~Runner();
 
         /// Add a provider to use during resolution.
         /// \param provider The provider to add.
         void add(utility::Owned<Provider> provider);
 
-        /// Run the given tree in basic-block form.
-        /// \param flow The flow tree to run.
+        /// Run the given file and return the resulting unit.
+        /// \param file The path to the file to run.
+        /// \param out The output stream to report to.
         /// \return The resulting compile-able unit.
-        utility::Owned<Unit> run(bbt::Flow const& flow);
+        utility::Optional<utility::Owned<Unit>> run(std::filesystem::path const& file, std::ostream& out);
 
     private:
         struct Implementation;

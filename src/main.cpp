@@ -34,26 +34,6 @@
 
 namespace ance
 {
-    template<class Printer, class Tree>
-    void print(Tree const& tree, std::filesystem::path const& debug_path, std::string const& tree_name)
-    {
-        std::filesystem::path const tree_path = debug_path / (tree_name + ".txt");
-        std::ofstream               out {tree_path};
-
-        Printer printer {out};
-        printer.print(tree);
-    }
-
-    template<class Grapher, class Tree>
-    void graph(Tree const& tree, std::filesystem::path const& debug_path, std::string const& tree_name)
-    {
-        std::filesystem::path const tree_path = debug_path / (tree_name + ".gml");
-        std::ofstream               out {tree_path};
-
-        Grapher grapher {out};
-        grapher.graph(tree);
-    }
-
     static int program(int const argc, char** argv)
     {
         if (argc != 2)
@@ -85,34 +65,12 @@ namespace ance
         std::filesystem::path const debug_path = output_path / "dbg";
         create_directories(debug_path);
 
-        bool const warnings_as_errors = false;// todo: allow setting
-
         sources::SourceTree source_tree {base_path};
         core::Reporter      reporter;
+        core::Context       context {debug_path};
 
-        auto check_for_fail = [&source_tree, &reporter, &out]() {
-            reporter.emit(source_tree, out);
-
-            if (reporter.errorCount() > 0 || (warnings_as_errors && reporter.warningCount() > 0))
-            {
-                out << "ance: " << reporter.errorCount() << " errors, " << reporter.warningCount() << " warnings" << std::endl;
-                out << "ance: Failed";
-
-                if (reporter.errorCount() == 0) out << " (by warning)";
-
-                return true;
-            }
-
-            reporter.clear();
-
-            return false;
-        };
-
-        ast::Parser       parser {source_tree, reporter};
-        est::Expander     expander {reporter};
-        bbt::Segmenter    segmenter {reporter};
-        cet::Runner       runner {reporter};
-        build::Compiler   compiler {reporter};
+        cet::Runner     runner {source_tree, reporter, context};
+        build::Compiler compiler {source_tree, reporter, context}; // todo: consider using the runner internally
 
         utility::List<utility::Shared<core::Entity>> print_provider; // todo: remove
         bbt::FlowBuilder builder (core::Location::global());
@@ -205,37 +163,20 @@ namespace ance
 
         runner.add(cet::Provider::fromList(std::move(print_provider)));
 
-        sources::SourceFile const& primary_file = source_tree.addFile(file_name);
-        if (check_for_fail()) return EXIT_FAILURE;
+        utility::Optional<utility::Owned<cet::Unit>> unit = runner.run(file_name, out);
+        if (!unit.hasValue()) return EXIT_FAILURE;
 
-        utility::Owned<ast::Statement> parsed = parser.parse(primary_file.index());
-        if (check_for_fail()) return EXIT_FAILURE;
-
-        print<ast::Printer>(*parsed, debug_path, "ast");
-
-        utility::Owned<est::Statement> expanded = expander.expand(*parsed);
-        if (check_for_fail()) return EXIT_FAILURE;
-
-        print<est::Printer>(*expanded, debug_path, "est");
-
-        utility::Owned<bbt::Flow> segmented = segmenter.segment(*expanded);
-        if (check_for_fail()) return EXIT_FAILURE;
-
-        print<bbt::Printer>(*segmented, debug_path, "bbt");
-        graph<bbt::Grapher>(*segmented, debug_path, "bbt");
-
-        utility::Owned<cet::Unit> unit = runner.run(*segmented);
-        if (check_for_fail()) return EXIT_FAILURE;
-
-        print<cet::Printer>(*unit, debug_path, "cet");
-        graph<cet::Grapher>(*unit, debug_path, "cet");
-
-        compiler.compile(*unit);
-        if (check_for_fail()) return EXIT_FAILURE;
+        bool ok = compiler.compile(**unit, out);
+        if (!ok) return EXIT_FAILURE;
 
         reporter.emit(source_tree, out);
 
-        // todo: add unordered scopes, have them as default at file top-level except for the primary file - maybe make distinction explicit in compiler code
+        // restructure the visitors - each visitor except compiler should use the previous one internally, meaning in main only the runner and compiler is used and gets the path passed into it
+        // todo: restore that parsed code is printed
+        // todo: restore that expanded code is printed
+        // todo: restore that segmented code is printed and graphed
+
+        // todo: add unordered scopes, have them as default at file top-level except for the primary file - maybe make distinction explicit in code, e.g. reflect in naming in grammar
         // todo: add intrinsic and wrapper function to include another file (use the string), running the cmp code in there too
 
         // todo: add global variables so that circular dependencies can exist

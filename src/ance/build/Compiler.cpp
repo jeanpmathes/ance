@@ -147,24 +147,30 @@ struct ance::build::Compiler::Implementation
         Intrinsics intrinsics_ {reporter_};
     };
 
-    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context) : source_tree_(source_tree), reporter_(reporter), context_(context) {}
 
-    void compile(cet::Unit const& unit)
+    bool compile(cet::Unit const& unit, std::ostream& out)
     {
         utility::Owned<CET> cet = utility::makeOwned<CET>(reporter_);
 
         cet->visit(unit);
+
+        (void) context_; // todo: use or remove
+
+        return reporter_.checkForFail(source_tree_, out);
     }
 
 private:
+    sources::SourceTree& source_tree_;
     core::Reporter& reporter_;
+    core::Context& context_;
 };
 
-ance::build::Compiler::Compiler(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
+ance::build::Compiler::Compiler(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context) : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context)) {}
 
 ance::build::Compiler::~Compiler() = default;
 
-void ance::build::Compiler::compile(cet::Unit const& unit)
+bool ance::build::Compiler::compile(cet::Unit const& unit, std::ostream& out)
 {
-    implementation_->compile(unit);
+    return implementation_->compile(unit, out);
 }

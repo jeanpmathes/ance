@@ -1,6 +1,7 @@
 #ifndef ANCE_BUILD_COMPILER_H
 #define ANCE_BUILD_COMPILER_H
 
+#include "ance/core/Context.h"
 #include "ance/core/Reporter.h"
 #include "ance/utility/Owners.h"
 
@@ -15,12 +16,12 @@ namespace ance::build
     class Compiler
     {
       public:
-        explicit Compiler(core::Reporter& reporter);
+        Compiler(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
         ~Compiler();
 
         /// Compile a CET unit.
         /// \param unit The unit to compile.
-        void compile(cet::Unit const& unit);
+        bool compile(cet::Unit const& unit, std::ostream& out);
 
       private:
         struct Implementation;

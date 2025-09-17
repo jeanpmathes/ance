@@ -18,6 +18,7 @@
 #include "ance/sources/SourceTree.h"
 
 #include "Node.h"
+#include "Printer.h"
 
 namespace ance::ast
 {
@@ -432,10 +433,14 @@ namespace ance::ast
 
 struct ance::ast::Parser::Implementation
 {
-    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+        : source_tree_(source_tree), reporter_(reporter), context_(context)
+    {}
 
-    utility::Owned<Statement> parse(sources::SourceFile const& source_file)
+    utility::Optional<utility::Owned<Statement>> parse(std::filesystem::path const& file_path, std::ostream& out)
     {
+        sources::SourceFile& source_file = source_tree_.addFile(file_path);
+
         std::fstream code;
         code.open(source_file.getRelativePath());
 
@@ -454,22 +459,29 @@ struct ance::ast::Parser::Implementation
         anceParser::FileContext* file = parser->file();
 
         SourceVisitor visitor {source_file.index()};
-        return visitor.expectStatement(file);
+        utility::Owned<Statement> statement = visitor.expectStatement(file);
+
+        if (reporter_.checkForFail(source_tree_, out))
+            return std::nullopt;
+
+        context_.print<Printer>(*statement, "ast");
+
+        return statement;
     }
 
   private:
+    sources::SourceTree& source_tree_;
     core::Reporter& reporter_;
+    core::Context& context_;
 };
 
-ance::ast::Parser::Parser(sources::SourceTree& source_tree, core::Reporter& reporter)
-    : source_tree_(source_tree)
-    , reporter_(reporter)
-    , implementation_(utility::makeOwned<Implementation>(reporter))
+ance::ast::Parser::Parser(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
 {}
 
 ance::ast::Parser::~Parser() = default;
 
-ance::utility::Owned<ance::ast::Statement> ance::ast::Parser::parse(size_t const index)
+ance::utility::Optional<ance::utility::Owned<ance::ast::Statement>> ance::ast::Parser::parse(std::filesystem::path const& file, std::ostream& out)
 {
-    return implementation_->parse(source_tree_.getFile(index));
+    return implementation_->parse(file, out);
 }

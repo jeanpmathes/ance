@@ -1,12 +1,15 @@
 #ifndef ANCE_BBT_SEGMENTER_H
 #define ANCE_BBT_SEGMENTER_H
 
+#include <filesystem>
+
+#include "ance/core/Context.h"
 #include "ance/core/Reporter.h"
 #include "ance/utility/Owners.h"
 
-namespace ance::est
+namespace ance::sources
 {
-    struct Statement;
+    class SourceTree;
 }
 
 namespace ance::bbt
@@ -17,13 +20,14 @@ namespace ance::bbt
   class Segmenter
   {
   public:
-    explicit Segmenter(core::Reporter& reporter);
+    Segmenter(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
     ~Segmenter();
 
-    /// Segment a statement into a basic block control flow.
-    /// \param statement The statement to segment.
-    /// \return The control flow built from the statement.
-    utility::Owned<Flow> segment(est::Statement const& statement);
+    /// Segment a file into a basic block control flow.
+    /// \param file The path to the file to segment.
+    /// \param out The output stream to report to.
+    /// \return The control flow built from the file.
+    utility::Optional<utility::Owned<Flow>> segment(std::filesystem::path const& file, std::ostream& out);
 
   private:
     struct Implementation;

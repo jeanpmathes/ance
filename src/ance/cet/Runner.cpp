@@ -6,14 +6,19 @@
 #include <expected>
 #include <string>
 #include <functional>
+#include <filesystem>
 
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Value.h"
 
 #include "ance/bbt/Function.h"
 #include "ance/bbt/Node.h"
+#include "ance/bbt/Segmenter.h"
 #include "ance/cet/Node.h"
 #include "ance/cet/Provider.h"
+
+#include "Printer.h"
+#include "Grapher.h"
 
 struct ance::cet::Runner::Implementation
 {
@@ -637,14 +642,25 @@ struct ance::cet::Runner::Implementation
         bool encountered_error_ = false;
     };
 
-    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+        : source_tree_(source_tree), reporter_(reporter), segmenter_(source_tree, reporter, context), context_(context)
+    {}
 
-    utility::Owned<Unit> run(bbt::Flow const& flow)
+    utility::Optional<utility::Owned<Unit>> run(std::filesystem::path const& file, std::ostream& out)
     {
-        utility::Owned<Unit> unit = utility::makeOwned<Unit>();
+        utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segment(file, out);
+        if (!flow.hasValue())
+            return std::nullopt;
 
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(reporter_, providers_);
-        bbt->visit(flow);
+        bbt->visit(**flow);
+
+        utility::Owned<Unit> unit = utility::makeOwned<Unit>();
+        if (reporter_.checkForFail(source_tree_, out))
+            return std::nullopt;
+
+        context_.print<Printer>(*unit, "cet");
+        context_.graph<Grapher>(*unit, "cet");
 
         return unit;
     }
@@ -655,12 +671,16 @@ struct ance::cet::Runner::Implementation
     }
 
 private:
+    sources::SourceTree& source_tree_;
     core::Reporter& reporter_;
-
     utility::List<utility::Owned<Provider>> providers_ = {};
+    bbt::Segmenter segmenter_;
+    core::Context& context_;
 };
 
-ance::cet::Runner::Runner(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
+ance::cet::Runner::Runner(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
+{}
 
 ance::cet::Runner::~Runner() = default;
 
@@ -669,7 +689,7 @@ void ance::cet::Runner::add(utility::Owned<Provider> provider)
     implementation_->add(std::move(provider));
 }
 
-ance::utility::Owned<ance::cet::Unit> ance::cet::Runner::run(bbt::Flow const& flow)
+ance::utility::Optional<ance::utility::Owned<ance::cet::Unit>> ance::cet::Runner::run(std::filesystem::path const& file, std::ostream& out)
 {
-    return implementation_->run(flow);
+    return implementation_->run(file, out);
 }

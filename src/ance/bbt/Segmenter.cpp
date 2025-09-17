@@ -9,7 +9,11 @@
 #include "ance/bbt/Node.h"
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Value.h"
+#include "ance/est/Expander.h"
 #include "ance/est/Node.h"
+
+#include "Printer.h"
+#include "Grapher.h"
 
 struct ance::bbt::Segmenter::Implementation
 {
@@ -869,25 +873,45 @@ struct ance::bbt::Segmenter::Implementation
 
         std::map<est::Temporary const*, Temporary const*> temporaries_;
     };
+    
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+        : source_tree_(source_tree)
+        , reporter_(reporter)
+        , expander_(source_tree, reporter, context)
+        , context_(context)
+    {}
 
-    explicit Implementation(core::Reporter& reporter) : reporter_(reporter) {}
-
-    utility::Owned<Flow> segment(est::Statement const& statement)
+    utility::Optional<utility::Owned<Flow>> segment(std::filesystem::path const& file, std::ostream& out)
     {
+        utility::Optional<utility::Owned<est::Statement>> expanded = expander_.expand(file, out);
+        if (!expanded.hasValue()) return std::nullopt;
+
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
 
-        return ret->apply(statement);
+        utility::Owned<Flow> flow = ret->apply(**expanded);
+        if (reporter_.checkForFail(source_tree_, out))
+            return std::nullopt;
+
+        context_.print<Printer>(*flow, "bbt");
+        context_.graph<Grapher>(*flow, "bbt");
+
+        return flow;
     }
 
   private:
+    sources::SourceTree& source_tree_;
     core::Reporter& reporter_;
+    est::Expander   expander_;
+    core::Context& context_;
 };
 
-ance::bbt::Segmenter::Segmenter(core::Reporter& reporter) : implementation_(utility::makeOwned<Implementation>(reporter)) {}
+ance::bbt::Segmenter::Segmenter(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
+{}
 
 ance::bbt::Segmenter::~Segmenter() = default;
 
-ance::utility::Owned<ance::bbt::Flow> ance::bbt::Segmenter::segment(est::Statement const& statement)
+ance::utility::Optional<ance::utility::Owned<ance::bbt::Flow>> ance::bbt::Segmenter::segment(std::filesystem::path const& file, std::ostream& out)
 {
-    return implementation_->segment(statement);
+    return implementation_->segment(file, out);
 }
