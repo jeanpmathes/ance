@@ -15,7 +15,11 @@
 class  anceBaseVisitor : public anceVisitor {
 public:
 
-  virtual std::any visitFile(anceParser::FileContext *ctx) override {
+  virtual std::any visitUnorderedScopeFile(anceParser::UnorderedScopeFileContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitOrderedScopeFile(anceParser::OrderedScopeFileContext *ctx) override {
     return visitChildren(ctx);
   }
 

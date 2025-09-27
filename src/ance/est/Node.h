@@ -29,6 +29,16 @@ namespace ance::est
         core::Location location;
     };
 
+    /// Represents a source file creating an unordered scope.
+    /// Note that actual source files may contain a top-level ordered scope,
+    /// which would be represented as a statement node instead of a file node.
+    struct File final
+        : Node
+        , utility::ConcreteNode<File, Visitor>
+    {
+        explicit File(core::Location const& source_location);
+    };
+
     /// Statement node in the EST.
     struct Statement
         : virtual Node
@@ -267,6 +277,8 @@ namespace ance::est
         using AbstractVisitor::visit;
 
         ~Visitor() override = default;
+
+        virtual void visit(File const& file) = 0;
 
         virtual void visit(ErrorStatement const& error)    = 0;
         virtual void visit(Pass const& pass_statement)     = 0;

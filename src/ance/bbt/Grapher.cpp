@@ -18,6 +18,13 @@ struct ance::bbt::Grapher::Implementation
         explicit BBT(std::ostream& out) : Grapher(out) {}
         ~BBT() override = default;
 
+        void visit(UnorderedScope const&) override
+        {
+            beginGraph();
+
+            endGraph();
+        }
+
         void visit(Flow const& flow) override
         {
             beginGraph();
@@ -109,9 +116,9 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(UnaryOperation const&) override {}
 
-        void visit(ScopeEnter const&) override {}
+        void visit(OrderedScopeEnter const&) override {}
 
-        void visit(ScopeExit const&) override {}
+        void visit(OrderedScopeExit const&) override {}
 
 
         size_t current_id_ = 0;
@@ -119,10 +126,10 @@ struct ance::bbt::Grapher::Implementation
 
     explicit Implementation(std::ostream& out) : out_(out) {}
 
-    void graph(Flow const& flow) const
+    void graph(Node const& node) const
     {
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(out_);
-        bbt->visit(flow);
+        bbt->visit(node);
     }
 
   private:
@@ -131,6 +138,12 @@ struct ance::bbt::Grapher::Implementation
 
 ance::bbt::Grapher::Grapher(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
 ance::bbt::Grapher::~Grapher() = default;
+
+
+void ance::bbt::Grapher::graph(UnorderedScope const& scope) const
+{
+    implementation_->graph(scope);
+}
 
 void ance::bbt::Grapher::graph(Flow const& flow) const
 {

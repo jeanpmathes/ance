@@ -7,6 +7,7 @@
 
 namespace ance::bbt
 {
+    struct UnorderedScope;
     struct Flow;
     struct BasicBlock;
 
@@ -17,6 +18,7 @@ namespace ance::bbt
         explicit Printer(std::ostream& out);
         ~Printer();
 
+        void print(UnorderedScope const& scope) const;
         void print(Flow const& flow) const;
         void print(BasicBlock const& block) const;
 

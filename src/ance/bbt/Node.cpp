@@ -7,6 +7,12 @@
 
 ance::bbt::Node::Node(core::Location const& source_location) : location(source_location) {}
 
+ance::bbt::UnorderedScope::UnorderedScope(core::Location const& source_location)
+    : Node(source_location)
+{
+
+}
+
 ance::bbt::Flow::Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBlock& start, core::Location const& source_location)
     : Node(source_location)
     , blocks(std::move(content))
@@ -121,9 +127,9 @@ ance::bbt::TypeOf::TypeOf(Temporary const& expr, Temporary const& result, core::
     , expression(expr)
     , destination(result) {}
 
-ance::bbt::ScopeEnter::ScopeEnter(core::Location const& source_location)
+ance::bbt::OrderedScopeEnter::OrderedScopeEnter(core::Location const& source_location)
     : Node(source_location), Statement() {}
 
-ance::bbt::ScopeExit::ScopeExit(ScopeEnter const& entry, core::Location const& source_location)
+ance::bbt::OrderedScopeExit::OrderedScopeExit(OrderedScopeEnter const& entry, core::Location const& source_location)
     : Node(source_location), Statement(), enter(entry) {}
 

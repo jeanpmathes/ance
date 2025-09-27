@@ -15,6 +15,11 @@ struct ance::est::Printer::Implementation
         explicit EST(std::ostream& out) : Printer(out) {}
         ~EST() override = default;
 
+        void visit(File const&) override
+        {
+
+        }
+
         void visit(ErrorStatement const&) override { print("// error"); }
 
         void visit(Pass const&) override
@@ -205,10 +210,10 @@ struct ance::est::Printer::Implementation
 
     explicit Implementation(std::ostream& out) : out_(out) {}
 
-    void print(Statement const& statement) const
+    void print(Node const& node) const
     {
         utility::Owned<EST> est = utility::makeOwned<EST>(out_);
-        est->visit(statement);
+        est->visit(node);
     }
 
   private:
@@ -217,6 +222,11 @@ struct ance::est::Printer::Implementation
 
 ance::est::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
 ance::est::Printer::~Printer() = default;
+
+void ance::est::Printer::print(File const& file) const
+{
+    implementation_->print(file);
+}
 
 void ance::est::Printer::print(Statement const& statement) const
 {

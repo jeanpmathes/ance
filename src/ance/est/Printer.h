@@ -7,6 +7,7 @@
 
 namespace ance::est
 {
+    struct File;
     struct Statement;
 
     /// Prints the EST to a stream.
@@ -16,6 +17,7 @@ namespace ance::est
         explicit Printer(std::ostream& out);
         ~Printer();
 
+        void print(File const& file) const;
         void print(Statement const& statement) const;
 
       private:

@@ -163,7 +163,7 @@ namespace ance
 
         runner.add(cet::Provider::fromList(std::move(print_provider)));
 
-        utility::Optional<utility::Owned<cet::Unit>> unit = runner.run(file_name, out);
+        utility::Optional<utility::Owned<cet::Unit>> unit = runner.runOrderedFile(file_name, out);
         if (!unit.hasValue()) return EXIT_FAILURE;
 
         bool ok = compiler.compile(**unit, out);
@@ -171,18 +171,20 @@ namespace ance
 
         reporter.emit(source_tree, out);
 
-        // restructure the visitors - each visitor except compiler should use the previous one internally, meaning in main only the runner and compiler is used and gets the path passed into it
-        // todo: restore that parsed code is printed
-        // todo: restore that expanded code is printed
-        // todo: restore that segmented code is printed and graphed
+        // todo: add intrinsic and wrapper function to include another file (use the string), call the runOrderedScope of the runner from the intrinsic
 
-        // todo: add unordered scopes, have them as default at file top-level except for the primary file - maybe make distinction explicit in code, e.g. reflect in naming in grammar
-        // todo: add intrinsic and wrapper function to include another file (use the string), running the cmp code in there too
+        // todo: currently inclusion of a new file overrides the print and graph files, change them so that they append the original file name to their name (both should take a file name as an argument)
+        // todo: maybe even take file path as arg, duplicate the directory structure in the dbg directory and make each file a dir containing the different stage dumps
 
-        // todo: add global variables so that circular dependencies can exist
+        // todo: allow putting statements into unordered scopes, they will be executed in some undefined order, use it to test the inclusion
+        // todo: an unordered scope should contain a vector of flows
+
+        // todo: add cmp global variables so that circular dependencies can exist, included files should be run by the runner
+        // todo: the variable declarations should be transformed into a statement which uses the global variable declaration intrinsic
+        // todo: maybe to put it into the right scope a new outer intrinsic is needed which takes a scope and gives the parent scope
 
         // todo: change the runner to allow arbitrary stopping and continuation of execution
-        // todo: it should have a list of run-points and if running one of those stops it continues with the next one
+        // todo: it should have a list of run-points and if running one of those stops it continues with the next one, all code in ordered scopes becomes separate run points
         // todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
 
         // todo: remove essentially everything from the CET as it has to be rebuilt anyways

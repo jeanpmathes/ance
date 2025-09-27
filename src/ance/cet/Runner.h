@@ -29,11 +29,17 @@ namespace ance::cet
         /// \param provider The provider to add.
         void add(utility::Owned<Provider> provider);
 
-        /// Run the given file and return the resulting unit.
+        /// Run the given ordered file and return the resulting unit.
         /// \param file The path to the file to run.
         /// \param out The output stream to report to.
         /// \return The resulting compile-able unit.
-        utility::Optional<utility::Owned<Unit>> run(std::filesystem::path const& file, std::ostream& out);
+        utility::Optional<utility::Owned<Unit>> runOrderedFile(std::filesystem::path const& file, std::ostream& out);
+
+        /// Run the given unordered file and return the resulting unit.
+        /// \param file The path to the file to run.
+        /// \param out The output stream to report to.
+        /// \return The resulting compile-able unit.
+        utility::Optional<utility::Owned<Unit>> runUnorderedFile(std::filesystem::path const& file, std::ostream& out);
 
     private:
         struct Implementation;

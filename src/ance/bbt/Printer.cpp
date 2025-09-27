@@ -15,6 +15,11 @@ struct ance::bbt::Printer::Implementation
         explicit BBT(std::ostream& out) : Printer(out) {}
         ~BBT() override = default;
 
+        void visit(UnorderedScope const&) override
+        {
+
+        }
+
         void visit(Flow const& flow) override
         {
             for (auto& block : flow.blocks)
@@ -173,24 +178,18 @@ struct ance::bbt::Printer::Implementation
             print(";");
         }
 
-        void visit(ScopeEnter const&) override { print("// enter scope"); }
+        void visit(OrderedScopeEnter const&) override { print("// enter scope"); }
 
-        void visit(ScopeExit const&) override { print("// exit scope"); }
+        void visit(OrderedScopeExit const&) override { print("// exit scope"); }
 
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}
 
-    void print(Flow const& flow) const
+    void print(Node const& node) const
     {
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(out_);
-        bbt->visit(flow);
-    }
-
-    void print(BasicBlock const& block) const
-    {
-        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(out_);
-        bbt->visit(block);
+        bbt->visit(node);
     }
 
   private:
@@ -199,6 +198,11 @@ struct ance::bbt::Printer::Implementation
 
 ance::bbt::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
 ance::bbt::Printer::~Printer() = default;
+
+void ance::bbt::Printer::print(UnorderedScope const& scope) const
+{
+    implementation_->print(scope);
+}
 
 void ance::bbt::Printer::print(Flow const& flow) const
 {

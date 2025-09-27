@@ -226,6 +226,13 @@ struct ance::bbt::Segmenter::Implementation
         {}
         ~RET() override = default;
 
+        utility::Owned<UnorderedScope> apply(est::File const& file)
+        {
+            visit(file);
+
+            return utility::makeOwned<UnorderedScope>(file.location); // todo: think about how / if to incorporate visitor here, probably a vector of flows in the visitor class
+        }
+
         utility::Owned<Flow> apply(est::Statement const& statement)
         {
             assert(bbs_.empty());
@@ -427,6 +434,11 @@ struct ance::bbt::Segmenter::Implementation
             current_exit_bb_  = &exit;
         }
 
+        void visit(est::File const&) override
+        {
+            // See the respective apply method.
+        }
+
         void visit(est::ErrorStatement const& error_statement) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;
@@ -457,7 +469,7 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const entry = addEmptyBlock(blocks);
 
-            auto [scope_enter, enter] = addBlockAndGetInner<ScopeEnter>(blocks, block.location);
+            auto [scope_enter, enter] = addBlockAndGetInner<OrderedScopeEnter>(blocks, block.location);
             scopes_.emplace_back(&enter.get());
             link(entry, scope_enter);
             std::reference_wrapper current = scope_enter;
@@ -470,7 +482,7 @@ struct ance::bbt::Segmenter::Implementation
                 current = statement_exit;
             }
 
-            std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, enter, block.location);
+            std::reference_wrapper const scope_exit = addBlock<OrderedScopeExit>(blocks, enter, block.location);
             scopes_.pop_back();
             link(current, scope_exit);
 
@@ -584,7 +596,7 @@ struct ance::bbt::Segmenter::Implementation
             size_t const target_depth = loops_.back().scope_depth;
             for (size_t i = scopes_.size(); i > target_depth; i--)
             {
-                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *scopes_[i - 1], break_statement.location);
+                std::reference_wrapper const scope_exit = addBlock<OrderedScopeExit>(blocks, *scopes_[i - 1], break_statement.location);
                 link(current, scope_exit);
                 current = scope_exit;
             }
@@ -608,7 +620,7 @@ struct ance::bbt::Segmenter::Implementation
             size_t const target_depth = loops_.back().scope_depth;
             for (size_t i = scopes_.size(); i > target_depth; i--)
             {
-                std::reference_wrapper const scope_exit = addBlock<ScopeExit>(blocks, *scopes_[i - 1], continue_statement.location);
+                std::reference_wrapper const scope_exit = addBlock<OrderedScopeExit>(blocks, *scopes_[i - 1], continue_statement.location);
                 link(current, scope_exit);
                 current = scope_exit;
             }
@@ -867,7 +879,7 @@ struct ance::bbt::Segmenter::Implementation
         Temporary const* current_destination_ = nullptr;
 
         std::vector<Loop>   loops_  = {};
-        std::vector<ScopeEnter const*> scopes_ = {};
+        std::vector<OrderedScopeEnter const*> scopes_ = {};
 
         core::Reporter& reporter_;
 
@@ -881,9 +893,9 @@ struct ance::bbt::Segmenter::Implementation
         , context_(context)
     {}
 
-    utility::Optional<utility::Owned<Flow>> segment(std::filesystem::path const& file, std::ostream& out)
+    utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file, std::ostream& out)
     {
-        utility::Optional<utility::Owned<est::Statement>> expanded = expander_.expand(file, out);
+        utility::Optional<utility::Owned<est::Statement>> expanded = expander_.expandOrderedFile(file, out);
         if (!expanded.hasValue()) return std::nullopt;
 
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
@@ -896,6 +908,23 @@ struct ance::bbt::Segmenter::Implementation
         context_.graph<Grapher>(*flow, "bbt");
 
         return flow;
+    }
+
+    utility::Optional<utility::Owned<UnorderedScope>> segmentUnorderedFile(std::filesystem::path const& file, std::ostream& out)
+    {
+        utility::Optional<utility::Owned<est::File>> expanded = expander_.expandUnorderedFile(file, out);
+        if (!expanded.hasValue()) return std::nullopt;
+
+        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
+
+        utility::Owned<UnorderedScope> scope = ret->apply(**expanded);
+        if (reporter_.checkForFail(source_tree_, out))
+            return std::nullopt;
+
+        context_.print<Printer>(*scope, "bbt");
+        context_.graph<Grapher>(*scope, "bbt");
+
+        return scope;
     }
 
   private:
@@ -911,7 +940,14 @@ ance::bbt::Segmenter::Segmenter(sources::SourceTree& source_tree, core::Reporter
 
 ance::bbt::Segmenter::~Segmenter() = default;
 
-ance::utility::Optional<ance::utility::Owned<ance::bbt::Flow>> ance::bbt::Segmenter::segment(std::filesystem::path const& file, std::ostream& out)
+ance::utility::Optional<ance::utility::Owned<ance::bbt::Flow>> ance::bbt::Segmenter::segmentOrderedFile(std::filesystem::path const& file,
+    std::ostream& out)
 {
-    return implementation_->segment(file, out);
+    return implementation_->segmentOrderedFile(file, out);
+}
+
+ance::utility::Optional<ance::utility::Owned<ance::bbt::UnorderedScope>> ance::bbt::Segmenter::segmentUnorderedFile(std::filesystem::path const& file,
+                                                                                                                    std::ostream&                out)
+{
+    return implementation_->segmentUnorderedFile(file, out);
 }

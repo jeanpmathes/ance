@@ -2,6 +2,13 @@
 
 ance::ast::Node::Node(core::Location const& source_location) : location(source_location) {}
 
+ance::ast::File::File(core::Location const& source_location)
+    : Node(source_location)
+    , ConcreteNode()
+{
+
+}
+
 bool ance::ast::Statement::isCompound() const
 {
     return false;

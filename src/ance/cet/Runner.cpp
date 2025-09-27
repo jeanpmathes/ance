@@ -355,6 +355,11 @@ struct ance::cet::Runner::Implementation
             return scopes_.back().get();
         }
 
+        void visit(bbt::UnorderedScope const&) override
+        {
+
+        }
+
         void visit(bbt::Flow const& flow) override
         {
             run(flow.entry);
@@ -598,7 +603,7 @@ struct ance::cet::Runner::Implementation
             }
         }
 
-        void visit(bbt::ScopeEnter const&) override
+        void visit(bbt::OrderedScopeEnter const&) override
         {
             utility::Owned<Scope> scope = utility::makeOwned<OrderedScope>(this->scope());
             scopes_.emplace_back(std::move(scope));
@@ -606,7 +611,7 @@ struct ance::cet::Runner::Implementation
             // todo: make value storage also part of the scope so it is cleaned up when scope exits
         }
 
-        void visit(bbt::ScopeExit const&) override
+        void visit(bbt::OrderedScopeExit const&) override
         {
             scopes_.pop_back();
 
@@ -646,14 +651,33 @@ struct ance::cet::Runner::Implementation
         : source_tree_(source_tree), reporter_(reporter), segmenter_(source_tree, reporter, context), context_(context)
     {}
 
-    utility::Optional<utility::Owned<Unit>> run(std::filesystem::path const& file, std::ostream& out)
+    utility::Optional<utility::Owned<Unit>> runOrderedFile(std::filesystem::path const& file, std::ostream& out)
     {
-        utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segment(file, out);
+        utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentOrderedFile(file, out);
         if (!flow.hasValue())
             return std::nullopt;
 
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(reporter_, providers_);
         bbt->visit(**flow);
+
+        utility::Owned<Unit> unit = utility::makeOwned<Unit>();
+        if (reporter_.checkForFail(source_tree_, out))
+            return std::nullopt;
+
+        context_.print<Printer>(*unit, "cet");
+        context_.graph<Grapher>(*unit, "cet");
+
+        return unit;
+    }
+
+    utility::Optional<utility::Owned<Unit>> runUnorderedFile(std::filesystem::path const& file, std::ostream& out)
+    {
+        utility::Optional<utility::Owned<bbt::UnorderedScope>> scope = segmenter_.segmentUnorderedFile(file, out);
+        if (!scope.hasValue())
+            return std::nullopt;
+
+        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(reporter_, providers_);
+        bbt->visit(**scope);
 
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
         if (reporter_.checkForFail(source_tree_, out))
@@ -689,7 +713,12 @@ void ance::cet::Runner::add(utility::Owned<Provider> provider)
     implementation_->add(std::move(provider));
 }
 
-ance::utility::Optional<ance::utility::Owned<ance::cet::Unit>> ance::cet::Runner::run(std::filesystem::path const& file, std::ostream& out)
+ance::utility::Optional<ance::utility::Owned<ance::cet::Unit>> ance::cet::Runner::runOrderedFile(std::filesystem::path const& file, std::ostream& out)
 {
-    return implementation_->run(file, out);
+    return implementation_->runOrderedFile(file, out);
+}
+
+ance::utility::Optional<ance::utility::Owned<ance::cet::Unit>> ance::cet::Runner::runUnorderedFile(std::filesystem::path const& file, std::ostream& out)
+{
+    return implementation_->runUnorderedFile(file, out);
 }

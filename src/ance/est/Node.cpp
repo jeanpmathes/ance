@@ -7,6 +7,8 @@
 
 ance::est::Node::Node(core::Location const& source_location) : location(source_location) {}
 
+ance::est::File::File(core::Location const& source_location) : Node(source_location) {}
+
 bool ance::est::Statement::isCompound() const { return false; }
 
 ance::est::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}

@@ -29,39 +29,64 @@ struct ance::est::Expander::Implementation
         explicit AST(core::Reporter& reporter) : reporter_(reporter) {}
         ~AST() override = default;
 
+        void setResult(utility::Owned<File> file)
+        {
+            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+
+            file_expansion_ = std::move(file);
+            statement_expansion_  = std::nullopt;
+            expression_expansion_ = std::nullopt;
+        }
+
         void setResult(utility::Owned<Statement> statement)
         {
-            assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
             Statements statements;
             statements.emplace_back(std::move(statement));
 
+            file_expansion_ = std::nullopt;
             statement_expansion_  = std::move(statements);
             expression_expansion_ = std::nullopt;
         }
 
         void setResult(Statements statements)
         {
-            assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
+            file_expansion_ = std::nullopt;
             statement_expansion_  = std::move(statements);
             expression_expansion_ = std::nullopt;
         }
 
         void setResult(utility::Owned<Expression> expression)
         {
-            assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
+            file_expansion_ = std::nullopt;
             statement_expansion_  = std::nullopt;
             expression_expansion_ = {.before = {}, .center = std::move(expression), .after = {}};
         }
 
         void setResult(Expansion expansion)
         {
-            assert(!statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
+            file_expansion_ = std::nullopt;
             statement_expansion_  = std::nullopt;
             expression_expansion_ = std::move(expansion);
+        }
+
+        utility::Owned<File> expand(ast::File const& file)
+        {
+            visit(file);
+
+            assert(file_expansion_.hasValue());
+
+            utility::Owned<File> result = std::move(*file_expansion_);
+            file_expansion_            = std::nullopt;
+
+            return result;
         }
 
         Statements expand(ast::Statement const& statement)
@@ -109,6 +134,11 @@ struct ance::est::Expander::Implementation
             for (auto& statement : statements) { location.extend(statement->location); }
 
             return utility::makeOwned<Block>(std::move(statements), location);
+        }
+
+        void visit(ast::File const& file) override
+        {
+            setResult(utility::makeOwned<File>(file.location));
         }
 
         void visit(ast::ErrorStatement const& error_statement) override
@@ -338,15 +368,16 @@ struct ance::est::Expander::Implementation
         }
 
       private:
+        utility::Optional<utility::Owned<File>> file_expansion_;
         utility::Optional<Statements> statement_expansion_;
         utility::Optional<Expansion>  expression_expansion_;
 
         core::Reporter& reporter_;
     };
 
-    utility::Optional<utility::Owned<Statement>> expand(std::filesystem::path const& file, std::ostream& out)
+    utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file, std::ostream& out) // todo: reduce duplication with below (template)
     {
-        utility::Optional<utility::Owned<ast::Statement>> parsed = parser_.parse(file, out);
+        utility::Optional<utility::Owned<ast::Statement>> parsed = parser_.parseOrderedFile(file, out);
         if (!parsed.hasValue()) return std::nullopt;
 
         utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
@@ -359,6 +390,21 @@ struct ance::est::Expander::Implementation
         context_.print<Printer>(*block, "est");
 
         return block;
+    }
+
+    utility::Optional<utility::Owned<File>> expandUnorderedFile(std::filesystem::path const& file, std::ostream& out)
+    {
+        utility::Optional<utility::Owned<ast::File>> parsed = parser_.parseUnorderedFile(file, out);
+        if (!parsed.hasValue()) return std::nullopt;
+
+        utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
+        utility::Owned<File> est = ast->expand(**parsed);
+
+        if (reporter_.checkForFail(source_tree_, out)) return std::nullopt;
+
+        context_.print<Printer>(*est, "est");
+
+        return est;
     }
 
   private:
@@ -374,7 +420,12 @@ ance::est::Expander::Expander(sources::SourceTree& source_tree, core::Reporter& 
 
 ance::est::Expander::~Expander() = default;
 
-ance::utility::Optional<ance::utility::Owned<ance::est::Statement>> ance::est::Expander::expand(std::filesystem::path const& file, std::ostream& out)
+ance::utility::Optional<ance::utility::Owned<ance::est::Statement>> ance::est::Expander::expandOrderedFile(std::filesystem::path const& file, std::ostream& out)
 {
-    return implementation_->expand(file, out);
+    return implementation_->expandOrderedFile(file, out);
+}
+
+ance::utility::Optional<ance::utility::Owned<ance::est::File>> ance::est::Expander::expandUnorderedFile(std::filesystem::path const& file, std::ostream& out)
+{
+    return implementation_->expandUnorderedFile(file, out);
 }

@@ -199,6 +199,14 @@ namespace ance::ast
         }
 
     public:
+        utility::Owned<File> expectFile(anceParser::UnorderedScopeFileContext* ctx)
+        {
+            if (std::any const result = visit(ctx); result.has_value())
+                return utility::wrap<File>(result);
+
+            return utility::makeOwned<File>(location(ctx));
+        }
+
         template<typename T>
         utility::Owned<Statement> expectStatement(T* ctx)
         {
@@ -218,7 +226,12 @@ namespace ance::ast
         }
 
     protected:
-        std::any visitFile(anceParser::FileContext* context) override
+        std::any visitUnorderedScopeFile(anceParser::UnorderedScopeFileContext*) override
+        {
+            return {};
+        }
+
+        std::any visitOrderedScopeFile(anceParser::OrderedScopeFileContext* context) override
         {
             return visit(context->statement());
         }
@@ -437,7 +450,7 @@ struct ance::ast::Parser::Implementation
         : source_tree_(source_tree), reporter_(reporter), context_(context)
     {}
 
-    utility::Optional<utility::Owned<Statement>> parse(std::filesystem::path const& file_path, std::ostream& out)
+    utility::Optional<utility::Owned<File>> parseUnorderedFile(std::filesystem::path const& file_path, std::ostream& out) // todo: reduce duplication with below (templates)
     {
         sources::SourceFile& source_file = source_tree_.addFile(file_path);
 
@@ -456,10 +469,42 @@ struct ance::ast::Parser::Implementation
         parser->removeErrorListeners();
         parser->addErrorListener(syntax_error_listener->parserErrorListener());
 
-        anceParser::FileContext* file = parser->file();
+        anceParser::UnorderedScopeFileContext* unordered_scope_file_context = parser->unorderedScopeFile();
 
         SourceVisitor visitor {source_file.index()};
-        utility::Owned<Statement> statement = visitor.expectStatement(file);
+        utility::Owned<File> file = visitor.expectFile(unordered_scope_file_context);
+
+        if (reporter_.checkForFail(source_tree_, out))
+            return std::nullopt;
+
+        context_.print<Printer>(*file, "ast");
+
+        return file;
+    }
+
+    utility::Optional<utility::Owned<Statement>> parseOrderedFile(std::filesystem::path const& file_path, std::ostream& out)
+    {
+        sources::SourceFile& source_file = source_tree_.addFile(file_path);
+
+        std::fstream code;
+        code.open(source_file.getRelativePath());
+
+        utility::Owned<ErrorHandler> syntax_error_listener = utility::makeOwned<ErrorHandler>(reporter_, source_file);
+
+        utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(code);
+        utility::Owned<anceLexer>                lexer = utility::makeOwned<anceLexer>(input.get());
+        lexer->removeErrorListeners();
+        lexer->addErrorListener(syntax_error_listener->lexerErrorListener());
+
+        utility::Owned<antlr4::CommonTokenStream> tokens = utility::makeOwned<antlr4::CommonTokenStream>(lexer.get());
+        utility::Owned<anceParser>                parser = utility::makeOwned<anceParser>(tokens.get());
+        parser->removeErrorListeners();
+        parser->addErrorListener(syntax_error_listener->parserErrorListener());
+
+        anceParser::OrderedScopeFileContext* unordered_scope_file_context = parser->orderedScopeFile();
+
+        SourceVisitor visitor {source_file.index()};
+        utility::Owned<Statement> statement = visitor.expectStatement(unordered_scope_file_context);
 
         if (reporter_.checkForFail(source_tree_, out))
             return std::nullopt;
@@ -481,7 +526,13 @@ ance::ast::Parser::Parser(sources::SourceTree& source_tree, core::Reporter& repo
 
 ance::ast::Parser::~Parser() = default;
 
-ance::utility::Optional<ance::utility::Owned<ance::ast::Statement>> ance::ast::Parser::parse(std::filesystem::path const& file, std::ostream& out)
+ance::utility::Optional<ance::utility::Owned<ance::ast::File>> ance::ast::Parser::parseUnorderedFile(std::filesystem::path const& file, std::ostream& out)
 {
-    return implementation_->parse(file, out);
+    return implementation_->parseUnorderedFile(file, out);
 }
+
+ance::utility::Optional<ance::utility::Owned<ance::ast::Statement>> ance::ast::Parser::parseOrderedFile(std::filesystem::path const& file, std::ostream& out)
+{
+    return implementation_->parseOrderedFile(file, out);
+}
+

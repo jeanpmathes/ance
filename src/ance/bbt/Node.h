@@ -28,6 +28,15 @@ namespace ance::bbt
         core::Location location;
     };
 
+    /// An unordered scope contains a set of parts which are evaluated in an unspecified order.
+    /// An example of an unordered scope is the top-level of any file except for the primary file.
+    struct UnorderedScope final
+        : Node
+        , utility::ConcreteNode<UnorderedScope, Visitor>
+    {
+        explicit UnorderedScope(core::Location const& source_location);
+    };
+
     struct BasicBlock;
 
     /// The flow node represents a complete control flow build up by a set of basic blocks.
@@ -245,28 +254,30 @@ namespace ance::bbt
         Temporary const& destination;
     };
 
-    /// Enters a scope, which is used to manage variable lifetimes and visibility.
-    struct ScopeEnter final
+    /// Enters an ordered scope, which is used to manage variable lifetimes and visibility.
+    struct OrderedScopeEnter final
         : Statement
-        , utility::ConcreteNode<ScopeEnter, Visitor>
+        , utility::ConcreteNode<OrderedScopeEnter, Visitor>
     {
-        explicit ScopeEnter(core::Location const& source_location);
+        explicit OrderedScopeEnter(core::Location const& source_location);
     };
 
-    /// Exits a scope, which is used to manage variable lifetimes and visibility.
-    struct ScopeExit final
+    /// Exits an ordered scope, which is used to manage variable lifetimes and visibility.
+    struct OrderedScopeExit final
         : Statement
-        , utility::ConcreteNode<ScopeExit, Visitor>
+        , utility::ConcreteNode<OrderedScopeExit, Visitor>
     {
-        ScopeExit(ScopeEnter const& entry, core::Location const& source_location);
+        OrderedScopeExit(OrderedScopeEnter const& entry, core::Location const& source_location);
 
-        ScopeEnter const& enter;
+        OrderedScopeEnter const& enter;
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
         using AbstractVisitor::visit;
+
+        virtual void visit(UnorderedScope const& unordered_scope) = 0;
 
         virtual void visit(Flow const& flow) = 0;
 
@@ -289,8 +300,8 @@ namespace ance::bbt
         virtual void visit(Constant const& constant)              = 0;
         virtual void visit(CurrentScope const& current_scope)                      = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
-        virtual void visit(ScopeEnter const& scope_enter)         = 0;
-        virtual void visit(ScopeExit const& scope_exit)           = 0;
+        virtual void visit(OrderedScopeEnter const& scope_enter)         = 0;
+        virtual void visit(OrderedScopeExit const& scope_exit)           = 0;
 
         ~Visitor() override = default;
     };

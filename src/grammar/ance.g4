@@ -1,6 +1,8 @@
 grammar ance;
 
-file : statement EOF ;
+unorderedScopeFile : EOF ;
+
+orderedScopeFile : statement EOF ;
 
 statement
     : '{' ( statement )* '}' # BlockStatement

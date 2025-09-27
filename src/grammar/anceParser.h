@@ -23,8 +23,9 @@ public:
   };
 
   enum {
-    RuleFile = 0, RuleStatement = 1, RuleExpression = 2, RuleUnary = 3, 
-    RuleLiteral = 4, RuleType = 5, RuleBoolean = 6, RuleEntity = 7, RuleAssigner = 8
+    RuleUnorderedScopeFile = 0, RuleOrderedScopeFile = 1, RuleStatement = 2, 
+    RuleExpression = 3, RuleUnary = 4, RuleLiteral = 5, RuleType = 6, RuleBoolean = 7, 
+    RuleEntity = 8, RuleAssigner = 9
   };
 
   explicit anceParser(antlr4::TokenStream *input);
@@ -44,7 +45,8 @@ public:
   antlr4::atn::SerializedATNView getSerializedATN() const override;
 
 
-  class FileContext;
+  class UnorderedScopeFileContext;
+  class OrderedScopeFileContext;
   class StatementContext;
   class ExpressionContext;
   class UnaryContext;
@@ -54,9 +56,22 @@ public:
   class EntityContext;
   class AssignerContext; 
 
-  class  FileContext : public antlr4::ParserRuleContext {
+  class  UnorderedScopeFileContext : public antlr4::ParserRuleContext {
   public:
-    FileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    UnorderedScopeFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+    virtual size_t getRuleIndex() const override;
+    antlr4::tree::TerminalNode *EOF();
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+   
+  };
+
+  UnorderedScopeFileContext* unorderedScopeFile();
+
+  class  OrderedScopeFileContext : public antlr4::ParserRuleContext {
+  public:
+    OrderedScopeFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     StatementContext *statement();
     antlr4::tree::TerminalNode *EOF();
@@ -66,7 +81,7 @@ public:
    
   };
 
-  FileContext* file();
+  OrderedScopeFileContext* orderedScopeFile();
 
   class  StatementContext : public antlr4::ParserRuleContext {
   public:

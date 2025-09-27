@@ -43,8 +43,8 @@ void anceParserInitialize() {
   assert(anceParserStaticData == nullptr);
   auto staticData = std::make_unique<AnceParserStaticData>(
     std::vector<std::string>{
-      "file", "statement", "expression", "unary", "literal", "type", "boolean", 
-      "entity", "assigner"
+      "unorderedScopeFile", "orderedScopeFile", "statement", "expression", 
+      "unary", "literal", "type", "boolean", "entity", "assigner"
     },
     std::vector<std::string>{
       "", "'let'", "':'", "'if'", "'then'", "'else'", "'loop'", "'break'", 
@@ -63,43 +63,44 @@ void anceParserInitialize() {
     }
   );
   static const int32_t serializedATNSegment[] = {
-  	4,1,37,117,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
-  	7,7,7,2,8,7,8,1,0,1,0,1,0,1,1,1,1,5,1,24,8,1,10,1,12,1,27,9,1,1,1,1,1,
-  	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,40,8,1,1,1,1,1,1,1,1,1,1,1,1,
-  	1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,55,8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  	1,1,1,1,1,1,1,1,3,1,68,8,1,1,2,1,2,1,2,1,2,1,2,5,2,75,8,2,10,2,12,2,78,
-  	9,2,3,2,80,8,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,90,8,2,1,3,1,3,1,4,
-  	1,4,1,4,1,4,1,4,1,4,3,4,100,8,4,1,5,1,5,1,5,1,5,1,5,3,5,107,8,5,1,6,1,
-  	6,3,6,111,8,6,1,7,1,7,1,8,1,8,1,8,0,0,9,0,2,4,6,8,10,12,14,16,0,0,133,
-  	0,18,1,0,0,0,2,67,1,0,0,0,4,89,1,0,0,0,6,91,1,0,0,0,8,99,1,0,0,0,10,106,
-  	1,0,0,0,12,110,1,0,0,0,14,112,1,0,0,0,16,114,1,0,0,0,18,19,3,2,1,0,19,
-  	20,5,0,0,1,20,1,1,0,0,0,21,25,5,31,0,0,22,24,3,2,1,0,23,22,1,0,0,0,24,
-  	27,1,0,0,0,25,23,1,0,0,0,25,26,1,0,0,0,26,28,1,0,0,0,27,25,1,0,0,0,28,
-  	68,5,32,0,0,29,30,3,4,2,0,30,31,5,25,0,0,31,68,1,0,0,0,32,33,5,1,0,0,
-  	33,34,5,22,0,0,34,35,5,2,0,0,35,39,3,4,2,0,36,37,3,16,8,0,37,38,3,4,2,
-  	0,38,40,1,0,0,0,39,36,1,0,0,0,39,40,1,0,0,0,40,41,1,0,0,0,41,42,5,25,
-  	0,0,42,68,1,0,0,0,43,44,3,14,7,0,44,45,3,16,8,0,45,46,3,4,2,0,46,47,5,
-  	25,0,0,47,68,1,0,0,0,48,49,5,3,0,0,49,50,3,4,2,0,50,51,5,4,0,0,51,54,
-  	3,2,1,0,52,53,5,5,0,0,53,55,3,2,1,0,54,52,1,0,0,0,54,55,1,0,0,0,55,68,
-  	1,0,0,0,56,57,5,6,0,0,57,68,3,2,1,0,58,59,5,7,0,0,59,68,5,25,0,0,60,61,
-  	5,8,0,0,61,68,5,25,0,0,62,63,5,9,0,0,63,64,3,4,2,0,64,65,5,10,0,0,65,
-  	66,3,2,1,0,66,68,1,0,0,0,67,21,1,0,0,0,67,29,1,0,0,0,67,32,1,0,0,0,67,
-  	43,1,0,0,0,67,48,1,0,0,0,67,56,1,0,0,0,67,58,1,0,0,0,67,60,1,0,0,0,67,
-  	62,1,0,0,0,68,3,1,0,0,0,69,70,3,14,7,0,70,79,5,29,0,0,71,76,3,4,2,0,72,
-  	73,5,11,0,0,73,75,3,4,2,0,74,72,1,0,0,0,75,78,1,0,0,0,76,74,1,0,0,0,76,
-  	77,1,0,0,0,77,80,1,0,0,0,78,76,1,0,0,0,79,71,1,0,0,0,79,80,1,0,0,0,80,
-  	81,1,0,0,0,81,82,5,30,0,0,82,90,1,0,0,0,83,90,3,14,7,0,84,90,3,8,4,0,
-  	85,86,3,6,3,0,86,87,3,4,2,0,87,90,1,0,0,0,88,90,5,12,0,0,89,69,1,0,0,
-  	0,89,83,1,0,0,0,89,84,1,0,0,0,89,85,1,0,0,0,89,88,1,0,0,0,90,5,1,0,0,
-  	0,91,92,5,13,0,0,92,7,1,0,0,0,93,100,3,12,6,0,94,100,5,23,0,0,95,96,5,
-  	29,0,0,96,100,5,30,0,0,97,100,3,10,5,0,98,100,5,24,0,0,99,93,1,0,0,0,
-  	99,94,1,0,0,0,99,95,1,0,0,0,99,97,1,0,0,0,99,98,1,0,0,0,100,9,1,0,0,0,
-  	101,107,5,14,0,0,102,107,5,15,0,0,103,107,5,16,0,0,104,107,5,17,0,0,105,
-  	107,5,18,0,0,106,101,1,0,0,0,106,102,1,0,0,0,106,103,1,0,0,0,106,104,
-  	1,0,0,0,106,105,1,0,0,0,107,11,1,0,0,0,108,111,5,19,0,0,109,111,5,20,
-  	0,0,110,108,1,0,0,0,110,109,1,0,0,0,111,13,1,0,0,0,112,113,5,22,0,0,113,
-  	15,1,0,0,0,114,115,5,21,0,0,115,17,1,0,0,0,10,25,39,54,67,76,79,89,99,
-  	106,110
+  	4,1,37,121,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
+  	7,7,7,2,8,7,8,2,9,7,9,1,0,1,0,1,1,1,1,1,1,1,2,1,2,5,2,28,8,2,10,2,12,
+  	2,31,9,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,44,8,2,1,2,1,
+  	2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,59,8,2,1,2,1,2,1,2,
+  	1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,72,8,2,1,3,1,3,1,3,1,3,1,3,5,3,79,
+  	8,3,10,3,12,3,82,9,3,3,3,84,8,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,1,3,3,3,94,
+  	8,3,1,4,1,4,1,5,1,5,1,5,1,5,1,5,1,5,3,5,104,8,5,1,6,1,6,1,6,1,6,1,6,3,
+  	6,111,8,6,1,7,1,7,3,7,115,8,7,1,8,1,8,1,9,1,9,1,9,0,0,10,0,2,4,6,8,10,
+  	12,14,16,18,0,0,136,0,20,1,0,0,0,2,22,1,0,0,0,4,71,1,0,0,0,6,93,1,0,0,
+  	0,8,95,1,0,0,0,10,103,1,0,0,0,12,110,1,0,0,0,14,114,1,0,0,0,16,116,1,
+  	0,0,0,18,118,1,0,0,0,20,21,5,0,0,1,21,1,1,0,0,0,22,23,3,4,2,0,23,24,5,
+  	0,0,1,24,3,1,0,0,0,25,29,5,31,0,0,26,28,3,4,2,0,27,26,1,0,0,0,28,31,1,
+  	0,0,0,29,27,1,0,0,0,29,30,1,0,0,0,30,32,1,0,0,0,31,29,1,0,0,0,32,72,5,
+  	32,0,0,33,34,3,6,3,0,34,35,5,25,0,0,35,72,1,0,0,0,36,37,5,1,0,0,37,38,
+  	5,22,0,0,38,39,5,2,0,0,39,43,3,6,3,0,40,41,3,18,9,0,41,42,3,6,3,0,42,
+  	44,1,0,0,0,43,40,1,0,0,0,43,44,1,0,0,0,44,45,1,0,0,0,45,46,5,25,0,0,46,
+  	72,1,0,0,0,47,48,3,16,8,0,48,49,3,18,9,0,49,50,3,6,3,0,50,51,5,25,0,0,
+  	51,72,1,0,0,0,52,53,5,3,0,0,53,54,3,6,3,0,54,55,5,4,0,0,55,58,3,4,2,0,
+  	56,57,5,5,0,0,57,59,3,4,2,0,58,56,1,0,0,0,58,59,1,0,0,0,59,72,1,0,0,0,
+  	60,61,5,6,0,0,61,72,3,4,2,0,62,63,5,7,0,0,63,72,5,25,0,0,64,65,5,8,0,
+  	0,65,72,5,25,0,0,66,67,5,9,0,0,67,68,3,6,3,0,68,69,5,10,0,0,69,70,3,4,
+  	2,0,70,72,1,0,0,0,71,25,1,0,0,0,71,33,1,0,0,0,71,36,1,0,0,0,71,47,1,0,
+  	0,0,71,52,1,0,0,0,71,60,1,0,0,0,71,62,1,0,0,0,71,64,1,0,0,0,71,66,1,0,
+  	0,0,72,5,1,0,0,0,73,74,3,16,8,0,74,83,5,29,0,0,75,80,3,6,3,0,76,77,5,
+  	11,0,0,77,79,3,6,3,0,78,76,1,0,0,0,79,82,1,0,0,0,80,78,1,0,0,0,80,81,
+  	1,0,0,0,81,84,1,0,0,0,82,80,1,0,0,0,83,75,1,0,0,0,83,84,1,0,0,0,84,85,
+  	1,0,0,0,85,86,5,30,0,0,86,94,1,0,0,0,87,94,3,16,8,0,88,94,3,10,5,0,89,
+  	90,3,8,4,0,90,91,3,6,3,0,91,94,1,0,0,0,92,94,5,12,0,0,93,73,1,0,0,0,93,
+  	87,1,0,0,0,93,88,1,0,0,0,93,89,1,0,0,0,93,92,1,0,0,0,94,7,1,0,0,0,95,
+  	96,5,13,0,0,96,9,1,0,0,0,97,104,3,14,7,0,98,104,5,23,0,0,99,100,5,29,
+  	0,0,100,104,5,30,0,0,101,104,3,12,6,0,102,104,5,24,0,0,103,97,1,0,0,0,
+  	103,98,1,0,0,0,103,99,1,0,0,0,103,101,1,0,0,0,103,102,1,0,0,0,104,11,
+  	1,0,0,0,105,111,5,14,0,0,106,111,5,15,0,0,107,111,5,16,0,0,108,111,5,
+  	17,0,0,109,111,5,18,0,0,110,105,1,0,0,0,110,106,1,0,0,0,110,107,1,0,0,
+  	0,110,108,1,0,0,0,110,109,1,0,0,0,111,13,1,0,0,0,112,115,5,19,0,0,113,
+  	115,5,20,0,0,114,112,1,0,0,0,114,113,1,0,0,0,115,15,1,0,0,0,116,117,5,
+  	22,0,0,117,17,1,0,0,0,118,119,5,21,0,0,119,19,1,0,0,0,10,29,43,58,71,
+  	80,83,93,103,110,114
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -148,36 +149,32 @@ antlr4::atn::SerializedATNView anceParser::getSerializedATN() const {
 }
 
 
-//----------------- FileContext ------------------------------------------------------------------
+//----------------- UnorderedScopeFileContext ------------------------------------------------------------------
 
-anceParser::FileContext::FileContext(ParserRuleContext *parent, size_t invokingState)
+anceParser::UnorderedScopeFileContext::UnorderedScopeFileContext(ParserRuleContext *parent, size_t invokingState)
   : ParserRuleContext(parent, invokingState) {
 }
 
-anceParser::StatementContext* anceParser::FileContext::statement() {
-  return getRuleContext<anceParser::StatementContext>(0);
-}
-
-tree::TerminalNode* anceParser::FileContext::EOF() {
+tree::TerminalNode* anceParser::UnorderedScopeFileContext::EOF() {
   return getToken(anceParser::EOF, 0);
 }
 
 
-size_t anceParser::FileContext::getRuleIndex() const {
-  return anceParser::RuleFile;
+size_t anceParser::UnorderedScopeFileContext::getRuleIndex() const {
+  return anceParser::RuleUnorderedScopeFile;
 }
 
 
-std::any anceParser::FileContext::accept(tree::ParseTreeVisitor *visitor) {
+std::any anceParser::UnorderedScopeFileContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitFile(this);
+    return parserVisitor->visitUnorderedScopeFile(this);
   else
     return visitor->visitChildren(this);
 }
 
-anceParser::FileContext* anceParser::file() {
-  FileContext *_localctx = _tracker.createInstance<FileContext>(_ctx, getState());
-  enterRule(_localctx, 0, anceParser::RuleFile);
+anceParser::UnorderedScopeFileContext* anceParser::unorderedScopeFile() {
+  UnorderedScopeFileContext *_localctx = _tracker.createInstance<UnorderedScopeFileContext>(_ctx, getState());
+  enterRule(_localctx, 0, anceParser::RuleUnorderedScopeFile);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -188,9 +185,62 @@ anceParser::FileContext* anceParser::file() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(18);
+    setState(20);
+    match(anceParser::EOF);
+   
+  }
+  catch (RecognitionException &e) {
+    _errHandler->reportError(this, e);
+    _localctx->exception = std::current_exception();
+    _errHandler->recover(this, _localctx->exception);
+  }
+
+  return _localctx;
+}
+
+//----------------- OrderedScopeFileContext ------------------------------------------------------------------
+
+anceParser::OrderedScopeFileContext::OrderedScopeFileContext(ParserRuleContext *parent, size_t invokingState)
+  : ParserRuleContext(parent, invokingState) {
+}
+
+anceParser::StatementContext* anceParser::OrderedScopeFileContext::statement() {
+  return getRuleContext<anceParser::StatementContext>(0);
+}
+
+tree::TerminalNode* anceParser::OrderedScopeFileContext::EOF() {
+  return getToken(anceParser::EOF, 0);
+}
+
+
+size_t anceParser::OrderedScopeFileContext::getRuleIndex() const {
+  return anceParser::RuleOrderedScopeFile;
+}
+
+
+std::any anceParser::OrderedScopeFileContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
+    return parserVisitor->visitOrderedScopeFile(this);
+  else
+    return visitor->visitChildren(this);
+}
+
+anceParser::OrderedScopeFileContext* anceParser::orderedScopeFile() {
+  OrderedScopeFileContext *_localctx = _tracker.createInstance<OrderedScopeFileContext>(_ctx, getState());
+  enterRule(_localctx, 2, anceParser::RuleOrderedScopeFile);
+
+#if __cplusplus > 201703L
+  auto onExit = finally([=, this] {
+#else
+  auto onExit = finally([=] {
+#endif
+    exitRule();
+  });
+  try {
+    enterOuterAlt(_localctx, 1);
+    setState(22);
     statement();
-    setState(19);
+    setState(23);
     match(anceParser::EOF);
    
   }
@@ -411,7 +461,7 @@ std::any anceParser::ContinueStatementContext::accept(tree::ParseTreeVisitor *vi
 }
 anceParser::StatementContext* anceParser::statement() {
   StatementContext *_localctx = _tracker.createInstance<StatementContext>(_ctx, getState());
-  enterRule(_localctx, 2, anceParser::RuleStatement);
+  enterRule(_localctx, 4, anceParser::RuleStatement);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -422,15 +472,15 @@ anceParser::StatementContext* anceParser::statement() {
     exitRule();
   });
   try {
-    setState(67);
+    setState(71);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 3, _ctx)) {
     case 1: {
       _localctx = _tracker.createInstance<anceParser::BlockStatementContext>(_localctx);
       enterOuterAlt(_localctx, 1);
-      setState(21);
-      match(anceParser::CURLY_BRACKET_OPEN);
       setState(25);
+      match(anceParser::CURLY_BRACKET_OPEN);
+      setState(29);
       _errHandler->sync(this);
       _la = _input->LA(1);
       while ((((_la & ~ 0x3fULL) == 0) &&
@@ -454,13 +504,13 @@ anceParser::StatementContext* anceParser::statement() {
         | (1ULL << anceParser::STRING)
         | (1ULL << anceParser::BRACKET_OPEN)
         | (1ULL << anceParser::CURLY_BRACKET_OPEN))) != 0)) {
-        setState(22);
+        setState(26);
         statement();
-        setState(27);
+        setState(31);
         _errHandler->sync(this);
         _la = _input->LA(1);
       }
-      setState(28);
+      setState(32);
       match(anceParser::CURLY_BRACKET_CLOSE);
       break;
     }
@@ -468,9 +518,9 @@ anceParser::StatementContext* anceParser::statement() {
     case 2: {
       _localctx = _tracker.createInstance<anceParser::ExpressionStatementContext>(_localctx);
       enterOuterAlt(_localctx, 2);
-      setState(29);
+      setState(33);
       expression();
-      setState(30);
+      setState(34);
       match(anceParser::SEMICOLON);
       break;
     }
@@ -478,25 +528,25 @@ anceParser::StatementContext* anceParser::statement() {
     case 3: {
       _localctx = _tracker.createInstance<anceParser::LetStatementContext>(_localctx);
       enterOuterAlt(_localctx, 3);
-      setState(32);
+      setState(36);
       match(anceParser::T__0);
-      setState(33);
+      setState(37);
       match(anceParser::IDENTIFIER);
-      setState(34);
+      setState(38);
       match(anceParser::T__1);
-      setState(35);
-      antlrcpp::downCast<LetStatementContext *>(_localctx)->varType = expression();
       setState(39);
+      antlrcpp::downCast<LetStatementContext *>(_localctx)->varType = expression();
+      setState(43);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
       if (_la == anceParser::T__20) {
-        setState(36);
+        setState(40);
         assigner();
-        setState(37);
+        setState(41);
         antlrcpp::downCast<LetStatementContext *>(_localctx)->assigned = expression();
       }
-      setState(41);
+      setState(45);
       match(anceParser::SEMICOLON);
       break;
     }
@@ -504,13 +554,13 @@ anceParser::StatementContext* anceParser::statement() {
     case 4: {
       _localctx = _tracker.createInstance<anceParser::AssignmentStatementContext>(_localctx);
       enterOuterAlt(_localctx, 4);
-      setState(43);
+      setState(47);
       entity();
-      setState(44);
+      setState(48);
       assigner();
-      setState(45);
+      setState(49);
       expression();
-      setState(46);
+      setState(50);
       match(anceParser::SEMICOLON);
       break;
     }
@@ -518,22 +568,22 @@ anceParser::StatementContext* anceParser::statement() {
     case 5: {
       _localctx = _tracker.createInstance<anceParser::IfStatementContext>(_localctx);
       enterOuterAlt(_localctx, 5);
-      setState(48);
+      setState(52);
       match(anceParser::T__2);
-      setState(49);
+      setState(53);
       expression();
-      setState(50);
-      match(anceParser::T__3);
-      setState(51);
-      antlrcpp::downCast<IfStatementContext *>(_localctx)->trueBlock = statement();
       setState(54);
+      match(anceParser::T__3);
+      setState(55);
+      antlrcpp::downCast<IfStatementContext *>(_localctx)->trueBlock = statement();
+      setState(58);
       _errHandler->sync(this);
 
       switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 2, _ctx)) {
       case 1: {
-        setState(52);
+        setState(56);
         match(anceParser::T__4);
-        setState(53);
+        setState(57);
         antlrcpp::downCast<IfStatementContext *>(_localctx)->falseBlock = statement();
         break;
       }
@@ -547,9 +597,9 @@ anceParser::StatementContext* anceParser::statement() {
     case 6: {
       _localctx = _tracker.createInstance<anceParser::LoopStatementContext>(_localctx);
       enterOuterAlt(_localctx, 6);
-      setState(56);
+      setState(60);
       match(anceParser::T__5);
-      setState(57);
+      setState(61);
       statement();
       break;
     }
@@ -557,9 +607,9 @@ anceParser::StatementContext* anceParser::statement() {
     case 7: {
       _localctx = _tracker.createInstance<anceParser::BreakStatementContext>(_localctx);
       enterOuterAlt(_localctx, 7);
-      setState(58);
+      setState(62);
       match(anceParser::T__6);
-      setState(59);
+      setState(63);
       match(anceParser::SEMICOLON);
       break;
     }
@@ -567,9 +617,9 @@ anceParser::StatementContext* anceParser::statement() {
     case 8: {
       _localctx = _tracker.createInstance<anceParser::ContinueStatementContext>(_localctx);
       enterOuterAlt(_localctx, 8);
-      setState(60);
+      setState(64);
       match(anceParser::T__7);
-      setState(61);
+      setState(65);
       match(anceParser::SEMICOLON);
       break;
     }
@@ -577,13 +627,13 @@ anceParser::StatementContext* anceParser::statement() {
     case 9: {
       _localctx = _tracker.createInstance<anceParser::WhileStatementContext>(_localctx);
       enterOuterAlt(_localctx, 9);
-      setState(62);
+      setState(66);
       match(anceParser::T__8);
-      setState(63);
+      setState(67);
       expression();
-      setState(64);
+      setState(68);
       match(anceParser::T__9);
-      setState(65);
+      setState(69);
       statement();
       break;
     }
@@ -710,7 +760,7 @@ std::any anceParser::HereExpressionContext::accept(tree::ParseTreeVisitor *visit
 }
 anceParser::ExpressionContext* anceParser::expression() {
   ExpressionContext *_localctx = _tracker.createInstance<ExpressionContext>(_ctx, getState());
-  enterRule(_localctx, 4, anceParser::RuleExpression);
+  enterRule(_localctx, 6, anceParser::RuleExpression);
   size_t _la = 0;
 
 #if __cplusplus > 201703L
@@ -721,17 +771,17 @@ anceParser::ExpressionContext* anceParser::expression() {
     exitRule();
   });
   try {
-    setState(89);
+    setState(93);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 6, _ctx)) {
     case 1: {
       _localctx = _tracker.createInstance<anceParser::CallExpressionContext>(_localctx);
       enterOuterAlt(_localctx, 1);
-      setState(69);
+      setState(73);
       entity();
-      setState(70);
+      setState(74);
       match(anceParser::BRACKET_OPEN);
-      setState(79);
+      setState(83);
       _errHandler->sync(this);
 
       _la = _input->LA(1);
@@ -749,22 +799,22 @@ anceParser::ExpressionContext* anceParser::expression() {
         | (1ULL << anceParser::INTEGER)
         | (1ULL << anceParser::STRING)
         | (1ULL << anceParser::BRACKET_OPEN))) != 0)) {
-        setState(71);
+        setState(75);
         expression();
-        setState(76);
+        setState(80);
         _errHandler->sync(this);
         _la = _input->LA(1);
         while (_la == anceParser::T__10) {
-          setState(72);
+          setState(76);
           match(anceParser::T__10);
-          setState(73);
+          setState(77);
           expression();
-          setState(78);
+          setState(82);
           _errHandler->sync(this);
           _la = _input->LA(1);
         }
       }
-      setState(81);
+      setState(85);
       match(anceParser::BRACKET_CLOSE);
       break;
     }
@@ -772,7 +822,7 @@ anceParser::ExpressionContext* anceParser::expression() {
     case 2: {
       _localctx = _tracker.createInstance<anceParser::AccessExpressionContext>(_localctx);
       enterOuterAlt(_localctx, 2);
-      setState(83);
+      setState(87);
       entity();
       break;
     }
@@ -780,7 +830,7 @@ anceParser::ExpressionContext* anceParser::expression() {
     case 3: {
       _localctx = _tracker.createInstance<anceParser::LiteralExpressionContext>(_localctx);
       enterOuterAlt(_localctx, 3);
-      setState(84);
+      setState(88);
       literal();
       break;
     }
@@ -788,9 +838,9 @@ anceParser::ExpressionContext* anceParser::expression() {
     case 4: {
       _localctx = _tracker.createInstance<anceParser::UnaryOperationExpressionContext>(_localctx);
       enterOuterAlt(_localctx, 4);
-      setState(85);
+      setState(89);
       unary();
-      setState(86);
+      setState(90);
       expression();
       break;
     }
@@ -798,7 +848,7 @@ anceParser::ExpressionContext* anceParser::expression() {
     case 5: {
       _localctx = _tracker.createInstance<anceParser::HereExpressionContext>(_localctx);
       enterOuterAlt(_localctx, 5);
-      setState(88);
+      setState(92);
       match(anceParser::T__11);
       break;
     }
@@ -845,7 +895,7 @@ std::any anceParser::UnaryNotContext::accept(tree::ParseTreeVisitor *visitor) {
 }
 anceParser::UnaryContext* anceParser::unary() {
   UnaryContext *_localctx = _tracker.createInstance<UnaryContext>(_ctx, getState());
-  enterRule(_localctx, 6, anceParser::RuleUnary);
+  enterRule(_localctx, 8, anceParser::RuleUnary);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -857,7 +907,7 @@ anceParser::UnaryContext* anceParser::unary() {
   try {
     _localctx = _tracker.createInstance<anceParser::UnaryNotContext>(_localctx);
     enterOuterAlt(_localctx, 1);
-    setState(91);
+    setState(95);
     match(anceParser::T__12);
    
   }
@@ -966,7 +1016,7 @@ std::any anceParser::SizeLiteralContext::accept(tree::ParseTreeVisitor *visitor)
 }
 anceParser::LiteralContext* anceParser::literal() {
   LiteralContext *_localctx = _tracker.createInstance<LiteralContext>(_ctx, getState());
-  enterRule(_localctx, 8, anceParser::RuleLiteral);
+  enterRule(_localctx, 10, anceParser::RuleLiteral);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -976,14 +1026,14 @@ anceParser::LiteralContext* anceParser::literal() {
     exitRule();
   });
   try {
-    setState(99);
+    setState(103);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case anceParser::T__18:
       case anceParser::T__19: {
         _localctx = _tracker.createInstance<anceParser::BooleanLiteralContext>(_localctx);
         enterOuterAlt(_localctx, 1);
-        setState(93);
+        setState(97);
         boolean();
         break;
       }
@@ -991,7 +1041,7 @@ anceParser::LiteralContext* anceParser::literal() {
       case anceParser::INTEGER: {
         _localctx = _tracker.createInstance<anceParser::SizeLiteralContext>(_localctx);
         enterOuterAlt(_localctx, 2);
-        setState(94);
+        setState(98);
         match(anceParser::INTEGER);
         break;
       }
@@ -999,9 +1049,9 @@ anceParser::LiteralContext* anceParser::literal() {
       case anceParser::BRACKET_OPEN: {
         _localctx = _tracker.createInstance<anceParser::UnitLiteralContext>(_localctx);
         enterOuterAlt(_localctx, 3);
-        setState(95);
+        setState(99);
         match(anceParser::BRACKET_OPEN);
-        setState(96);
+        setState(100);
         match(anceParser::BRACKET_CLOSE);
         break;
       }
@@ -1013,7 +1063,7 @@ anceParser::LiteralContext* anceParser::literal() {
       case anceParser::T__17: {
         _localctx = _tracker.createInstance<anceParser::TypeLiteralContext>(_localctx);
         enterOuterAlt(_localctx, 4);
-        setState(97);
+        setState(101);
         type();
         break;
       }
@@ -1021,7 +1071,7 @@ anceParser::LiteralContext* anceParser::literal() {
       case anceParser::STRING: {
         _localctx = _tracker.createInstance<anceParser::StringLiteralContext>(_localctx);
         enterOuterAlt(_localctx, 5);
-        setState(98);
+        setState(102);
         match(anceParser::STRING);
         break;
       }
@@ -1112,7 +1162,7 @@ std::any anceParser::TypeTypeContext::accept(tree::ParseTreeVisitor *visitor) {
 }
 anceParser::TypeContext* anceParser::type() {
   TypeContext *_localctx = _tracker.createInstance<TypeContext>(_ctx, getState());
-  enterRule(_localctx, 10, anceParser::RuleType);
+  enterRule(_localctx, 12, anceParser::RuleType);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1122,13 +1172,13 @@ anceParser::TypeContext* anceParser::type() {
     exitRule();
   });
   try {
-    setState(106);
+    setState(110);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case anceParser::T__13: {
         _localctx = _tracker.createInstance<anceParser::BoolTypeContext>(_localctx);
         enterOuterAlt(_localctx, 1);
-        setState(101);
+        setState(105);
         match(anceParser::T__13);
         break;
       }
@@ -1136,7 +1186,7 @@ anceParser::TypeContext* anceParser::type() {
       case anceParser::T__14: {
         _localctx = _tracker.createInstance<anceParser::UnitTypeContext>(_localctx);
         enterOuterAlt(_localctx, 2);
-        setState(102);
+        setState(106);
         match(anceParser::T__14);
         break;
       }
@@ -1144,7 +1194,7 @@ anceParser::TypeContext* anceParser::type() {
       case anceParser::T__15: {
         _localctx = _tracker.createInstance<anceParser::SizeTypeContext>(_localctx);
         enterOuterAlt(_localctx, 3);
-        setState(103);
+        setState(107);
         match(anceParser::T__15);
         break;
       }
@@ -1152,7 +1202,7 @@ anceParser::TypeContext* anceParser::type() {
       case anceParser::T__16: {
         _localctx = _tracker.createInstance<anceParser::StringTypeContext>(_localctx);
         enterOuterAlt(_localctx, 4);
-        setState(104);
+        setState(108);
         match(anceParser::T__16);
         break;
       }
@@ -1160,7 +1210,7 @@ anceParser::TypeContext* anceParser::type() {
       case anceParser::T__17: {
         _localctx = _tracker.createInstance<anceParser::TypeTypeContext>(_localctx);
         enterOuterAlt(_localctx, 5);
-        setState(105);
+        setState(109);
         match(anceParser::T__17);
         break;
       }
@@ -1218,7 +1268,7 @@ std::any anceParser::FalseContext::accept(tree::ParseTreeVisitor *visitor) {
 }
 anceParser::BooleanContext* anceParser::boolean() {
   BooleanContext *_localctx = _tracker.createInstance<BooleanContext>(_ctx, getState());
-  enterRule(_localctx, 12, anceParser::RuleBoolean);
+  enterRule(_localctx, 14, anceParser::RuleBoolean);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1228,13 +1278,13 @@ anceParser::BooleanContext* anceParser::boolean() {
     exitRule();
   });
   try {
-    setState(110);
+    setState(114);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case anceParser::T__18: {
         _localctx = _tracker.createInstance<anceParser::TrueContext>(_localctx);
         enterOuterAlt(_localctx, 1);
-        setState(108);
+        setState(112);
         match(anceParser::T__18);
         break;
       }
@@ -1242,7 +1292,7 @@ anceParser::BooleanContext* anceParser::boolean() {
       case anceParser::T__19: {
         _localctx = _tracker.createInstance<anceParser::FalseContext>(_localctx);
         enterOuterAlt(_localctx, 2);
-        setState(109);
+        setState(113);
         match(anceParser::T__19);
         break;
       }
@@ -1286,7 +1336,7 @@ std::any anceParser::EntityContext::accept(tree::ParseTreeVisitor *visitor) {
 
 anceParser::EntityContext* anceParser::entity() {
   EntityContext *_localctx = _tracker.createInstance<EntityContext>(_ctx, getState());
-  enterRule(_localctx, 14, anceParser::RuleEntity);
+  enterRule(_localctx, 16, anceParser::RuleEntity);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1297,7 +1347,7 @@ anceParser::EntityContext* anceParser::entity() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(112);
+    setState(116);
     match(anceParser::IDENTIFIER);
    
   }
@@ -1331,7 +1381,7 @@ std::any anceParser::AssignerContext::accept(tree::ParseTreeVisitor *visitor) {
 
 anceParser::AssignerContext* anceParser::assigner() {
   AssignerContext *_localctx = _tracker.createInstance<AssignerContext>(_ctx, getState());
-  enterRule(_localctx, 16, anceParser::RuleAssigner);
+  enterRule(_localctx, 18, anceParser::RuleAssigner);
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1342,7 +1392,7 @@ anceParser::AssignerContext* anceParser::assigner() {
   });
   try {
     enterOuterAlt(_localctx, 1);
-    setState(114);
+    setState(118);
     match(anceParser::T__20);
    
   }

@@ -28,6 +28,16 @@ namespace ance::ast
         core::Location location;
     };
 
+    /// Represents a source file creating an unordered scope.
+    /// Note that actual source files may contain a top-level ordered scope,
+    /// which would be represented as a statement node instead of a file node.
+    struct File final
+        : Node
+        , utility::ConcreteNode<File, Visitor>
+    {
+        explicit File(core::Location const& source_location);
+    };
+
     /// A statement is an independent part of code.
     struct Statement
         : virtual Node
@@ -45,7 +55,7 @@ namespace ance::ast
         explicit ErrorStatement(core::Location const& source_location);
     };
 
-    /// A block statement combines multiple statements into a single statement.
+    /// A block statement combines multiple statements into a single statement, creating a new ordered scope.
     struct Block final
         : Statement
         , utility::ConcreteNode<Block, Visitor>
@@ -225,6 +235,8 @@ namespace ance::ast
         using AbstractVisitor::visit;
 
         ~Visitor() override = default;
+
+        virtual void visit(File const& file) = 0;
 
         virtual void visit(ErrorStatement const& error)    = 0;
         virtual void visit(Block const& block)             = 0;

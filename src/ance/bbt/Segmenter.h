@@ -14,25 +14,32 @@ namespace ance::sources
 
 namespace ance::bbt
 {
-  struct Flow;
+    struct UnorderedScope;
+    struct Flow;
 
-  /// Segments RETs into BBTs.
-  class Segmenter
-  {
-  public:
-    Segmenter(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
-    ~Segmenter();
+    /// Segments RETs into BBTs.
+    class Segmenter
+    {
+      public:
+        Segmenter(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
+        ~Segmenter();
 
-    /// Segment a file into a basic block control flow.
-    /// \param file The path to the file to segment.
-    /// \param out The output stream to report to.
-    /// \return The control flow built from the file.
-    utility::Optional<utility::Owned<Flow>> segment(std::filesystem::path const& file, std::ostream& out);
+        /// Segment an ordered file into a basic block control flow.
+        /// \param file The path to the file to segment.
+        /// \param out The output stream to report to.
+        /// \return The control flow built from the file.
+        utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file, std::ostream& out);
 
-  private:
-    struct Implementation;
-    utility::Owned<Implementation> implementation_;
-  };
+        /// Segment an unordered file into an unordered scope.
+        /// \param file The path to the file to segment.
+        /// \param out The output stream to report to.
+        /// \return The unordered scope built from the file.
+        utility::Optional<utility::Owned<UnorderedScope>> segmentUnorderedFile(std::filesystem::path const& file, std::ostream& out);
+
+      private:
+        struct Implementation;
+        utility::Owned<Implementation> implementation_;
+    };
 }
 
 #endif
