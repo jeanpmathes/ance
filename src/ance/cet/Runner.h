@@ -35,12 +35,6 @@ namespace ance::cet
         /// \return The resulting compile-able unit.
         utility::Optional<utility::Owned<Unit>> runOrderedFile(std::filesystem::path const& file, std::ostream& out);
 
-        /// Run the given unordered file and return the resulting unit.
-        /// \param file The path to the file to run.
-        /// \param out The output stream to report to.
-        /// \return The resulting compile-able unit.
-        utility::Optional<utility::Owned<Unit>> runUnorderedFile(std::filesystem::path const& file, std::ostream& out);
-
     private:
         struct Implementation;
         utility::Owned<Implementation> implementation_;

@@ -44,11 +44,12 @@ ance::core::Declare::Declare()
 ance::core::Resolve::Resolve()
     : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::EntityRef()) {}
 
-ance::core::Log::Log()
-    : Static(Signature::likeUnnamed("log", Type::String(), Type::Location()), Type::Unit()) {}
+ance::core::Log::Log() : Static(Signature::likeUnnamed("log", Type::String(), Type::Location()), Type::Unit()) {}
+
+ance::core::Include::Include() : Static(Signature::likeUnnamed("include", Type::String(), Type::Location()), Type::Unit()) {}
 
 ance::core::B2Str::B2Str()
-    : Static(Signature::likeUnnamed("b2str", Type::Bool()), Type::String()) {}
+    : Static(Signature::likeUnnamed("b2str", Type::Bool()), Type::String()) {} // todo: path type
 
 std::ostream& operator<<(std::ostream& os, ance::core::Intrinsic const& intrinsic)
 {

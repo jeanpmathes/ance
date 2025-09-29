@@ -52,6 +52,11 @@ struct ance::build::Compiler::Implementation
             unsupported(log);
         }
 
+        void visit(core::Include const& include) override
+        {
+            unsupported(include);
+        }
+
         void visit(core::B2Str const& b2str) override
         {
             unsupported(b2str);

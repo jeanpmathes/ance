@@ -72,7 +72,7 @@ namespace ance
         cet::Runner     runner {source_tree, reporter, context};
         build::Compiler compiler {source_tree, reporter, context}; // todo: consider using the runner internally
 
-        utility::List<utility::Shared<core::Entity>> print_provider; // todo: remove
+        utility::List<utility::Shared<core::Entity>> provider; // todo: remove / improve the functions
         bbt::FlowBuilder builder (core::Location::global());
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
@@ -97,8 +97,9 @@ namespace ance
             }
             (void)result;
         }
-        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1b",
-                core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool())), core::Type::Unit(), builder.build()));
+        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1b",
+                core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool())),
+                core::Type::Unit(), builder.build()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
@@ -121,9 +122,10 @@ namespace ance
             }
             (void)result;
         }
-        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2b",
+        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2b",
                 core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool()),
-                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())), core::Type::Unit(), builder.build()));
+                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())),
+                core::Type::Unit(), builder.build()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
@@ -140,8 +142,9 @@ namespace ance
             }
             (void)result;
         }
-        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1s",
-                core::Signature::Parameter(core::Identifier::like("value"), core::Type::String())), core::Type::Unit(), builder.build()));
+        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1s",
+                core::Signature::Parameter(core::Identifier::like("value"), core::Type::String())),
+                core::Type::Unit(), builder.build()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
@@ -157,11 +160,31 @@ namespace ance
             }
             (void)result;
         }
-        print_provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2s",
+        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2s",
                 core::Signature::Parameter(core::Identifier::like("value"), core::Type::String()),
-                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())), core::Type::Unit(), builder.build()));
+                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())),
+                core::Type::Unit(), builder.build()));
 
-        runner.add(cet::Provider::fromList(std::move(print_provider)));
+        builder.setActiveBasicBlock(builder.createBasicBlock());
+        {
+            bbt::Temporary const& file = builder.pushVariableRead(core::Identifier::like("file"));
+            bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
+
+            bbt::Temporary const& result = builder.pushTemporary();
+            {
+                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
+                args.emplace_back(file);
+                args.emplace_back(location);
+                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Include::instance(), std::move(args), result, core::Location::global()));
+            }
+            (void)result;
+        }
+        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("include",
+                core::Signature::Parameter(core::Identifier::like("file"), core::Type::String()),
+                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())),
+                core::Type::Unit(), builder.build()));
+
+        runner.add(cet::Provider::fromList(std::move(provider)));
 
         utility::Optional<utility::Owned<cet::Unit>> unit = runner.runOrderedFile(file_name, out);
         if (!unit.hasValue()) return EXIT_FAILURE;
@@ -173,11 +196,17 @@ namespace ance
 
         // todo: add intrinsic and wrapper function to include another file (use the string), call the runOrderedScope of the runner from the intrinsic
 
+        // todo: test case that file does not exist
+
         // todo: currently inclusion of a new file overrides the print and graph files, change them so that they append the original file name to their name (both should take a file name as an argument)
         // todo: maybe even take file path as arg, duplicate the directory structure in the dbg directory and make each file a dir containing the different stage dumps
 
         // todo: allow putting statements into unordered scopes, they will be executed in some undefined order, use it to test the inclusion
         // todo: an unordered scope should contain a vector of flows
+        // todo: in the grammar, a ordered block must be used instead of just placing statements in the file, like this: do { ... }
+
+        // todo: instead of running the flows directly when include is called and ignoring the produced unit, the lambda run_unordered_file should return the flows / the unordered scope, and be renamed to not have run in its name
+        // todo: the passed method which is currently runUnorderedFile can also be renamed then
 
         // todo: add cmp global variables so that circular dependencies can exist, included files should be run by the runner
         // todo: the variable declarations should be transformed into a statement which uses the global variable declaration intrinsic

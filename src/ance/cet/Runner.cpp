@@ -17,8 +17,9 @@
 #include "ance/cet/Node.h"
 #include "ance/cet/Provider.h"
 
-#include "Printer.h"
 #include "Grapher.h"
+#include "Printer.h"
+#include "ance/sources/SourceTree.h"
 
 struct ance::cet::Runner::Implementation
 {
@@ -152,8 +153,13 @@ struct ance::cet::Runner::Implementation
     public:
         using IntrinsicVisitor::visit;
 
-        explicit Intrinsics(core::Reporter& reporter, std::function<void(core::Entity const&)> allocate, std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide)
-            : reporter_(reporter), allocate_(std::move(allocate)), provide_(std::move(provide))
+        Intrinsics(
+            sources::SourceTree& source_tree,
+            core::Reporter& reporter,
+            std::function<void(core::Entity const&)> allocate,
+            std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide,
+            std::function<void(std::filesystem::path const&)> include)
+            : source_tree_(source_tree), reporter_(reporter), allocate_(std::move(allocate)), provide_(std::move(provide)), include_(std::move(include))
         {
         }
 
@@ -251,6 +257,20 @@ struct ance::cet::Runner::Implementation
             setResult(core::Value::makeString(value ? "true" : "false"));
         }
 
+        void visit(core::Include const&) override
+        {
+            assert(arguments_->size() == 2);
+            assert(arguments_->at(0)->type() == core::Type::String());
+            assert(arguments_->at(1)->type() == core::Type::Location());
+
+            std::string const& file = arguments_->at(0)->getString();
+            core::Location const& location = arguments_->at(1)->getLocation();
+
+            std::filesystem::path const path = source_tree_.getFile(location.file()).getDirectory() / file;
+
+            include_(path);
+        }
+
     private:
         void setResult(utility::Shared<core::Value> value)
         {
@@ -264,9 +284,12 @@ struct ance::cet::Runner::Implementation
             return_value_ = std::nullopt;
         }
 
+        sources::SourceTree& source_tree_;
         core::Reporter& reporter_;
+
         std::function<void(core::Entity const&)> allocate_;
         std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide_;
+        std::function<void(std::filesystem::path const&)> include_;
 
         core::Location location_ = core::Location::global();
         utility::List<utility::Shared<core::Value>> const* arguments_ = nullptr;
@@ -280,7 +303,8 @@ struct ance::cet::Runner::Implementation
     public:
         using Visitor::visit;
 
-        BBT(core::Reporter& reporter, utility::List<utility::Owned<Provider>>& providers) : reporter_(reporter), providers_(providers) {}
+        BBT(sources::SourceTree& source_tree, core::Reporter& reporter, std::function<utility::Optional<utility::Owned<Unit>>(std::filesystem::path const&)> run_unordered_file, utility::List<utility::Owned<Provider>>& providers)
+        : source_tree_(source_tree), reporter_(reporter), run_unordered_file_(std::move(run_unordered_file)), providers_(providers) {}
         ~BBT() override = default;
 
         [[nodiscard]] bool requireType(core::Type const& expected, core::Type const& actual, core::Location const& location) const
@@ -619,7 +643,9 @@ struct ance::cet::Runner::Implementation
         }
 
       private:
+        sources::SourceTree& source_tree_;
         core::Reporter& reporter_;
+        std::function<utility::Optional<utility::Owned<Unit>>(std::filesystem::path const&)> run_unordered_file_;
         utility::List<utility::Owned<Provider>>& providers_;
 
         std::function<void(core::Entity const&)> allocate_ = [this](core::Entity const& entity) {
@@ -637,7 +663,11 @@ struct ance::cet::Runner::Implementation
             return std::nullopt;
         };
 
-        Intrinsics intrinsics_ {reporter_, allocate_, provide_};
+        std::function<void(std::filesystem::path const&)> include_ = [this](std::filesystem::path const& path) {
+            std::ignore = run_unordered_file_(path);
+        };
+
+        Intrinsics intrinsics_ {source_tree_, reporter_, allocate_, provide_, include_};
 
         std::map<core::Entity const*, utility::Shared<core::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
@@ -657,7 +687,7 @@ struct ance::cet::Runner::Implementation
         if (!flow.hasValue())
             return std::nullopt;
 
-        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(reporter_, providers_);
+        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(source_tree_, reporter_, [&](std::filesystem::path const& f) { return runUnorderedFile(f, out); }, providers_);
         bbt->visit(**flow);
 
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
@@ -676,7 +706,7 @@ struct ance::cet::Runner::Implementation
         if (!scope.hasValue())
             return std::nullopt;
 
-        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(reporter_, providers_);
+        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(source_tree_, reporter_, [&](std::filesystem::path const& f) { return runUnorderedFile(f, out); }, providers_);
         bbt->visit(**scope);
 
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
@@ -716,9 +746,4 @@ void ance::cet::Runner::add(utility::Owned<Provider> provider)
 ance::utility::Optional<ance::utility::Owned<ance::cet::Unit>> ance::cet::Runner::runOrderedFile(std::filesystem::path const& file, std::ostream& out)
 {
     return implementation_->runOrderedFile(file, out);
-}
-
-ance::utility::Optional<ance::utility::Owned<ance::cet::Unit>> ance::cet::Runner::runUnorderedFile(std::filesystem::path const& file, std::ostream& out)
-{
-    return implementation_->runUnorderedFile(file, out);
 }

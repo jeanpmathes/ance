@@ -140,6 +140,22 @@ namespace ance::core
         }
     };
 
+    /// This intrinsic includes another source file.
+    struct Include final : Static<Include>
+    {
+    private:
+        Include();
+
+    public:
+        ~Include() override = default;
+
+        static Include& instance()
+        {
+            static Include instance;
+            return instance;
+        }
+    };
+
     /// Visitor for all intrinsics.
     class IntrinsicVisitor : public utility::AbstractVisitor<IntrinsicVisitor>
     {
@@ -153,6 +169,7 @@ namespace ance::core
         virtual void visit(Resolve const& resolve) = 0;
         virtual void visit(Log const& log)         = 0;
         virtual void visit(B2Str const& b2str)     = 0;
+        virtual void visit(Include const& include) = 0;
     };
 }
 

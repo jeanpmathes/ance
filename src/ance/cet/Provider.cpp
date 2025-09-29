@@ -11,7 +11,7 @@ struct ance::cet::Provider::Implementation
         entities.insert_or_assign(entity->name(), std::move(entity));
     }
 
-    core::Entity const* provide(core::Identifier const& identifier) const
+    [[nodiscard]] core::Entity const* provide(core::Identifier const& identifier) const
     {
         auto const it = entities.find(identifier);
         if (it != entities.end()) return it->second.get();
