@@ -127,10 +127,13 @@ struct ance::core::Reporter::Implementation {
                 continue;
             }
 
-            sources::SourceFile const& source_file = source_tree.getFile(entry.location_.file());
+            sources::SourceFile const& source_file = source_tree.getFile(entry.location_.fileIndex());
 
             out << source_file.getRelativePath().generic_string() << " ";
             out << entry.location_ << " " << entry.message_ << std::endl;
+
+            if (entry.location_.isFile()) continue;
+
             out << std::endl;
 
             std::u32string_view const line_view = text::trim(source_file.getLine(entry.location_.line()), start);
@@ -161,6 +164,35 @@ struct ance::core::Reporter::Implementation {
         entries_.clear();
         error_count_   = 0;
         warning_count_ = 0;
+    }
+
+    void report(sources::SourceTree& source_tree, std::ostream& out)
+    {
+        bool const warnings_as_errors = false;// todo: allow setting
+
+        emit(source_tree, out);
+
+        if (errorCount() > 0 || (warnings_as_errors && warningCount() > 0))
+        {
+            out << "ance: " << errorCount() << " errors, " << warningCount() << " warnings" << std::endl;
+            out << "ance: Failed";
+
+            if (errorCount() == 0) out << " (by warning)";
+        }
+        else
+        {
+            out << "ance: " << warningCount() << " warnings" << std::endl;
+            out << "ance: Success";
+        }
+
+        clear();
+    }
+
+    [[nodiscard]] bool isFailed() const
+    {
+        bool const warnings_as_errors = false;// todo: allow setting
+
+        return errorCount() > 0 || (warnings_as_errors && warningCount() > 0);
     }
 
     [[nodiscard]] size_t errorCount() const { return error_count_; }
@@ -202,31 +234,21 @@ void ance::core::Reporter::clear()
     implementation_->clear();
 }
 
-bool ance::core::Reporter::checkForFail(sources::SourceTree& source_tree, std::ostream& out)
+void ance::core::Reporter::report(sources::SourceTree& source_tree, std::ostream& out)
 {
-    bool const warnings_as_errors = false;// todo: allow setting
+    implementation_->report(source_tree, out);
+}
 
-    emit(source_tree, out);
-
-    if (errorCount() > 0 || (warnings_as_errors && warningCount() > 0))
-    {
-        out << "ance: " << errorCount() << " errors, " << warningCount() << " warnings" << std::endl;
-        out << "ance: Failed";
-
-        if (errorCount() == 0) out << " (by warning)";
-
-        return true;
-    }
-
-    clear();
-
-    return false;
+bool ance::core::Reporter::isFailed() const
+{
+    return implementation_->isFailed();
 }
 
 size_t ance::core::Reporter::errorCount() const
 {
     return implementation_->errorCount();
 }
+
 size_t ance::core::Reporter::warningCount() const
 {
     return implementation_->warningCount();

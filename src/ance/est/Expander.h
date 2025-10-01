@@ -26,15 +26,13 @@ namespace ance::est
 
         /// Expand an ordered scope in a file, removing syntactic sugar.
         /// \param file The path to the file to expand.
-        /// \param out The output stream to report to.
         /// \return The expanded statement.
-        utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file, std::ostream& out);
+        utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file);
 
         /// Expand an unordered scope in a file, removing syntactic sugar.
         /// \param file The path to the file to expand.
-        /// \param out The output stream to report to.
         /// \return The expanded file.
-        utility::Optional<utility::Owned<File>> expandUnorderedFile(std::filesystem::path const& file, std::ostream& out);
+        utility::Optional<utility::Owned<File>> expandUnorderedFile(std::filesystem::path const& file);
 
       private:
         struct Implementation;

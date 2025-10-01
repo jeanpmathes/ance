@@ -893,15 +893,17 @@ struct ance::bbt::Segmenter::Implementation
         , context_(context)
     {}
 
-    utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file, std::ostream& out)
+    utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file) // todo: reduce duplication with below (templates)
     {
-        utility::Optional<utility::Owned<est::Statement>> expanded = expander_.expandOrderedFile(file, out);
+        (void)source_tree_; // todo: use or remove
+
+        utility::Optional<utility::Owned<est::Statement>> expanded = expander_.expandOrderedFile(file);
         if (!expanded.hasValue()) return std::nullopt;
 
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
 
         utility::Owned<Flow> flow = ret->apply(**expanded);
-        if (reporter_.checkForFail(source_tree_, out))
+        if (reporter_.isFailed())
             return std::nullopt;
 
         context_.print<Printer>(*flow, "bbt");
@@ -910,15 +912,15 @@ struct ance::bbt::Segmenter::Implementation
         return flow;
     }
 
-    utility::Optional<utility::Owned<UnorderedScope>> segmentUnorderedFile(std::filesystem::path const& file, std::ostream& out)
+    utility::Optional<utility::Owned<UnorderedScope>> segmentUnorderedFile(std::filesystem::path const& file)
     {
-        utility::Optional<utility::Owned<est::File>> expanded = expander_.expandUnorderedFile(file, out);
+        utility::Optional<utility::Owned<est::File>> expanded = expander_.expandUnorderedFile(file);
         if (!expanded.hasValue()) return std::nullopt;
 
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
 
         utility::Owned<UnorderedScope> scope = ret->apply(**expanded);
-        if (reporter_.checkForFail(source_tree_, out))
+        if (reporter_.isFailed())
             return std::nullopt;
 
         context_.print<Printer>(*scope, "bbt");
@@ -940,14 +942,12 @@ ance::bbt::Segmenter::Segmenter(sources::SourceTree& source_tree, core::Reporter
 
 ance::bbt::Segmenter::~Segmenter() = default;
 
-ance::utility::Optional<ance::utility::Owned<ance::bbt::Flow>> ance::bbt::Segmenter::segmentOrderedFile(std::filesystem::path const& file,
-    std::ostream& out)
+ance::utility::Optional<ance::utility::Owned<ance::bbt::Flow>> ance::bbt::Segmenter::segmentOrderedFile(std::filesystem::path const& file)
 {
-    return implementation_->segmentOrderedFile(file, out);
+    return implementation_->segmentOrderedFile(file);
 }
 
-ance::utility::Optional<ance::utility::Owned<ance::bbt::UnorderedScope>> ance::bbt::Segmenter::segmentUnorderedFile(std::filesystem::path const& file,
-                                                                                                                    std::ostream&                out)
+ance::utility::Optional<ance::utility::Owned<ance::bbt::UnorderedScope>> ance::bbt::Segmenter::segmentUnorderedFile(std::filesystem::path const& file)
 {
-    return implementation_->segmentUnorderedFile(file, out);
+    return implementation_->segmentUnorderedFile(file);
 }

@@ -21,7 +21,7 @@ namespace ance::build
 
         /// Compile a CET unit.
         /// \param unit The unit to compile.
-        bool compile(cet::Unit const& unit, std::ostream& out);
+        bool compile(cet::Unit const& unit);
 
       private:
         struct Implementation;

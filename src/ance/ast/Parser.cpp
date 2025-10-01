@@ -450,66 +450,87 @@ struct ance::ast::Parser::Implementation
         : source_tree_(source_tree), reporter_(reporter), context_(context)
     {}
 
-    utility::Optional<utility::Owned<File>> parseUnorderedFile(std::filesystem::path const& file_path, std::ostream& out) // todo: reduce duplication with below (templates)
+    utility::Optional<utility::Owned<File>> parseUnorderedFile(std::filesystem::path const& file_path) // todo: reduce duplication with below (templates)
     {
         sources::SourceFile& source_file = source_tree_.addFile(file_path);
 
-        std::fstream code;
-        code.open(source_file.getRelativePath());
+        utility::Optional<utility::Owned<File>> file;
 
-        utility::Owned<ErrorHandler> syntax_error_listener = utility::makeOwned<ErrorHandler>(reporter_, source_file);
+        if (source_file.isOk())
+        {
+            std::fstream code;
+            code.open(source_file.getRelativePath());
 
-        utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(code);
-        utility::Owned<anceLexer>                lexer = utility::makeOwned<anceLexer>(input.get());
-        lexer->removeErrorListeners();
-        lexer->addErrorListener(syntax_error_listener->lexerErrorListener());
+            utility::Owned<ErrorHandler> syntax_error_listener = utility::makeOwned<ErrorHandler>(reporter_, source_file);
 
-        utility::Owned<antlr4::CommonTokenStream> tokens = utility::makeOwned<antlr4::CommonTokenStream>(lexer.get());
-        utility::Owned<anceParser>                parser = utility::makeOwned<anceParser>(tokens.get());
-        parser->removeErrorListeners();
-        parser->addErrorListener(syntax_error_listener->parserErrorListener());
+            utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(code);
+            utility::Owned<anceLexer>                lexer = utility::makeOwned<anceLexer>(input.get());
+            lexer->removeErrorListeners();
+            lexer->addErrorListener(syntax_error_listener->lexerErrorListener());
 
-        anceParser::UnorderedScopeFileContext* unordered_scope_file_context = parser->unorderedScopeFile();
+            utility::Owned<antlr4::CommonTokenStream> tokens = utility::makeOwned<antlr4::CommonTokenStream>(lexer.get());
+            utility::Owned<anceParser>                parser = utility::makeOwned<anceParser>(tokens.get());
+            parser->removeErrorListeners();
+            parser->addErrorListener(syntax_error_listener->parserErrorListener());
 
-        SourceVisitor visitor {source_file.index()};
-        utility::Owned<File> file = visitor.expectFile(unordered_scope_file_context);
+            anceParser::UnorderedScopeFileContext* unordered_scope_file_context = parser->unorderedScopeFile();
 
-        if (reporter_.checkForFail(source_tree_, out))
+            SourceVisitor visitor {source_file.index()};
+
+            file = visitor.expectFile(unordered_scope_file_context);
+        }
+        else
+        {
+            reporter_.error("Failed to read file", core::Location::file(source_file.index()));
+        }
+
+        if (reporter_.isFailed())
             return std::nullopt;
 
-        context_.print<Printer>(*file, "ast");
+        context_.print<Printer>(**file, "ast");
 
         return file;
     }
 
-    utility::Optional<utility::Owned<Statement>> parseOrderedFile(std::filesystem::path const& file_path, std::ostream& out)
+    utility::Optional<utility::Owned<Statement>> parseOrderedFile(std::filesystem::path const& file_path)
     {
         sources::SourceFile& source_file = source_tree_.addFile(file_path);
 
-        std::fstream code;
-        code.open(source_file.getRelativePath());
+        utility::Optional<utility::Owned<Statement>> statement;
 
-        utility::Owned<ErrorHandler> syntax_error_listener = utility::makeOwned<ErrorHandler>(reporter_, source_file);
+        if (source_file.isOk())
+        {
+            std::fstream code;
+            code.open(source_file.getRelativePath());
 
-        utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(code);
-        utility::Owned<anceLexer>                lexer = utility::makeOwned<anceLexer>(input.get());
-        lexer->removeErrorListeners();
-        lexer->addErrorListener(syntax_error_listener->lexerErrorListener());
+            utility::Owned<ErrorHandler> syntax_error_listener = utility::makeOwned<ErrorHandler>(reporter_, source_file);
 
-        utility::Owned<antlr4::CommonTokenStream> tokens = utility::makeOwned<antlr4::CommonTokenStream>(lexer.get());
-        utility::Owned<anceParser>                parser = utility::makeOwned<anceParser>(tokens.get());
-        parser->removeErrorListeners();
-        parser->addErrorListener(syntax_error_listener->parserErrorListener());
+            utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(code);
+            utility::Owned<anceLexer>                lexer = utility::makeOwned<anceLexer>(input.get());
+            lexer->removeErrorListeners();
+            lexer->addErrorListener(syntax_error_listener->lexerErrorListener());
 
-        anceParser::OrderedScopeFileContext* unordered_scope_file_context = parser->orderedScopeFile();
+            utility::Owned<antlr4::CommonTokenStream> tokens = utility::makeOwned<antlr4::CommonTokenStream>(lexer.get());
+            utility::Owned<anceParser>                parser = utility::makeOwned<anceParser>(tokens.get());
+            parser->removeErrorListeners();
+            parser->addErrorListener(syntax_error_listener->parserErrorListener());
 
-        SourceVisitor visitor {source_file.index()};
-        utility::Owned<Statement> statement = visitor.expectStatement(unordered_scope_file_context);
+            anceParser::OrderedScopeFileContext* unordered_scope_file_context = parser->orderedScopeFile();
 
-        if (reporter_.checkForFail(source_tree_, out))
+            SourceVisitor visitor {source_file.index()};
+
+            statement = visitor.expectStatement(unordered_scope_file_context);
+        }
+        else
+        {
+            reporter_.error("Failed to read file", core::Location::file(source_file.index()));
+        }
+
+
+        if (reporter_.isFailed())
             return std::nullopt;
 
-        context_.print<Printer>(*statement, "ast");
+        context_.print<Printer>(**statement, "ast");
 
         return statement;
     }
@@ -526,13 +547,13 @@ ance::ast::Parser::Parser(sources::SourceTree& source_tree, core::Reporter& repo
 
 ance::ast::Parser::~Parser() = default;
 
-ance::utility::Optional<ance::utility::Owned<ance::ast::File>> ance::ast::Parser::parseUnorderedFile(std::filesystem::path const& file, std::ostream& out)
+ance::utility::Optional<ance::utility::Owned<ance::ast::File>> ance::ast::Parser::parseUnorderedFile(std::filesystem::path const& file)
 {
-    return implementation_->parseUnorderedFile(file, out);
+    return implementation_->parseUnorderedFile(file);
 }
 
-ance::utility::Optional<ance::utility::Owned<ance::ast::Statement>> ance::ast::Parser::parseOrderedFile(std::filesystem::path const& file, std::ostream& out)
+ance::utility::Optional<ance::utility::Owned<ance::ast::Statement>> ance::ast::Parser::parseOrderedFile(std::filesystem::path const& file)
 {
-    return implementation_->parseOrderedFile(file, out);
+    return implementation_->parseOrderedFile(file);
 }
 

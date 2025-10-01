@@ -44,8 +44,13 @@ namespace ance::core
         /// Clear all reported messages.
         void clear();
 
-        /// Emit all messages, clear them and return whether compilation should fail.
-        bool checkForFail(sources::SourceTree& source_tree, std::ostream& out);
+        /// Report all messages, a summary and clear the messages.
+        /// \param source_tree The source tree to use for source locations.
+        /// \param out The stream to emit the messages to.
+        void report(sources::SourceTree& source_tree, std::ostream& out);
+
+        /// Check whether compilation should fail.
+        [[nodiscard]] bool isFailed() const;
 
         /// Get the number of reported errors.
         /// \return The error count.

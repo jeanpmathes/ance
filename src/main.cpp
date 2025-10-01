@@ -186,17 +186,25 @@ namespace ance
 
         runner.add(cet::Provider::fromList(std::move(provider)));
 
-        utility::Optional<utility::Owned<cet::Unit>> unit = runner.runOrderedFile(file_name, out);
-        if (!unit.hasValue()) return EXIT_FAILURE;
+        int exit_code = EXIT_FAILURE;
 
-        bool ok = compiler.compile(**unit, out);
-        if (!ok) return EXIT_FAILURE;
+        utility::Optional<utility::Owned<cet::Unit>> unit = runner.runOrderedFile(file_name);
 
-        reporter.emit(source_tree, out);
+        if (unit.hasValue())
+        {
+            if (compiler.compile(**unit))
+            {
+                exit_code = EXIT_SUCCESS;
+            }
+        }
 
-        // todo: add intrinsic and wrapper function to include another file (use the string), call the runOrderedScope of the runner from the intrinsic
+        reporter.report(source_tree, out);
 
-        // todo: test case that file does not exist
+        return exit_code;
+
+        // todo: fix that the existing file is not correctly included
+
+        // todo: make parser more resilient for example in the case of {sdfdsg as the first line
 
         // todo: currently inclusion of a new file overrides the print and graph files, change them so that they append the original file name to their name (both should take a file name as an argument)
         // todo: maybe even take file path as arg, duplicate the directory structure in the dbg directory and make each file a dir containing the different stage dumps
@@ -237,11 +245,6 @@ namespace ance
         // todo: think about making the typeof node an intrinsic, would either require an any type or something else for the argument like overloading
         // todo: the entity_ref type should instead become an entity type and the intrinsic simply returns a reference to that
         // todo: when inheritance becomes a thing then entity should have subclasses like variable and function -> add that to the inheritance note in planning
-
-        out << "ance: " << reporter.warningCount() << " warnings" << std::endl;
-        out << "ance: Success";
-
-        return EXIT_SUCCESS;
     }
 }
 

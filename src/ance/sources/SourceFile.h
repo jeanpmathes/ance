@@ -20,6 +20,10 @@ namespace ance::sources
         SourceFile(SourceFile const& other) = delete;
         SourceFile(SourceFile&& other)      = delete;
 
+        /// Whether the file was successfully read.
+        /// \return True if the file was read successfully, false otherwise.
+        [[nodiscard]] bool isOk() const;
+
         /// Get a string view of a source line.
         /// \param line The line number, starting from 1.
         /// \return A view of the line.
@@ -61,6 +65,7 @@ namespace ance::sources
         std::filesystem::path    full_path_;
 
         size_t                   index_;
+        bool                     is_ok_;
     };
 }
 

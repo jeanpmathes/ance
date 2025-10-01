@@ -375,15 +375,17 @@ struct ance::est::Expander::Implementation
         core::Reporter& reporter_;
     };
 
-    utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file, std::ostream& out) // todo: reduce duplication with below (template)
+    utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file) // todo: reduce duplication with below (template)
     {
-        utility::Optional<utility::Owned<ast::Statement>> parsed = parser_.parseOrderedFile(file, out);
+        (void)source_tree_;//todo: use or remove
+
+        utility::Optional<utility::Owned<ast::Statement>> parsed = parser_.parseOrderedFile(file);
         if (!parsed.hasValue()) return std::nullopt;
 
         utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
         Statements statements = ast->expand(**parsed);
 
-        if (reporter_.checkForFail(source_tree_, out)) return std::nullopt;
+        if (reporter_.isFailed()) return std::nullopt;
 
         auto block = utility::makeOwned<Block>(std::move(statements), parsed.value()->location);
 
@@ -392,15 +394,15 @@ struct ance::est::Expander::Implementation
         return block;
     }
 
-    utility::Optional<utility::Owned<File>> expandUnorderedFile(std::filesystem::path const& file, std::ostream& out)
+    utility::Optional<utility::Owned<File>> expandUnorderedFile(std::filesystem::path const& file)
     {
-        utility::Optional<utility::Owned<ast::File>> parsed = parser_.parseUnorderedFile(file, out);
+        utility::Optional<utility::Owned<ast::File>> parsed = parser_.parseUnorderedFile(file);
         if (!parsed.hasValue()) return std::nullopt;
 
         utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
         utility::Owned<File> est = ast->expand(**parsed);
 
-        if (reporter_.checkForFail(source_tree_, out)) return std::nullopt;
+        if (reporter_.isFailed()) return std::nullopt;
 
         context_.print<Printer>(*est, "est");
 
@@ -420,12 +422,12 @@ ance::est::Expander::Expander(sources::SourceTree& source_tree, core::Reporter& 
 
 ance::est::Expander::~Expander() = default;
 
-ance::utility::Optional<ance::utility::Owned<ance::est::Statement>> ance::est::Expander::expandOrderedFile(std::filesystem::path const& file, std::ostream& out)
+ance::utility::Optional<ance::utility::Owned<ance::est::Statement>> ance::est::Expander::expandOrderedFile(std::filesystem::path const& file)
 {
-    return implementation_->expandOrderedFile(file, out);
+    return implementation_->expandOrderedFile(file);
 }
 
-ance::utility::Optional<ance::utility::Owned<ance::est::File>> ance::est::Expander::expandUnorderedFile(std::filesystem::path const& file, std::ostream& out)
+ance::utility::Optional<ance::utility::Owned<ance::est::File>> ance::est::Expander::expandUnorderedFile(std::filesystem::path const& file)
 {
-    return implementation_->expandUnorderedFile(file, out);
+    return implementation_->expandUnorderedFile(file);
 }

@@ -22,6 +22,11 @@ namespace ance::core
         /// \return A global location.
         static Location global();
 
+        /// Create a file location. It targets an entire file.
+        /// \param file_index The index of the file.
+        /// \return The location.
+        static Location file(size_t file_index);
+
         /// Create a simple location. It targets a single code point.
         /// \param line The line number.
         /// \param column The column number.
@@ -43,17 +48,23 @@ namespace ance::core
 
         /// Get the file index of this location.
         /// \return The file index.
-        [[nodiscard]] size_t file() const;
+        [[nodiscard]] size_t fileIndex() const;
 
         /// Get whether this location is global, meaning not an actual source location.
         /// \return True if it is global.
         [[nodiscard]] bool isGlobal() const;
+
+        /// Get whether this location is a file location, meaning it targets an entire file.
+        /// \return True if it is a file location.
+        /// \note A global or simple location is not considered a file location.
+        [[nodiscard]] bool isFile() const;
 
         /// Get whether this location is on a single line.
         /// \return True if it is on a single line.
         [[nodiscard]] bool isSingleLine() const;
 
         /// Extend this location to include another location.
+        /// If this is a global or file location, it will be set to the passed location.
         /// \param location The location to extend to.
         void extend(Location const& location);
 

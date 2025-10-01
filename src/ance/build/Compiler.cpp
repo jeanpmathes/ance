@@ -154,15 +154,16 @@ struct ance::build::Compiler::Implementation
 
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context) : source_tree_(source_tree), reporter_(reporter), context_(context) {}
 
-    bool compile(cet::Unit const& unit, std::ostream& out)
+    bool compile(cet::Unit const& unit)
     {
         utility::Owned<CET> cet = utility::makeOwned<CET>(reporter_);
 
         cet->visit(unit);
 
         (void) context_; // todo: use or remove
+        (void) source_tree_; // todo: use or remove
 
-        return reporter_.checkForFail(source_tree_, out);
+        return reporter_.isFailed();
     }
 
 private:
@@ -175,7 +176,7 @@ ance::build::Compiler::Compiler(sources::SourceTree& source_tree, core::Reporter
 
 ance::build::Compiler::~Compiler() = default;
 
-bool ance::build::Compiler::compile(cet::Unit const& unit, std::ostream& out)
+bool ance::build::Compiler::compile(cet::Unit const& unit)
 {
-    return implementation_->compile(unit, out);
+    return implementation_->compile(unit);
 }

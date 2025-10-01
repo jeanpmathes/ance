@@ -26,15 +26,13 @@ namespace ance::bbt
 
         /// Segment an ordered file into a basic block control flow.
         /// \param file The path to the file to segment.
-        /// \param out The output stream to report to.
         /// \return The control flow built from the file.
-        utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file, std::ostream& out);
+        utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file);
 
         /// Segment an unordered file into an unordered scope.
         /// \param file The path to the file to segment.
-        /// \param out The output stream to report to.
         /// \return The unordered scope built from the file.
-        utility::Optional<utility::Owned<UnorderedScope>> segmentUnorderedFile(std::filesystem::path const& file, std::ostream& out);
+        utility::Optional<utility::Owned<UnorderedScope>> segmentUnorderedFile(std::filesystem::path const& file);
 
       private:
         struct Implementation;

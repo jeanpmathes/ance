@@ -5,22 +5,32 @@
 
 #include <boost/locale/encoding.hpp>
 
-ance::sources::SourceFile::SourceFile(std::filesystem::path const& base_directory, std::filesystem::path const& file, size_t index)
-    : relative_path_(file), full_path_(base_directory / file), index_(index)
+ance::sources::SourceFile::SourceFile(std::filesystem::path const& base_directory, std::filesystem::path const& file, size_t const index)
+    : relative_path_(file)
+    , full_path_(base_directory / file)
+    , index_(index)
+    , is_ok_(false)
 {
     std::ifstream file_stream(full_path_);
 
-    for (std::string line; std::getline(file_stream, line);)
-    {
-        lines_.emplace_back(boost::locale::conv::utf_to_utf<char32_t>(line));
-    }
+    is_ok_ = file_stream.is_open();
 
-    file_stream.close();
+    if (is_ok_)
+    {
+        for (std::string line; std::getline(file_stream, line);) { lines_.emplace_back(boost::locale::conv::utf_to_utf<char32_t>(line)); }
+
+        file_stream.close();
+    }
 
     lines_.emplace_back(U"");
 }
 
-std::u32string_view ance::sources::SourceFile::getLine(size_t line) const
+bool ance::sources::SourceFile::isOk() const
+{
+    return is_ok_;
+}
+
+std::u32string_view ance::sources::SourceFile::getLine(size_t const line) const
 {
     return std::u32string_view(lines_[line - 1]);
 }
