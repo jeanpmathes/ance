@@ -133,14 +133,25 @@ namespace ance::ast
                     return;
                 }
 
-
                 if (expected_tokens.size() == 1)
                 {
-                    std::string const expected_text(parser->getVocabulary().getLiteralName(
-                        static_cast<size_t>(expected_tokens.getSingleElement())));
+                    std::string expected_text(parser->getVocabulary().getLiteralName(static_cast<size_t>(expected_tokens.getSingleElement())));
+
+                    if (expected_text.empty())
+                    {
+                        expected_text = parser->getVocabulary().getSymbolicName(static_cast<size_t>(expected_tokens.getSingleElement()));
+                    }
 
                     parent_.reporter_.error("Expected " + expected_text + " somewhere around here",
                                             core::Location::simple(line, char_position, parent_.source_file_.index()));
+                    return;
+                }
+
+                if (!expected_tokens.isEmpty())
+                {
+                    parent_.reporter_.error("Unexpected token '" + offending_symbol->getText() + "', check it and previous tokens for errors",
+                                            core::Location::simple(line, char_position, parent_.source_file_.index()));
+
                     return;
                 }
 

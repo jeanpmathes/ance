@@ -202,10 +202,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: fix that the existing file is not correctly included
-
-        // todo: make parser more resilient for example in the case of {sdfdsg as the first line
-
         // todo: currently inclusion of a new file overrides the print and graph files, change them so that they append the original file name to their name (both should take a file name as an argument)
         // todo: maybe even take file path as arg, duplicate the directory structure in the dbg directory and make each file a dir containing the different stage dumps
 
