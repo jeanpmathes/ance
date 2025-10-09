@@ -906,8 +906,8 @@ struct ance::bbt::Segmenter::Implementation
         if (reporter_.isFailed())
             return std::nullopt;
 
-        context_.print<Printer>(*flow, "bbt");
-        context_.graph<Grapher>(*flow, "bbt");
+        context_.print<Printer>(*flow, "bbt", file);
+        context_.graph<Grapher>(*flow, "bbt", file);
 
         return flow;
     }
@@ -923,8 +923,8 @@ struct ance::bbt::Segmenter::Implementation
         if (reporter_.isFailed())
             return std::nullopt;
 
-        context_.print<Printer>(*scope, "bbt");
-        context_.graph<Grapher>(*scope, "bbt");
+        context_.print<Printer>(*scope, "bbt", file);
+        context_.graph<Grapher>(*scope, "bbt", file);
 
         return scope;
     }

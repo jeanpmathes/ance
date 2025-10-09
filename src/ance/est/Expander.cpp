@@ -389,7 +389,7 @@ struct ance::est::Expander::Implementation
 
         auto block = utility::makeOwned<Block>(std::move(statements), parsed.value()->location);
 
-        context_.print<Printer>(*block, "est");
+        context_.print<Printer>(*block, "est", file);
 
         return block;
     }
@@ -404,7 +404,7 @@ struct ance::est::Expander::Implementation
 
         if (reporter_.isFailed()) return std::nullopt;
 
-        context_.print<Printer>(*est, "est");
+        context_.print<Printer>(*est, "est", file);
 
         return est;
     }

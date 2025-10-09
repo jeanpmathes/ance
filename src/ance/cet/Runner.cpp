@@ -695,8 +695,8 @@ struct ance::cet::Runner::Implementation
         if (reporter_.isFailed())
             return std::nullopt;
 
-        context_.print<Printer>(*unit, "cet");
-        context_.graph<Grapher>(*unit, "cet");
+        context_.print<Printer>(*unit, "cet", file);
+        context_.graph<Grapher>(*unit, "cet", file);
 
         return unit;
     }
@@ -714,8 +714,8 @@ struct ance::cet::Runner::Implementation
         if (reporter_.isFailed())
             return std::nullopt;
 
-        context_.print<Printer>(*unit, "cet");
-        context_.graph<Grapher>(*unit, "cet");
+        context_.print<Printer>(*unit, "cet", file);
+        context_.graph<Grapher>(*unit, "cet", file);
 
         return unit;
     }

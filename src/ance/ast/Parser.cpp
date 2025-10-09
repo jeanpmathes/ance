@@ -498,7 +498,7 @@ struct ance::ast::Parser::Implementation
         if (reporter_.isFailed())
             return std::nullopt;
 
-        context_.print<Printer>(**file, "ast");
+        context_.print<Printer>(**file, "ast", source_file.getRelativePath());
 
         return file;
     }
@@ -541,7 +541,7 @@ struct ance::ast::Parser::Implementation
         if (reporter_.isFailed())
             return std::nullopt;
 
-        context_.print<Printer>(**statement, "ast");
+        context_.print<Printer>(**statement, "ast", source_file.getRelativePath());
 
         return statement;
     }
