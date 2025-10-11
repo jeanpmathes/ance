@@ -7,17 +7,21 @@
 
 ance::bbt::Node::Node(core::Location const& source_location) : location(source_location) {}
 
-ance::bbt::UnorderedScope::UnorderedScope(core::Location const& source_location)
+ance::bbt::UnorderedScope::UnorderedScope(utility::List<utility::Owned<Flow>> flow_list, core::Location const& source_location)
     : Node(source_location)
-{
-
-}
+    , flows(std::move(flow_list))
+{}
 
 ance::bbt::Flow::Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBlock& start, core::Location const& source_location)
     : Node(source_location)
     , blocks(std::move(content))
     , entry(start)
 {}
+
+std::string ance::bbt::Flow::id() const
+{
+    return utility::id(this);
+}
 
 ance::bbt::BasicBlock::BasicBlock(size_t const                             number,
                                   utility::List<utility::Owned<Statement>> content,

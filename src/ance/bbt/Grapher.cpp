@@ -1,6 +1,7 @@
 #include "Grapher.h"
 
 #include <sstream>
+#include <string>
 
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Printer.h"
@@ -18,9 +19,14 @@ struct ance::bbt::Grapher::Implementation
         explicit BBT(std::ostream& out) : Grapher(out) {}
         ~BBT() override = default;
 
-        void visit(UnorderedScope const&) override
+        void visit(UnorderedScope const& scope) override
         {
             beginGraph();
+
+            for (auto const& flow : scope.flows)
+            {
+                graphFlow(*flow, flow->id());
+            }
 
             endGraph();
         }
@@ -29,14 +35,7 @@ struct ance::bbt::Grapher::Implementation
         {
             beginGraph();
 
-            beginGroup("flow");
-
-            for (auto& block : flow.blocks)
-            {
-                visit(*block);
-            }
-
-            endGroup();
+            graphFlow(flow, "flow");
 
             endGraph();
         }
@@ -120,6 +119,18 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(OrderedScopeExit const&) override {}
 
+      private:
+        void graphFlow(Flow const& flow, std::string const& label)
+        {
+            beginGroup(label);
+
+            for (auto& block : flow.blocks)
+            {
+                visit(*block);
+            }
+
+            endGroup();
+        }
 
         size_t current_id_ = 0;
     };

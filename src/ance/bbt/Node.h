@@ -28,13 +28,17 @@ namespace ance::bbt
         core::Location location;
     };
 
+    struct Flow;
+
     /// An unordered scope contains a set of parts which are evaluated in an unspecified order.
     /// An example of an unordered scope is the top-level of any file except for the primary file.
     struct UnorderedScope final
         : Node
         , utility::ConcreteNode<UnorderedScope, Visitor>
     {
-        explicit UnorderedScope(core::Location const& source_location);
+        UnorderedScope(utility::List<utility::Owned<Flow>> flow_list, core::Location const& source_location);
+
+        utility::List<utility::Owned<Flow>> flows = {};
     };
 
     struct BasicBlock;
@@ -48,6 +52,8 @@ namespace ance::bbt
 
         utility::List<utility::Owned<BasicBlock>> blocks;
         BasicBlock&                               entry;
+
+        [[nodiscard]] std::string id() const;
     };
 
     struct Statement;

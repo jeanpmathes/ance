@@ -138,7 +138,15 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::File const& file) override
         {
-            setResult(utility::makeOwned<File>(file.location));
+            utility::List<utility::Owned<Statement>> statements;
+
+            for (auto const& statement : file.statements)
+            {
+                Statements expanded = expand(*statement);
+                statements.emplace_back(wrap(std::move(expanded)));
+            }
+
+            setResult(utility::makeOwned<File>(std::move(statements), file.location));
         }
 
         void visit(ast::ErrorStatement const& error_statement) override

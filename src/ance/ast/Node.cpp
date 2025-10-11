@@ -2,12 +2,11 @@
 
 ance::ast::Node::Node(core::Location const& source_location) : location(source_location) {}
 
-ance::ast::File::File(core::Location const& source_location)
+ance::ast::File::File(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location)
     : Node(source_location)
     , ConcreteNode()
-{
-
-}
+    , statements(std::move(statement_list))
+{}
 
 bool ance::ast::Statement::isCompound() const
 {

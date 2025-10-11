@@ -379,9 +379,15 @@ struct ance::cet::Runner::Implementation
             return scopes_.back().get();
         }
 
-        void visit(bbt::UnorderedScope const&) override
+        void visit(bbt::UnorderedScope const& scope) override
         {
+            for (auto const& flow : scope.flows)
+            {
+                visit(*flow);
 
+                if (encountered_error_)
+                    return;
+            }
         }
 
         void visit(bbt::Flow const& flow) override

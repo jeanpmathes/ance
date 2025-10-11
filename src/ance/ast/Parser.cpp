@@ -215,7 +215,7 @@ namespace ance::ast
             if (std::any const result = visit(ctx); result.has_value())
                 return utility::wrap<File>(result);
 
-            return utility::makeOwned<File>(location(ctx));
+            return utility::makeOwned<File>(utility::List<utility::Owned<Statement>> {}, location(ctx));
         }
 
         template<typename T>
@@ -237,9 +237,17 @@ namespace ance::ast
         }
 
     protected:
-        std::any visitUnorderedScopeFile(anceParser::UnorderedScopeFileContext*) override
+        std::any visitUnorderedScopeFile(anceParser::UnorderedScopeFileContext* context) override
         {
-            return {};
+            utility::List<utility::Owned<Statement>> statements;
+
+            for (anceParser::StatementContext* statement : context->statement())
+            {
+                statements.push_back(expectStatement(statement));
+            }
+
+            File* file = new File(std::move(statements), location(context));
+            return file;
         }
 
         std::any visitOrderedScopeFile(anceParser::OrderedScopeFileContext* context) override

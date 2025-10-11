@@ -1,6 +1,6 @@
 grammar ance;
 
-unorderedScopeFile : EOF ;
+unorderedScopeFile : ( 'do' statement )* EOF ;
 
 orderedScopeFile : statement EOF ;
 

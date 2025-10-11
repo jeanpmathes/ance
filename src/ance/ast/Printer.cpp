@@ -16,9 +16,27 @@ struct ance::ast::Printer::Implementation
         explicit AST(std::ostream& out) : Printer(out) {}
         ~AST() override = default;
 
-        void visit(File const&) override
+        void visit(File const& file) override
         {
+            bool first = true;
 
+            for (auto const& statement : file.statements)
+            {
+                if (!first) { line(); }
+                first = false;
+
+                print("do ");
+
+                if (statement->isCompound())
+                {
+                    line();
+                    visit(*statement);
+                }
+                else
+                {
+                    visit(*statement);
+                }
+            }
         }
 
         void visit(ErrorStatement const&) override { print("// error"); }

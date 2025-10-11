@@ -15,9 +15,20 @@ struct ance::bbt::Printer::Implementation
         explicit BBT(std::ostream& out) : Printer(out) {}
         ~BBT() override = default;
 
-        void visit(UnorderedScope const&) override
+        void visit(UnorderedScope const& scope) override
         {
+            for (auto const& flow : scope.flows)
+            {
+                print("flow ");
+                print(flow->id());
+                print(":");
+                line();
+                enter();
 
+                visit(*flow);
+
+                exit();
+            }
         }
 
         void visit(Flow const& flow) override

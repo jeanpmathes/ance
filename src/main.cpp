@@ -202,13 +202,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: currently inclusion of a new file overrides the print and graph files, change them so that they append the original file name to their name (both should take a file name as an argument)
-        // todo: take file path as arg, duplicate the directory structure in the dbg directory and make each file a dir containing the different stage dumps
-
-        // todo: allow putting statements into unordered scopes, they will be executed in some undefined order, use it to test the inclusion
-        // todo: an unordered scope should contain a vector of flows
-        // todo: in the grammar, a ordered block must be used instead of just placing statements in the file, like this: do { ... }
-
         // todo: instead of running the flows directly when include is called and ignoring the produced unit, the lambda run_unordered_file should return the flows / the unordered scope, and be renamed to not have run in its name
         // todo: the passed method which is currently runUnorderedFile can also be renamed then
 

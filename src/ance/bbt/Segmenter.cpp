@@ -228,14 +228,22 @@ struct ance::bbt::Segmenter::Implementation
 
         utility::Owned<UnorderedScope> apply(est::File const& file)
         {
-            visit(file);
+            utility::List<utility::Owned<Flow>> flows;
 
-            return utility::makeOwned<UnorderedScope>(file.location); // todo: think about how / if to incorporate visitor here, probably a vector of flows in the visitor class
+            for (auto const& statement : file.statements)
+            {
+                flows.emplace_back(apply(*statement));
+            }
+
+            return utility::makeOwned<UnorderedScope>(std::move(flows), file.location);
         }
 
         utility::Owned<Flow> apply(est::Statement const& statement)
         {
             assert(bbs_.empty());
+            assert(temporaries_.empty());
+            assert(loops_.empty());
+            assert(scopes_.empty());
 
             utility::Owned<SimpleBB> entry_block = utility::makeOwned<SimpleBB>();
             std::reference_wrapper   entry       = *entry_block;
@@ -286,7 +294,14 @@ struct ance::bbt::Segmenter::Implementation
 
             BasicBlock& first_block = *basic_blocks[current_entry.get().index()];
 
-            return utility::makeOwned<Flow>(std::move(basic_blocks), first_block, statement.location);
+            utility::Owned<Flow> flow = utility::makeOwned<Flow>(std::move(basic_blocks), first_block, statement.location);
+
+            bbs_.clear();
+            temporaries_.clear();
+            loops_.clear();
+            scopes_.clear();
+
+            return flow;
         }
 
         std::reference_wrapper<BaseBB> simplify(std::reference_wrapper<BaseBB> entry)

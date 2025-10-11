@@ -7,7 +7,10 @@
 
 ance::est::Node::Node(core::Location const& source_location) : location(source_location) {}
 
-ance::est::File::File(core::Location const& source_location) : Node(source_location) {}
+ance::est::File::File(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location)
+    : Node(source_location)
+    , statements(std::move(statement_list))
+{}
 
 bool ance::est::Statement::isCompound() const { return false; }
 
