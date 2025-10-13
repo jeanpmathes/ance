@@ -202,9 +202,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: instead of running the flows directly when include is called and ignoring the produced unit, the lambda run_unordered_file should return the flows / the unordered scope, and be renamed to not have run in its name
-        // todo: the passed method which is currently runUnorderedFile can also be renamed then
-
         // todo: add cmp global variables so that circular dependencies can exist, included files should be run by the runner
         // todo: the variable declarations should be transformed into a statement which uses the global variable declaration intrinsic
         // todo: maybe to put it into the right scope a new outer intrinsic is needed which takes a scope and gives the parent scope

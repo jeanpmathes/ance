@@ -303,8 +303,12 @@ struct ance::cet::Runner::Implementation
     public:
         using Visitor::visit;
 
-        BBT(sources::SourceTree& source_tree, core::Reporter& reporter, std::function<utility::Optional<utility::Owned<Unit>>(std::filesystem::path const&)> run_unordered_file, utility::List<utility::Owned<Provider>>& providers)
-        : source_tree_(source_tree), reporter_(reporter), run_unordered_file_(std::move(run_unordered_file)), providers_(providers) {}
+        BBT(
+            sources::SourceTree& source_tree,
+            core::Reporter& reporter,
+            std::function<utility::Optional<utility::Owned<bbt::UnorderedScope>>(std::filesystem::path const&)> get_unordered_scope,
+            utility::List<utility::Owned<Provider>>& providers)
+        : source_tree_(source_tree), reporter_(reporter), read_unordered_scope_(std::move(get_unordered_scope)), providers_(providers) {}
         ~BBT() override = default;
 
         [[nodiscard]] bool requireType(core::Type const& expected, core::Type const& actual, core::Location const& location) const
@@ -383,6 +387,8 @@ struct ance::cet::Runner::Implementation
         {
             for (auto const& flow : scope.flows)
             {
+                flows_.emplace_back(flow.get());
+
                 visit(*flow);
 
                 if (encountered_error_)
@@ -651,7 +657,7 @@ struct ance::cet::Runner::Implementation
       private:
         sources::SourceTree& source_tree_;
         core::Reporter& reporter_;
-        std::function<utility::Optional<utility::Owned<Unit>>(std::filesystem::path const&)> run_unordered_file_;
+        std::function<utility::Optional<utility::Owned<bbt::UnorderedScope>>(std::filesystem::path const&)> read_unordered_scope_;
         utility::List<utility::Owned<Provider>>& providers_;
 
         std::function<void(core::Entity const&)> allocate_ = [this](core::Entity const& entity) {
@@ -670,8 +676,19 @@ struct ance::cet::Runner::Implementation
         };
 
         std::function<void(std::filesystem::path const&)> include_ = [this](std::filesystem::path const& path) {
-            auto const result = run_unordered_file_(path);
-            if (!result.hasValue()) abort();
+            utility::Optional<utility::Owned<bbt::UnorderedScope>> scope = read_unordered_scope_(path);
+
+            if (!scope.hasValue())
+            {
+                abort();
+                return;
+            }
+
+            bbt::UnorderedScope& scope_ref = **scope;
+
+            unordered_scopes_.emplace_back(std::move(*scope));
+
+            this->visit(scope_ref);
         };
 
         Intrinsics intrinsics_ {source_tree_, reporter_, allocate_, provide_, include_};
@@ -682,6 +699,9 @@ struct ance::cet::Runner::Implementation
 
         bbt::BasicBlock const* next_ = nullptr;
         bool encountered_error_ = false;
+
+        utility::List<utility::Owned<bbt::UnorderedScope>> unordered_scopes_;
+        utility::List<bbt::Flow const*> flows_;
     };
 
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
@@ -694,7 +714,7 @@ struct ance::cet::Runner::Implementation
         if (!flow.hasValue())
             return std::nullopt;
 
-        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(source_tree_, reporter_, [&](std::filesystem::path const& f) { return runUnorderedFile(f); }, providers_);
+        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(source_tree_, reporter_, [&](std::filesystem::path const& f) { return readUnorderedScope(f); }, providers_);
         bbt->visit(**flow);
 
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
@@ -707,23 +727,9 @@ struct ance::cet::Runner::Implementation
         return unit;
     }
 
-    utility::Optional<utility::Owned<Unit>> runUnorderedFile(std::filesystem::path const& file)
+    utility::Optional<utility::Owned<bbt::UnorderedScope>> readUnorderedScope(std::filesystem::path const& file)
     {
-        utility::Optional<utility::Owned<bbt::UnorderedScope>> scope = segmenter_.segmentUnorderedFile(file);
-        if (!scope.hasValue())
-            return std::nullopt;
-
-        utility::Owned<BBT> bbt = utility::makeOwned<BBT>(source_tree_, reporter_, [&](std::filesystem::path const& f) { return runUnorderedFile(f); }, providers_);
-        bbt->visit(**scope);
-
-        utility::Owned<Unit> unit = utility::makeOwned<Unit>();
-        if (reporter_.isFailed())
-            return std::nullopt;
-
-        context_.print<Printer>(*unit, "cet", file);
-        context_.graph<Grapher>(*unit, "cet", file);
-
-        return unit;
+        return segmenter_.segmentUnorderedFile(file);
     }
 
     void add(utility::Owned<Provider> provider)
