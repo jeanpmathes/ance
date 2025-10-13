@@ -51,7 +51,9 @@ struct ance::cet::Runner::Implementation
       public:
         virtual ~Scope() = default;
 
-        utility::Optional<utility::Shared<core::Value>> declare(core::Identifier const& identifier, core::Type const& type, core::Location const& location, std::function<void(core::Entity const&)> allocate, core::Reporter& reporter)
+        Scope* parent() const { return parent_; }
+
+        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> declare(core::Identifier const& identifier, core::Type const& type, core::Location const& location, std::function<void(core::Entity const&)> allocate, core::Reporter& reporter)
         {
             if (!canDeclare(identifier))
             {
@@ -146,6 +148,42 @@ struct ance::cet::Runner::Implementation
         std::vector<utility::Owned<Variable>> all_variables_ = {};
         std::map<core::Identifier, std::reference_wrapper<Variable const>> active_variables_ = {};
         std::set<core::Identifier> outer_identifiers_ = {};
+    };
+
+    class UnorderedScope final : public Scope
+    {
+      public:
+        explicit UnorderedScope(Scope* parent)
+            : Scope(parent)
+        {}
+
+        ~UnorderedScope() override = default;
+
+      protected:
+        [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override
+        {
+            return !variables_.contains(identifier);
+        }
+
+        void onDeclare(utility::Owned<Variable> variable) override
+        {
+            variables_.emplace(variable->identifier(), std::cref(*variable));
+            all_variables_.emplace_back(std::move(variable));
+        }
+
+        [[nodiscard]] Variable const* onFind(core::Identifier const& identifier) override
+        {
+            if (variables_.contains(identifier))
+            {
+                return &variables_.at(identifier).get();
+            }
+
+            return nullptr;
+        }
+
+      private:
+        std::vector<utility::Owned<Variable>> all_variables_ = {};
+        std::map<core::Identifier, std::reference_wrapper<Variable const>> variables_ = {};
     };
 
     class Intrinsics final : core::IntrinsicVisitor
@@ -378,13 +416,14 @@ struct ance::cet::Runner::Implementation
 
         [[nodiscard]] Scope* scope()
         {
-            if (scopes_.empty()) return nullptr;
-
-            return scopes_.back().get();
+            return current_scope_;
         }
 
         void visit(bbt::UnorderedScope const& scope) override
         {
+            Scope* previous = current_scope_;
+            current_scope_ = scopes_.emplace_back(utility::makeOwned<UnorderedScope>(nullptr)).get();
+
             for (auto const& flow : scope.flows)
             {
                 flows_.emplace_back(flow.get());
@@ -394,10 +433,14 @@ struct ance::cet::Runner::Implementation
                 if (encountered_error_)
                     return;
             }
+
+            current_scope_ = previous;
         }
 
         void visit(bbt::Flow const& flow) override
         {
+            flows_.emplace_back(&flow);
+
             run(flow.entry);
         }
 
@@ -562,14 +605,14 @@ struct ance::cet::Runner::Implementation
             for (auto argument : call.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
             {
-                Scope& scope = *scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope()));
+                current_scope_ = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
 
                 for (size_t i = 0; i < function.signature().arity(); ++i)
                 {
                     core::Signature::Parameter const& parameter = function.signature().parameters()[i];
                     utility::Shared<core::Value> & argument  = arguments[i];
 
-                    utility::Optional<utility::Shared<core::Value>> variable = scope.declare(parameter.name, parameter.type, core::Location::global(), allocate_, reporter_);
+                    utility::Optional<utility::Shared<core::Value>> variable = current_scope_->declare(parameter.name, parameter.type, core::Location::global(), allocate_, reporter_);
 
                     if (!variable.hasValue())
                     {
@@ -582,7 +625,7 @@ struct ance::cet::Runner::Implementation
 
                 visit(function.body());
 
-                scopes_.pop_back();
+                current_scope_ = current_scope_->parent();
             }
 
             temporaries_.insert_or_assign(&call.destination, core::Value::makeUnit());
@@ -641,17 +684,17 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::OrderedScopeEnter const&) override
         {
-            utility::Owned<Scope> scope = utility::makeOwned<OrderedScope>(this->scope());
-            scopes_.emplace_back(std::move(scope));
+            current_scope_ = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
 
-            // todo: make value storage also part of the scope so it is cleaned up when scope exits
+            // todo: associate the value storage with the scope so that context switch works better
         }
 
         void visit(bbt::OrderedScopeExit const&) override
         {
-            scopes_.pop_back();
+            current_scope_ = current_scope_->parent();
 
-            // todo: destructors and stuff
+            // todo: destructors and stuff, clean up value storage
+            // todo: maybe deleting the scope instance is a good idea?
         }
 
       private:
@@ -686,7 +729,7 @@ struct ance::cet::Runner::Implementation
 
             bbt::UnorderedScope& scope_ref = **scope;
 
-            unordered_scopes_.emplace_back(std::move(*scope));
+            roots_.emplace_back(std::move(*scope));
 
             this->visit(scope_ref);
         };
@@ -695,12 +738,14 @@ struct ance::cet::Runner::Implementation
 
         std::map<core::Entity const*, utility::Shared<core::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
+
         std::vector<utility::Owned<Scope>> scopes_ = {};
+        Scope* current_scope_ = nullptr;
 
         bbt::BasicBlock const* next_ = nullptr;
         bool encountered_error_ = false;
 
-        utility::List<utility::Owned<bbt::UnorderedScope>> unordered_scopes_;
+        utility::List<utility::Owned<bbt::UnorderedScope>> roots_;
         utility::List<bbt::Flow const*> flows_;
     };
 

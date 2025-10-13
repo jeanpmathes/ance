@@ -202,13 +202,15 @@ namespace ance
 
         return exit_code;
 
-        // todo: add cmp global variables so that circular dependencies can exist, included files should be run by the runner
-        // todo: the variable declarations should be transformed into a statement which uses the global variable declaration intrinsic
-        // todo: maybe to put it into the right scope a new outer intrinsic is needed which takes a scope and gives the parent scope
+        // todo: add cmp global variables so that circular dependencies can exist
+        // todo: the global variable declarations should be transformed into a statement which uses the variable declaration intrinsic, in a do block
+        // todo: maybe to put it into the right scope a new getparent intrinsic is needed which takes a scope and gives the parent scope
 
         // todo: change the runner to allow arbitrary stopping and continuation of execution
-        // todo: it should have a list of run-points and if running one of those stops it continues with the next one, all code in ordered scopes becomes separate run points
+        // todo: it should have a list of run-points and if running one of those stops it continues with the next one, all code in unordered scopes becomes separate run points
         // todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
+        // todo: when encountering an unordered scope, simply add all new runpoints instead of directly executing
+        // todo: run points must also store the scope they are in so that current_scope_ can be set
 
         // todo: remove essentially everything from the CET as it has to be rebuilt anyways
         // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes (maybe use limited variants in the earlier steps, e.g. type enums for the ast, make current type and value and entity a thing of the bbt)
