@@ -271,6 +271,23 @@ struct ance::cet::Runner::Implementation
             }
         }
 
+        void visit(core::GetParent const&) override
+        {
+            assert(arguments_->size() == 1);
+            assert(arguments_->at(0)->type() == core::Type::Scope());
+
+            auto* scope = static_cast<Scope*>(arguments_->at(0)->getScope());
+
+            if (scope->parent() == nullptr)
+            {
+                reporter_.error("Scope has no parent", location_);
+                abort();
+                return;
+            }
+
+            setResult(core::Value::makeScope(scope->parent()));
+        }
+
         void visit(core::Log const&) override
         {
             assert(arguments_->size() == 2);

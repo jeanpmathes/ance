@@ -5,6 +5,7 @@
 
 #include "ance/utility/Owners.h"
 #include "ance/core/Identifier.h"
+#include "ance/core/AccessModifier.h"
 
 namespace ance::core
 {
@@ -29,6 +30,9 @@ namespace ance::core
 
         /// Print an identifier to the output stream.
         void print(Identifier const& identifier);
+
+        /// Print an access modifier to the output stream.
+        void print(AccessModifier access_modifier);
 
         /// Print an intrinsic to the output stream.
         void print(Intrinsic const& intrinsic);

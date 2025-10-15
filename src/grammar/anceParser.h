@@ -15,17 +15,18 @@ public:
     T__0 = 1, T__1 = 2, T__2 = 3, T__3 = 4, T__4 = 5, T__5 = 6, T__6 = 7, 
     T__7 = 8, T__8 = 9, T__9 = 10, T__10 = 11, T__11 = 12, T__12 = 13, T__13 = 14, 
     T__14 = 15, T__15 = 16, T__16 = 17, T__17 = 18, T__18 = 19, T__19 = 20, 
-    T__20 = 21, IDENTIFIER = 22, INTEGER = 23, STRING = 24, SEMICOLON = 25, 
-    WHITESPACE = 26, BLOCK_COMMENT = 27, LINE_COMMENT = 28, BRACKET_OPEN = 29, 
-    BRACKET_CLOSE = 30, CURLY_BRACKET_OPEN = 31, CURLY_BRACKET_CLOSE = 32, 
-    SQUARE_BRACKET_OPEN = 33, SQUARE_BRACKET_CLOSE = 34, POINTY_BRACKET_OPEN = 35, 
-    POINTY_BRACKET_CLOSE = 36, ERROR_CHAR = 37
+    T__20 = 21, T__21 = 22, T__22 = 23, T__23 = 24, T__24 = 25, T__25 = 26, 
+    IDENTIFIER = 27, INTEGER = 28, STRING = 29, SEMICOLON = 30, WHITESPACE = 31, 
+    BLOCK_COMMENT = 32, LINE_COMMENT = 33, BRACKET_OPEN = 34, BRACKET_CLOSE = 35, 
+    CURLY_BRACKET_OPEN = 36, CURLY_BRACKET_CLOSE = 37, SQUARE_BRACKET_OPEN = 38, 
+    SQUARE_BRACKET_CLOSE = 39, POINTY_BRACKET_OPEN = 40, POINTY_BRACKET_CLOSE = 41, 
+    ERROR_CHAR = 42
   };
 
   enum {
-    RuleUnorderedScopeFile = 0, RuleOrderedScopeFile = 1, RuleStatement = 2, 
-    RuleExpression = 3, RuleUnary = 4, RuleLiteral = 5, RuleType = 6, RuleBoolean = 7, 
-    RuleEntity = 8, RuleAssigner = 9
+    RuleUnorderedScopeFile = 0, RuleOrderedScopeFile = 1, RuleDeclaration = 2, 
+    RuleStatement = 3, RuleExpression = 4, RuleUnary = 5, RuleLiteral = 6, 
+    RuleType = 7, RuleBoolean = 8, RuleEntity = 9, RuleAssigner = 10, RuleAccessModifier = 11
   };
 
   explicit anceParser(antlr4::TokenStream *input);
@@ -47,6 +48,7 @@ public:
 
   class UnorderedScopeFileContext;
   class OrderedScopeFileContext;
+  class DeclarationContext;
   class StatementContext;
   class ExpressionContext;
   class UnaryContext;
@@ -54,15 +56,16 @@ public:
   class TypeContext;
   class BooleanContext;
   class EntityContext;
-  class AssignerContext; 
+  class AssignerContext;
+  class AccessModifierContext; 
 
   class  UnorderedScopeFileContext : public antlr4::ParserRuleContext {
   public:
     UnorderedScopeFileContext(antlr4::ParserRuleContext *parent, size_t invokingState);
     virtual size_t getRuleIndex() const override;
     antlr4::tree::TerminalNode *EOF();
-    std::vector<StatementContext *> statement();
-    StatementContext* statement(size_t i);
+    std::vector<DeclarationContext *> declaration();
+    DeclarationContext* declaration(size_t i);
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
@@ -84,6 +87,46 @@ public:
   };
 
   OrderedScopeFileContext* orderedScopeFile();
+
+  class  DeclarationContext : public antlr4::ParserRuleContext {
+  public:
+    DeclarationContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    DeclarationContext() = default;
+    void copyFrom(DeclarationContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  VariableDeclarationContext : public DeclarationContext {
+  public:
+    VariableDeclarationContext(DeclarationContext *ctx);
+
+    anceParser::ExpressionContext *varType = nullptr;
+    anceParser::ExpressionContext *assigned = nullptr;
+    AccessModifierContext *accessModifier();
+    antlr4::tree::TerminalNode *IDENTIFIER();
+    antlr4::tree::TerminalNode *SEMICOLON();
+    std::vector<ExpressionContext *> expression();
+    ExpressionContext* expression(size_t i);
+    AssignerContext *assigner();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  RunnableDeclarationContext : public DeclarationContext {
+  public:
+    RunnableDeclarationContext(DeclarationContext *ctx);
+
+    StatementContext *statement();
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  DeclarationContext* declaration();
 
   class  StatementContext : public antlr4::ParserRuleContext {
   public:
@@ -457,6 +500,45 @@ public:
   };
 
   AssignerContext* assigner();
+
+  class  AccessModifierContext : public antlr4::ParserRuleContext {
+  public:
+    AccessModifierContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    AccessModifierContext() = default;
+    void copyFrom(AccessModifierContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
+    virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  PrivateContext : public AccessModifierContext {
+  public:
+    PrivateContext(AccessModifierContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  PublicContext : public AccessModifierContext {
+  public:
+    PublicContext(AccessModifierContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  class  ExternContext : public AccessModifierContext {
+  public:
+    ExternContext(AccessModifierContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
+  };
+
+  AccessModifierContext* accessModifier();
 
 
   // By default the static state used to implement the parser is lazily initialized during the first

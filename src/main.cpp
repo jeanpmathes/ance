@@ -202,15 +202,16 @@ namespace ance
 
         return exit_code;
 
-        // todo: add cmp global variables so that circular dependencies can exist
-        // todo: the global variable declarations should be transformed into a statement which uses the variable declaration intrinsic, in a do block
-        // todo: maybe to put it into the right scope a new getparent intrinsic is needed which takes a scope and gives the parent scope
+        // todo: bring back the assigner enum (no refs) and use it wherever it is used in grammar, correctly perform validation based on it (e.g. global var must be final)
+        // todo: also implement final check for all variables (preventing assignment)
+        // todo: also check assigners in all print outputs
 
         // todo: change the runner to allow arbitrary stopping and continuation of execution
         // todo: it should have a list of run-points and if running one of those stops it continues with the next one, all code in unordered scopes becomes separate run points
         // todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
         // todo: when encountering an unordered scope, simply add all new runpoints instead of directly executing
         // todo: run points must also store the scope they are in so that current_scope_ can be set
+        // todo: check that global variable references can be resolved this way, also check circular case which should be detected (no runnable run point)
 
         // todo: remove essentially everything from the CET as it has to be rebuilt anyways
         // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes (maybe use limited variants in the earlier steps, e.g. type enums for the ast, make current type and value and entity a thing of the bbt)

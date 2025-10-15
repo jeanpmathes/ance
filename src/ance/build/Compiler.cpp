@@ -47,6 +47,11 @@ struct ance::build::Compiler::Implementation
             unsupported(resolve);
         }
 
+        void visit(core::GetParent const& get_parent) override
+        {
+            unsupported(get_parent);
+        }
+
         void visit(core::Log const& log) override
         {
             unsupported(log);

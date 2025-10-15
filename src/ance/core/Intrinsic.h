@@ -108,6 +108,22 @@ namespace ance::core
         }
     };
 
+    /// This intrinsic retrieves the parent scope of a scope value.
+    struct GetParent final : Static<GetParent>
+    {
+    private:
+        GetParent();
+
+    public:
+        ~GetParent() override = default;
+
+        static GetParent& instance()
+        {
+            static GetParent instance;
+            return instance;
+        }
+    };
+
     /// This intrinsic converts a boolean to a string.
     struct B2Str final : Static<B2Str>
     {
@@ -167,6 +183,7 @@ namespace ance::core
         virtual void visit(NoOp const& no_op)      = 0;
         virtual void visit(Declare const& declare) = 0;
         virtual void visit(Resolve const& resolve) = 0;
+        virtual void visit(GetParent const& get_parent) = 0;
         virtual void visit(Log const& log)         = 0;
         virtual void visit(B2Str const& b2str)     = 0;
         virtual void visit(Include const& include) = 0;

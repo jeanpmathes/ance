@@ -20,23 +20,44 @@ struct ance::ast::Printer::Implementation
         {
             bool first = true;
 
-            for (auto const& statement : file.statements)
+            for (auto const& declaration : file.declarations)
             {
                 if (!first) { line(); }
                 first = false;
 
-                print("do ");
-
-                if (statement->isCompound())
-                {
-                    line();
-                    visit(*statement);
-                }
-                else
-                {
-                    visit(*statement);
-                }
+                visit(*declaration);
             }
+        }
+
+        void visit(ErrorDeclaration const&) override
+        {
+            print("// error");
+        }
+
+        void visit(RunnableDeclaration const& runnable) override
+        {
+            print("do ");
+
+            if (runnable.body->isCompound()) line();
+
+            visit(*runnable.body);
+        }
+
+        void visit(VariableDeclaration const& variable_declaration) override
+        {
+            print(variable_declaration.access_modifier);
+            print(" cmp ");
+            print(variable_declaration.identifier);
+            print(": ");
+            visit(*variable_declaration.type);
+
+            if (variable_declaration.value.hasValue())
+            {
+                print(" := ");
+                visit(**variable_declaration.value);
+            }
+
+            print(";");
         }
 
         void visit(ErrorStatement const&) override { print("// error"); }

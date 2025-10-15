@@ -2,10 +2,36 @@
 
 ance::ast::Node::Node(core::Location const& source_location) : location(source_location) {}
 
-ance::ast::File::File(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location)
+ance::ast::File::File(utility::List<utility::Owned<Declaration>> declaration_list, core::Location const& source_location)
     : Node(source_location)
     , ConcreteNode()
-    , statements(std::move(statement_list))
+    , declarations(std::move(declaration_list))
+{}
+
+ance::ast::ErrorDeclaration::ErrorDeclaration(core::Location const& source_location) : Node(source_location), Declaration()
+{
+
+}
+
+ance::ast::RunnableDeclaration::RunnableDeclaration(utility::Owned<Statement> statement, core::Location const& source_location)
+    : Node(source_location)
+    , Declaration()
+    , body(std::move(statement))
+{
+
+}
+
+ance::ast::VariableDeclaration::VariableDeclaration(core::AccessModifier const                    access,
+                                          core::Identifier const&                       name,
+                                          utility::Owned<Expression>                    t,
+                                          utility::Optional<utility::Owned<Expression>> definition,
+                                          core::Location const&                         source_location)
+    : Node(source_location)
+    , Declaration()
+    , access_modifier(access)
+    , identifier(name)
+    , type(std::move(t))
+    , value(std::move(definition))
 {}
 
 bool ance::ast::Statement::isCompound() const
@@ -33,9 +59,9 @@ ance::ast::Independent::Independent(utility::Owned<Expression> independent_expre
 {}
 
 ance::ast::Let::Let(core::Identifier const&                       name,
-                    utility::Owned<Expression>                           t,
+                    utility::Owned<Expression>                    t,
                     utility::Optional<utility::Owned<Expression>> definition,
-                    core::Location const& source_location)
+                    core::Location const&                         source_location)
     : Node(source_location)
     , Statement()
     , identifier(name)

@@ -23,6 +23,14 @@ public:
     return visitChildren(ctx);
   }
 
+  virtual std::any visitRunnableDeclaration(anceParser::RunnableDeclarationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitVariableDeclaration(anceParser::VariableDeclarationContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
   virtual std::any visitBlockStatement(anceParser::BlockStatementContext *ctx) override {
     return visitChildren(ctx);
   }
@@ -136,6 +144,18 @@ public:
   }
 
   virtual std::any visitAssigner(anceParser::AssignerContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitPublic(anceParser::PublicContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitPrivate(anceParser::PrivateContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitExtern(anceParser::ExternContext *ctx) override {
     return visitChildren(ctx);
   }
 

@@ -26,6 +26,12 @@ void ance::core::Printer::print(Identifier const& identifier)
     out_ << identifier;
 }
 
+void ance::core::Printer::print(AccessModifier const access_modifier)
+{
+    indent();
+    out_ << access_modifier.toString(); // todo: access modifier should provide operator<<
+}
+
 void ance::core::Printer::print(Intrinsic const& intrinsic)
 {
     indent();

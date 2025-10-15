@@ -23,6 +23,10 @@ public:
 
     virtual std::any visitOrderedScopeFile(anceParser::OrderedScopeFileContext *context) = 0;
 
+    virtual std::any visitRunnableDeclaration(anceParser::RunnableDeclarationContext *context) = 0;
+
+    virtual std::any visitVariableDeclaration(anceParser::VariableDeclarationContext *context) = 0;
+
     virtual std::any visitBlockStatement(anceParser::BlockStatementContext *context) = 0;
 
     virtual std::any visitExpressionStatement(anceParser::ExpressionStatementContext *context) = 0;
@@ -80,6 +84,12 @@ public:
     virtual std::any visitEntity(anceParser::EntityContext *context) = 0;
 
     virtual std::any visitAssigner(anceParser::AssignerContext *context) = 0;
+
+    virtual std::any visitPublic(anceParser::PublicContext *context) = 0;
+
+    virtual std::any visitPrivate(anceParser::PrivateContext *context) = 0;
+
+    virtual std::any visitExtern(anceParser::ExternContext *context) = 0;
 
 
 };

@@ -1,8 +1,13 @@
 grammar ance;
 
-unorderedScopeFile : ( 'do' statement )* EOF ;
+unorderedScopeFile : ( declaration )* EOF ;
 
 orderedScopeFile : statement EOF ;
+
+declaration
+    : 'do' statement # RunnableDeclaration
+    | accessModifier 'cmp' IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # VariableDeclaration
+    ;
 
 statement
     : '{' ( statement )* '}' # BlockStatement
@@ -55,6 +60,13 @@ entity
 
 assigner
     : '<:'
+    | ':='
+    ;
+
+accessModifier
+    : 'public' # Public
+    | 'private' # Private
+    | 'extern' # Extern
     ;
 
 IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )

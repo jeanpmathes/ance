@@ -44,6 +44,8 @@ ance::core::Declare::Declare()
 ance::core::Resolve::Resolve()
     : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::EntityRef()) {}
 
+ance::core::GetParent::GetParent() : Static(Signature::likeUnnamed("getparent", Type::Scope()), Type::Scope()) {}
+
 ance::core::Log::Log() : Static(Signature::likeUnnamed("log", Type::String(), Type::Location()), Type::Unit()) {}
 
 ance::core::Include::Include() : Static(Signature::likeUnnamed("include", Type::String(), Type::Location()), Type::Unit()) {}

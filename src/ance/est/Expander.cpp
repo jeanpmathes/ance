@@ -29,50 +29,65 @@ struct ance::est::Expander::Implementation
         explicit AST(core::Reporter& reporter) : reporter_(reporter) {}
         ~AST() override = default;
 
-        void setResult(utility::Owned<File> file)
+        void setResultFile(utility::Owned<File> file)
         {
-            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+            assert(!file_expansion_.hasValue() && !declaration_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
             file_expansion_ = std::move(file);
+            declaration_expansion_ = std::nullopt;
             statement_expansion_  = std::nullopt;
             expression_expansion_ = std::nullopt;
         }
 
-        void setResult(utility::Owned<Statement> statement)
+        void setResultDeclaration(utility::Owned<Statement> statement)
         {
-            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+            assert(!file_expansion_.hasValue() && !declaration_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+
+            file_expansion_        = std::nullopt;
+            declaration_expansion_ = std::move(statement);
+            statement_expansion_   = std::nullopt;
+            expression_expansion_  = std::nullopt;
+        }
+
+        void setResultStatement(utility::Owned<Statement> statement)
+        {
+            assert(!file_expansion_.hasValue() && !declaration_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
             Statements statements;
             statements.emplace_back(std::move(statement));
 
             file_expansion_ = std::nullopt;
+            declaration_expansion_ = std::nullopt;
             statement_expansion_  = std::move(statements);
             expression_expansion_ = std::nullopt;
         }
 
-        void setResult(Statements statements)
+        void setResultStatement(Statements statements)
         {
-            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+            assert(!file_expansion_.hasValue() && !declaration_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
             file_expansion_ = std::nullopt;
+            declaration_expansion_ = std::nullopt;
             statement_expansion_  = std::move(statements);
             expression_expansion_ = std::nullopt;
         }
 
-        void setResult(utility::Owned<Expression> expression)
+        void setResultExpression(utility::Owned<Expression> expression)
         {
-            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+            assert(!file_expansion_.hasValue() && !declaration_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
             file_expansion_ = std::nullopt;
+            declaration_expansion_ = std::nullopt;
             statement_expansion_  = std::nullopt;
             expression_expansion_ = {.before = {}, .center = std::move(expression), .after = {}};
         }
 
-        void setResult(Expansion expansion)
+        void setResultExpression(Expansion expansion)
         {
-            assert(!file_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
+            assert(!file_expansion_.hasValue() && !declaration_expansion_.hasValue() && !statement_expansion_.hasValue() && !expression_expansion_.hasValue());
 
             file_expansion_ = std::nullopt;
+            declaration_expansion_ = std::nullopt;
             statement_expansion_  = std::nullopt;
             expression_expansion_ = std::move(expansion);
         }
@@ -85,6 +100,18 @@ struct ance::est::Expander::Implementation
 
             utility::Owned<File> result = std::move(*file_expansion_);
             file_expansion_            = std::nullopt;
+
+            return result;
+        }
+
+        utility::Owned<Statement> expand(ast::Declaration const& declaration)
+        {
+            visit(declaration);
+
+            assert(declaration_expansion_.hasValue());
+
+            utility::Owned<Statement> result = std::move(*declaration_expansion_);
+            declaration_expansion_          = std::nullopt;
 
             return result;
         }
@@ -138,20 +165,74 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::File const& file) override
         {
-            utility::List<utility::Owned<Statement>> statements;
+            utility::List<utility::Owned<Statement>> declaration_statements;
 
-            for (auto const& statement : file.statements)
+            for (auto const& declaration : file.declarations)
             {
-                Statements expanded = expand(*statement);
-                statements.emplace_back(wrap(std::move(expanded)));
+                utility::Owned<Statement> expanded = expand(*declaration);
+                declaration_statements.emplace_back(std::move(expanded));
             }
 
-            setResult(utility::makeOwned<File>(std::move(statements), file.location));
+            setResultFile(utility::makeOwned<File>(std::move(declaration_statements), file.location));
+        }
+
+        void visit(ast::ErrorDeclaration const& error) override
+        {
+            setResultDeclaration(utility::makeOwned<ErrorStatement>(error.location));
+        }
+
+        void visit(ast::RunnableDeclaration const& runnable) override
+        {
+            Statements statements = expand(*runnable.body);
+
+            setResultDeclaration(wrap(std::move(statements)));
+        }
+
+        void visit(ast::VariableDeclaration const& global) override
+        {
+            Statements statements;
+
+            Expansion type_expansion = expand(*global.type);
+
+            append(statements, std::move(type_expansion.before));
+
+            utility::List<utility::Owned<Expression>> parent_arguments;
+            parent_arguments.emplace_back(utility::makeOwned<CurrentScope>(global.location));
+
+            utility::Owned<Expression> parent_scope = utility::makeOwned<Intrinsic>(
+                core::GetParent::instance(), std::move(parent_arguments), global.location);
+
+            utility::List<utility::Owned<Expression>> declare_arguments;
+            declare_arguments.emplace_back(std::move(parent_scope));
+            declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(global.identifier, global.location));
+            declare_arguments.emplace_back(std::move(type_expansion.center));
+
+            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(
+                utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), global.location),
+                global.location);
+            Temporary const& tmp_entity = *temporary_entity;
+            statements.emplace_back(std::move(temporary_entity));
+
+            if (global.value.hasValue())
+            {
+                Expansion value_expansion = expand(**global.value);
+
+                append(statements, std::move(value_expansion.before));
+                statements.emplace_back(utility::makeOwned<Write>(
+                    utility::makeOwned<ReadTemporary>(tmp_entity, global.location),
+                    std::move(value_expansion.center),
+                    global.location));
+                append(statements, std::move(value_expansion.after));
+            }
+
+            append(statements, std::move(type_expansion.after));
+
+            setResultDeclaration(wrap(std::move(statements)));
         }
 
         void visit(ast::ErrorStatement const& error_statement) override
         {
-            setResult(utility::makeOwned<ErrorStatement>(error_statement.location));
+            setResultStatement(utility::makeOwned<ErrorStatement>(error_statement.location));
         }
 
         void visit(ast::Block const& block) override
@@ -164,7 +245,7 @@ struct ance::est::Expander::Implementation
                 append(statements, std::move(expanded));
             }
 
-            setResult(utility::makeOwned<Block>(std::move(statements), block.location));
+            setResultStatement(utility::makeOwned<Block>(std::move(statements), block.location));
         }
 
         void visit(ast::Independent const& independent) override
@@ -177,7 +258,7 @@ struct ance::est::Expander::Implementation
             statements.emplace_back(utility::makeOwned<Independent>(std::move(expansion.center), independent.location));
             append(statements, std::move(expansion.after));
 
-            setResult(std::move(statements));
+            setResultStatement(std::move(statements));
         }
 
         void visit(ast::Let const& let) override
@@ -212,7 +293,7 @@ struct ance::est::Expander::Implementation
             append(statements, std::move(after));
             append(statements, std::move(type_expansion.after));
 
-            setResult(std::move(statements));
+            setResultStatement(std::move(statements));
         }
 
         void visit(ast::Assignment const& assignment) override
@@ -234,7 +315,7 @@ struct ance::est::Expander::Implementation
 
             append(statements, std::move(expansion.after));
 
-            setResult(std::move(statements));
+            setResultStatement(std::move(statements));
         }
 
         void visit(ast::If const& if_statement) override
@@ -254,7 +335,7 @@ struct ance::est::Expander::Implementation
 
             append(statements, std::move(condition_expansion.after));
 
-            setResult(std::move(statements));
+            setResultStatement(std::move(statements));
         }
 
         void visit(ast::Loop const& loop) override
@@ -264,21 +345,21 @@ struct ance::est::Expander::Implementation
             Statements block = expand(*loop.body);
             statements.emplace_back(utility::makeOwned<Loop>(wrap(std::move(block)), loop.location));
 
-            setResult(std::move(statements));
+            setResultStatement(std::move(statements));
         }
 
         void visit(ast::Break const& break_statement) override
         {
             Statements statements;
             statements.emplace_back(utility::makeOwned<Break>(break_statement.location));
-            setResult(std::move(statements));
+            setResultStatement(std::move(statements));
         }
 
         void visit(ast::Continue const& continue_statement) override
         {
             Statements statements;
             statements.emplace_back(utility::makeOwned<Continue>(continue_statement.location));
-            setResult(std::move(statements));
+            setResultStatement(std::move(statements));
         }
 
         void visit(ast::While const& while_statement) override
@@ -307,12 +388,12 @@ struct ance::est::Expander::Implementation
 
             Statements statements;
             statements.emplace_back(utility::makeOwned<Loop>(wrap(std::move(loop_body)), while_statement.location));
-            setResult(std::move(statements));
+            setResultStatement(std::move(statements));
         }
 
         void visit(ast::ErrorExpression const& error_expression) override
         {
-            setResult(utility::makeOwned<ErrorExpression>(error_expression.location));
+            setResultExpression(utility::makeOwned<ErrorExpression>(error_expression.location));
         }
 
         void visit(ast::Call const& call) override
@@ -334,7 +415,7 @@ struct ance::est::Expander::Implementation
             resolve_arguments.emplace_back(utility::makeOwned<CurrentScope>(call.location));
             resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(call.identifier, call.location));
 
-            setResult({
+            setResultExpression({
                 .before = std::move(before),
                 .center = utility::makeOwned<Call>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), call.location), std::move(arguments), call.location),
                 .after  = std::move(after),
@@ -347,7 +428,7 @@ struct ance::est::Expander::Implementation
             resolve_arguments.emplace_back(utility::makeOwned<CurrentScope>(access.location));
             resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(access.identifier, access.location));
 
-            setResult({
+            setResultExpression({
                 .before = {},
                 .center = utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location), access.location),
                 .after  = {}
@@ -356,19 +437,19 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Here const& here) override
         {
-            setResult(utility::makeOwned<Here>(here.location));
+            setResultExpression(utility::makeOwned<Here>(here.location));
         }
 
         void visit(ast::Literal const& literal) override
         {
-            setResult(utility::makeOwned<Literal>(literal.value->clone(), literal.location));
+            setResultExpression(utility::makeOwned<Literal>(literal.value->clone(), literal.location));
         }
 
         void visit(ast::UnaryOperation const& unary_operation) override
         {
             Expansion operand = expand(*unary_operation.operand);
 
-            setResult({
+            setResultExpression({
                 .before = std::move(operand.before),
                 .center = utility::makeOwned<UnaryOperation>(unary_operation.op, std::move(operand.center), unary_operation.location),
                 .after  = std::move(operand.after),
@@ -377,6 +458,7 @@ struct ance::est::Expander::Implementation
 
       private:
         utility::Optional<utility::Owned<File>> file_expansion_;
+        utility::Optional<utility::Owned<Statement>> declaration_expansion_;
         utility::Optional<Statements> statement_expansion_;
         utility::Optional<Expansion>  expression_expansion_;
 

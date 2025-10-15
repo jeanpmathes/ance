@@ -5,6 +5,7 @@
 #include "ance/core/Reporter.h"
 #include "ance/core/Value.h"
 #include "ance/core/UnaryOperator.h"
+#include "ance/core/AccessModifier.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -28,7 +29,9 @@ namespace ance::ast
         core::Location location;
     };
 
+    struct Declaration;
     struct Statement;
+    struct Expression;
 
     /// Represents a source file creating an unordered scope.
     /// Note that actual source files may contain a top-level ordered scope,
@@ -37,9 +40,49 @@ namespace ance::ast
         : Node
         , utility::ConcreteNode<File, Visitor>
     {
-        File(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location);
+        File(utility::List<utility::Owned<Declaration>> declaration_list, core::Location const& source_location);
 
-        utility::List<utility::Owned<Statement>> statements = {};
+        utility::List<utility::Owned<Declaration>> declarations = {};
+    };
+
+    /// Declarations are nodes that introduce named entities and are used in unordered scopes.
+    struct Declaration : virtual Node, virtual utility::AbstractNode<Visitor>
+    {
+    };
+
+    /// A declaration that could not be parsed correctly.
+    struct ErrorDeclaration final
+        : Declaration
+        , utility::ConcreteNode<ErrorDeclaration, Visitor>
+    {
+        explicit ErrorDeclaration(core::Location const& source_location);
+    };
+
+    /// Declares a statement to be run in an unordered scope.
+    struct RunnableDeclaration final
+        : Declaration
+        , utility::ConcreteNode<RunnableDeclaration, Visitor>
+    {
+        RunnableDeclaration(utility::Owned<Statement> statement, core::Location const& source_location);
+
+        utility::Owned<Statement> body;
+    };
+
+    /// A variable declaration in an unordered scope.
+    struct VariableDeclaration final
+        : Declaration
+        , utility::ConcreteNode<VariableDeclaration, Visitor>
+    {
+        VariableDeclaration(core::AccessModifier access,
+                        core::Identifier const&                        name,
+                        utility::Owned<Expression>                     t,
+                        utility::Optional<utility::Owned<Expression>>  definition,
+                        core::Location const&                          source_location);
+
+        core::AccessModifier                          access_modifier;
+        core::Identifier                              identifier;
+        utility::Owned<Expression>                    type;
+        utility::Optional<utility::Owned<Expression>> value;
     };
 
     /// A statement is an independent part of code.
@@ -83,7 +126,7 @@ namespace ance::ast
         utility::Owned<Expression> expression;
     };
 
-    /// A let statement declares a variable and can also define its value.
+    /// A let statement declares a variable and can also define its value in an ordered scope.
     struct Let final
         : Statement
         , utility::ConcreteNode<Let, Visitor>
@@ -241,6 +284,10 @@ namespace ance::ast
         ~Visitor() override = default;
 
         virtual void visit(File const& file) = 0;
+
+        virtual void visit(ErrorDeclaration const& error) = 0;
+        virtual void visit(RunnableDeclaration const& runnable) = 0;
+        virtual void visit(VariableDeclaration const& global) = 0;
 
         virtual void visit(ErrorStatement const& error)    = 0;
         virtual void visit(Block const& block)             = 0;

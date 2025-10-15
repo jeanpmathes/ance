@@ -215,7 +215,16 @@ namespace ance::ast
             if (std::any const result = visit(ctx); result.has_value())
                 return utility::wrap<File>(result);
 
-            return utility::makeOwned<File>(utility::List<utility::Owned<Statement>> {}, location(ctx));
+            return utility::makeOwned<File>(utility::List<utility::Owned<Declaration>> {}, location(ctx));
+        }
+
+        template<typename T>
+        utility::Owned<Declaration> expectDeclaration(T* ctx)
+        {
+            if (std::any const result = visit(ctx); result.has_value())
+                return utility::wrap<Declaration>(result);
+
+            return utility::makeOwned<ErrorDeclaration>(location(ctx));
         }
 
         template<typename T>
@@ -236,23 +245,52 @@ namespace ance::ast
             return utility::makeOwned<ErrorExpression>(location(ctx));
         }
 
+        core::AccessModifier expectAccessModifier(anceParser::AccessModifierContext* ctx)
+        {
+            if (std::any const result = visit(ctx); result.has_value())
+                return std::any_cast<core::AccessModifier>(result);
+
+            return core::AccessModifier::PRIVATE_ACCESS;
+        }
+
     protected:
         std::any visitUnorderedScopeFile(anceParser::UnorderedScopeFileContext* context) override
         {
-            utility::List<utility::Owned<Statement>> statements;
+            utility::List<utility::Owned<Declaration>> declarations;
 
-            for (anceParser::StatementContext* statement : context->statement())
+            for (anceParser::DeclarationContext* declaration : context->declaration())
             {
-                statements.push_back(expectStatement(statement));
+                declarations.push_back(expectDeclaration(declaration));
             }
 
-            File* file = new File(std::move(statements), location(context));
+            File* file = new File(std::move(declarations), location(context));
             return file;
         }
 
         std::any visitOrderedScopeFile(anceParser::OrderedScopeFileContext* context) override
         {
             return visit(context->statement());
+        }
+
+        std::any visitRunnableDeclaration(anceParser::RunnableDeclarationContext* context) override
+        {
+            utility::Owned<Statement> body = expectStatement(context->statement());
+
+            Declaration* declaration = new RunnableDeclaration(std::move(body), location(context));
+            return declaration;
+        }
+
+        std::any visitVariableDeclaration(anceParser::VariableDeclarationContext* context) override
+        {
+            core::AccessModifier const access_modifier = expectAccessModifier(context->accessModifier());
+            core::Identifier const     name            = identifier(context->IDENTIFIER());
+            utility::Owned<Expression> type            = expectExpression(context->varType);
+
+            utility::Optional<utility::Owned<Expression>> expression;
+            if (context->assigned != nullptr) expression = expectExpression(context->assigned);
+
+            Declaration* declaration = new VariableDeclaration(access_modifier, name, std::move(type), std::move(expression), location(context));
+            return declaration;
         }
 
         std::any visitBlockStatement(anceParser::BlockStatementContext* context) override
@@ -448,6 +486,24 @@ namespace ance::ast
         {
             Expression* expression = new Literal(core::Value::makeType(core::Type::String()), location(context));
             return expression;
+        }
+
+        std::any visitPublic(anceParser::PublicContext*) override
+        {
+            core::AccessModifier access_modifier = core::AccessModifier::PUBLIC_ACCESS;
+            return access_modifier;
+        }
+
+        std::any visitPrivate(anceParser::PrivateContext*) override
+        {
+            core::AccessModifier access_modifier = core::AccessModifier::PRIVATE_ACCESS;
+            return access_modifier;
+        }
+
+        std::any visitExtern(anceParser::ExternContext*) override
+        {
+            core::AccessModifier access_modifier = core::AccessModifier::EXTERN_ACCESS;
+            return access_modifier;
         }
 
       protected:
