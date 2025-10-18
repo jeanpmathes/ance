@@ -218,6 +218,16 @@ namespace ance::est
         utility::Shared<core::Value> value;
     };
 
+    /// Provides the default value for a type.
+    struct Default final
+        : Expression
+        , utility::ConcreteNode<Default, Visitor>
+    {
+        Default(utility::Owned<Expression> t, core::Location const& source_location);
+
+        utility::Owned<Expression> type;
+    };
+
     /// Expression providing the current source location.
     struct Here final
         : Expression
@@ -301,6 +311,7 @@ namespace ance::est
         virtual void visit(Call const& call)             = 0;
         virtual void visit(Read const& access)         = 0;
         virtual void visit(Literal const& literal)       = 0;
+        virtual void visit(Default const& default_value) = 0;
         virtual void visit(Here const& here)              = 0;
         virtual void visit(CurrentScope const& current_scope)              = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;

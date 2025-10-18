@@ -64,7 +64,7 @@ void anceParserInitialize() {
     }
   );
   static const int32_t serializedATNSegment[] = {
-  	4,1,42,152,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
+  	4,1,42,154,2,0,7,0,2,1,7,1,2,2,7,2,2,3,7,3,2,4,7,4,2,5,7,5,2,6,7,6,2,
   	7,7,7,2,8,7,8,2,9,7,9,2,10,7,10,2,11,7,11,1,0,5,0,26,8,0,10,0,12,0,29,
   	9,0,1,0,1,0,1,1,1,1,1,1,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,1,2,3,2,46,
   	8,2,1,2,1,2,3,2,50,8,2,1,3,1,3,5,3,54,8,3,10,3,12,3,57,9,3,1,3,1,3,1,
@@ -73,11 +73,11 @@ void anceParserInitialize() {
   	3,1,3,1,3,1,3,3,3,98,8,3,1,4,1,4,1,4,1,4,1,4,5,4,105,8,4,10,4,12,4,108,
   	9,4,3,4,110,8,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,1,4,3,4,120,8,4,1,5,1,5,1,
   	6,1,6,1,6,1,6,1,6,1,6,3,6,130,8,6,1,7,1,7,1,7,1,7,1,7,3,7,137,8,7,1,8,
-  	1,8,3,8,141,8,8,1,9,1,9,1,10,1,10,1,11,1,11,1,11,3,11,150,8,11,1,11,0,
-  	0,12,0,2,4,6,8,10,12,14,16,18,20,22,0,1,1,0,22,23,170,0,27,1,0,0,0,2,
-  	32,1,0,0,0,4,49,1,0,0,0,6,97,1,0,0,0,8,119,1,0,0,0,10,121,1,0,0,0,12,
-  	129,1,0,0,0,14,136,1,0,0,0,16,140,1,0,0,0,18,142,1,0,0,0,20,144,1,0,0,
-  	0,22,149,1,0,0,0,24,26,3,4,2,0,25,24,1,0,0,0,26,29,1,0,0,0,27,25,1,0,
+  	1,8,3,8,141,8,8,1,9,1,9,1,10,1,10,3,10,147,8,10,1,11,1,11,1,11,3,11,152,
+  	8,11,1,11,0,0,12,0,2,4,6,8,10,12,14,16,18,20,22,0,0,173,0,27,1,0,0,0,
+  	2,32,1,0,0,0,4,49,1,0,0,0,6,97,1,0,0,0,8,119,1,0,0,0,10,121,1,0,0,0,12,
+  	129,1,0,0,0,14,136,1,0,0,0,16,140,1,0,0,0,18,142,1,0,0,0,20,146,1,0,0,
+  	0,22,151,1,0,0,0,24,26,3,4,2,0,25,24,1,0,0,0,26,29,1,0,0,0,27,25,1,0,
   	0,0,27,28,1,0,0,0,28,30,1,0,0,0,29,27,1,0,0,0,30,31,5,0,0,1,31,1,1,0,
   	0,0,32,33,3,6,3,0,33,34,5,0,0,1,34,3,1,0,0,0,35,36,5,1,0,0,36,50,3,6,
   	3,0,37,38,3,22,11,0,38,39,5,2,0,0,39,40,5,27,0,0,40,41,5,3,0,0,41,45,
@@ -109,10 +109,10 @@ void anceParserInitialize() {
   	0,0,135,137,5,19,0,0,136,131,1,0,0,0,136,132,1,0,0,0,136,133,1,0,0,0,
   	136,134,1,0,0,0,136,135,1,0,0,0,137,15,1,0,0,0,138,141,5,20,0,0,139,141,
   	5,21,0,0,140,138,1,0,0,0,140,139,1,0,0,0,141,17,1,0,0,0,142,143,5,27,
-  	0,0,143,19,1,0,0,0,144,145,7,0,0,0,145,21,1,0,0,0,146,150,5,24,0,0,147,
-  	150,5,25,0,0,148,150,5,26,0,0,149,146,1,0,0,0,149,147,1,0,0,0,149,148,
-  	1,0,0,0,150,23,1,0,0,0,14,27,45,49,55,69,84,97,106,109,119,129,136,140,
-  	149
+  	0,0,143,19,1,0,0,0,144,147,5,22,0,0,145,147,5,23,0,0,146,144,1,0,0,0,
+  	146,145,1,0,0,0,147,21,1,0,0,0,148,152,5,24,0,0,149,152,5,25,0,0,150,
+  	152,5,26,0,0,151,148,1,0,0,0,151,149,1,0,0,0,151,150,1,0,0,0,152,23,1,
+  	0,0,0,15,27,45,49,55,69,84,97,106,109,119,129,136,140,146,151
   };
   staticData->serializedATN = antlr4::atn::SerializedATNView(serializedATNSegment, sizeof(serializedATNSegment) / sizeof(serializedATNSegment[0]));
 
@@ -1545,18 +1545,35 @@ size_t anceParser::AssignerContext::getRuleIndex() const {
   return anceParser::RuleAssigner;
 }
 
+void anceParser::AssignerContext::copyFrom(AssignerContext *ctx) {
+  ParserRuleContext::copyFrom(ctx);
+}
 
-std::any anceParser::AssignerContext::accept(tree::ParseTreeVisitor *visitor) {
+//----------------- CopyAssignerContext ------------------------------------------------------------------
+
+anceParser::CopyAssignerContext::CopyAssignerContext(AssignerContext *ctx) { copyFrom(ctx); }
+
+
+std::any anceParser::CopyAssignerContext::accept(tree::ParseTreeVisitor *visitor) {
   if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
-    return parserVisitor->visitAssigner(this);
+    return parserVisitor->visitCopyAssigner(this);
   else
     return visitor->visitChildren(this);
 }
+//----------------- FinalCopyAssignerContext ------------------------------------------------------------------
 
+anceParser::FinalCopyAssignerContext::FinalCopyAssignerContext(AssignerContext *ctx) { copyFrom(ctx); }
+
+
+std::any anceParser::FinalCopyAssignerContext::accept(tree::ParseTreeVisitor *visitor) {
+  if (auto parserVisitor = dynamic_cast<anceVisitor*>(visitor))
+    return parserVisitor->visitFinalCopyAssigner(this);
+  else
+    return visitor->visitChildren(this);
+}
 anceParser::AssignerContext* anceParser::assigner() {
   AssignerContext *_localctx = _tracker.createInstance<AssignerContext>(_ctx, getState());
   enterRule(_localctx, 20, anceParser::RuleAssigner);
-  size_t _la = 0;
 
 #if __cplusplus > 201703L
   auto onExit = finally([=, this] {
@@ -1566,17 +1583,27 @@ anceParser::AssignerContext* anceParser::assigner() {
     exitRule();
   });
   try {
-    enterOuterAlt(_localctx, 1);
-    setState(144);
-    _la = _input->LA(1);
-    if (!(_la == anceParser::T__21
+    setState(146);
+    _errHandler->sync(this);
+    switch (_input->LA(1)) {
+      case anceParser::T__21: {
+        _localctx = _tracker.createInstance<anceParser::CopyAssignerContext>(_localctx);
+        enterOuterAlt(_localctx, 1);
+        setState(144);
+        match(anceParser::T__21);
+        break;
+      }
 
-    || _la == anceParser::T__22)) {
-    _errHandler->recoverInline(this);
-    }
-    else {
-      _errHandler->reportMatch(this);
-      consume();
+      case anceParser::T__22: {
+        _localctx = _tracker.createInstance<anceParser::FinalCopyAssignerContext>(_localctx);
+        enterOuterAlt(_localctx, 2);
+        setState(145);
+        match(anceParser::T__22);
+        break;
+      }
+
+    default:
+      throw NoViableAltException(this);
     }
    
   }
@@ -1649,13 +1676,13 @@ anceParser::AccessModifierContext* anceParser::accessModifier() {
     exitRule();
   });
   try {
-    setState(149);
+    setState(151);
     _errHandler->sync(this);
     switch (_input->LA(1)) {
       case anceParser::T__23: {
         _localctx = _tracker.createInstance<anceParser::PublicContext>(_localctx);
         enterOuterAlt(_localctx, 1);
-        setState(146);
+        setState(148);
         match(anceParser::T__23);
         break;
       }
@@ -1663,7 +1690,7 @@ anceParser::AccessModifierContext* anceParser::accessModifier() {
       case anceParser::T__24: {
         _localctx = _tracker.createInstance<anceParser::PrivateContext>(_localctx);
         enterOuterAlt(_localctx, 2);
-        setState(147);
+        setState(149);
         match(anceParser::T__24);
         break;
       }
@@ -1671,7 +1698,7 @@ anceParser::AccessModifierContext* anceParser::accessModifier() {
       case anceParser::T__25: {
         _localctx = _tracker.createInstance<anceParser::ExternContext>(_localctx);
         enterOuterAlt(_localctx, 3);
-        setState(148);
+        setState(150);
         match(anceParser::T__25);
         break;
       }

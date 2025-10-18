@@ -226,6 +226,17 @@ namespace ance::bbt
         Temporary const&             destination;
     };
 
+    /// Provides the default value for a type.
+    struct Default final
+        : Statement
+        , utility::ConcreteNode<Default, Visitor>
+    {
+        Default(Temporary const& t, Temporary const& result, core::Location const& source_location);
+
+        Temporary const& type;
+        Temporary const& destination;
+    };
+
     /// Writes the current scope to the destination temporary.
     struct CurrentScope final
         : Statement
@@ -304,8 +315,10 @@ namespace ance::bbt
         virtual void visit(Call const& call)                      = 0;
         virtual void visit(Read const& read)                      = 0;
         virtual void visit(Constant const& constant)              = 0;
+        virtual void visit(Default const& default_value)          = 0;
         virtual void visit(CurrentScope const& current_scope)                      = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
+        virtual void visit(TypeOf const& type_of)                 = 0;
         virtual void visit(OrderedScopeEnter const& scope_enter)         = 0;
         virtual void visit(OrderedScopeExit const& scope_exit)           = 0;
 

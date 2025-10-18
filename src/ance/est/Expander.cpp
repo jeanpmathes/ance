@@ -202,10 +202,15 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> parent_scope = utility::makeOwned<Intrinsic>(
                 core::GetParent::instance(), std::move(parent_arguments), global.location);
 
+            utility::Owned<Temporary> tempoary_type = utility::makeOwned<Temporary>(std::move(type_expansion.center), global.location);
+            Temporary const&        tmp_type       = *tempoary_type;
+            statements.emplace_back(std::move(tempoary_type));
+
             utility::List<utility::Owned<Expression>> declare_arguments;
             declare_arguments.emplace_back(std::move(parent_scope));
             declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(global.identifier, global.location));
-            declare_arguments.emplace_back(std::move(type_expansion.center));
+            declare_arguments.emplace_back(utility::makeOwned<Literal>(core::Value::makeBool(global.assigner.isFinal()), global.location));
+            declare_arguments.emplace_back(utility::makeOwned<ReadTemporary>(tmp_type, global.location));
 
             utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(
                 utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), global.location),
@@ -223,6 +228,13 @@ struct ance::est::Expander::Implementation
                     std::move(value_expansion.center),
                     global.location));
                 append(statements, std::move(value_expansion.after));
+            }
+            else
+            {
+                statements.emplace_back(utility::makeOwned<Write>(
+                    utility::makeOwned<ReadTemporary>(tmp_entity, global.location),
+                    utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, global.location), global.location),
+                    global.location));
             }
 
             append(statements, std::move(type_expansion.after));
@@ -269,10 +281,15 @@ struct ance::est::Expander::Implementation
 
             append(statements, std::move(type_expansion.before));
 
+            utility::Owned<Temporary> temporary_type = utility::makeOwned<Temporary>(std::move(type_expansion.center), let.location);
+            Temporary const&        tmp_type       = *temporary_type;
+            statements.emplace_back(std::move(temporary_type));
+
             utility::List<utility::Owned<Expression>> declare_arguments;
             declare_arguments.emplace_back(utility::makeOwned<CurrentScope>(let.location));
             declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(let.identifier, let.location));
-            declare_arguments.emplace_back(std::move(type_expansion.center));
+            declare_arguments.emplace_back(utility::makeOwned<Literal>(core::Value::makeBool(let.assigner.isFinal()), let.location));
+            declare_arguments.emplace_back(utility::makeOwned<ReadTemporary>(tmp_type, let.location));
             utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), let.location), let.location); // todo: the core::Declare feels kinda ugly because it does not show it to be an intrinsic
             Temporary const& tmp_entity = *temporary_entity;
             statements.emplace_back(std::move(temporary_entity));
@@ -288,6 +305,12 @@ struct ance::est::Expander::Implementation
                 statements.emplace_back(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, let.location), std::move(expansion.center), let.location));
 
                 after = std::move(expansion.after);
+            }
+            else
+            {
+                statements.emplace_back(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, let.location),
+                                                                utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, let.location), let.location),
+                                                                 let.location));
             }
 
             append(statements, std::move(after));

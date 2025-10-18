@@ -6,6 +6,7 @@
 #include "ance/core/Value.h"
 #include "ance/core/UnaryOperator.h"
 #include "ance/core/AccessModifier.h"
+#include "ance/core/Assigner.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -76,12 +77,14 @@ namespace ance::ast
         VariableDeclaration(core::AccessModifier access,
                         core::Identifier const&                        name,
                         utility::Owned<Expression>                     t,
+                        core::Assigner assignment,
                         utility::Optional<utility::Owned<Expression>>  definition,
                         core::Location const&                          source_location);
 
         core::AccessModifier                          access_modifier;
         core::Identifier                              identifier;
         utility::Owned<Expression>                    type;
+        core::Assigner                                assigner;
         utility::Optional<utility::Owned<Expression>> value;
     };
 
@@ -133,11 +136,13 @@ namespace ance::ast
     {
         Let(core::Identifier const&                       name,
         utility::Owned<Expression> t,
+        core::Assigner assignment,
             utility::Optional<utility::Owned<Expression>> definition,
             core::Location const&                         source_location);
 
         core::Identifier                              identifier;
         utility::Owned<Expression> type;
+        core::Assigner                                assigner;
         utility::Optional<utility::Owned<Expression>> value;
     };
 
@@ -147,10 +152,12 @@ namespace ance::ast
         , utility::ConcreteNode<Assignment, Visitor>
     {
         Assignment(core::Identifier const&                        assigned,
+                    core::Assigner assignment,
                     utility::Owned<Expression>                    expression,
                     core::Location const&                         source_location);
 
         core::Identifier         identifier;
+        core::Assigner           assigner;
         utility::Owned<Expression> value;
     };
 

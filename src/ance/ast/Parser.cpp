@@ -176,7 +176,10 @@ namespace ance::ast
     class SourceVisitor final : public anceBaseVisitor
     {
       public:
-        explicit SourceVisitor(size_t const file_index) : file_index_(file_index) {}
+        SourceVisitor(size_t const file_index, core::Reporter& reporter)
+            : file_index_(file_index)
+            , reporter_(reporter)
+        {}
 
         ~SourceVisitor() override = default;
 
@@ -245,6 +248,14 @@ namespace ance::ast
             return utility::makeOwned<ErrorExpression>(location(ctx));
         }
 
+        core::Assigner expectAssigner(anceParser::AssignerContext* ctx)
+        {
+            if (std::any const result = visit(ctx); result.has_value())
+                return std::any_cast<core::Assigner>(result);
+
+            return core::Assigner::UNSPECIFIED;
+        }
+
         core::AccessModifier expectAccessModifier(anceParser::AccessModifierContext* ctx)
         {
             if (std::any const result = visit(ctx); result.has_value())
@@ -286,10 +297,20 @@ namespace ance::ast
             core::Identifier const     name            = identifier(context->IDENTIFIER());
             utility::Owned<Expression> type            = expectExpression(context->varType);
 
+            core::Assigner assigner = core::Assigner::UNSPECIFIED;
             utility::Optional<utility::Owned<Expression>> expression;
-            if (context->assigned != nullptr) expression = expectExpression(context->assigned);
+            if (context->assigned != nullptr)
+            {
+                assigner   = expectAssigner(context->assigner());
+                expression = expectExpression(context->assigned);
 
-            Declaration* declaration = new VariableDeclaration(access_modifier, name, std::move(type), std::move(expression), location(context));
+                if (!assigner.isFinal())
+                {
+                    reporter_.error("Unordered scope variable declarations must be final", location(context->assigner()));
+                }
+            }
+
+            Declaration* declaration = new VariableDeclaration(access_modifier, name, std::move(type), assigner, std::move(expression), location(context));
             return declaration;
         }
 
@@ -317,22 +338,32 @@ namespace ance::ast
         std::any visitLetStatement(anceParser::LetStatementContext* ctx) override
         {
             core::Identifier const name = identifier(ctx->IDENTIFIER());
-
-            utility::Optional<utility::Owned<Expression>> expression;
             utility::Owned<Expression> type = expectExpression(ctx->varType);
 
-            if (ctx->assigned != nullptr) expression = expectExpression(ctx->assigned);
+            core::Assigner assigner = core::Assigner::UNSPECIFIED;
+            utility::Optional<utility::Owned<Expression>> expression;
+            if (ctx->assigned != nullptr)
+            {
+                assigner   = expectAssigner(ctx->assigner());
+                expression = expectExpression(ctx->assigned);
+            }
 
-            Statement* statement = new Let(name, std::move(type), std::move(expression), location(ctx));
+            Statement* statement = new Let(name, std::move(type), assigner, std::move(expression), location(ctx));
             return statement;
         }
 
         std::any visitAssignmentStatement(anceParser::AssignmentStatementContext* ctx) override
         {
             core::Identifier const     assigned = identifier(ctx->entity()->IDENTIFIER());
+            core::Assigner const assigner = expectAssigner(ctx->assigner());
             utility::Owned<Expression> value    = expectExpression(ctx->expression());
 
-            Statement* statement = new Assignment(assigned, std::move(value), location(ctx));
+            if (assigner.isFinal())
+            {
+                reporter_.error("Assignment to existing variable cannot be final", location(ctx->assigner()));
+            }
+
+            Statement* statement = new Assignment(assigned, assigner, std::move(value), location(ctx));
             return statement;
         }
 
@@ -488,6 +519,18 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitCopyAssigner(anceParser::CopyAssignerContext*) override
+        {
+            core::Assigner assigner = core::Assigner::COPY_ASSIGNMENT;
+            return assigner;
+        }
+
+        std::any visitFinalCopyAssigner(anceParser::FinalCopyAssignerContext*) override
+        {
+            core::Assigner assigner = core::Assigner::FINAL_COPY_ASSIGNMENT;
+            return assigner;
+        }
+
         std::any visitPublic(anceParser::PublicContext*) override
         {
             core::AccessModifier access_modifier = core::AccessModifier::PUBLIC_ACCESS;
@@ -516,6 +559,7 @@ namespace ance::ast
 
       private:
         size_t file_index_;
+        core::Reporter& reporter_;
     };
 }
 
@@ -550,7 +594,7 @@ struct ance::ast::Parser::Implementation
 
             anceParser::UnorderedScopeFileContext* unordered_scope_file_context = parser->unorderedScopeFile();
 
-            SourceVisitor visitor {source_file.index()};
+            SourceVisitor visitor {source_file.index(), reporter_};
 
             file = visitor.expectFile(unordered_scope_file_context);
         }
@@ -592,7 +636,7 @@ struct ance::ast::Parser::Implementation
 
             anceParser::OrderedScopeFileContext* unordered_scope_file_context = parser->orderedScopeFile();
 
-            SourceVisitor visitor {source_file.index()};
+            SourceVisitor visitor {source_file.index(), reporter_};
 
             statement = visitor.expectStatement(unordered_scope_file_context);
         }

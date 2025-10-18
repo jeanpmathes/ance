@@ -794,6 +794,27 @@ struct ance::bbt::Segmenter::Implementation
             setResult(std::move(blocks), inner, inner);
         }
 
+        void visit(est::Default const& default_value) override
+        {
+            utility::List<utility::Owned<BaseBB>> blocks;
+
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
+
+            auto [temporary, type] = addBlockAndGetInner<Temporary>(blocks, default_value.type->location);
+            link(entry, temporary);
+
+            auto [type_entry, type_exit] = segment(*default_value.type, type.get());
+            link(temporary, type_entry);
+
+            std::reference_wrapper const inner = addBlock<Default>(blocks, type.get(), destination(), default_value.location);
+            link(type_exit, inner);
+
+            std::reference_wrapper const exit = addEmptyBlock(blocks);
+            link(inner, exit);
+
+            setResult(std::move(blocks), entry, exit);
+        }
+
         void visit(est::Here const& here) override
         {
             utility::List<utility::Owned<BaseBB>> blocks;

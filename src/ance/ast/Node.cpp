@@ -17,20 +17,19 @@ ance::ast::RunnableDeclaration::RunnableDeclaration(utility::Owned<Statement> st
     : Node(source_location)
     , Declaration()
     , body(std::move(statement))
-{
-
-}
-
-ance::ast::VariableDeclaration::VariableDeclaration(core::AccessModifier const                    access,
-                                          core::Identifier const&                       name,
-                                          utility::Owned<Expression>                    t,
-                                          utility::Optional<utility::Owned<Expression>> definition,
-                                          core::Location const&                         source_location)
+{}
+ance::ast::VariableDeclaration::VariableDeclaration(core::AccessModifier                          access,
+                                                    core::Identifier const&                       name,
+                                                    utility::Owned<Expression>                    t,
+                                                    core::Assigner                                assignment,
+                                                    utility::Optional<utility::Owned<Expression>> definition,
+                                                    core::Location const&                         source_location)
     : Node(source_location)
     , Declaration()
     , access_modifier(access)
     , identifier(name)
     , type(std::move(t))
+    , assigner(assignment)
     , value(std::move(definition))
 {}
 
@@ -60,19 +59,25 @@ ance::ast::Independent::Independent(utility::Owned<Expression> independent_expre
 
 ance::ast::Let::Let(core::Identifier const&                       name,
                     utility::Owned<Expression>                    t,
+                    core::Assigner                                assignment,
                     utility::Optional<utility::Owned<Expression>> definition,
                     core::Location const&                         source_location)
     : Node(source_location)
     , Statement()
     , identifier(name)
     , type(std::move(t))
+    , assigner(assignment)
     , value(std::move(definition))
 {}
 
-ance::ast::Assignment::Assignment(core::Identifier const& assigned, utility::Owned<Expression> expression, core::Location const& source_location)
+ance::ast::Assignment::Assignment(core::Identifier const&    assigned,
+                                  core::Assigner             assignment,
+                                  utility::Owned<Expression> expression,
+                                  core::Location const&      source_location)
     : Node(source_location)
     , Statement()
     , identifier(assigned)
+    , assigner(assignment)
     , value(std::move(expression))
 {}
 

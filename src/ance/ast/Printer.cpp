@@ -53,7 +53,9 @@ struct ance::ast::Printer::Implementation
 
             if (variable_declaration.value.hasValue())
             {
-                print(" := ");
+                print(" ");
+                print(variable_declaration.assigner);
+                print(" ");
                 visit(**variable_declaration.value);
             }
 
@@ -99,7 +101,9 @@ struct ance::ast::Printer::Implementation
 
             if (let.value.hasValue())
             {
-                print(" <: ");
+                print(" ");
+                print(let.assigner);
+                print(" ");
                 visit(**let.value);
             }
 
@@ -109,7 +113,9 @@ struct ance::ast::Printer::Implementation
         void visit(Assignment const& assignment) override
         {
             print(assignment.identifier);
-            print(" <: ");
+            print(" ");
+            print(assignment.assigner);
+            print(" ");
             visit(*assignment.value);
             print(";");
         }

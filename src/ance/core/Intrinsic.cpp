@@ -36,23 +36,6 @@ void ance::core::Dynamic::display(std::ostream& os) const
     os << "\"" << signature().name() << "\"";
 }
 
-ance::core::NoOp::NoOp() : Static(Signature::like("nop"), Type::Unit()) {}
-
-ance::core::Declare::Declare()
-    : Static(Signature::likeUnnamed("declare", Type::Scope(), Type::Ident(), Type::Self()), Type::EntityRef()) {}
-
-ance::core::Resolve::Resolve()
-    : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::EntityRef()) {}
-
-ance::core::GetParent::GetParent() : Static(Signature::likeUnnamed("getparent", Type::Scope()), Type::Scope()) {}
-
-ance::core::Log::Log() : Static(Signature::likeUnnamed("log", Type::String(), Type::Location()), Type::Unit()) {}
-
-ance::core::Include::Include() : Static(Signature::likeUnnamed("include", Type::String(), Type::Location()), Type::Unit()) {}
-
-ance::core::B2Str::B2Str()
-    : Static(Signature::likeUnnamed("b2str", Type::Bool()), Type::String()) {} // todo: path type
-
 std::ostream& operator<<(std::ostream& os, ance::core::Intrinsic const& intrinsic)
 {
     intrinsic.display(os);

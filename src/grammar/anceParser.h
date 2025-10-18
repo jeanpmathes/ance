@@ -492,11 +492,30 @@ public:
   class  AssignerContext : public antlr4::ParserRuleContext {
   public:
     AssignerContext(antlr4::ParserRuleContext *parent, size_t invokingState);
+   
+    AssignerContext() = default;
+    void copyFrom(AssignerContext *context);
+    using antlr4::ParserRuleContext::copyFrom;
+
     virtual size_t getRuleIndex() const override;
+
+   
+  };
+
+  class  CopyAssignerContext : public AssignerContext {
+  public:
+    CopyAssignerContext(AssignerContext *ctx);
 
 
     virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
-   
+  };
+
+  class  FinalCopyAssignerContext : public AssignerContext {
+  public:
+    FinalCopyAssignerContext(AssignerContext *ctx);
+
+
+    virtual std::any accept(antlr4::tree::ParseTreeVisitor *visitor) override;
   };
 
   AssignerContext* assigner();

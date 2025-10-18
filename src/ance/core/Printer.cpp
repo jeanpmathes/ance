@@ -29,7 +29,13 @@ void ance::core::Printer::print(Identifier const& identifier)
 void ance::core::Printer::print(AccessModifier const access_modifier)
 {
     indent();
-    out_ << access_modifier.toString(); // todo: access modifier should provide operator<<
+    out_ << access_modifier.toString();// todo: access modifier should provide operator<<
+}
+
+void ance::core::Printer::print(Assigner const assigner)
+{
+    indent();
+    out_ << assigner.getSymbol();// todo: assigner should provide operator<<
 }
 
 void ance::core::Printer::print(Intrinsic const& intrinsic)

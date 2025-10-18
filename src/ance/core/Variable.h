@@ -16,8 +16,9 @@ namespace ance::core
         /// Creates a new variable.
         /// \param identifier The identifier of the variable.
         /// \param type The type of the variable.
+        /// \param is_final Whether the variable is final or not.
         /// \param location The location where the variable was defined.
-        Variable(Identifier const& identifier, Type const& type, Location const& location);
+        Variable(Identifier const& identifier, Type const& type, bool is_final, Location const& location);
 
         ~Variable() override = default;
 
@@ -26,6 +27,9 @@ namespace ance::core
 
         /// Gets the type of this variable.
         [[nodiscard]] Type const& type() const;
+
+        /// Whether this variable is final.
+        [[nodiscard]] bool isFinal() const;
 
         /// Gets the location where this variable was defined.
         [[nodiscard]] Location const& location() const;
@@ -36,6 +40,7 @@ namespace ance::core
       private:
         Identifier  identifier_;
         Type const& type_;
+        bool        is_final_;
         Location    location_;
     };
 }

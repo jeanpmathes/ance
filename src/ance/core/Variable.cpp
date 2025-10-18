@@ -2,8 +2,8 @@
 
 namespace ance::core
 {
-    Variable::Variable(Identifier const& identifier, Type const& type, Location const& location)
-        : identifier_(identifier), type_(type), location_(location) {}
+    Variable::Variable(Identifier const& identifier, Type const& type, bool const is_final, Location const& location)
+        : identifier_(identifier), type_(type), is_final_(is_final), location_(location) {}
 
     Identifier const& Variable::name() const
     {
@@ -13,6 +13,11 @@ namespace ance::core
     Type const& Variable::type() const
     {
         return type_;
+    }
+
+    bool Variable::isFinal() const
+    {
+        return is_final_;
     }
 
     Location const& Variable::location() const

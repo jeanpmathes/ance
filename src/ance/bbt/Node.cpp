@@ -108,6 +108,13 @@ ance::bbt::Constant::Constant(utility::Shared<core::Value> constant, Temporary c
     , destination(result)
 {}
 
+ance::bbt::Default::Default(Temporary const& t, Temporary const& result, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , type(t)
+    , destination(result)
+{}
+
 ance::bbt::CurrentScope::CurrentScope(Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()

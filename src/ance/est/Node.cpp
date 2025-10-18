@@ -104,7 +104,17 @@ ance::est::Read::Read(utility::Owned<Expression> accessed, core::Location const&
     , target(std::move(accessed))
 {}
 
-ance::est::Literal::Literal(utility::Shared<core::Value> constant, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(constant)) {}
+ance::est::Literal::Literal(utility::Shared<core::Value> constant, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , value(std::move(constant))
+{}
+
+ance::est::Default::Default(utility::Owned<Expression> t, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , type(std::move(t))
+{}
 
 ance::est::Here::Here(core::Location const& source_location)
     : Node(source_location)

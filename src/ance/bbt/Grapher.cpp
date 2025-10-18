@@ -108,12 +108,19 @@ struct ance::bbt::Grapher::Implementation
 
         }
 
+        void visit(Default const&) override
+        {
+
+        }
+
         void visit(CurrentScope const&) override
         {
 
         }
 
         void visit(UnaryOperation const&) override {}
+
+        void visit(TypeOf const&) override {}
 
         void visit(OrderedScopeEnter const&) override {}
 

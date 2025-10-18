@@ -75,7 +75,9 @@ struct ance::est::Printer::Implementation
 
         void visit(Write const& assignment) override
         {
-            print("write(<:) ");
+            print("write(");
+            print(core::Assigner::COPY_ASSIGNMENT);
+            print(") ");
             visit(*assignment.value);
             print(" to ");
             visit(*assignment.target);
@@ -136,7 +138,9 @@ struct ance::est::Printer::Implementation
             print(temporary.id());
             if (temporary.definition.hasValue())
             {
-                print(" <: ");
+                print(" ");
+                print(core::Assigner::COPY_ASSIGNMENT);
+                print(" ");
                 visit(**temporary.definition);
             }
             print(";");
@@ -146,7 +150,9 @@ struct ance::est::Printer::Implementation
         {
             print("temporary ");
             print(write_temporary.temporary.id());
-            print(" <: temporary ");
+            print(" ");
+            print(core::Assigner::COPY_ASSIGNMENT);
+            print(" temporary ");
             visit(*write_temporary.value);
             print(");");
         }
@@ -186,6 +192,13 @@ struct ance::est::Printer::Implementation
         void visit(Literal const& literal) override
         {
             print(literal.value);
+        }
+
+        void visit(Default const& default_value) override
+        {
+            print("default (");
+            visit(*default_value.type);
+            print(")");
         }
 
         void visit(Here const&) override

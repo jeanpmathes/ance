@@ -59,8 +59,8 @@ entity
     ;
 
 assigner
-    : '<:'
-    | ':='
+    : '<:' # CopyAssigner
+    | ':=' # FinalCopyAssigner
     ;
 
 accessModifier

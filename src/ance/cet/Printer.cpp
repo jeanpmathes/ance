@@ -87,7 +87,9 @@ struct ance::cet::Printer::Implementation
 
             if (declare.value != nullptr)
             {
-                print(" <: temporary ");
+                print(" ");
+                print(core::Assigner::COPY_ASSIGNMENT);
+                print(" temporary ");
                 print(declare.value->id());
             }
 
@@ -97,7 +99,9 @@ struct ance::cet::Printer::Implementation
         void visit(Store const& store) override
         {
             print(store.variable.name());
-            print(" <: temporary ");
+            print(" ");
+            print(core::Assigner::COPY_ASSIGNMENT);
+            print(" temporary ");
             print(store.value.id());
             print(";");
         }
@@ -115,7 +119,9 @@ struct ance::cet::Printer::Implementation
         {
             print("temporary ");
             print(write_temporary.destination.id());
-            print(" <: temporary ");
+            print(" ");
+            print(core::Assigner::COPY_ASSIGNMENT);
+            print(" temporary ");
             print(write_temporary.source.id());
             print(";");
         }
@@ -124,7 +130,9 @@ struct ance::cet::Printer::Implementation
         {
             print("temporary ");
             print(intrinsic.destination.id());
-            print(" <- intrinsic(");
+            print(" ");
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" intrinsic(");
             print(intrinsic.intrinsic);
             for (auto const* argument : intrinsic.arguments)
             {
@@ -138,7 +146,9 @@ struct ance::cet::Printer::Implementation
         {
             print("temporary ");
             print(call.destination.id());
-            print(" <- ");
+            print(" ");
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" ");
             print("<unknown function>"); // todo: function name
             print("(");
             for (size_t i = 0; i < call.arguments.size(); ++i)
@@ -153,7 +163,9 @@ struct ance::cet::Printer::Implementation
         {
             print("temporary ");
             print(read.destination.id());
-            print(" <: ");
+            print(" ");
+            print(core::Assigner::COPY_ASSIGNMENT);
+            print(" ");
             print(read.variable.name());
         }
 
@@ -161,7 +173,9 @@ struct ance::cet::Printer::Implementation
         {
             print("temporary ");
             print(constant.destination.id());
-            print(" <: ");
+            print(" ");
+            print(core::Assigner::COPY_ASSIGNMENT);
+            print(" ");
             print(constant.value);
         }
 
@@ -169,7 +183,9 @@ struct ance::cet::Printer::Implementation
         {
             print("temporary ");
             print(unary_operation.destination.id());
-            print(" <- ");
+            print(" ");
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" ");
             print(unary_operation.op.toString());
             print(" ");
             print(unary_operation.operand.id());

@@ -143,7 +143,11 @@ public:
     return visitChildren(ctx);
   }
 
-  virtual std::any visitAssigner(anceParser::AssignerContext *ctx) override {
+  virtual std::any visitCopyAssigner(anceParser::CopyAssignerContext *ctx) override {
+    return visitChildren(ctx);
+  }
+
+  virtual std::any visitFinalCopyAssigner(anceParser::FinalCopyAssignerContext *ctx) override {
     return visitChildren(ctx);
   }
 

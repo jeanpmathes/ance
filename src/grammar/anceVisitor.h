@@ -83,7 +83,9 @@ public:
 
     virtual std::any visitEntity(anceParser::EntityContext *context) = 0;
 
-    virtual std::any visitAssigner(anceParser::AssignerContext *context) = 0;
+    virtual std::any visitCopyAssigner(anceParser::CopyAssignerContext *context) = 0;
+
+    virtual std::any visitFinalCopyAssigner(anceParser::FinalCopyAssignerContext *context) = 0;
 
     virtual std::any visitPublic(anceParser::PublicContext *context) = 0;
 

@@ -26,8 +26,8 @@ struct ance::cet::Runner::Implementation
     class Variable
     {
     public:
-        Variable(core::Identifier const& identifier, core::Type const& type, core::Location const& location)
-            : identifier_(identifier), type_(type), variable_(identifier, type, location)
+        Variable(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location)
+            : identifier_(identifier), type_(type), variable_(identifier, type, is_final, location)
         {
         }
 
@@ -53,7 +53,7 @@ struct ance::cet::Runner::Implementation
 
         Scope* parent() const { return parent_; }
 
-        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> declare(core::Identifier const& identifier, core::Type const& type, core::Location const& location, std::function<void(core::Entity const&)> allocate, core::Reporter& reporter)
+        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> declare(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location, core::Reporter& reporter)
         {
             if (!canDeclare(identifier))
             {
@@ -61,10 +61,8 @@ struct ance::cet::Runner::Implementation
                 return std::nullopt;
             }
 
-            utility::Owned<Variable> variable = utility::makeOwned<Variable>(identifier, type, location);
+            utility::Owned<Variable> variable = utility::makeOwned<Variable>(identifier, type, is_final, location);
             Variable const& variable_ref = *variable;
-
-            allocate(variable_ref.variable());
 
             onDeclare(std::move(variable));
 
@@ -194,10 +192,9 @@ struct ance::cet::Runner::Implementation
         Intrinsics(
             sources::SourceTree& source_tree,
             core::Reporter& reporter,
-            std::function<void(core::Entity const&)> allocate,
             std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide,
             std::function<void(std::filesystem::path const&)> include)
-            : source_tree_(source_tree), reporter_(reporter), allocate_(std::move(allocate)), provide_(std::move(provide)), include_(std::move(include))
+            : source_tree_(source_tree), reporter_(reporter), provide_(std::move(provide)), include_(std::move(include))
         {
         }
 
@@ -229,16 +226,18 @@ struct ance::cet::Runner::Implementation
 
         void visit(core::Declare const&) override
         {
-            assert(arguments_->size() == 3);
+            assert(arguments_->size() == 4);
             assert(arguments_->at(0)->type() == core::Type::Scope());
             assert(arguments_->at(1)->type() == core::Type::Ident());
-            assert(arguments_->at(2)->type() == core::Type::Self());
+            assert(arguments_->at(2)->type() == core::Type::Bool());
+            assert(arguments_->at(3)->type() == core::Type::Self());
 
             Scope& scope = *static_cast<Scope*>(arguments_->at(0)->getScope());
             core::Identifier const& identifier = arguments_->at(1)->getIdentifier();
-            core::Type const& type = arguments_->at(2)->getType();
+            bool const is_final = arguments_->at(2)->getBool();
+            core::Type const& type = arguments_->at(3)->getType();
 
-            auto variable = scope.declare(identifier, type, location_, allocate_, reporter_);
+            auto variable = scope.declare(identifier, type, is_final, location_, reporter_);
 
             if (variable.hasValue())
             {
@@ -342,7 +341,6 @@ struct ance::cet::Runner::Implementation
         sources::SourceTree& source_tree_;
         core::Reporter& reporter_;
 
-        std::function<void(core::Entity const&)> allocate_;
         std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide_;
         std::function<void(std::filesystem::path const&)> include_;
 
@@ -388,12 +386,14 @@ struct ance::cet::Runner::Implementation
 
             if (arity != argument_count)
             {
-                reporter_.error("Call to '" + signature.name() + "' with wrong number of arguments: " +
+                reporter_.error("Call to '" + signature.name() + "' with wrong number of arguments:" +
                                 " expected " + std::to_string(arity) +
                                 " but got " + std::to_string(argument_count),
                                 location);
                 ok = false;
             }
+
+            if (!ok) return false;
 
             for (size_t i = 0; i < argument_count; ++i)
             {
@@ -543,7 +543,18 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            core::Type const& type = entity.asVariable()->type(); // todo: use a type method on Entity to get the type
+            core::Variable const* variable = entity.asVariable();
+
+            bool const is_defined = variables_.contains(&entity);
+
+            if (variable->isFinal() && is_defined)
+            {
+                reporter_.error("Cannot store to final variable '" + entity.name() + "'", store.target.location);
+                abort();
+                return;
+            }
+
+            core::Type const& type = variable->type(); // todo: use a type method on Entity to get the type
 
             if (!requireType(type, value->type(), store.value.location))
             {
@@ -629,7 +640,7 @@ struct ance::cet::Runner::Implementation
                     core::Signature::Parameter const& parameter = function.signature().parameters()[i];
                     utility::Shared<core::Value> & argument  = arguments[i];
 
-                    utility::Optional<utility::Shared<core::Value>> variable = current_scope_->declare(parameter.name, parameter.type, core::Location::global(), allocate_, reporter_);
+                    utility::Optional<utility::Shared<core::Value>> variable = current_scope_->declare(parameter.name, parameter.type, true, core::Location::global(), reporter_);
 
                     if (!variable.hasValue())
                     {
@@ -667,6 +678,14 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
+            bool const is_defined = variables_.contains(&entity);
+            if (!is_defined)
+            {
+                reporter_.error("Reading from undefined variable '" + entity.name() + "'", read.target.location);
+                abort();
+                return;
+            }
+
             utility::Shared<core::Value> value = variables_.at(&entity);
             temporaries_.insert_or_assign(&read.destination, value);
         }
@@ -674,6 +693,20 @@ struct ance::cet::Runner::Implementation
         void visit(bbt::Constant const& constant) override
         {
             temporaries_.insert_or_assign(&constant.destination, constant.value->clone());
+        }
+
+        void visit(bbt::Default const& default_value) override
+        {
+            utility::Shared<core::Value> type_value = temporaries_.at(&default_value.type);
+
+            if (!requireType(core::Type::Self(), type_value->type(), default_value.type.location))
+            {
+                abort();
+                return;
+            }
+
+            utility::Shared<core::Value> value = core::Value::makeDefault(type_value->getType());
+            temporaries_.insert_or_assign(&default_value.destination, value);
         }
 
         void visit(bbt::CurrentScope const& current_scope) override
@@ -699,6 +732,12 @@ struct ance::cet::Runner::Implementation
             }
         }
 
+        void visit(bbt::TypeOf const& type_of) override
+        {
+            utility::Shared<core::Value> value = temporaries_.at(&type_of.expression);
+            temporaries_.insert_or_assign(&type_of.destination, core::Value::makeType(value->type()));
+        }
+
         void visit(bbt::OrderedScopeEnter const&) override
         {
             current_scope_ = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
@@ -719,10 +758,6 @@ struct ance::cet::Runner::Implementation
         core::Reporter& reporter_;
         std::function<utility::Optional<utility::Owned<bbt::UnorderedScope>>(std::filesystem::path const&)> read_unordered_scope_;
         utility::List<utility::Owned<Provider>>& providers_;
-
-        std::function<void(core::Entity const&)> allocate_ = [this](core::Entity const& entity) {
-            this->variables_.insert_or_assign(&entity, core::Value::makeDefault(entity.asVariable()->type())); // todo: give entity a type method?
-        };
 
         std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide_ = [this](core::Identifier const& identifier) -> utility::Optional<utility::Shared<core::Value>> {
             for (auto& provider : this->providers_)
@@ -751,7 +786,7 @@ struct ance::cet::Runner::Implementation
             this->visit(scope_ref);
         };
 
-        Intrinsics intrinsics_ {source_tree_, reporter_, allocate_, provide_, include_};
+        Intrinsics intrinsics_ {source_tree_, reporter_, provide_, include_};
 
         std::map<core::Entity const*, utility::Shared<core::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
