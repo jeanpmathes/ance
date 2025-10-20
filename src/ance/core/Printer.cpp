@@ -56,12 +56,6 @@ void ance::core::Printer::print(utility::Shared<Value> const& value)
     out_ << *value;
 }
 
-void ance::core::Printer::print(size_t const value)
-{
-    indent();
-    out_ << value;
-}
-
 void ance::core::Printer::line()
 {
     indent();

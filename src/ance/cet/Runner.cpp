@@ -7,6 +7,8 @@
 #include <string>
 #include <functional>
 #include <filesystem>
+#include <vector>
+
 
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Value.h"
@@ -85,19 +87,6 @@ struct ance::cet::Runner::Implementation
             }
 
             return provider(identifier);
-        }
-
-        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> expect(core::Identifier const& identifier, std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> const& provider, core::Reporter& reporter)
-        {
-            utility::Optional<utility::Shared<core::Value>> variable = find(identifier, provider);
-
-            if (!variable.hasValue())
-            {
-                reporter.error("Cannot resolve name '" + identifier + "'", identifier.location());
-                return std::nullopt;
-            }
-
-            return variable;
         }
 
       protected:
@@ -184,6 +173,11 @@ struct ance::cet::Runner::Implementation
         std::map<core::Identifier, std::reference_wrapper<Variable const>> variables_ = {};
     };
 
+    struct PendingResolution
+    {
+        core::Identifier identifier;
+    };
+
     class Intrinsics final : core::IntrinsicVisitor
     {
     public:
@@ -204,6 +198,7 @@ struct ance::cet::Runner::Implementation
             arguments_ = &arguments;
             return_value_ = core::Value::makeUnit();
             expected_return_type_ = &intrinsic.returnType();
+            pending_resolution_ = std::nullopt;
 
             this->visit(intrinsic);
 
@@ -212,6 +207,17 @@ struct ance::cet::Runner::Implementation
             expected_return_type_ = nullptr;
 
             return return_value_;
+        }
+
+        [[nodiscard]] bool isPending() const
+        {
+            return pending_resolution_.hasValue();
+        }
+
+        [[nodiscard]] PendingResolution const& pending() const
+        {
+            assert(pending_resolution_.hasValue());
+            return pending_resolution_.value();
         }
 
         void visit(core::Dynamic const& dynamic) override
@@ -258,7 +264,7 @@ struct ance::cet::Runner::Implementation
             Scope& scope = *static_cast<Scope*>(arguments_->at(0)->getScope());
             core::Identifier const& identifier = arguments_->at(1)->getIdentifier();
 
-            utility::Optional<utility::Shared<core::Value>> variable = scope.expect(identifier, provide_, reporter_);
+            utility::Optional<utility::Shared<core::Value>> variable = scope.find(identifier, provide_);
 
             if (variable.hasValue())
             {
@@ -266,7 +272,7 @@ struct ance::cet::Runner::Implementation
             }
             else
             {
-                abort();
+                setPending(identifier);
             }
         }
 
@@ -335,6 +341,13 @@ struct ance::cet::Runner::Implementation
 
         void abort()
         {
+            pending_resolution_ = std::nullopt;
+            return_value_ = std::nullopt;
+        }
+
+        void setPending(core::Identifier const& identifier)
+        {
+            pending_resolution_ = PendingResolution {identifier};
             return_value_ = std::nullopt;
         }
 
@@ -349,12 +362,38 @@ struct ance::cet::Runner::Implementation
 
         utility::Optional<utility::Shared<core::Value>> return_value_ = std::nullopt;
         core::Type const* expected_return_type_ = nullptr;
+        utility::Optional<PendingResolution> pending_resolution_ = std::nullopt;
     };
 
     class BBT final : public bbt::Visitor
     {
     public:
         using Visitor::visit;
+
+        enum class ExecutionResult
+        {
+            Completed,
+            Pending,
+            Error,
+        };
+
+        struct RunPoint
+        {
+            RunPoint(bbt::BasicBlock const& start, Scope* initial_scope)
+                : block(&start), scope(initial_scope)
+            {
+            }
+
+            void clearBlocker()
+            {
+                blocker = std::nullopt;
+            }
+
+            bbt::BasicBlock const*         block = nullptr;
+            size_t                         statement_index = 0;
+            Scope*                         scope = nullptr;
+            utility::Optional<PendingResolution> blocker = std::nullopt;
+        };
 
         BBT(
             sources::SourceTree& source_tree,
@@ -363,6 +402,80 @@ struct ance::cet::Runner::Implementation
             utility::List<utility::Owned<Provider>>& providers)
         : source_tree_(source_tree), reporter_(reporter), read_unordered_scope_(std::move(get_unordered_scope)), providers_(providers) {}
         ~BBT() override = default;
+
+        void schedule(bbt::Flow const& flow)
+        {
+            run_points_.emplace_back(flow.entry, current_scope_);
+        }
+
+        [[nodiscard]] bool hasRunPoints() const
+        {
+            return !run_points_.empty();
+        }
+
+        std::list<RunPoint>::iterator getRunPointBegin()
+        {
+            return run_points_.begin();
+        }
+
+        std::list<RunPoint>::iterator getRunPointEnd()
+        {
+            return run_points_.end();
+        }
+
+        std::list<RunPoint>::iterator removeRunPoint(std::list<RunPoint>::iterator const& index)
+        {
+            return run_points_.erase(index);
+        }
+
+        void reportBlockers() const
+        {
+            for (auto const& run_point : run_points_)
+            {
+                if (run_point.blocker.hasValue())
+                {
+                    auto const& [identifier] = run_point.blocker.value();
+                    reporter_.error("Cannot resolve name '" + identifier + "'", identifier.location());
+                }
+            }
+        }
+
+        ExecutionResult execute(RunPoint& run_point)
+        {
+            RunPoint* previous_run_point = current_run_point_;
+            bbt::BasicBlock const* previous_next = next_;
+            size_t const previous_statement_index = current_statement_index_;
+            Scope* previous_scope = current_scope_;
+            ExecutionResult const previous_result = execution_result_;
+
+            current_run_point_ = &run_point;
+            run_point.clearBlocker();
+
+            execution_result_ = ExecutionResult::Completed;
+            next_ = run_point.block;
+            current_statement_index_ = run_point.statement_index;
+            current_scope_ = run_point.scope;
+
+            while (next_ != nullptr && execution_result_ == ExecutionResult::Completed)
+            {
+                run_point.block = next_;
+                visit(*next_);
+            }
+
+            run_point.scope = current_scope_;
+            run_point.block = next_;
+            run_point.statement_index = current_statement_index_;
+
+            ExecutionResult const result = execution_result_;
+
+            current_scope_ = previous_scope;
+            current_statement_index_ = previous_statement_index;
+            next_ = previous_next;
+            execution_result_ = previous_result;
+            current_run_point_ = previous_run_point;
+
+            return result;
+        }
 
         [[nodiscard]] bool requireType(core::Type const& expected, core::Type const& actual, core::Location const& location) const
         {
@@ -409,26 +522,22 @@ struct ance::cet::Runner::Implementation
 
         void abort()
         {
-            encountered_error_ = true;
+            execution_result_ = ExecutionResult::Error;
             next_ = nullptr;
-        }
-
-        void run(bbt::BasicBlock const& basic_block)
-        {
-            next_ = &basic_block;
-
-            while (next_ != nullptr)
+            if (current_run_point_ != nullptr)
             {
-                visit(*next_);
+                current_run_point_->clearBlocker();
             }
-
-            // todo: when creating new basic blocks here, also implement simplification / already output simplified blocks for compilation
-            // todo: maybe simplification code should be shared in some way?
         }
 
-        void run(bbt::Statement const& statement)
+        void block(PendingResolution const& blocker)
         {
-            visit(statement);
+            execution_result_ = ExecutionResult::Pending;
+            next_ = nullptr;
+
+            assert(current_run_point_ != nullptr);
+            current_run_point_->blocker = blocker;
+            current_run_point_->scope = current_scope_;
         }
 
         [[nodiscard]] Scope* scope()
@@ -438,40 +547,65 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::UnorderedScope const& scope) override
         {
-            Scope* previous = current_scope_;
-            current_scope_ = scopes_.emplace_back(utility::makeOwned<UnorderedScope>(nullptr)).get();
-
-            for (auto const& flow : scope.flows)
-            {
-                flows_.emplace_back(flow.get());
-
-                visit(*flow);
-
-                if (encountered_error_)
-                    return;
-            }
-
-            current_scope_ = previous;
+            scheduleUnorderedScope(scope);
         }
 
         void visit(bbt::Flow const& flow) override
         {
-            flows_.emplace_back(&flow);
+            RunPoint run_point(flow.entry, current_scope_);
+            ExecutionResult const result = execute(run_point);
 
-            run(flow.entry);
+            if (result == ExecutionResult::Pending)
+            {
+                if (run_point.blocker.hasValue())
+                {
+                    block(run_point.blocker.value());
+                }
+                else
+                {
+                    abort();
+                }
+            }
         }
 
         void visit(bbt::BasicBlock const& basic_block) override
         {
-            for (auto& statement : basic_block.statements)
-            {
-                run(*statement);
+            assert(current_run_point_ != nullptr);
 
-                if (encountered_error_)
+            current_run_point_->block = &basic_block;
+            current_run_point_->scope = current_scope_;
+
+            size_t const statement_count = basic_block.statements.size();
+
+            while (current_statement_index_ < statement_count)
+            {
+                current_run_point_->statement_index = current_statement_index_;
+                current_run_point_->scope = current_scope_;
+
+                visit(*basic_block.statements[current_statement_index_]);
+
+                if (execution_result_ != ExecutionResult::Completed)
+                {
                     return;
+                }
+
+                current_statement_index_ += 1;
             }
 
+            current_run_point_->statement_index = current_statement_index_;
+            current_run_point_->scope = current_scope_;
+
+            current_statement_index_ = 0;
             visit(*basic_block.link);
+
+            if (execution_result_ != ExecutionResult::Completed)
+            {
+                return;
+            }
+
+            current_run_point_->block = next_;
+            current_run_point_->statement_index = current_statement_index_;
+            current_run_point_->scope = current_scope_;
         }
 
         void visit(bbt::ErrorLink const& error_link) override
@@ -592,7 +726,14 @@ struct ance::cet::Runner::Implementation
 
             if (!result.hasValue())
             {
-                abort();
+                if (intrinsics_.isPending())
+                {
+                    block(intrinsics_.pending());
+                }
+                else
+                {
+                    abort();
+                }
                 return;
             }
 
@@ -633,6 +774,7 @@ struct ance::cet::Runner::Implementation
             for (auto argument : call.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
             {
+                Scope* previous_scope = current_scope_;
                 current_scope_ = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
 
                 for (size_t i = 0; i < function.signature().arity(); ++i)
@@ -651,9 +793,30 @@ struct ance::cet::Runner::Implementation
                     variables_.insert_or_assign(&(*variable)->getEntity(), argument);
                 }
 
-                visit(function.body());
+                RunPoint nested(function.body().entry, current_scope_);
+                ExecutionResult const nested_result = execute(nested); // todo: this is very wrong
 
-                current_scope_ = current_scope_->parent();
+                current_scope_ = previous_scope;
+
+                if (nested_result == ExecutionResult::Pending)
+                {
+                    if (nested.blocker.hasValue())
+                    {
+                        block(nested.blocker.value());
+                    }
+                    else
+                    {
+                        abort();
+                    }
+
+                    return;
+                }
+
+                if (nested_result == ExecutionResult::Error)
+                {
+                    abort();
+                    return;
+                }
             }
 
             temporaries_.insert_or_assign(&call.destination, core::Value::makeUnit());
@@ -770,6 +933,19 @@ struct ance::cet::Runner::Implementation
             return std::nullopt;
         };
 
+        void scheduleUnorderedScope(bbt::UnorderedScope const& scope)
+        {
+            Scope* previous = current_scope_;
+            current_scope_ = scopes_.emplace_back(utility::makeOwned<UnorderedScope>(nullptr)).get();
+
+            for (auto const& flow : scope.flows)
+            {
+                schedule(*flow);
+            }
+
+            current_scope_ = previous;
+        }
+
         std::function<void(std::filesystem::path const&)> include_ = [this](std::filesystem::path const& path) {
             utility::Optional<utility::Owned<bbt::UnorderedScope>> scope = read_unordered_scope_(path);
 
@@ -783,7 +959,7 @@ struct ance::cet::Runner::Implementation
 
             roots_.emplace_back(std::move(*scope));
 
-            this->visit(scope_ref);
+            scheduleUnorderedScope(scope_ref);
         };
 
         Intrinsics intrinsics_ {source_tree_, reporter_, provide_, include_};
@@ -791,28 +967,68 @@ struct ance::cet::Runner::Implementation
         std::map<core::Entity const*, utility::Shared<core::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
 
-        std::vector<utility::Owned<Scope>> scopes_ = {};
-        Scope* current_scope_ = nullptr;
+        std::list<RunPoint> run_points_ = {};
+        RunPoint* current_run_point_ = nullptr;
+        size_t current_statement_index_ = 0;
 
         bbt::BasicBlock const* next_ = nullptr;
-        bool encountered_error_ = false;
+        ExecutionResult execution_result_ = ExecutionResult::Completed;
 
         utility::List<utility::Owned<bbt::UnorderedScope>> roots_;
-        utility::List<bbt::Flow const*> flows_;
+
+        std::vector<utility::Owned<Scope>> scopes_ = {};
+        Scope* current_scope_ = nullptr;
     };
 
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
         : source_tree_(source_tree), reporter_(reporter), segmenter_(source_tree, reporter, context), context_(context)
     {}
 
-    utility::Optional<utility::Owned<Unit>> runOrderedFile(std::filesystem::path const& file) // todo: reduce duplication with below (templates)
+    utility::Optional<utility::Owned<Unit>> runOrderedFile(std::filesystem::path const& file)
     {
         utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentOrderedFile(file);
         if (!flow.hasValue())
             return std::nullopt;
 
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(source_tree_, reporter_, [&](std::filesystem::path const& f) { return readUnorderedScope(f); }, providers_);
-        bbt->visit(**flow);
+        bbt->schedule(**flow);
+
+        while (bbt->hasRunPoints())
+        {
+            bool progress = false;
+
+            for (auto iterator = bbt->getRunPointBegin(); iterator != bbt->getRunPointEnd(); )
+            {
+                BBT::ExecutionResult const result = bbt->execute(*iterator);
+
+                if (result == BBT::ExecutionResult::Completed)
+                {
+                    iterator = bbt->removeRunPoint(iterator);
+                    progress = true;
+
+                    continue;
+                }
+
+                if (result == BBT::ExecutionResult::Pending)
+                {
+                    iterator = std::next(iterator);
+
+                    continue;
+                }
+
+                if (result == BBT::ExecutionResult::Error)
+                {
+                    return std::nullopt;
+                }
+            }
+
+            if (!progress && bbt->hasRunPoints())
+            {
+                bbt->reportBlockers();
+
+                return std::nullopt;
+            }
+        }
 
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
         if (reporter_.isFailed())

@@ -47,9 +47,6 @@ namespace ance::core
         /// Print a value to the output stream.
         void print(utility::Shared<Value> const& value);
 
-        /// Print a size_t value to the output stream.
-        void print(size_t value);
-
         /// Start a new line.
         void line();
 

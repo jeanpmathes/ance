@@ -43,7 +43,7 @@ struct ance::bbt::Printer::Implementation
         void visit(BasicBlock const& block) override
         {
             print("block ");
-            print(block.id);
+            print(std::to_string(block.id));
             line();
             enter();
 
@@ -81,9 +81,9 @@ struct ance::bbt::Printer::Implementation
         void visit(Branch const& branch_link) override
         {
             print("branch (");
-            print(branch_link.true_branch.id);
+            print(std::to_string(branch_link.true_branch.id));
             print(", ");
-            print(branch_link.false_branch.id);
+            print(std::to_string(branch_link.false_branch.id));
             print(") on temporary ");
             print(branch_link.condition.id());
         }
@@ -91,7 +91,7 @@ struct ance::bbt::Printer::Implementation
         void visit(Jump const& jump_link) override
         {
             print("jump (");
-            print(jump_link.target.id);
+            print(std::to_string(jump_link.target.id));
             print(")");
         }
 

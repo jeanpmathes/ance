@@ -202,16 +202,16 @@ namespace ance
 
         return exit_code;
 
-        // todo: bring back the assigner enum (no refs) and use it wherever it is used in grammar, correctly perform validation based on it (e.g. global var must be final)
-        // todo: also implement final check for all variables (preventing assignment)
-        // todo: also check assigners in all print outputs
-
-        // todo: change the runner to allow arbitrary stopping and continuation of execution
-        // todo: it should have a list of run-points and if running one of those stops it continues with the next one, all code in unordered scopes becomes separate run points
-        // todo: when encountering a resolution intrinsic which cannot be resolved yet, stop current execution and return as soon as resolution is possible
-        // todo: when encountering an unordered scope, simply add all new runpoints instead of directly executing
-        // todo: run points must also store the scope they are in so that current_scope_ can be set
+        // todo: fix the current error (only happens sometimes)
+        // todo: make sure that unresolvable variables are actually detected and cause compiler errors, e.g. at end or in while loops
         // todo: check that global variable references can be resolved this way, also check circular case which should be detected (no runnable run point)
+
+        // todo: think about function calls - creating a new run point for each function call is wrong, instead run points should have a stack
+        // todo: a function call would push to the stack of the current run point, every attempt of execution would go directly to the called fucntion
+        // todo: when the stack is popped, the outer run point continues execution
+        // todo: but the return value has to be stored in the run point too, and the function call has to check on repeated execution whether there is already a return value
+
+        // todo: refactor runner by pulling stuff out into other files
 
         // todo: remove essentially everything from the CET as it has to be rebuilt anyways
         // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes (maybe use limited variants in the earlier steps, e.g. type enums for the ast, make current type and value and entity a thing of the bbt)
