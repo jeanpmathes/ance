@@ -446,17 +446,17 @@ struct ance::cet::Runner::Implementation
             bbt::BasicBlock const* previous_next = next_;
             size_t const previous_statement_index = current_statement_index_;
             Scope* previous_scope = current_scope_;
-            ExecutionResult const previous_result = execution_result_;
+            utility::Optional<ExecutionResult> const previous_result = execution_result_;
 
             current_run_point_ = &run_point;
             run_point.clearBlocker();
 
-            execution_result_ = ExecutionResult::Completed;
+            execution_result_ = std::nullopt;
             next_ = run_point.block;
             current_statement_index_ = run_point.statement_index;
             current_scope_ = run_point.scope;
 
-            while (next_ != nullptr && execution_result_ == ExecutionResult::Completed)
+            while (!execution_result_.hasValue() && next_ != nullptr)
             {
                 run_point.block = next_;
                 visit(*next_);
@@ -466,7 +466,7 @@ struct ance::cet::Runner::Implementation
             run_point.block = next_;
             run_point.statement_index = current_statement_index_;
 
-            ExecutionResult const result = execution_result_;
+            ExecutionResult const result = execution_result_.valueOr(ExecutionResult::Completed);
 
             current_scope_ = previous_scope;
             current_statement_index_ = previous_statement_index;
@@ -523,21 +523,15 @@ struct ance::cet::Runner::Implementation
         void abort()
         {
             execution_result_ = ExecutionResult::Error;
-            next_ = nullptr;
-            if (current_run_point_ != nullptr)
-            {
-                current_run_point_->clearBlocker();
-            }
+
+            current_run_point_->clearBlocker();
         }
 
         void block(PendingResolution const& blocker)
         {
             execution_result_ = ExecutionResult::Pending;
-            next_ = nullptr;
 
-            assert(current_run_point_ != nullptr);
             current_run_point_->blocker = blocker;
-            current_run_point_->scope = current_scope_;
         }
 
         [[nodiscard]] Scope* scope()
@@ -584,7 +578,7 @@ struct ance::cet::Runner::Implementation
 
                 visit(*basic_block.statements[current_statement_index_]);
 
-                if (execution_result_ != ExecutionResult::Completed)
+                if (execution_result_.hasValue())
                 {
                     return;
                 }
@@ -597,15 +591,6 @@ struct ance::cet::Runner::Implementation
 
             current_statement_index_ = 0;
             visit(*basic_block.link);
-
-            if (execution_result_ != ExecutionResult::Completed)
-            {
-                return;
-            }
-
-            current_run_point_->block = next_;
-            current_run_point_->statement_index = current_statement_index_;
-            current_run_point_->scope = current_scope_;
         }
 
         void visit(bbt::ErrorLink const& error_link) override
@@ -972,7 +957,7 @@ struct ance::cet::Runner::Implementation
         size_t current_statement_index_ = 0;
 
         bbt::BasicBlock const* next_ = nullptr;
-        ExecutionResult execution_result_ = ExecutionResult::Completed;
+        utility::Optional<ExecutionResult> execution_result_;
 
         utility::List<utility::Owned<bbt::UnorderedScope>> roots_;
 

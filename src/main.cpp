@@ -202,9 +202,7 @@ namespace ance
 
         return exit_code;
 
-        // todo: fix the current error (only happens sometimes)
-        // todo: make sure that unresolvable variables are actually detected and cause compiler errors, e.g. at end or in while loops
-        // todo: check that global variable references can be resolved this way, also check circular case which should be detected (no runnable run point)
+        // todo: get current global variables in included.nc to work, then check that cyclical case is handled correctly
 
         // todo: think about function calls - creating a new run point for each function call is wrong, instead run points should have a stack
         // todo: a function call would push to the stack of the current run point, every attempt of execution would go directly to the called fucntion
