@@ -202,8 +202,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: get current global variables in included.nc to work, then check that cyclical case is handled correctly
-
         // todo: think about function calls - creating a new run point for each function call is wrong, instead run points should have a stack
         // todo: a function call would push to the stack of the current run point, every attempt of execution would go directly to the called fucntion
         // todo: when the stack is popped, the outer run point continues execution

@@ -188,55 +188,67 @@ struct ance::est::Expander::Implementation
             setResultDeclaration(wrap(std::move(statements)));
         }
 
-        void visit(ast::VariableDeclaration const& global) override
+        void visit(ast::VariableDeclaration const& variable_declaration) override
         {
             Statements statements;
 
-            Expansion type_expansion = expand(*global.type);
+            Expansion type_expansion = expand(*variable_declaration.type);
 
             append(statements, std::move(type_expansion.before));
 
             utility::List<utility::Owned<Expression>> parent_arguments;
-            parent_arguments.emplace_back(utility::makeOwned<CurrentScope>(global.location));
+            parent_arguments.emplace_back(utility::makeOwned<CurrentScope>(variable_declaration.location));
 
             utility::Owned<Expression> parent_scope = utility::makeOwned<Intrinsic>(
-                core::GetParent::instance(), std::move(parent_arguments), global.location);
+                core::GetParent::instance(), std::move(parent_arguments), variable_declaration.location);
 
-            utility::Owned<Temporary> tempoary_type = utility::makeOwned<Temporary>(std::move(type_expansion.center), global.location);
-            Temporary const&        tmp_type       = *tempoary_type;
-            statements.emplace_back(std::move(tempoary_type));
+            utility::Owned<Temporary> temporary_type = utility::makeOwned<Temporary>(std::move(type_expansion.center), variable_declaration.location);
+            Temporary const&        tmp_type       = *temporary_type;
+            statements.emplace_back(std::move(temporary_type));
 
-            utility::List<utility::Owned<Expression>> declare_arguments;
-            declare_arguments.emplace_back(std::move(parent_scope));
-            declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(global.identifier, global.location));
-            declare_arguments.emplace_back(utility::makeOwned<Literal>(core::Value::makeBool(global.assigner.isFinal()), global.location));
-            declare_arguments.emplace_back(utility::makeOwned<ReadTemporary>(tmp_type, global.location));
+            // We need to go through the initializer expression first, otherwise the name would already be declared.
+            // If we then yield in the initializer other run points could access the undefined variable.
 
-            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(
-                utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), global.location),
-                global.location);
-            Temporary const& tmp_entity = *temporary_entity;
-            statements.emplace_back(std::move(temporary_entity));
+            Temporary const* tmp_initial_value;
+            Statements initial_value_after_statements;
 
-            if (global.value.hasValue())
+            if (variable_declaration.value.hasValue())
             {
-                Expansion value_expansion = expand(**global.value);
+                Expansion value_expansion = expand(**variable_declaration.value);
 
                 append(statements, std::move(value_expansion.before));
-                statements.emplace_back(utility::makeOwned<Write>(
-                    utility::makeOwned<ReadTemporary>(tmp_entity, global.location),
-                    std::move(value_expansion.center),
-                    global.location));
-                append(statements, std::move(value_expansion.after));
+
+                utility::Owned<Temporary> temporary_value = utility::makeOwned<Temporary>(std::move(value_expansion.center), variable_declaration.location);
+                tmp_initial_value = temporary_value.get();
+                statements.emplace_back(std::move(temporary_value));
+
+                initial_value_after_statements = std::move(value_expansion.after);
             }
             else
             {
-                statements.emplace_back(utility::makeOwned<Write>(
-                    utility::makeOwned<ReadTemporary>(tmp_entity, global.location),
-                    utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, global.location), global.location),
-                    global.location));
+                utility::Owned<Temporary> temporary_value = utility::makeOwned<Temporary>(utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location), variable_declaration.location), variable_declaration.location);
+                tmp_initial_value = temporary_value.get();
+                statements.emplace_back(std::move(temporary_value));
             }
 
+            utility::List<utility::Owned<Expression>> declare_arguments;
+            declare_arguments.emplace_back(std::move(parent_scope));
+            declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(variable_declaration.identifier, variable_declaration.location));
+            declare_arguments.emplace_back(utility::makeOwned<Literal>(core::Value::makeBool(variable_declaration.assigner.isFinal()), variable_declaration.location));
+            declare_arguments.emplace_back(utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location));
+
+            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(
+                utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), variable_declaration.location),
+                variable_declaration.location);
+            Temporary const& tmp_entity = *temporary_entity;
+            statements.emplace_back(std::move(temporary_entity));
+
+            statements.emplace_back(utility::makeOwned<Write>(
+                    utility::makeOwned<ReadTemporary>(tmp_entity, variable_declaration.location),
+                    utility::makeOwned<ReadTemporary>(*tmp_initial_value, variable_declaration.location),
+                    variable_declaration.location));
+
+            append(statements, std::move(initial_value_after_statements));
             append(statements, std::move(type_expansion.after));
 
             setResultDeclaration(wrap(std::move(statements)));
@@ -285,6 +297,28 @@ struct ance::est::Expander::Implementation
             Temporary const&        tmp_type       = *temporary_type;
             statements.emplace_back(std::move(temporary_type));
 
+            Temporary const* tmp_initial_value;
+            Statements after;
+
+            if (let.value.hasValue())
+            {
+                Expansion expansion = expand(**let.value);
+
+                append(statements, std::move(expansion.before));
+
+                utility::Owned<Temporary> temporary_value = utility::makeOwned<Temporary>(std::move(expansion.center), let.location);
+                tmp_initial_value = temporary_value.get();
+                statements.emplace_back(std::move(temporary_value));
+
+                after = std::move(expansion.after);
+            }
+            else
+            {
+                utility::Owned<Temporary> temporary_value = utility::makeOwned<Temporary>(utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, let.location), let.location), let.location);
+                tmp_initial_value = temporary_value.get();
+                statements.emplace_back(std::move(temporary_value));
+            }
+
             utility::List<utility::Owned<Expression>> declare_arguments;
             declare_arguments.emplace_back(utility::makeOwned<CurrentScope>(let.location));
             declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(let.identifier, let.location));
@@ -294,24 +328,9 @@ struct ance::est::Expander::Implementation
             Temporary const& tmp_entity = *temporary_entity;
             statements.emplace_back(std::move(temporary_entity));
 
-            Statements                                    after;
-
-            if (let.value.hasValue())
-            {
-                Expansion expansion = expand(**let.value);
-
-                append(statements, std::move(expansion.before));
-
-                statements.emplace_back(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, let.location), std::move(expansion.center), let.location));
-
-                after = std::move(expansion.after);
-            }
-            else
-            {
-                statements.emplace_back(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, let.location),
-                                                                utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, let.location), let.location),
+            statements.emplace_back(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, let.location),
+                                                                utility::makeOwned<ReadTemporary>(*tmp_initial_value, let.location),
                                                                  let.location));
-            }
 
             append(statements, std::move(after));
             append(statements, std::move(type_expansion.after));
