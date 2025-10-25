@@ -202,11 +202,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: think about function calls - creating a new run point for each function call is wrong, instead run points should have a stack
-        // todo: a function call would push to the stack of the current run point, every attempt of execution would go directly to the called fucntion
-        // todo: when the stack is popped, the outer run point continues execution
-        // todo: but the return value has to be stored in the run point too, and the function call has to check on repeated execution whether there is already a return value
-
         // todo: refactor runner by pulling stuff out into other files
 
         // todo: remove essentially everything from the CET as it has to be rebuilt anyways

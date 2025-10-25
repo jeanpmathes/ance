@@ -8,7 +8,7 @@
 #include <functional>
 #include <filesystem>
 #include <vector>
-
+#include <list>
 
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Value.h"
@@ -53,7 +53,7 @@ struct ance::cet::Runner::Implementation
       public:
         virtual ~Scope() = default;
 
-        Scope* parent() const { return parent_; }
+        [[nodiscard]] Scope* parent() const { return parent_; }
 
         [[nodiscard]] utility::Optional<utility::Shared<core::Value>> declare(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location, core::Reporter& reporter)
         {
@@ -372,8 +372,13 @@ struct ance::cet::Runner::Implementation
 
         enum class ExecutionResult
         {
+            /// The run point has completed execution. Only produced by top-level run points.
             Completed,
+            /// The run point is pending on the resolution of a name. Running it directly again will again result in pending.
             Pending,
+            /// The run point yielded execution to allow re-entry into itself, e.g. after the function changed. It should be entered again immediately.
+            Yield,
+            /// The run point encountered an unrecoverable error.
             Error,
         };
 
@@ -389,10 +394,13 @@ struct ance::cet::Runner::Implementation
                 blocker = std::nullopt;
             }
 
-            bbt::BasicBlock const*         block = nullptr;
-            size_t                         statement_index = 0;
-            Scope*                         scope = nullptr;
+            bbt::BasicBlock const*                 block = nullptr;
+            size_t                       statement_index = 0;
+            Scope*                                 scope = nullptr;
             utility::Optional<PendingResolution> blocker = std::nullopt;
+
+            std::list<RunPoint>                             stack        = {};
+            utility::Optional<utility::Shared<core::Value>> return_value = std::nullopt;
         };
 
         BBT(
@@ -440,7 +448,7 @@ struct ance::cet::Runner::Implementation
             }
         }
 
-        ExecutionResult execute(RunPoint& run_point)
+        std::tuple<ExecutionResult, utility::Shared<core::Value>> execute(RunPoint* run_point)
         {
             RunPoint* previous_run_point = current_run_point_;
             bbt::BasicBlock const* previous_next = next_;
@@ -448,23 +456,23 @@ struct ance::cet::Runner::Implementation
             Scope* previous_scope = current_scope_;
             utility::Optional<ExecutionResult> const previous_result = execution_result_;
 
-            current_run_point_ = &run_point;
-            run_point.clearBlocker();
+            current_run_point_ = run_point;
+            run_point->clearBlocker();
 
             execution_result_ = std::nullopt;
-            next_ = run_point.block;
-            current_statement_index_ = run_point.statement_index;
-            current_scope_ = run_point.scope;
+            next_ = run_point->block;
+            current_statement_index_ = run_point->statement_index;
+            current_scope_ = run_point->scope;
 
             while (!execution_result_.hasValue() && next_ != nullptr)
             {
-                run_point.block = next_;
+                run_point->block = next_;
                 visit(*next_);
             }
 
-            run_point.scope = current_scope_;
-            run_point.block = next_;
-            run_point.statement_index = current_statement_index_;
+            run_point->scope = current_scope_;
+            run_point->block = next_;
+            run_point->statement_index = current_statement_index_;
 
             ExecutionResult const result = execution_result_.valueOr(ExecutionResult::Completed);
 
@@ -473,6 +481,36 @@ struct ance::cet::Runner::Implementation
             next_ = previous_next;
             execution_result_ = previous_result;
             current_run_point_ = previous_run_point;
+
+            return {result, core::Value::makeUnit()};
+        }
+
+        ExecutionResult execute(RunPoint& run_point)
+        {
+            RunPoint* targeted_run_point = &run_point;
+            bool is_top_level = true;
+
+            if (!run_point.stack.empty())
+            {
+                targeted_run_point = &run_point.stack.back();
+                is_top_level = false;
+            }
+
+            auto [result, return_value] = execute(targeted_run_point);
+
+            if (!is_top_level && result == ExecutionResult::Completed)
+            {
+                run_point.stack.pop_back();
+                result = ExecutionResult::Yield;
+
+                RunPoint* next = &run_point;
+                if (!run_point.stack.empty())
+                {
+                    next = &run_point.stack.back();
+                }
+
+                next->return_value = return_value;
+            }
 
             return result;
         }
@@ -534,6 +572,13 @@ struct ance::cet::Runner::Implementation
             current_run_point_->blocker = blocker;
         }
 
+        void yield()
+        {
+            execution_result_ = ExecutionResult::Yield;
+
+            current_run_point_->clearBlocker();
+        }
+
         [[nodiscard]] Scope* scope()
         {
             return current_scope_;
@@ -544,22 +589,9 @@ struct ance::cet::Runner::Implementation
             scheduleUnorderedScope(scope);
         }
 
-        void visit(bbt::Flow const& flow) override
+        void visit(bbt::Flow const&) override
         {
-            RunPoint run_point(flow.entry, current_scope_);
-            ExecutionResult const result = execute(run_point);
-
-            if (result == ExecutionResult::Pending)
-            {
-                if (run_point.blocker.hasValue())
-                {
-                    block(run_point.blocker.value());
-                }
-                else
-                {
-                    abort();
-                }
-            }
+            assert(false);
         }
 
         void visit(bbt::BasicBlock const& basic_block) override
@@ -727,6 +759,16 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Call const& call) override
         {
+            RunPoint& run_point = *current_run_point_;
+
+            if (run_point.return_value.hasValue())
+            {
+                temporaries_.insert_or_assign(&call.destination, run_point.return_value.value());
+                run_point.return_value = std::nullopt;
+
+                return;
+            }
+
             utility::Shared<core::Value> called = temporaries_.at(&call.called);
 
             if (!requireType(core::Type::EntityRef(), called->type(), call.called.location))
@@ -758,53 +800,27 @@ struct ance::cet::Runner::Implementation
             utility::List<utility::Shared<core::Value>> arguments = {};
             for (auto argument : call.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
+            Scope* function_scope = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
+
+            for (size_t i = 0; i < function.signature().arity(); ++i)
             {
-                Scope* previous_scope = current_scope_;
-                current_scope_ = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
+                core::Signature::Parameter const& parameter = function.signature().parameters()[i];
+                utility::Shared<core::Value>& argument = arguments[i];
 
-                for (size_t i = 0; i < function.signature().arity(); ++i)
-                {
-                    core::Signature::Parameter const& parameter = function.signature().parameters()[i];
-                    utility::Shared<core::Value> & argument  = arguments[i];
+                utility::Optional<utility::Shared<core::Value>> variable = function_scope->declare(parameter.name, parameter.type, true, core::Location::global(), reporter_);
 
-                    utility::Optional<utility::Shared<core::Value>> variable = current_scope_->declare(parameter.name, parameter.type, true, core::Location::global(), reporter_);
-
-                    if (!variable.hasValue())
-                    {
-                        abort();
-                        return;
-                    }
-
-                    variables_.insert_or_assign(&(*variable)->getEntity(), argument);
-                }
-
-                RunPoint nested(function.body().entry, current_scope_);
-                ExecutionResult const nested_result = execute(nested); // todo: this is very wrong
-
-                current_scope_ = previous_scope;
-
-                if (nested_result == ExecutionResult::Pending)
-                {
-                    if (nested.blocker.hasValue())
-                    {
-                        block(nested.blocker.value());
-                    }
-                    else
-                    {
-                        abort();
-                    }
-
-                    return;
-                }
-
-                if (nested_result == ExecutionResult::Error)
+                if (!variable.hasValue())
                 {
                     abort();
                     return;
                 }
+
+                variables_.insert_or_assign(&(*variable)->getEntity(), argument);
             }
 
-            temporaries_.insert_or_assign(&call.destination, core::Value::makeUnit());
+            run_point.stack.emplace_back(function.body().entry, function_scope);
+
+            yield();
         }
 
         void visit(bbt::Read const& read) override
@@ -997,6 +1013,13 @@ struct ance::cet::Runner::Implementation
                 if (result == BBT::ExecutionResult::Pending)
                 {
                     iterator = std::next(iterator);
+
+                    continue;
+                }
+
+                if (result == BBT::ExecutionResult::Yield)
+                {
+                    progress = true;
 
                     continue;
                 }
