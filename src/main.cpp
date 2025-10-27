@@ -202,9 +202,8 @@ namespace ance
 
         return exit_code;
 
-        // todo: refactor runner by pulling stuff out into other files
+        // todo: remove essentially everything from the CET as it has to be rebuilt anyways, just remove everything, put no new stuff in
 
-        // todo: remove essentially everything from the CET as it has to be rebuilt anyways
         // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes (maybe use limited variants in the earlier steps, e.g. type enums for the ast, make current type and value and entity a thing of the bbt)
 
         // todo: instead of passing an allocate lambda to the intrinsics, the entity ref should have a read and write function with validation whether it is allowed, each variable thus stores the value instead of one large variable array

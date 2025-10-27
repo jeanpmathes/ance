@@ -16,355 +16,16 @@
 #include "ance/bbt/Function.h"
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Segmenter.h"
+
 #include "ance/cet/Node.h"
 #include "ance/cet/Provider.h"
-
-#include "Grapher.h"
-#include "Printer.h"
-#include "ance/sources/SourceTree.h"
+#include "ance/cet/Grapher.h"
+#include "ance/cet/Printer.h"
+#include "ance/cet/Scope.h"
+#include "ance/cet/IntrinsicsRunner.h"
 
 struct ance::cet::Runner::Implementation
 {
-    class Variable
-    {
-    public:
-        Variable(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location)
-            : identifier_(identifier), type_(type), variable_(identifier, type, is_final, location)
-        {
-        }
-
-        [[nodiscard]] core::Identifier const& identifier() const { return identifier_; }
-        [[nodiscard]] core::Type const& type() const { return type_; }
-        [[nodiscard]] core::Variable const& variable() const { return variable_; }
-
-    private:
-        core::Identifier identifier_;
-        core::Type const& type_;
-        core::Variable variable_;
-    };
-
-    class Scope
-    {
-      protected:
-        explicit Scope(Scope* parent) : parent_(parent)
-        {
-        }
-
-      public:
-        virtual ~Scope() = default;
-
-        [[nodiscard]] Scope* parent() const { return parent_; }
-
-        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> declare(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location, core::Reporter& reporter)
-        {
-            if (!canDeclare(identifier))
-            {
-                reporter.error("Declaring '" + identifier + "' in this scope would block previous access to outside of the scope", location);
-                return std::nullopt;
-            }
-
-            utility::Owned<Variable> variable = utility::makeOwned<Variable>(identifier, type, is_final, location);
-            Variable const& variable_ref = *variable;
-
-            onDeclare(std::move(variable));
-
-            return core::Value::makeEntityRef(variable_ref.variable());
-        }
-
-        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> find(core::Identifier const& identifier,
-                                                                           std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> const& provider)
-        {
-            Variable const* variable = onFind(identifier);
-
-            if (variable != nullptr)
-            {
-                return core::Value::makeEntityRef(variable->variable());
-            }
-
-            if (parent_ != nullptr)
-            {
-                return parent_->find(identifier, provider);
-            }
-
-            return provider(identifier);
-        }
-
-      protected:
-        [[nodiscard]] virtual bool                                                         canDeclare(core::Identifier const& identifier) const = 0;
-        virtual void                                                                       onDeclare(utility::Owned<Variable> variable)   = 0;
-        [[nodiscard]] virtual Variable const* onFind(core::Identifier const& identifier)  = 0;
-
-      private:
-        Scope* parent_;
-    };
-
-    class OrderedScope final : public Scope
-    {
-      public:
-        explicit OrderedScope(Scope* parent)
-            : Scope(parent)
-        {}
-
-        ~OrderedScope() override = default;
-
-      protected:
-        [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override
-        {
-            return !outer_identifiers_.contains(identifier);
-        }
-
-        void onDeclare(utility::Owned<Variable> variable) override
-        {
-            active_variables_.emplace(variable->identifier(), std::cref(*variable));
-            all_variables_.emplace_back(std::move(variable));
-        }
-
-        [[nodiscard]] Variable const* onFind(core::Identifier const& identifier) override
-        {
-            if (active_variables_.contains(identifier))
-            {
-                return &active_variables_.at(identifier).get();
-            }
-
-            outer_identifiers_.insert(identifier);
-
-            return nullptr;
-        }
-
-      private:
-        std::vector<utility::Owned<Variable>> all_variables_ = {};
-        std::map<core::Identifier, std::reference_wrapper<Variable const>> active_variables_ = {};
-        std::set<core::Identifier> outer_identifiers_ = {};
-    };
-
-    class UnorderedScope final : public Scope
-    {
-      public:
-        explicit UnorderedScope(Scope* parent)
-            : Scope(parent)
-        {}
-
-        ~UnorderedScope() override = default;
-
-      protected:
-        [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override
-        {
-            return !variables_.contains(identifier);
-        }
-
-        void onDeclare(utility::Owned<Variable> variable) override
-        {
-            variables_.emplace(variable->identifier(), std::cref(*variable));
-            all_variables_.emplace_back(std::move(variable));
-        }
-
-        [[nodiscard]] Variable const* onFind(core::Identifier const& identifier) override
-        {
-            if (variables_.contains(identifier))
-            {
-                return &variables_.at(identifier).get();
-            }
-
-            return nullptr;
-        }
-
-      private:
-        std::vector<utility::Owned<Variable>> all_variables_ = {};
-        std::map<core::Identifier, std::reference_wrapper<Variable const>> variables_ = {};
-    };
-
-    struct PendingResolution
-    {
-        core::Identifier identifier;
-    };
-
-    class Intrinsics final : core::IntrinsicVisitor
-    {
-    public:
-        using IntrinsicVisitor::visit;
-
-        Intrinsics(
-            sources::SourceTree& source_tree,
-            core::Reporter& reporter,
-            std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide,
-            std::function<void(std::filesystem::path const&)> include)
-            : source_tree_(source_tree), reporter_(reporter), provide_(std::move(provide)), include_(std::move(include))
-        {
-        }
-
-        utility::Optional<utility::Shared<core::Value>> run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<core::Value>> const& arguments, core::Location const& location)
-        {
-            location_ = location;
-            arguments_ = &arguments;
-            return_value_ = core::Value::makeUnit();
-            expected_return_type_ = &intrinsic.returnType();
-            pending_resolution_ = std::nullopt;
-
-            this->visit(intrinsic);
-
-            location_ = core::Location::global();
-            arguments_ = nullptr;
-            expected_return_type_ = nullptr;
-
-            return return_value_;
-        }
-
-        [[nodiscard]] bool isPending() const
-        {
-            return pending_resolution_.hasValue();
-        }
-
-        [[nodiscard]] PendingResolution const& pending() const
-        {
-            assert(pending_resolution_.hasValue());
-            return pending_resolution_.value();
-        }
-
-        void visit(core::Dynamic const& dynamic) override
-        {
-            reporter_.error("Unsupported intrinsic '" + dynamic.identifier() + "'", location_);
-        }
-
-        void visit(core::NoOp const&) override
-        {
-            // Do nothing.
-        }
-
-        void visit(core::Declare const&) override
-        {
-            assert(arguments_->size() == 4);
-            assert(arguments_->at(0)->type() == core::Type::Scope());
-            assert(arguments_->at(1)->type() == core::Type::Ident());
-            assert(arguments_->at(2)->type() == core::Type::Bool());
-            assert(arguments_->at(3)->type() == core::Type::Self());
-
-            Scope& scope = *static_cast<Scope*>(arguments_->at(0)->getScope());
-            core::Identifier const& identifier = arguments_->at(1)->getIdentifier();
-            bool const is_final = arguments_->at(2)->getBool();
-            core::Type const& type = arguments_->at(3)->getType();
-
-            auto variable = scope.declare(identifier, type, is_final, location_, reporter_);
-
-            if (variable.hasValue())
-            {
-                setResult(std::move(*variable));
-            }
-            else
-            {
-                abort();
-            }
-        }
-
-        void visit(core::Resolve const&) override
-        {
-            assert(arguments_->size() == 2);
-            assert(arguments_->at(0)->type() == core::Type::Scope());
-            assert(arguments_->at(1)->type() == core::Type::Ident());
-
-            Scope& scope = *static_cast<Scope*>(arguments_->at(0)->getScope());
-            core::Identifier const& identifier = arguments_->at(1)->getIdentifier();
-
-            utility::Optional<utility::Shared<core::Value>> variable = scope.find(identifier, provide_);
-
-            if (variable.hasValue())
-            {
-                setResult(std::move(*variable));
-            }
-            else
-            {
-                setPending(identifier);
-            }
-        }
-
-        void visit(core::GetParent const&) override
-        {
-            assert(arguments_->size() == 1);
-            assert(arguments_->at(0)->type() == core::Type::Scope());
-
-            auto* scope = static_cast<Scope*>(arguments_->at(0)->getScope());
-
-            if (scope->parent() == nullptr)
-            {
-                reporter_.error("Scope has no parent", location_);
-                abort();
-                return;
-            }
-
-            setResult(core::Value::makeScope(scope->parent()));
-        }
-
-        void visit(core::Log const&) override
-        {
-            assert(arguments_->size() == 2);
-            assert(arguments_->at(0)->type() == core::Type::String());
-            assert(arguments_->at(1)->type() == core::Type::Location());
-
-            std::string const& value = arguments_->at(0)->getString();
-            core::Location const& loc = arguments_->at(1)->getLocation();
-
-            reporter_.info(value, loc);
-
-            setResult(core::Value::makeUnit());
-        }
-
-        void visit(core::B2Str const&) override
-        {
-            assert(arguments_->size() == 1);
-            assert(arguments_->at(0)->type() == core::Type::Bool());
-
-            bool const value = arguments_->at(0)->getBool();
-
-            setResult(core::Value::makeString(value ? "true" : "false"));
-        }
-
-        void visit(core::Include const&) override
-        {
-            assert(arguments_->size() == 2);
-            assert(arguments_->at(0)->type() == core::Type::String());
-            assert(arguments_->at(1)->type() == core::Type::Location());
-
-            std::string const& file = arguments_->at(0)->getString();
-            core::Location const& location = arguments_->at(1)->getLocation();
-
-            std::filesystem::path const path = source_tree_.getFile(location.fileIndex()).getDirectory() / file;
-
-            include_(path);
-        }
-
-    private:
-        void setResult(utility::Shared<core::Value> value)
-        {
-            assert(value->type() == *expected_return_type_);
-
-            return_value_ = std::move(value);
-        }
-
-        void abort()
-        {
-            pending_resolution_ = std::nullopt;
-            return_value_ = std::nullopt;
-        }
-
-        void setPending(core::Identifier const& identifier)
-        {
-            pending_resolution_ = PendingResolution {identifier};
-            return_value_ = std::nullopt;
-        }
-
-        sources::SourceTree& source_tree_;
-        core::Reporter& reporter_;
-
-        std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide_;
-        std::function<void(std::filesystem::path const&)> include_;
-
-        core::Location location_ = core::Location::global();
-        utility::List<utility::Shared<core::Value>> const* arguments_ = nullptr;
-
-        utility::Optional<utility::Shared<core::Value>> return_value_ = std::nullopt;
-        core::Type const* expected_return_type_ = nullptr;
-        utility::Optional<PendingResolution> pending_resolution_ = std::nullopt;
-    };
-
     class BBT final : public bbt::Visitor
     {
     public:
@@ -411,9 +72,9 @@ struct ance::cet::Runner::Implementation
         : source_tree_(source_tree), reporter_(reporter), read_unordered_scope_(std::move(get_unordered_scope)), providers_(providers) {}
         ~BBT() override = default;
 
-        void schedule(bbt::Flow const& flow)
+        void schedule(bbt::Flow const& flow, Scope* scope)
         {
-            run_points_.emplace_back(flow.entry, current_scope_);
+            run_points_.emplace_back(flow.entry, scope);
         }
 
         [[nodiscard]] bool hasRunPoints() const
@@ -450,37 +111,32 @@ struct ance::cet::Runner::Implementation
 
         std::tuple<ExecutionResult, utility::Shared<core::Value>> execute(RunPoint* run_point)
         {
-            RunPoint* previous_run_point = current_run_point_;
-            bbt::BasicBlock const* previous_next = next_;
-            size_t const previous_statement_index = current_statement_index_;
-            Scope* previous_scope = current_scope_;
-            utility::Optional<ExecutionResult> const previous_result = execution_result_;
+            State const previous_state = state_;
 
-            current_run_point_ = run_point;
+            state_ = State
+            {
+                .current_run_point = run_point,
+                .current_statement_index = run_point->statement_index,
+                .next = run_point->block,
+                .execution_result = std::nullopt,
+                .current_scope = run_point->scope,
+            };
+
             run_point->clearBlocker();
 
-            execution_result_ = std::nullopt;
-            next_ = run_point->block;
-            current_statement_index_ = run_point->statement_index;
-            current_scope_ = run_point->scope;
-
-            while (!execution_result_.hasValue() && next_ != nullptr)
+            while (!state_.execution_result.hasValue() && state_.next != nullptr)
             {
-                run_point->block = next_;
-                visit(*next_);
+                run_point->block = state_.next;
+                visit(*state_.next);
             }
 
-            run_point->scope = current_scope_;
-            run_point->block = next_;
-            run_point->statement_index = current_statement_index_;
+            run_point->scope = state_.current_scope;
+            run_point->block = state_.next;
+            run_point->statement_index = state_.current_statement_index;
 
-            ExecutionResult const result = execution_result_.valueOr(ExecutionResult::Completed);
+            ExecutionResult const result = state_.execution_result.valueOr(ExecutionResult::Completed);
 
-            current_scope_ = previous_scope;
-            current_statement_index_ = previous_statement_index;
-            next_ = previous_next;
-            execution_result_ = previous_result;
-            current_run_point_ = previous_run_point;
+            state_ = previous_state;
 
             return {result, core::Value::makeUnit()};
         }
@@ -560,28 +216,28 @@ struct ance::cet::Runner::Implementation
 
         void abort()
         {
-            execution_result_ = ExecutionResult::Error;
+            state_.execution_result = ExecutionResult::Error;
 
-            current_run_point_->clearBlocker();
+            state_.current_run_point->clearBlocker();
         }
 
         void block(PendingResolution const& blocker)
         {
-            execution_result_ = ExecutionResult::Pending;
+            state_.execution_result = ExecutionResult::Pending;
 
-            current_run_point_->blocker = blocker;
+            state_.current_run_point->blocker = blocker;
         }
 
         void yield()
         {
-            execution_result_ = ExecutionResult::Yield;
+            state_.execution_result = ExecutionResult::Yield;
 
-            current_run_point_->clearBlocker();
+            state_.current_run_point->clearBlocker();
         }
 
-        [[nodiscard]] Scope* scope()
+        [[nodiscard]] Scope* scope() const
         {
-            return current_scope_;
+            return state_.current_scope;
         }
 
         void visit(bbt::UnorderedScope const& scope) override
@@ -596,32 +252,20 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::BasicBlock const& basic_block) override
         {
-            assert(current_run_point_ != nullptr);
-
-            current_run_point_->block = &basic_block;
-            current_run_point_->scope = current_scope_;
+            assert(state_.current_run_point != nullptr);
 
             size_t const statement_count = basic_block.statements.size();
 
-            while (current_statement_index_ < statement_count)
+            while (state_.current_statement_index < statement_count)
             {
-                current_run_point_->statement_index = current_statement_index_;
-                current_run_point_->scope = current_scope_;
+                visit(*basic_block.statements[state_.current_statement_index]);
 
-                visit(*basic_block.statements[current_statement_index_]);
+                if (state_.execution_result.hasValue()) return;
 
-                if (execution_result_.hasValue())
-                {
-                    return;
-                }
-
-                current_statement_index_ += 1;
+                state_.current_statement_index += 1;
             }
 
-            current_run_point_->statement_index = current_statement_index_;
-            current_run_point_->scope = current_scope_;
-
-            current_statement_index_ = 0;
+            state_.current_statement_index = 0;
             visit(*basic_block.link);
         }
 
@@ -634,7 +278,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Return const&) override
         {
-            next_ = nullptr;
+            state_.next = nullptr;
         }
 
         void visit(bbt::Branch const& branch_link) override
@@ -649,17 +293,17 @@ struct ance::cet::Runner::Implementation
 
             if (condition->getBool())
             {
-                next_ = &branch_link.true_branch;
+                state_.next = &branch_link.true_branch;
             }
             else
             {
-                next_ = &branch_link.false_branch;
+                state_.next = &branch_link.false_branch;
             }
         }
 
         void visit(bbt::Jump const& jump_link) override
         {
-            next_ = &jump_link.target;
+            state_.next = &jump_link.target;
         }
 
         void visit(bbt::ErrorStatement const& error_statement) override
@@ -737,29 +381,28 @@ struct ance::cet::Runner::Implementation
             }
 
             utility::List<utility::Shared<core::Value>> arguments = {};
+
             for (auto argument : intrinsic.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
             auto result = intrinsics_.run(intrinsic.intrinsic, arguments, intrinsic.location);
 
-            if (!result.hasValue())
+            if (result.isFailed())
             {
-                if (intrinsics_.isPending())
-                {
-                    block(intrinsics_.pending());
-                }
-                else
-                {
-                    abort();
-                }
-                return;
+                abort();
             }
-
-            temporaries_.insert_or_assign(&intrinsic.destination, result.value());
+            else if (result.isPending())
+            {
+                block(result.getPending());
+            }
+            else
+            {
+                temporaries_.insert_or_assign(&intrinsic.destination, result.getResult());
+            }
         }
 
         void visit(bbt::Call const& call) override
         {
-            RunPoint& run_point = *current_run_point_;
+            RunPoint& run_point = *state_.current_run_point;
 
             if (run_point.return_value.hasValue())
             {
@@ -904,14 +547,14 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::OrderedScopeEnter const&) override
         {
-            current_scope_ = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
+            state_.current_scope = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
 
             // todo: associate the value storage with the scope so that context switch works better
         }
 
         void visit(bbt::OrderedScopeExit const&) override
         {
-            current_scope_ = current_scope_->parent();
+            state_.current_scope = scope()->parent();
 
             // todo: destructors and stuff, clean up value storage
             // todo: maybe deleting the scope instance is a good idea?
@@ -936,15 +579,12 @@ struct ance::cet::Runner::Implementation
 
         void scheduleUnorderedScope(bbt::UnorderedScope const& scope)
         {
-            Scope* previous = current_scope_;
-            current_scope_ = scopes_.emplace_back(utility::makeOwned<UnorderedScope>(nullptr)).get();
+            Scope* unordered_scope = scopes_.emplace_back(utility::makeOwned<UnorderedScope>(nullptr)).get();
 
             for (auto const& flow : scope.flows)
             {
-                schedule(*flow);
+                schedule(*flow, unordered_scope);
             }
-
-            current_scope_ = previous;
         }
 
         std::function<void(std::filesystem::path const&)> include_ = [this](std::filesystem::path const& path) {
@@ -956,29 +596,33 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            bbt::UnorderedScope& scope_ref = **scope;
+            bbt::UnorderedScope const& scope_ref = **scope;
 
             roots_.emplace_back(std::move(*scope));
 
             scheduleUnorderedScope(scope_ref);
         };
 
-        Intrinsics intrinsics_ {source_tree_, reporter_, provide_, include_};
+        IntrinsicsRunner intrinsics_ {source_tree_, reporter_, provide_, include_};
 
         std::map<core::Entity const*, utility::Shared<core::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
 
         std::list<RunPoint> run_points_ = {};
-        RunPoint* current_run_point_ = nullptr;
-        size_t current_statement_index_ = 0;
-
-        bbt::BasicBlock const* next_ = nullptr;
-        utility::Optional<ExecutionResult> execution_result_;
-
         utility::List<utility::Owned<bbt::UnorderedScope>> roots_;
-
         std::vector<utility::Owned<Scope>> scopes_ = {};
-        Scope* current_scope_ = nullptr;
+
+        struct State
+        {
+            RunPoint* current_run_point = nullptr;
+            size_t current_statement_index = 0;
+
+            bbt::BasicBlock const* next = nullptr;
+            utility::Optional<ExecutionResult> execution_result = std::nullopt;
+            Scope* current_scope = nullptr;
+        };
+
+        State state_;
     };
 
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
@@ -992,7 +636,7 @@ struct ance::cet::Runner::Implementation
             return std::nullopt;
 
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(source_tree_, reporter_, [&](std::filesystem::path const& f) { return readUnorderedScope(f); }, providers_);
-        bbt->schedule(**flow);
+        bbt->schedule(**flow, nullptr);
 
         while (bbt->hasRunPoints())
         {
