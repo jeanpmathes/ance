@@ -1,5 +1,4 @@
 #include <filesystem>
-#include <fstream>
 #include <iostream>
 
 #include <boost/locale.hpp>
@@ -10,22 +9,14 @@
 
 #include "ance/ast/Node.h"
 #include "ance/ast/Parser.h"
-#include "ance/ast/Printer.h"
 
 #include "ance/est/Expander.h"
-#include "ance/est/Node.h"
-#include "ance/est/Printer.h"
 
 #include "ance/bbt/Node.h"
-#include "ance/bbt/Printer.h"
-#include "ance/bbt/Grapher.h"
-#include "ance/bbt/Segmenter.h"
 #include "ance/bbt/Function.h"
 #include "ance/bbt/FlowBuilder.h"
 
 #include "ance/cet/Node.h"
-#include "ance/cet/Printer.h"
-#include "ance/cet/Grapher.h"
 #include "ance/cet/Runner.h"
 #include "ance/cet/Provider.h"
 
@@ -202,8 +193,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: remove essentially everything from the CET as it has to be rebuilt anyways, just remove everything, put no new stuff in
-
         // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes (maybe use limited variants in the earlier steps, e.g. type enums for the ast, make current type and value and entity a thing of the bbt)
 
         // todo: instead of passing an allocate lambda to the intrinsics, the entity ref should have a read and write function with validation whether it is allowed, each variable thus stores the value instead of one large variable array
@@ -212,6 +201,7 @@ namespace ance
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
 
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
+        // todo: build a very minimal CET that heavily relies and uses intrinsics
 
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code

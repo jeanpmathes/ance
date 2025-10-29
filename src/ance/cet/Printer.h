@@ -18,7 +18,6 @@ namespace ance::cet
         ~Printer();
 
         void print(Unit const& unit) const;
-        void print(BasicBlock const& block) const;
 
       private:
         struct Implementation;
