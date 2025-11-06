@@ -234,7 +234,7 @@ struct ance::est::Expander::Implementation
             utility::List<utility::Owned<Expression>> declare_arguments;
             declare_arguments.emplace_back(std::move(parent_scope));
             declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(variable_declaration.identifier, variable_declaration.location));
-            declare_arguments.emplace_back(utility::makeOwned<Literal>(core::Value::makeBool(variable_declaration.assigner.isFinal()), variable_declaration.location));
+            declare_arguments.emplace_back(utility::makeOwned<BoolLiteral>(variable_declaration.assigner.isFinal(), variable_declaration.location));
             declare_arguments.emplace_back(utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location));
 
             utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(
@@ -322,7 +322,7 @@ struct ance::est::Expander::Implementation
             utility::List<utility::Owned<Expression>> declare_arguments;
             declare_arguments.emplace_back(utility::makeOwned<CurrentScope>(let.location));
             declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(let.identifier, let.location));
-            declare_arguments.emplace_back(utility::makeOwned<Literal>(core::Value::makeBool(let.assigner.isFinal()), let.location));
+            declare_arguments.emplace_back(utility::makeOwned<BoolLiteral>(let.assigner.isFinal(), let.location));
             declare_arguments.emplace_back(utility::makeOwned<ReadTemporary>(tmp_type, let.location));
             utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), let.location), let.location); // todo: the core::Declare feels kinda ugly because it does not show it to be an intrinsic
             Temporary const& tmp_entity = *temporary_entity;
@@ -482,9 +482,29 @@ struct ance::est::Expander::Implementation
             setResultExpression(utility::makeOwned<Here>(here.location));
         }
 
-        void visit(ast::Literal const& literal) override
+        void visit(ast::UnitLiteral const& unit_literal) override
         {
-            setResultExpression(utility::makeOwned<Literal>(literal.value->clone(), literal.location));
+            setResultExpression(utility::makeOwned<UnitLiteral>(unit_literal.location));
+        }
+
+        void visit(ast::SizeLiteral const& size_literal) override
+        {
+            setResultExpression(utility::makeOwned<SizeLiteral>(size_literal.value, size_literal.location));
+        }
+
+        void visit(ast::StringLiteral const& string_literal) override
+        {
+            setResultExpression(utility::makeOwned<StringLiteral>(string_literal.value, string_literal.location));
+        }
+
+        void visit(ast::BoolLiteral const& bool_literal) override
+        {
+            setResultExpression(utility::makeOwned<BoolLiteral>(bool_literal.value, bool_literal.location));
+        }
+
+        void visit(ast::TypeLiteral const& type_literal) override
+        {
+            setResultExpression(utility::makeOwned<TypeLiteral>(type_literal.type, type_literal.location));
         }
 
         void visit(ast::UnaryOperation const& unary_operation) override

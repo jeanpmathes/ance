@@ -11,13 +11,13 @@
 namespace ance::core
 {
     struct Intrinsic;
-
-    class Value;
 }
 
 /// The basic-block tree (BBT) namespace.
 namespace ance::bbt
 {
+    class Value;
+
     class Visitor;
 
     /// Base class for all nodes in the BBT.
@@ -220,10 +220,10 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Constant, Visitor>
     {
-        Constant(utility::Shared<core::Value> constant, Temporary const& result, core::Location const& source_location);
+        Constant(utility::Shared<Value> constant, Temporary const& result, core::Location const& source_location);
 
-        utility::Shared<core::Value> value;
-        Temporary const&             destination;
+        utility::Shared<Value> value;
+        Temporary const&       destination;
     };
 
     /// Provides the default value for a type.

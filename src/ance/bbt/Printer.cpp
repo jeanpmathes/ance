@@ -1,6 +1,8 @@
 #include "Printer.h"
 
 #include "ance/core/Printer.h"
+
+#include "Value.h"
 #include "ance/bbt/Node.h"
 
 struct ance::bbt::Printer::Implementation
@@ -177,7 +179,7 @@ struct ance::bbt::Printer::Implementation
             print(" ");
             print(core::Assigner::COPY_ASSIGNMENT);
             print(" ");
-            print(constant.value);
+            print(constant.value->toString());
             print(";");
         }
 

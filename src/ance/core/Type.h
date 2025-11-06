@@ -19,6 +19,12 @@ namespace ance::core
         /// \param identifier The identifier of the type.
         explicit Type(Identifier const& identifier);
 
+        Type(const Type&) = delete;
+        Type& operator=(const Type&) = delete;
+
+        Type(Type&&) = delete;
+        Type& operator=(Type&&) = delete;
+
       public:
         /// Gets the name of this type.
         [[nodiscard]] Identifier const& name() const;

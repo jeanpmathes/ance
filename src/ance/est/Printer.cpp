@@ -189,9 +189,29 @@ struct ance::est::Printer::Implementation
             visit(*access.target);
         }
 
-        void visit(Literal const& literal) override
+        void visit(UnitLiteral const&) override
         {
-            print(literal.value);
+            print("()");
+        }
+
+        void visit(SizeLiteral const& size_literal) override
+        {
+            print(size_literal.value);
+        }
+
+        void visit(StringLiteral const& string_literal) override
+        {
+            print("\"" + string_literal.value + "\"");
+        }
+
+        void visit(BoolLiteral const& bool_literal) override
+        {
+            print(bool_literal.value ? "true" : "false");
+        }
+
+        void visit(TypeLiteral const& type_literal) override
+        {
+            print(type_literal.type.name());
         }
 
         void visit(Default const& default_value) override

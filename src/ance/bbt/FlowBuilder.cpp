@@ -1,9 +1,11 @@
 #include "FlowBuilder.h"
 
-#include "ance/core/Intrinsic.h"
-
 #include <cassert>
 #include <map>
+
+#include "ance/core/Intrinsic.h"
+
+#include "ance/bbt/Value.h"
 
 namespace ance::bbt
 {
@@ -59,7 +61,7 @@ namespace ance::bbt
             pushStatement(utility::makeOwned<CurrentScope>(scope_arg, location_));
 
             Temporary const& identifier_arg = pushTemporary();
-            pushStatement(utility::makeOwned<Constant>(core::Value::makeIdentifier(name), identifier_arg, location_));
+            pushStatement(utility::makeOwned<Constant>(IdentifierValue::make(name), identifier_arg, location_));
 
             Temporary const& resolve_result = pushTemporary();
             utility::List<std::reference_wrapper<Temporary const>> resolve_arguments;
@@ -73,7 +75,7 @@ namespace ance::bbt
             return read_result;
         }
 
-        Temporary const& pushConstant(utility::Shared<core::Value> value)
+        Temporary const& pushConstant(utility::Shared<Value> value)
         {
             Temporary const& constant_result = pushTemporary();
             pushStatement(utility::makeOwned<Constant>(std::move(value), constant_result, location_));
@@ -128,7 +130,7 @@ namespace ance::bbt
         return implementation_->pushVariableRead(name);
     }
 
-    Temporary const& FlowBuilder::pushConstant(utility::Shared<core::Value> value)
+    Temporary const& FlowBuilder::pushConstant(utility::Shared<Value> value)
     {
         return implementation_->pushConstant(std::move(value));
     }

@@ -44,9 +44,6 @@ namespace ance::core
         /// Print a type to the output stream.
         void print(Type const& type);
 
-        /// Print a value to the output stream.
-        void print(utility::Shared<Value> const& value);
-
         /// Start a new line.
         void line();
 

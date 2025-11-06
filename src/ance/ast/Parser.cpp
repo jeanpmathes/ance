@@ -455,13 +455,13 @@ namespace ance::ast
 
         std::any visitTrue(anceParser::TrueContext* context) override
         {
-            Expression* expression = new Literal(core::Value::makeBool(true), location(context));
+            Expression* expression = new BoolLiteral(true, location(context));
             return expression;
         }
 
         std::any visitFalse(anceParser::FalseContext* context) override
         {
-            Expression* expression = new Literal(core::Value::makeBool(false), location(context));
+            Expression* expression = new BoolLiteral(false, location(context));
             return expression;
         }
 
@@ -470,13 +470,13 @@ namespace ance::ast
             // todo: use llvm::APInt instead of size_t
             // todo: do all the validation of integer literals and stuff like whether they actually fit into their type
 
-            Expression* expression = new Literal(core::Value::makeSize(std::stoull(context->getText())), location(context));
+            Expression* expression = new SizeLiteral(context->getText(), location(context));
             return expression;
         }
 
         std::any visitUnitLiteral(anceParser::UnitLiteralContext* context) override
         {
-            Expression* expression = new Literal(core::Value::makeUnit(), location(context));
+            Expression* expression = new UnitLiteral(location(context));
             return expression;
         }
 
@@ -485,37 +485,37 @@ namespace ance::ast
             std::string text = context->getText();
             text = text.substr(1, text.size() - 2); // Remove quotes.
 
-            Expression* expression = new Literal(core::Value::makeString(text), location(context));
+            Expression* expression = new StringLiteral(text, location(context));
             return expression;
         }
 
         std::any visitBoolType(anceParser::BoolTypeContext* context) override
         {
-            Expression* expression = new Literal(core::Value::makeType(core::Type::Bool()), location(context));
+            Expression* expression = new TypeLiteral(core::Type::Bool(), location(context));
             return expression;
         }
 
         std::any visitUnitType(anceParser::UnitTypeContext* context) override
         {
-            Expression* expression = new Literal(core::Value::makeType(core::Type::Unit()), location(context));
+            Expression* expression = new TypeLiteral(core::Type::Unit(), location(context));
             return expression;
         }
 
         std::any visitSizeType(anceParser::SizeTypeContext* context) override
         {
-            Expression* expression = new Literal(core::Value::makeType(core::Type::Size()), location(context));
+            Expression* expression = new TypeLiteral(core::Type::Size(), location(context));
             return expression;
         }
 
         std::any visitTypeType(anceParser::TypeTypeContext* context) override
         {
-            Expression* expression = new Literal(core::Value::makeType(core::Type::Self()), location(context));
+            Expression* expression = new TypeLiteral(core::Type::Self(), location(context));
             return expression;
         }
 
         std::any visitStringType(anceParser::StringTypeContext* context) override
         {
-            Expression* expression = new Literal(core::Value::makeType(core::Type::String()), location(context));
+            Expression* expression = new TypeLiteral(core::Type::String(), location(context));
             return expression;
         }
 

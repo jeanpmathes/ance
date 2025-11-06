@@ -14,6 +14,7 @@
 
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Function.h"
+#include "ance/bbt/Value.h"
 #include "ance/bbt/FlowBuilder.h"
 
 #include "ance/cet/Node.h"
@@ -77,7 +78,7 @@ namespace ance
                 builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::B2Str::instance(), std::move(args), str_value, core::Location::global()));
             }
 
-            bbt::Temporary const& location = builder.pushConstant(core::Value::makeLocation(core::Location::global()));
+            bbt::Temporary const& location = builder.pushConstant(bbt::LocationValue::make(core::Location::global()));
 
             bbt::Temporary const& result = builder.pushTemporary();
             {
@@ -122,7 +123,7 @@ namespace ance
         {
             bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
 
-            bbt::Temporary const& location = builder.pushConstant(core::Value::makeLocation(core::Location::global()));
+            bbt::Temporary const& location = builder.pushConstant(bbt::LocationValue::make(core::Location::global()));
 
             bbt::Temporary const& result = builder.pushTemporary();
             {
@@ -193,15 +194,22 @@ namespace ance
 
         return exit_code;
 
-        // todo: rethink core classes like Variable, Value, Function, Type, ... and maybe remove them, going for per-tree classes instead or even usage of nodes (maybe use limited variants in the earlier steps, e.g. type enums for the ast, make current type and value and entity a thing of the bbt)
+        // todo: make functions a value so they do not inherit from entities any more
+
+        // todo: remove the entity class, bbt value would instead have a variable ref
+
+        // todo: move variable into cet namespace the same way as scope
+        // todo: also make sure that no other trees use or reference these, e.g. the bbt value class
+
+        // todo: put the variable storage (values) into the scope classes and not global, and each variable then stores the value
 
         // todo: instead of passing an allocate lambda to the intrinsics, the entity ref should have a read and write function with validation whether it is allowed, each variable thus stores the value instead of one large variable array
-        // todo: and the variables / entities would be stored in the scope they are delcared in
 
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
 
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
-        // todo: build a very minimal CET that heavily relies and uses intrinsics
+        // todo: build a very minimal CET that heavily relies and uses intrinsics, should be close to LLVM IR in capability and nodes
+        // todo: needs its own value type (defined in CET namespace), do not use the one from BBT or LLVM
 
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code

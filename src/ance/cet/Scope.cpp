@@ -7,7 +7,7 @@ ance::cet::Scope* ance::cet::Scope::parent() const
     return parent_;
 }
 
-ance::utility::Optional<ance::utility::Shared<ance::core::Value>> ance::cet::Scope::declare(core::Identifier const& identifier,
+ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::declare(core::Identifier const& identifier,
                                                                                             core::Type const&       type,
                                                                                             bool                    is_final,
                                                                                             core::Location const&   location,
@@ -24,16 +24,16 @@ ance::utility::Optional<ance::utility::Shared<ance::core::Value>> ance::cet::Sco
 
     onDeclare(std::move(variable));
 
-    return core::Value::makeEntityRef(variable_ref.variable());
+    return bbt::EntityRefValue::make(variable_ref.variable());
 }
 
-ance::utility::Optional<ance::utility::Shared<ance::core::Value>> ance::cet::Scope::find(
+ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::find(
     core::Identifier const&                                                                        identifier,
-    std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> const& provider)
+    std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> const& provider)
 {
     Variable const* variable = onFind(identifier);
 
-    if (variable != nullptr) { return core::Value::makeEntityRef(variable->variable()); }
+    if (variable != nullptr) { return bbt::EntityRefValue::make(variable->variable()); }
 
     if (parent_ != nullptr) { return parent_->find(identifier, provider); }
 

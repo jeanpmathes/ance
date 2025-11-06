@@ -1,9 +1,11 @@
-#pragma once
+#ifndef ANCE_BBT_FLOWBUILDER_H
+#define ANCE_BBT_FLOWBUILDER_H
 
-#include "ance/bbt/Node.h"
 #include "ance/core/Location.h"
 
-namespace ance::core
+#include "ance/bbt/Node.h"
+
+namespace ance::bbt
 {
     class Value;
 }
@@ -33,7 +35,7 @@ namespace ance::bbt
         Temporary const& pushVariableRead(core::Identifier const& name);
 
         /// Pushes the statements needed to create a constant value to the currently active basic block and returns the temporary holding the value.
-        Temporary const& pushConstant(utility::Shared<core::Value> value);
+        Temporary const& pushConstant(utility::Shared<Value> value);
 
         /// Builds the flow from the added basic blocks and statements.
         utility::Owned<Flow> build();
@@ -44,3 +46,5 @@ namespace ance::bbt
     };
 
 }
+
+#endif

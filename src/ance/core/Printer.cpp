@@ -2,7 +2,6 @@
 
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Type.h"
-#include "ance/core/Value.h"
 
 ance::core::Printer::Printer(std::ostream& out) : out_(out) {}
 
@@ -48,12 +47,6 @@ void ance::core::Printer::print(Type const& type)
 {
     indent();
     out_ << type;
-}
-
-void ance::core::Printer::print(utility::Shared<Value> const& value)
-{
-    indent();
-    out_ << *value;
 }
 
 void ance::core::Printer::line()

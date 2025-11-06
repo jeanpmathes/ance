@@ -101,7 +101,7 @@ ance::bbt::Call::Call(Temporary const&                                  function
     , destination(result)
 {}
 
-ance::bbt::Constant::Constant(utility::Shared<core::Value> constant, Temporary const& result, core::Location const& source_location)
+ance::bbt::Constant::Constant(utility::Shared<Value> constant, Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , value(std::move(constant))

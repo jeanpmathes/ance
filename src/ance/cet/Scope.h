@@ -9,11 +9,12 @@
 
 #include "ance/core/Identifier.h"
 #include "ance/core/Type.h"
-#include "ance/core/Value.h"
 #include "ance/core/Location.h"
 #include "ance/core/Reporter.h"
 
 #include "ance/cet/Variable.h"
+
+#include "ance/bbt/Value.h"
 
 namespace ance::cet
 {
@@ -27,15 +28,15 @@ namespace ance::cet
 
         [[nodiscard]] Scope* parent() const;
 
-        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> declare(core::Identifier const& identifier,
+        [[nodiscard]] utility::Optional<utility::Shared<bbt::Value>> declare(core::Identifier const& identifier,
                                                                               core::Type const&       type,
                                                                               bool                    is_final,
                                                                               core::Location const&   location,
                                                                               core::Reporter&         reporter);
 
-        [[nodiscard]] utility::Optional<utility::Shared<core::Value>> find(
+        [[nodiscard]] utility::Optional<utility::Shared<bbt::Value>> find(
             core::Identifier const&                                                                        identifier,
-            std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> const& provider);
+            std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> const& provider);
 
       protected:
         [[nodiscard]] virtual bool                                                         canDeclare(core::Identifier const& identifier) const = 0;

@@ -3,7 +3,6 @@
 
 #include "ance/core/Identifier.h"
 #include "ance/core/Reporter.h"
-#include "ance/core/Value.h"
 #include "ance/core/UnaryOperator.h"
 #include "ance/core/AccessModifier.h"
 #include "ance/core/Assigner.h"
@@ -254,14 +253,52 @@ namespace ance::ast
         core::Identifier identifier;
     };
 
-    /// A literal value.
-    struct Literal final
+    /// A literal for the unit value.
+    struct UnitLiteral final
         : Expression
-        , utility::ConcreteNode<Literal, Visitor>
+        , utility::ConcreteNode<UnitLiteral, Visitor>
     {
-        Literal(utility::Shared<core::Value> literal, core::Location const& source_location);
+        explicit UnitLiteral(core::Location const& source_location);
+    };
 
-        utility::Shared<core::Value> value;
+    /// A literal for a value of the size type.
+    struct SizeLiteral final
+        : Expression
+        , utility::ConcreteNode<SizeLiteral, Visitor>
+    {
+        SizeLiteral(std::string text, core::Location const& source_location);
+
+        std::string value;
+    };
+
+    /// A literal for a string value.
+    struct StringLiteral final
+        : Expression
+        , utility::ConcreteNode<StringLiteral, Visitor>
+    {
+        StringLiteral(std::string text, core::Location const& source_location);
+
+        std::string value;
+    };
+
+    /// A literal for a boolean value.
+    struct BoolLiteral final
+        : Expression
+        , utility::ConcreteNode<BoolLiteral, Visitor>
+    {
+        BoolLiteral(bool v, core::Location const& source_location);
+
+        bool value;
+    };
+
+    /// A type literal.
+    struct TypeLiteral final
+        : Expression
+        , utility::ConcreteNode<TypeLiteral, Visitor>
+    {
+        TypeLiteral(core::Type const& value, core::Location const& source_location);
+
+        core::Type const& type;
     };
 
     /// An expression that resolves to its own source location.
@@ -310,7 +347,11 @@ namespace ance::ast
         virtual void visit(ErrorExpression const& error) = 0;
         virtual void visit(Call const& call)             = 0;
         virtual void visit(Access const& access)         = 0;
-        virtual void visit(Literal const& literal)       = 0;
+        virtual void visit(UnitLiteral const& unit_literal) = 0;
+        virtual void visit(SizeLiteral const& size_literal) = 0;
+        virtual void visit(StringLiteral const& string_literal) = 0;
+        virtual void visit(BoolLiteral const& bool_literal) = 0;
+        virtual void visit(TypeLiteral const& type_literal) = 0;
         virtual void visit(Here const& here)             = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
     };

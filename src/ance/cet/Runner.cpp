@@ -11,7 +11,6 @@
 #include <list>
 
 #include "ance/core/Intrinsic.h"
-#include "ance/core/Value.h"
 
 #include "ance/bbt/Function.h"
 #include "ance/bbt/Node.h"
@@ -23,6 +22,7 @@
 #include "ance/cet/Printer.h"
 #include "ance/cet/Scope.h"
 #include "ance/cet/IntrinsicsRunner.h"
+#include "ance/cet/ValueExtensions.h"
 
 struct ance::cet::Runner::Implementation
 {
@@ -61,7 +61,7 @@ struct ance::cet::Runner::Implementation
             utility::Optional<PendingResolution> blocker = std::nullopt;
 
             std::list<RunPoint>                             stack        = {};
-            utility::Optional<utility::Shared<core::Value>> return_value = std::nullopt;
+            utility::Optional<utility::Shared<bbt::Value>> return_value = std::nullopt;
         };
 
         BBT(
@@ -109,7 +109,7 @@ struct ance::cet::Runner::Implementation
             }
         }
 
-        std::tuple<ExecutionResult, utility::Shared<core::Value>> execute(RunPoint* run_point)
+        std::tuple<ExecutionResult, utility::Shared<bbt::Value>> execute(RunPoint* run_point)
         {
             State const previous_state = state_;
 
@@ -138,7 +138,7 @@ struct ance::cet::Runner::Implementation
 
             state_ = previous_state;
 
-            return {result, core::Value::makeUnit()};
+            return {result, bbt::UnitValue::make()};
         }
 
         ExecutionResult execute(RunPoint& run_point)
@@ -283,7 +283,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Branch const& branch_link) override
         {
-            utility::Shared<core::Value> condition = temporaries_.at(&branch_link.condition);
+            utility::Shared<bbt::Value> condition = temporaries_.at(&branch_link.condition);
 
             if (!requireType(core::Type::Bool(), condition->type(), branch_link.condition.location))
             {
@@ -291,7 +291,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            if (condition->getBool())
+            if (condition->as<bbt::BoolValue>().value())
             {
                 state_.next = &branch_link.true_branch;
             }
@@ -320,8 +320,8 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Store const& store) override
         {
-            utility::Shared<core::Value> target = temporaries_.at(&store.target);
-            utility::Shared<core::Value> value = temporaries_.at(&store.value);
+            utility::Shared<bbt::Value> target = temporaries_.at(&store.target);
+            utility::Shared<bbt::Value> value = temporaries_.at(&store.value);
 
             if (!requireType(core::Type::EntityRef(), target->type(), store.target.location))
             {
@@ -329,7 +329,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            core::Entity const& entity = target->getEntity();
+            core::Entity const& entity = target->as<bbt::EntityRefValue>().value();
 
             if (entity.asVariable() == nullptr)
             {
@@ -362,13 +362,13 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Temporary const& temporary) override
         {
-            utility::Shared<core::Value> value = core::Value::makeUnit();
+            utility::Shared<bbt::Value> value = bbt::UnitValue::make();
             temporaries_.insert_or_assign(&temporary, value);
         }
 
         void visit(bbt::CopyTemporary const& write_temporary) override
         {
-            utility::Shared<core::Value> value = temporaries_.at(&write_temporary.source);
+            utility::Shared<bbt::Value> value = temporaries_.at(&write_temporary.source);
             temporaries_.insert_or_assign(&write_temporary.destination, value);
         }
 
@@ -380,7 +380,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::List<utility::Shared<core::Value>> arguments = {};
+            utility::List<utility::Shared<bbt::Value>> arguments = {};
 
             for (auto argument : intrinsic.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
@@ -412,7 +412,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::Shared<core::Value> called = temporaries_.at(&call.called);
+            utility::Shared<bbt::Value> called = temporaries_.at(&call.called);
 
             if (!requireType(core::Type::EntityRef(), called->type(), call.called.location))
             {
@@ -420,7 +420,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            core::Entity const& entity = called->getEntity();
+            core::Entity const& entity = called->as<bbt::EntityRefValue>().value();
 
             // todo: this is currently ugly, because having Function and Variable both be Entities is weird
             // todo: the better way would be to expand calls to be a resolve of a variable, a read from that variable, and then a unary operation call on that value
@@ -440,7 +440,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::List<utility::Shared<core::Value>> arguments = {};
+            utility::List<utility::Shared<bbt::Value>> arguments = {};
             for (auto argument : call.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
 
             Scope* function_scope = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
@@ -448,9 +448,9 @@ struct ance::cet::Runner::Implementation
             for (size_t i = 0; i < function.signature().arity(); ++i)
             {
                 core::Signature::Parameter const& parameter = function.signature().parameters()[i];
-                utility::Shared<core::Value>& argument = arguments[i];
+                utility::Shared<bbt::Value>& argument = arguments[i];
 
-                utility::Optional<utility::Shared<core::Value>> variable = function_scope->declare(parameter.name, parameter.type, true, core::Location::global(), reporter_);
+                utility::Optional<utility::Shared<bbt::Value>> variable = function_scope->declare(parameter.name, parameter.type, true, core::Location::global(), reporter_);
 
                 if (!variable.hasValue())
                 {
@@ -458,7 +458,7 @@ struct ance::cet::Runner::Implementation
                     return;
                 }
 
-                variables_.insert_or_assign(&(*variable)->getEntity(), argument);
+                variables_.insert_or_assign(&(*variable)->as<bbt::EntityRefValue>().value(), argument);
             }
 
             run_point.stack.emplace_back(function.body().entry, function_scope);
@@ -468,7 +468,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Read const& read) override
         {
-            utility::Shared<core::Value> target = temporaries_.at(&read.target);
+            utility::Shared<bbt::Value> target = temporaries_.at(&read.target);
 
             if (!requireType(core::Type::EntityRef(), target->type(), read.target.location))
             {
@@ -476,7 +476,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            core::Entity const& entity = target->getEntity();
+            core::Entity const& entity = target->as<bbt::EntityRefValue>().value();
 
             if (entity.asVariable() == nullptr) // todo: this is currently ugly, because having Function and Variable both be Entities is weird
             {
@@ -493,7 +493,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::Shared<core::Value> value = variables_.at(&entity);
+            utility::Shared<bbt::Value> value = variables_.at(&entity);
             temporaries_.insert_or_assign(&read.destination, value);
         }
 
@@ -504,7 +504,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Default const& default_value) override
         {
-            utility::Shared<core::Value> type_value = temporaries_.at(&default_value.type);
+            utility::Shared<bbt::Value> type_value = temporaries_.at(&default_value.type);
 
             if (!requireType(core::Type::Self(), type_value->type(), default_value.type.location))
             {
@@ -512,18 +512,34 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::Shared<core::Value> value = core::Value::makeDefault(type_value->getType());
+            auto get_default_value = [&](core::Type const& type) -> utility::Shared<bbt::Value> {
+                // todo: should become default constructor call at some point
+
+                if (type == core::Type::Bool()) return bbt::BoolValue::make(false);
+                if (type == core::Type::Unit()) return bbt::UnitValue::make();
+                if (type == core::Type::Size()) return bbt::SizeValue::make(0);
+                if (type == core::Type::Location()) return bbt::LocationValue::make(core::Location::global());
+                if (type == core::Type::String()) return bbt::StringValue::make("");
+
+                reporter_.error("Cannot create default value for type '" + type.name() + "'", default_value.type.location);
+
+                return bbt::UnitValue::make();
+            };
+
+            utility::Shared<bbt::Value> value = get_default_value(type_value->as<bbt::TypeValue>().value());
             temporaries_.insert_or_assign(&default_value.destination, value);
         }
 
         void visit(bbt::CurrentScope const& current_scope) override
         {
-            temporaries_.insert_or_assign(&current_scope.destination, core::Value::makeScope(this->scope()));
+            assert(this->scope() != nullptr);
+
+            temporaries_.insert_or_assign(&current_scope.destination, ScopeValue::make(*this->scope()));
         }
 
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
-            utility::Shared<core::Value> value = temporaries_.at(&unary_operation.operand);
+            utility::Shared<bbt::Value> value = temporaries_.at(&unary_operation.operand);
 
             if (!requireType(core::Type::Bool(), value->type(), unary_operation.operand.location))
             {
@@ -534,15 +550,15 @@ struct ance::cet::Runner::Implementation
             switch (unary_operation.op)
             {
                 case core::UnaryOperator::NOT:
-                    temporaries_.insert_or_assign(&unary_operation.destination, core::Value::makeBool(!value->getBool()));
+                    temporaries_.insert_or_assign(&unary_operation.destination, bbt::BoolValue::make(!value->as<bbt::BoolValue>().value()));
                     break;
             }
         }
 
         void visit(bbt::TypeOf const& type_of) override
         {
-            utility::Shared<core::Value> value = temporaries_.at(&type_of.expression);
-            temporaries_.insert_or_assign(&type_of.destination, core::Value::makeType(value->type()));
+            utility::Shared<bbt::Value> value = temporaries_.at(&type_of.expression);
+            temporaries_.insert_or_assign(&type_of.destination, bbt::TypeValue::make(value->type()));
         }
 
         void visit(bbt::OrderedScopeEnter const&) override
@@ -566,12 +582,12 @@ struct ance::cet::Runner::Implementation
         std::function<utility::Optional<utility::Owned<bbt::UnorderedScope>>(std::filesystem::path const&)> read_unordered_scope_;
         utility::List<utility::Owned<Provider>>& providers_;
 
-        std::function<utility::Optional<utility::Shared<core::Value>>(core::Identifier const&)> provide_ = [this](core::Identifier const& identifier) -> utility::Optional<utility::Shared<core::Value>> {
+        std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> provide_ = [this](core::Identifier const& identifier) -> utility::Optional<utility::Shared<bbt::Value>> {
             for (auto& provider : this->providers_)
             {
                 core::Entity const* entity = provider->provide(identifier);
                 if (entity != nullptr)
-                    return core::Value::makeEntityRef(*entity);
+                    return bbt::EntityRefValue::make(*entity);
             }
 
             return std::nullopt;
@@ -605,8 +621,8 @@ struct ance::cet::Runner::Implementation
 
         IntrinsicsRunner intrinsics_ {source_tree_, reporter_, provide_, include_};
 
-        std::map<core::Entity const*, utility::Shared<core::Value>> variables_ = {};
-        std::map<bbt::Temporary const*, utility::Shared<core::Value>> temporaries_ = {};
+        std::map<core::Entity const*, utility::Shared<bbt::Value>> variables_ = {};
+        std::map<bbt::Temporary const*, utility::Shared<bbt::Value>> temporaries_ = {};
 
         std::list<RunPoint> run_points_ = {};
         utility::List<utility::Owned<bbt::UnorderedScope>> roots_;
