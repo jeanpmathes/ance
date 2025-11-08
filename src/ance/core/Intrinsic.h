@@ -108,7 +108,7 @@ namespace ance::core
         /// - The scope to resolve the entity in.
         /// - The identifier of the entity to resolve.
         /// It returns a reference to the resolved entity.
-        Resolve() : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::EntityRef()) {}
+        Resolve() : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::Any()) {} // todo: instead of using any, some kind of inheritance would be better and the any could be removed?
 
     public:
         ~Resolve() override = default;

@@ -2,38 +2,40 @@
 
 #include <map>
 
-#include "ance/core/Entity.h"
+#include "ance/bbt/Function.h"
+#include "ance/utility/Optional.h"
 
 struct ance::cet::Provider::Implementation
 {
-    void insert(utility::Shared<core::Entity> entity)
+    void insert(utility::Shared<bbt::Function> function)
     {
-        entities.insert_or_assign(entity->name(), std::move(entity));
+        functions.insert_or_assign(function->name(), std::move(function));
     }
 
-    [[nodiscard]] core::Entity const* provide(core::Identifier const& identifier) const
+    [[nodiscard]] utility::Optional<utility::Shared<bbt::Function>> provide(core::Identifier const& identifier)
     {
-        auto const it = entities.find(identifier);
-        if (it != entities.end()) return it->second.get();
-        return nullptr;
+        auto const it = functions.find(identifier);
+        if (it != functions.end()) return it->second;
+        return std::nullopt;
     }
 
-    std::map<core::Identifier, utility::Shared<core::Entity>> entities = {};
+    std::map<core::Identifier, utility::Shared<bbt::Function>> functions = {};
 };
 
 ance::cet::Provider::Provider() : implementation_(utility::makeOwned<Implementation>()) {}
 ance::cet::Provider::~Provider() = default;
 
-ance::utility::Owned<ance::cet::Provider> ance::cet::Provider::fromList(utility::List<utility::Shared<core::Entity>>&& entities)
+ance::utility::Owned<ance::cet::Provider> ance::cet::Provider::fromList(utility::List<utility::Shared<bbt::Function>>&& functions)
 {
     utility::Owned<Provider> provider = utility::makeOwned<Provider>();
 
-    for (auto& entity : entities) { provider->implementation_->insert(std::move(entity)); }
+    for (auto& function : functions) { provider->implementation_->insert(std::move(function)); }
 
     return provider;
 }
 
-ance::core::Entity const* ance::cet::Provider::provide(core::Identifier const& identifier) const
+ance::utility::Optional<ance::utility::Shared<ance::bbt::Function>>
+ance::cet::Provider::provide(core::Identifier const& identifier)
 {
     return implementation_->provide(identifier);
 }

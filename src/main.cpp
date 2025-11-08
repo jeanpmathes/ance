@@ -64,7 +64,7 @@ namespace ance
         cet::Runner     runner {source_tree, reporter, context};
         build::Compiler compiler {source_tree, reporter, context}; // todo: consider using the runner internally
 
-        utility::List<utility::Shared<core::Entity>> provider; // todo: remove / improve the functions
+        utility::List<utility::Shared<bbt::Function>> provider; // todo: remove / improve the functions
         bbt::FlowBuilder builder (core::Location::global());
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
@@ -193,8 +193,6 @@ namespace ance
         reporter.report(source_tree, out);
 
         return exit_code;
-
-        // todo: make functions a value so they do not inherit from entities any more
 
         // todo: remove the entity class, bbt value would instead have a variable ref
 

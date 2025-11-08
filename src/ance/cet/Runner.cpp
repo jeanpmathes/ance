@@ -175,7 +175,7 @@ struct ance::cet::Runner::Implementation
         {
             bool ok = true;
 
-            if (expected != actual)
+            if (!actual.isAssignableTo(expected))
             {
                 reporter_.error("Expected type '" + expected.name() + "' but got '" + actual.name() + "'", location);
                 ok = false;
@@ -414,25 +414,13 @@ struct ance::cet::Runner::Implementation
 
             utility::Shared<bbt::Value> called = temporaries_.at(&call.called);
 
-            if (!requireType(core::Type::EntityRef(), called->type(), call.called.location))
+            if (!requireType(core::Type::Function(), called->type(), call.called.location))
             {
                 abort();
                 return;
             }
 
-            core::Entity const& entity = called->as<bbt::EntityRefValue>().value();
-
-            // todo: this is currently ugly, because having Function and Variable both be Entities is weird
-            // todo: the better way would be to expand calls to be a resolve of a variable, a read from that variable, and then a unary operation call on that value
-
-            if (entity.asFunction() == nullptr)
-            {
-                reporter_.error("Cannot call non-function entity '" + entity.name() + "'", call.called.location);
-                abort();
-                return;
-            }
-
-            bbt::Function const& function = *static_cast<bbt::Function const*>(entity.asFunction());
+            bbt::Function const& function = called->as<bbt::Function>();
 
             if (!requireSignature(function.signature(), call.arguments, call.location))
             {
@@ -585,9 +573,9 @@ struct ance::cet::Runner::Implementation
         std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> provide_ = [this](core::Identifier const& identifier) -> utility::Optional<utility::Shared<bbt::Value>> {
             for (auto& provider : this->providers_)
             {
-                core::Entity const* entity = provider->provide(identifier);
-                if (entity != nullptr)
-                    return bbt::EntityRefValue::make(*entity);
+                utility::Optional<utility::Shared<bbt::Function>> provided = provider->provide(identifier);
+                if (provided.hasValue())
+                    return provided.value();
             }
 
             return std::nullopt;

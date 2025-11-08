@@ -163,7 +163,7 @@ void ance::cet::IntrinsicsRunner::visit(core::Include const&)
 
 void ance::cet::IntrinsicsRunner::setResult(utility::Shared<bbt::Value> value)
 {
-    assert(value->type() == *state_.expected_return_type);
+    assert(value->type().isAssignableTo(*state_.expected_return_type));
 
     assert(!state_.return_value_.hasValue());
     assert(!state_.pending_resolution.hasValue());

@@ -65,6 +65,12 @@ namespace ance::core
         return type;
     }
 
+    Type const& Type::Function()
+    {
+        static Type const type {Identifier::like("Function")};
+        return type;
+    }
+
     Type const& Type::Self()
     {
         static Type const type {Identifier::like("Type")};
@@ -80,6 +86,12 @@ namespace ance::core
     Type const& Type::Location()
     {
         static Type const type {Identifier::like("Location")};
+        return type;
+    }
+
+    Type const& Type::Any()
+    {
+        static Type const type {Identifier::like("Any")};
         return type;
     }
 
@@ -101,6 +113,14 @@ namespace ance::core
     bool Type::operator!=(Type const& other) const
     {
         return !(*this == other);
+    }
+
+    bool Type::isAssignableTo(Type const& other) const
+    {
+        if (other == Any())
+            return true;
+
+        return *this == other;
     }
 }
 

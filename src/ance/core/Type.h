@@ -47,6 +47,9 @@ namespace ance::core
         /// Get the identifier type, which is the type of all identifiers.
         static Type const& Ident();
 
+        /// Get the function type.
+        static Type const& Function(); // TODO: function type should be parameterized (signature and return type)
+
         /// Get the type-type - the type of all types.
         static Type const& Self();
 
@@ -56,6 +59,9 @@ namespace ance::core
         /// Get the source location type.
         static Type const& Location();
 
+        /// Get the 'any' type, which can hold any value.
+        static Type const& Any();
+
         /// Get a type by its ID.
         [[nodiscard]] static Type const& byID(TypeID const& id) ;
 
@@ -64,6 +70,9 @@ namespace ance::core
 
         bool operator==(Type const& other) const;
         bool operator!=(Type const& other) const;
+
+        /// Checks whether this type is assignable to another type.
+        bool isAssignableTo(Type const& other) const;
 
       private:
         Identifier identifier_;

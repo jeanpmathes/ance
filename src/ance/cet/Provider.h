@@ -4,10 +4,11 @@
 #include "ance/core/Identifier.h"
 #include "ance/utility/Owners.h"
 #include "ance/utility/Containers.h"
+#include "ance/utility/Optional.h"
 
-namespace ance::core
+namespace ance::bbt
 {
-    class Entity;
+    class Function;
 }
 
 namespace ance::cet
@@ -19,10 +20,10 @@ namespace ance::cet
         Provider();
         ~Provider();
 
-        static utility::Owned<Provider> fromList(utility::List<utility::Shared<core::Entity>>&& entities);
+        static utility::Owned<Provider> fromList(utility::List<utility::Shared<bbt::Function>>&& functions);
 
-        /// Provides an entity for the given identifier, or nullptr if no such entity exists.
-        [[nodiscard]] core::Entity const* provide(core::Identifier const& identifier) const;
+        /// Provides a function for the given identifier, if it exists.
+        [[nodiscard]] utility::Optional<utility::Shared<bbt::Function>> provide(core::Identifier const& identifier);
 
     private:
         struct Implementation;
