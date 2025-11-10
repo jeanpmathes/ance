@@ -78,17 +78,17 @@ namespace ance::core
         }
     };
 
-    /// This intrinsic declares an entity in the calling scope.
+    /// This intrinsic declares a variable in the calling scope.
     struct Declare final : Static<Declare>
     {
     private:
         /// This intrinsic takes the following parameters:
-        /// - The scope to declare the entity in.
-        /// - The identifier of the entity to declare.
+        /// - The scope to declare the variable in.
+        /// - The identifier of the variable to declare.
         /// - Whether the declaration is final.
-        /// - The type of the entity to declare.
-        /// It returns a reference to the declared entity.
-        Declare() : Static(Signature::likeUnnamed("declare", Type::Scope(), Type::Ident(), Type::Bool(), Type::Self()), Type::EntityRef()) {}
+        /// - The type of the variable to declare.
+        /// It returns a reference to the declared variable.
+        Declare() : Static(Signature::likeUnnamed("declare", Type::Scope(), Type::Ident(), Type::Bool(), Type::Self()), Type::VariableRef()) {}
 
     public:
         ~Declare() override = default;
@@ -100,14 +100,14 @@ namespace ance::core
         }
     };
 
-    /// This intrinsic resolves an entity in the calling scope.
+    /// This intrinsic resolves a variable in the calling scope.
     struct Resolve final : Static<Resolve>
     {
     private:
         /// This intrinsic takes the following parameters:
-        /// - The scope to resolve the entity in.
-        /// - The identifier of the entity to resolve.
-        /// It returns a reference to the resolved entity.
+        /// - The scope to resolve the variable in.
+        /// - The identifier of the variable to resolve.
+        /// It returns a reference to the resolved variable.
         Resolve() : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::Any()) {} // todo: instead of using any, some kind of inheritance would be better and the any could be removed?
 
     public:

@@ -41,8 +41,8 @@ namespace ance::core
         /// Get the string type.
         static Type const& String();
 
-        /// Get the entity reference type, which is used to refer to entities.
-        static Type const& EntityRef();
+        /// Get the variable reference type, which is used to refer to variables.
+        static Type const& VariableRef(); // todo: should be split into variable type and reference type, variable type should be parameterized
 
         /// Get the identifier type, which is the type of all identifiers.
         static Type const& Ident();

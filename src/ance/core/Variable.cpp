@@ -24,14 +24,4 @@ namespace ance::core
     {
         return location_;
     }
-
-    Variable* Variable::asVariable()
-    {
-        return this;
-    }
-
-    Variable const* Variable::asVariable() const
-    {
-        return this;
-    }
 }

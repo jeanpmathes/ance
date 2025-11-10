@@ -24,7 +24,7 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
 
     onDeclare(std::move(variable));
 
-    return bbt::EntityRefValue::make(variable_ref.variable());
+    return bbt::VariableRefValue::make(variable_ref.variable());
 }
 
 ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::find(
@@ -33,7 +33,7 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
 {
     Variable const* variable = onFind(identifier);
 
-    if (variable != nullptr) { return bbt::EntityRefValue::make(variable->variable()); }
+    if (variable != nullptr) { return bbt::VariableRefValue::make(variable->variable()); }
 
     if (parent_ != nullptr) { return parent_->find(identifier, provider); }
 

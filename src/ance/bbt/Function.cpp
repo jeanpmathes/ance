@@ -42,7 +42,7 @@ ance::bbt::Flow const& ance::bbt::Function::body() const
 
 std::string ance::bbt::Function::toString() const
 {
-    return std::string(signature_.name().text());
+    return "@" + std::string(signature_.name().text());
 }
 
 ance::utility::Shared<ance::bbt::Value> ance::bbt::Function::clone() const

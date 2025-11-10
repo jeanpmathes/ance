@@ -196,12 +196,16 @@ namespace ance
 
         // todo: remove the entity class, bbt value would instead have a variable ref
 
-        // todo: move variable into cet namespace the same way as scope
-        // todo: also make sure that no other trees use or reference these, e.g. the bbt value class
+        // todo: move variable into cet namespace the same way as scope, merge if there is already a variable class there
+        // todo: also make sure that no other trees use or reference these, e.g. the bbt value class needs to be moved to the value extensions
 
         // todo: put the variable storage (values) into the scope classes and not global, and each variable then stores the value
 
         // todo: instead of passing an allocate lambda to the intrinsics, the entity ref should have a read and write function with validation whether it is allowed, each variable thus stores the value instead of one large variable array
+
+        // todo: instead of having the any type, the resolve should always return values of variable type
+        // todo: functions should be stored in variables, which means function calls need to be split into not just resolve and call but also a read of the variable
+        // todo: and the provider has to create variables for all passed functions, and they have to be final
 
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
 

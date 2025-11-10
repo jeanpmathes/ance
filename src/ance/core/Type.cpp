@@ -53,9 +53,9 @@ namespace ance::core
         return type;
     }
 
-    Type const& Type::EntityRef()
+    Type const& Type::VariableRef()
     {
-        static Type const type {Identifier::like("EntityRef")};
+        static Type const type {Identifier::like(".Variable")};
         return type;
     }
 

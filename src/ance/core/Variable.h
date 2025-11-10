@@ -3,14 +3,13 @@
 
 #include "ance/core/Identifier.h"
 #include "ance/core/Location.h"
-#include "ance/core/Entity.h"
 
 namespace ance::core
 {
     class Type;
 
     /// Represents a variable.
-    class Variable final : public Entity
+    class Variable final
     {
       public:
         /// Creates a new variable.
@@ -20,10 +19,8 @@ namespace ance::core
         /// \param location The location where the variable was defined.
         Variable(Identifier const& identifier, Type const& type, bool is_final, Location const& location);
 
-        ~Variable() override = default;
-
         /// Gets the identifier of this variable.
-        [[nodiscard]] Identifier const& name() const override;
+        [[nodiscard]] Identifier const& name() const;
 
         /// Gets the type of this variable.
         [[nodiscard]] Type const& type() const;
@@ -33,9 +30,6 @@ namespace ance::core
 
         /// Gets the location where this variable was defined.
         [[nodiscard]] Location const& location() const;
-
-        Variable*                       asVariable() override;
-        [[nodiscard]] Variable const* asVariable() const override;
 
       private:
         Identifier  identifier_;

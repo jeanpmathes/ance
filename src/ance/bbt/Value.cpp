@@ -4,7 +4,7 @@
 #include <utility>
 
 #include "ance/core/Type.h"
-#include "ance/core/Entity.h"
+#include "ance/core/Variable.h"
 
 namespace ance::bbt
 {
@@ -79,26 +79,26 @@ namespace ance::bbt
         return value_;
     }
 
-    EntityRefValue::EntityRefValue(core::Entity const& entity) : Value(core::Type::EntityRef()), entity_(entity) {}
+    VariableRefValue::VariableRefValue(core::Variable const& variable) : Value(core::Type::VariableRef()), variable_(variable) {}
 
-    utility::Shared<EntityRefValue> EntityRefValue::make(core::Entity const& entity)
+    utility::Shared<VariableRefValue> VariableRefValue::make(core::Variable const& variable)
     {
-        return utility::makeShared<EntityRefValue>(entity);
+        return utility::makeShared<VariableRefValue>(variable);
     }
 
-    std::string EntityRefValue::toString() const
+    std::string VariableRefValue::toString() const
     {
-        return "@" + std::string(entity_.name().text());
+        return "@" + std::string(variable_.name().text());
     }
 
-    utility::Shared<Value> EntityRefValue::clone() const
+    utility::Shared<Value> VariableRefValue::clone() const
     {
-        return make(entity_);
+        return make(variable_);
     }
 
-    core::Entity const& EntityRefValue::value() const
+    core::Variable const& VariableRefValue::value() const
     {
-        return entity_;
+        return variable_;
     }
 
     IdentifierValue::IdentifierValue(core::Identifier const& identifier) : Value(core::Type::Ident()), identifier_(identifier) {}

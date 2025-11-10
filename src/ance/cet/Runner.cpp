@@ -323,33 +323,24 @@ struct ance::cet::Runner::Implementation
             utility::Shared<bbt::Value> target = temporaries_.at(&store.target);
             utility::Shared<bbt::Value> value = temporaries_.at(&store.value);
 
-            if (!requireType(core::Type::EntityRef(), target->type(), store.target.location))
+            if (!requireType(core::Type::VariableRef(), target->type(), store.target.location))
             {
                 abort();
                 return;
             }
 
-            core::Entity const& entity = target->as<bbt::EntityRefValue>().value();
+            core::Variable const& variable = target->as<bbt::VariableRefValue>().value();
 
-            if (entity.asVariable() == nullptr)
+            bool const is_defined = variables_.contains(&variable);
+
+            if (variable.isFinal() && is_defined)
             {
-                reporter_.error("Cannot store to non-variable entity '" + entity.name() + "'", store.target.location);
+                reporter_.error("Cannot store to final variable '" + variable.name() + "'", store.target.location);
                 abort();
                 return;
             }
 
-            core::Variable const* variable = entity.asVariable();
-
-            bool const is_defined = variables_.contains(&entity);
-
-            if (variable->isFinal() && is_defined)
-            {
-                reporter_.error("Cannot store to final variable '" + entity.name() + "'", store.target.location);
-                abort();
-                return;
-            }
-
-            core::Type const& type = variable->type(); // todo: use a type method on Entity to get the type
+            core::Type const& type = variable.type();
 
             if (!requireType(type, value->type(), store.value.location))
             {
@@ -357,7 +348,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            variables_.insert_or_assign(&entity, value);
+            variables_.insert_or_assign(&variable, value);
         }
 
         void visit(bbt::Temporary const& temporary) override
@@ -446,7 +437,7 @@ struct ance::cet::Runner::Implementation
                     return;
                 }
 
-                variables_.insert_or_assign(&(*variable)->as<bbt::EntityRefValue>().value(), argument);
+                variables_.insert_or_assign(&(*variable)->as<bbt::VariableRefValue>().value(), argument);
             }
 
             run_point.stack.emplace_back(function.body().entry, function_scope);
@@ -458,30 +449,23 @@ struct ance::cet::Runner::Implementation
         {
             utility::Shared<bbt::Value> target = temporaries_.at(&read.target);
 
-            if (!requireType(core::Type::EntityRef(), target->type(), read.target.location))
+            if (!requireType(core::Type::VariableRef(), target->type(), read.target.location))
             {
                 abort();
                 return;
             }
 
-            core::Entity const& entity = target->as<bbt::EntityRefValue>().value();
+            core::Variable const& variable = target->as<bbt::VariableRefValue>().value();
 
-            if (entity.asVariable() == nullptr) // todo: this is currently ugly, because having Function and Variable both be Entities is weird
-            {
-                reporter_.error("Cannot read from non-variable entity '" + entity.name() + "'", read.target.location);
-                abort();
-                return;
-            }
-
-            bool const is_defined = variables_.contains(&entity);
+            bool const is_defined = variables_.contains(&variable);
             if (!is_defined)
             {
-                reporter_.error("Reading from undefined variable '" + entity.name() + "'", read.target.location);
+                reporter_.error("Reading from undefined variable '" + variable.name() + "'", read.target.location);
                 abort();
                 return;
             }
 
-            utility::Shared<bbt::Value> value = variables_.at(&entity);
+            utility::Shared<bbt::Value> value = variables_.at(&variable);
             temporaries_.insert_or_assign(&read.destination, value);
         }
 
@@ -609,7 +593,7 @@ struct ance::cet::Runner::Implementation
 
         IntrinsicsRunner intrinsics_ {source_tree_, reporter_, provide_, include_};
 
-        std::map<core::Entity const*, utility::Shared<bbt::Value>> variables_ = {};
+        std::map<core::Variable const*, utility::Shared<bbt::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<bbt::Value>> temporaries_ = {};
 
         std::list<RunPoint> run_points_ = {};
