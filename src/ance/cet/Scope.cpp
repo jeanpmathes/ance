@@ -1,5 +1,7 @@
 #include "Scope.h"
 
+#include "ance/cet/ValueExtensions.h"
+
 ance::cet::Scope::Scope(Scope* parent) : parent_(parent) {}
 
 ance::cet::Scope* ance::cet::Scope::parent() const
@@ -24,7 +26,7 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
 
     onDeclare(std::move(variable));
 
-    return bbt::VariableRefValue::make(variable_ref.variable());
+    return VariableRefValue::make(variable_ref);
 }
 
 ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::find(
@@ -33,7 +35,7 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
 {
     Variable const* variable = onFind(identifier);
 
-    if (variable != nullptr) { return bbt::VariableRefValue::make(variable->variable()); }
+    if (variable != nullptr) { return VariableRefValue::make(*variable); }
 
     if (parent_ != nullptr) { return parent_->find(identifier, provider); }
 
@@ -49,7 +51,7 @@ bool ance::cet::OrderedScope::canDeclare(core::Identifier const& identifier) con
 
 void ance::cet::OrderedScope::onDeclare(utility::Owned<Variable> variable)
 {
-    active_variables_.emplace(variable->identifier(), std::cref(*variable));
+    active_variables_.emplace(variable->name(), std::cref(*variable));
     all_variables_.emplace_back(std::move(variable));
 }
 
@@ -71,7 +73,7 @@ bool ance::cet::UnorderedScope::canDeclare(core::Identifier const& identifier) c
 
 void ance::cet::UnorderedScope::onDeclare(utility::Owned<Variable> variable)
 {
-    variables_.emplace(variable->identifier(), std::cref(*variable));
+    variables_.emplace(variable->name(), std::cref(*variable));
     all_variables_.emplace_back(std::move(variable));
 }
 

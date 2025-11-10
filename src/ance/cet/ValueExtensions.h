@@ -2,10 +2,12 @@
 #define ANCE_CET_VALUEEXTENSIONS_H
 
 #include "ance/bbt/Value.h"
-#include "ance/cet/Scope.h"
 
 namespace ance::cet
 {
+    class Variable;
+    class Scope;
+
     class ScopeValue final : public bbt::Value
     {
     public:
@@ -22,6 +24,23 @@ namespace ance::cet
         Scope& scope_;
     };
 
+    class VariableRefValue final : public bbt::Value
+    {
+    public:
+        explicit VariableRefValue(Variable const& variable);
+
+        static utility::Shared<VariableRefValue> make(Variable const& variable);
+
+        ~VariableRefValue() override = default;
+
+        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] utility::Shared<Value> clone() const override;
+
+        [[nodiscard]] Variable const& value() const;
+
+    private:
+        Variable const& variable_;
+    };
 }
 
 #endif

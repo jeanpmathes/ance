@@ -12,9 +12,9 @@
 #include "ance/core/Location.h"
 #include "ance/core/Reporter.h"
 
-#include "ance/cet/Variable.h"
-
 #include "ance/bbt/Value.h"
+
+#include "ance/cet/Variable.h"
 
 namespace ance::cet
 {

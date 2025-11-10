@@ -329,7 +329,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            core::Variable const& variable = target->as<bbt::VariableRefValue>().value();
+            Variable const& variable = target->as<VariableRefValue>().value();
 
             bool const is_defined = variables_.contains(&variable);
 
@@ -437,7 +437,7 @@ struct ance::cet::Runner::Implementation
                     return;
                 }
 
-                variables_.insert_or_assign(&(*variable)->as<bbt::VariableRefValue>().value(), argument);
+                variables_.insert_or_assign(&(*variable)->as<VariableRefValue>().value(), argument);
             }
 
             run_point.stack.emplace_back(function.body().entry, function_scope);
@@ -455,7 +455,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            core::Variable const& variable = target->as<bbt::VariableRefValue>().value();
+            Variable const& variable = target->as<VariableRefValue>().value();
 
             bool const is_defined = variables_.contains(&variable);
             if (!is_defined)
@@ -593,7 +593,7 @@ struct ance::cet::Runner::Implementation
 
         IntrinsicsRunner intrinsics_ {source_tree_, reporter_, provide_, include_};
 
-        std::map<core::Variable const*, utility::Shared<bbt::Value>> variables_ = {};
+        std::map<Variable const*, utility::Shared<bbt::Value>> variables_ = {};
         std::map<bbt::Temporary const*, utility::Shared<bbt::Value>> temporaries_ = {};
 
         std::list<RunPoint> run_points_ = {};

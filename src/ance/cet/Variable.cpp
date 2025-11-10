@@ -3,10 +3,11 @@
 ance::cet::Variable::Variable(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location)
     : identifier_(identifier)
     , type_(type)
-    , variable_(identifier, type, is_final, location)
+    , is_final_(is_final)
+    , location_(location)
 {}
 
-ance::core::Identifier const& ance::cet::Variable::identifier() const
+ance::core::Identifier const& ance::cet::Variable::name() const
 {
     return identifier_;
 }
@@ -16,7 +17,12 @@ ance::core::Type const& ance::cet::Variable::type() const
     return type_;
 }
 
-ance::core::Variable const& ance::cet::Variable::variable() const
+bool ance::cet::Variable::isFinal() const
 {
-    return variable_;
+    return is_final_;
+}
+
+ance::core::Location const& ance::cet::Variable::location() const
+{
+    return location_;
 }

@@ -3,23 +3,30 @@
 
 #include "ance/core/Identifier.h"
 #include "ance/core/Type.h"
-#include "ance/core/Variable.h"
 
 namespace ance::cet
 {
+    /// Represents a variable.
     class Variable
     {
-    public:
+      public:
+        /// Creates a new variable.
+        /// \param identifier The identifier of the variable.
+        /// \param type The type of the variable.
+        /// \param is_final Whether the variable is final or not.
+        /// \param location The location where the variable was defined.
         Variable(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location);
 
-      [[nodiscard]] core::Identifier const& identifier() const;
+        [[nodiscard]] core::Identifier const& name() const;
         [[nodiscard]] core::Type const&       type() const;
-      [[nodiscard]] core::Variable const&   variable() const;
+        [[nodiscard]] bool                    isFinal() const;
+        [[nodiscard]] core::Location const&   location() const;
 
       private:
-        core::Identifier identifier_;
+        core::Identifier  identifier_;
         core::Type const& type_;
-        core::Variable variable_;
+        bool              is_final_;
+        core::Location    location_;
     };
 }
 

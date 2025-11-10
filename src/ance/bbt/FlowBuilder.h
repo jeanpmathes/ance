@@ -5,6 +5,11 @@
 
 #include "ance/bbt/Node.h"
 
+namespace ance::core
+{
+    class Identifier;
+}
+
 namespace ance::bbt
 {
     class Value;

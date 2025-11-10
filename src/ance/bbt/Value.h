@@ -11,7 +11,6 @@ namespace ance::core
 {
     class Type;
     class Entity;
-    class Variable;
 }
 
 namespace ance::bbt
@@ -95,24 +94,6 @@ namespace ance::bbt
 
     private:
         size_t value_;
-    };
-
-    class VariableRefValue final : public Value
-    {
-    public:
-        explicit VariableRefValue(core::Variable const& variable);
-
-        static utility::Shared<VariableRefValue> make(core::Variable const& variable);
-
-        ~VariableRefValue() override = default;
-
-        [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
-
-        [[nodiscard]] core::Variable const& value() const;
-
-    private:
-        core::Variable const& variable_;
     };
 
     class IdentifierValue final : public Value

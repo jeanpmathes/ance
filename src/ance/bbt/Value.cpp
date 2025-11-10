@@ -4,7 +4,6 @@
 #include <utility>
 
 #include "ance/core/Type.h"
-#include "ance/core/Variable.h"
 
 namespace ance::bbt
 {
@@ -77,28 +76,6 @@ namespace ance::bbt
     size_t SizeValue::value() const
     {
         return value_;
-    }
-
-    VariableRefValue::VariableRefValue(core::Variable const& variable) : Value(core::Type::VariableRef()), variable_(variable) {}
-
-    utility::Shared<VariableRefValue> VariableRefValue::make(core::Variable const& variable)
-    {
-        return utility::makeShared<VariableRefValue>(variable);
-    }
-
-    std::string VariableRefValue::toString() const
-    {
-        return "@" + std::string(variable_.name().text());
-    }
-
-    utility::Shared<Value> VariableRefValue::clone() const
-    {
-        return make(variable_);
-    }
-
-    core::Variable const& VariableRefValue::value() const
-    {
-        return variable_;
     }
 
     IdentifierValue::IdentifierValue(core::Identifier const& identifier) : Value(core::Type::Ident()), identifier_(identifier) {}

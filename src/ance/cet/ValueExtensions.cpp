@@ -1,5 +1,8 @@
 #include "ValueExtensions.h"
 
+#include "ance/cet/Scope.h"
+#include "ance/cet/Variable.h"
+
 namespace ance::cet
 {
     ScopeValue::ScopeValue(Scope& scope) : Value(core::Type::Scope()), scope_(scope) {}
@@ -22,5 +25,27 @@ namespace ance::cet
     Scope& ScopeValue::value() const
     {
         return scope_;
+    }
+
+    VariableRefValue::VariableRefValue(Variable const& variable) : Value(core::Type::VariableRef()), variable_(variable) {}
+
+    utility::Shared<VariableRefValue> VariableRefValue::make(Variable const& variable)
+    {
+        return utility::makeShared<VariableRefValue>(variable);
+    }
+
+    std::string VariableRefValue::toString() const
+    {
+        return "@" + std::string(variable_.name().text());
+    }
+
+    utility::Shared<bbt::Value> VariableRefValue::clone() const
+    {
+        return make(variable_);
+    }
+
+    Variable const& VariableRefValue::value() const
+    {
+        return variable_;
     }
 }

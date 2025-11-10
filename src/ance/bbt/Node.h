@@ -2,7 +2,7 @@
 #define ANCE_BBT_NODE_H
 
 #include "ance/core/UnaryOperator.h"
-#include "ance/core/Variable.h"
+#include "ance/core/Location.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"

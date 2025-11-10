@@ -194,12 +194,11 @@ namespace ance
 
         return exit_code;
 
-        // todo: remove the entity class, bbt value would instead have a variable ref
+        // todo: put the variable storage (values) into the scope classes and not a global map,
+        // todo: also put temporary storage into scopes, so that there are NO global maps for values
 
-        // todo: move variable into cet namespace the same way as scope, merge if there is already a variable class there
-        // todo: also make sure that no other trees use or reference these, e.g. the bbt value class needs to be moved to the value extensions
-
-        // todo: put the variable storage (values) into the scope classes and not global, and each variable then stores the value
+        // todo: put the value storage into the variable class, instead of having maps or lists in scopes for values
+        // todo: might need changes in variable ref that it stores a pointer internally and one that is not const
 
         // todo: instead of passing an allocate lambda to the intrinsics, the entity ref should have a read and write function with validation whether it is allowed, each variable thus stores the value instead of one large variable array
 
