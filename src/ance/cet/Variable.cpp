@@ -26,3 +26,22 @@ ance::core::Location const& ance::cet::Variable::location() const
 {
     return location_;
 }
+
+bool ance::cet::Variable::isDefined() const
+{
+    return value_.hasValue();
+}
+
+ance::utility::Shared<ance::bbt::Value> ance::cet::Variable::getValue()
+{
+    assert(isDefined());
+
+    return value_.value();
+}
+
+void ance::cet::Variable::setValue(utility::Shared<bbt::Value> value)
+{
+    assert(!is_final_ || !isDefined());
+
+    value_ = std::move(value);
+}

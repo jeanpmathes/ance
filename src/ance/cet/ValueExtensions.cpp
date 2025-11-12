@@ -27,9 +27,9 @@ namespace ance::cet
         return scope_;
     }
 
-    VariableRefValue::VariableRefValue(Variable const& variable) : Value(core::Type::VariableRef()), variable_(variable) {}
+    VariableRefValue::VariableRefValue(Variable& variable) : Value(core::Type::VariableRef()), variable_(variable) {}
 
-    utility::Shared<VariableRefValue> VariableRefValue::make(Variable const& variable)
+    utility::Shared<VariableRefValue> VariableRefValue::make(Variable& variable)
     {
         return utility::makeShared<VariableRefValue>(variable);
     }
@@ -44,7 +44,7 @@ namespace ance::cet
         return make(variable_);
     }
 
-    Variable const& VariableRefValue::value() const
+    Variable& VariableRefValue::value() const
     {
         return variable_;
     }

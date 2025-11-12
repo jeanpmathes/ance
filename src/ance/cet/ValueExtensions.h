@@ -27,19 +27,19 @@ namespace ance::cet
     class VariableRefValue final : public bbt::Value
     {
     public:
-        explicit VariableRefValue(Variable const& variable);
+        explicit VariableRefValue(Variable& variable);
 
-        static utility::Shared<VariableRefValue> make(Variable const& variable);
+        static utility::Shared<VariableRefValue> make(Variable& variable);
 
         ~VariableRefValue() override = default;
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;
 
-        [[nodiscard]] Variable const& value() const;
+        [[nodiscard]] Variable& value() const;
 
     private:
-        Variable const& variable_;
+        Variable& variable_;
     };
 }
 

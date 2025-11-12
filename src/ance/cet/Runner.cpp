@@ -1,14 +1,16 @@
 #include "Runner.h"
 
+#include "Temporary.h"
+
+#include <expected>
+#include <filesystem>
+#include <functional>
 #include <iostream>
+#include <list>
 #include <map>
 #include <set>
-#include <expected>
 #include <string>
-#include <functional>
-#include <filesystem>
 #include <vector>
-#include <list>
 
 #include "ance/core/Intrinsic.h"
 
@@ -205,7 +207,9 @@ struct ance::cet::Runner::Implementation
             for (size_t i = 0; i < argument_count; ++i)
             {
                 auto const& argument = arguments[i];
-                auto const& argument_value = temporaries_.at(&argument.get());
+                Temporary& temporary = scope()->getTemporary(argument.get());
+
+                auto const& argument_value = temporary.getValue();
                 auto const& type = signature.parameters()[i].type.get();
 
                 ok &= requireType(type, argument_value->type(), argument.get().location);
@@ -283,7 +287,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Branch const& branch_link) override
         {
-            utility::Shared<bbt::Value> condition = temporaries_.at(&branch_link.condition);
+            utility::Shared<bbt::Value> condition = scope()->getTemporary(branch_link.condition).getValue();
 
             if (!requireType(core::Type::Bool(), condition->type(), branch_link.condition.location))
             {
@@ -320,8 +324,8 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Store const& store) override
         {
-            utility::Shared<bbt::Value> target = temporaries_.at(&store.target);
-            utility::Shared<bbt::Value> value = temporaries_.at(&store.value);
+            utility::Shared<bbt::Value> target = scope()->getTemporary(store.target).getValue();
+            utility::Shared<bbt::Value> value = scope()->getTemporary(store.value).getValue();
 
             if (!requireType(core::Type::VariableRef(), target->type(), store.target.location))
             {
@@ -329,9 +333,9 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            Variable const& variable = target->as<VariableRefValue>().value();
+            Variable& variable = target->as<VariableRefValue>().value();
 
-            bool const is_defined = variables_.contains(&variable);
+            bool const is_defined = variable.isDefined();
 
             if (variable.isFinal() && is_defined)
             {
@@ -348,19 +352,18 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            variables_.insert_or_assign(&variable, value);
+            variable.setValue(value);
         }
 
         void visit(bbt::Temporary const& temporary) override
         {
-            utility::Shared<bbt::Value> value = bbt::UnitValue::make();
-            temporaries_.insert_or_assign(&temporary, value);
+            scope()->createTemporary(temporary);
         }
 
         void visit(bbt::CopyTemporary const& write_temporary) override
         {
-            utility::Shared<bbt::Value> value = temporaries_.at(&write_temporary.source);
-            temporaries_.insert_or_assign(&write_temporary.destination, value);
+            utility::Shared<bbt::Value> value = scope()->getTemporary(write_temporary.source).getValue();
+            scope()->getTemporary(write_temporary.destination).setValue(value);
         }
 
         void visit(bbt::Intrinsic const& intrinsic) override
@@ -373,7 +376,7 @@ struct ance::cet::Runner::Implementation
 
             utility::List<utility::Shared<bbt::Value>> arguments = {};
 
-            for (auto argument : intrinsic.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
+            for (auto argument : intrinsic.arguments) { arguments.emplace_back(scope()->getTemporary(argument.get()).getValue()); }
 
             auto result = intrinsics_.run(intrinsic.intrinsic, arguments, intrinsic.location);
 
@@ -387,7 +390,7 @@ struct ance::cet::Runner::Implementation
             }
             else
             {
-                temporaries_.insert_or_assign(&intrinsic.destination, result.getResult());
+                scope()->getTemporary(intrinsic.destination).setValue(result.getResult());
             }
         }
 
@@ -397,13 +400,13 @@ struct ance::cet::Runner::Implementation
 
             if (run_point.return_value.hasValue())
             {
-                temporaries_.insert_or_assign(&call.destination, run_point.return_value.value());
+                scope()->getTemporary(call.destination).setValue(run_point.return_value.value());
                 run_point.return_value = std::nullopt;
 
                 return;
             }
 
-            utility::Shared<bbt::Value> called = temporaries_.at(&call.called);
+            utility::Shared<bbt::Value> called = scope()->getTemporary(call.called).getValue();
 
             if (!requireType(core::Type::Function(), called->type(), call.called.location))
             {
@@ -420,7 +423,7 @@ struct ance::cet::Runner::Implementation
             }
 
             utility::List<utility::Shared<bbt::Value>> arguments = {};
-            for (auto argument : call.arguments) { arguments.emplace_back(temporaries_.at(&argument.get())); }
+            for (auto argument : call.arguments) { arguments.emplace_back(scope()->getTemporary(argument.get()).getValue()); }
 
             Scope* function_scope = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
 
@@ -437,7 +440,7 @@ struct ance::cet::Runner::Implementation
                     return;
                 }
 
-                variables_.insert_or_assign(&(*variable)->as<VariableRefValue>().value(), argument);
+                (*variable)->as<VariableRefValue>().value().setValue(argument);
             }
 
             run_point.stack.emplace_back(function.body().entry, function_scope);
@@ -447,7 +450,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Read const& read) override
         {
-            utility::Shared<bbt::Value> target = temporaries_.at(&read.target);
+            utility::Shared<bbt::Value> target = scope()->getTemporary(read.target).getValue();
 
             if (!requireType(core::Type::VariableRef(), target->type(), read.target.location))
             {
@@ -455,9 +458,9 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            Variable const& variable = target->as<VariableRefValue>().value();
+            Variable& variable = target->as<VariableRefValue>().value();
 
-            bool const is_defined = variables_.contains(&variable);
+            bool const is_defined = variable.isDefined();
             if (!is_defined)
             {
                 reporter_.error("Reading from undefined variable '" + variable.name() + "'", read.target.location);
@@ -465,18 +468,18 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::Shared<bbt::Value> value = variables_.at(&variable);
-            temporaries_.insert_or_assign(&read.destination, value);
+            utility::Shared<bbt::Value> value = variable.getValue();
+            scope()->getTemporary(read.destination).setValue(value);
         }
 
         void visit(bbt::Constant const& constant) override
         {
-            temporaries_.insert_or_assign(&constant.destination, constant.value->clone());
+            scope()->getTemporary(constant.destination).setValue(constant.value->clone());
         }
 
         void visit(bbt::Default const& default_value) override
         {
-            utility::Shared<bbt::Value> type_value = temporaries_.at(&default_value.type);
+            utility::Shared<bbt::Value> type_value = scope()->getTemporary(default_value.type).getValue();
 
             if (!requireType(core::Type::Self(), type_value->type(), default_value.type.location))
             {
@@ -499,19 +502,19 @@ struct ance::cet::Runner::Implementation
             };
 
             utility::Shared<bbt::Value> value = get_default_value(type_value->as<bbt::TypeValue>().value());
-            temporaries_.insert_or_assign(&default_value.destination, value);
+            scope()->getTemporary(default_value.destination).setValue(value);
         }
 
         void visit(bbt::CurrentScope const& current_scope) override
         {
             assert(this->scope() != nullptr);
 
-            temporaries_.insert_or_assign(&current_scope.destination, ScopeValue::make(*this->scope()));
+            scope()->getTemporary(current_scope.destination).setValue(ScopeValue::make(*this->scope()));
         }
 
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
-            utility::Shared<bbt::Value> value = temporaries_.at(&unary_operation.operand);
+            utility::Shared<bbt::Value> value = scope()->getTemporary(unary_operation.operand).getValue();
 
             if (!requireType(core::Type::Bool(), value->type(), unary_operation.operand.location))
             {
@@ -522,15 +525,15 @@ struct ance::cet::Runner::Implementation
             switch (unary_operation.op)
             {
                 case core::UnaryOperator::NOT:
-                    temporaries_.insert_or_assign(&unary_operation.destination, bbt::BoolValue::make(!value->as<bbt::BoolValue>().value()));
+                    scope()->getTemporary(unary_operation.destination).setValue(bbt::BoolValue::make(!value->as<bbt::BoolValue>().value()));
                     break;
             }
         }
 
         void visit(bbt::TypeOf const& type_of) override
         {
-            utility::Shared<bbt::Value> value = temporaries_.at(&type_of.expression);
-            temporaries_.insert_or_assign(&type_of.destination, bbt::TypeValue::make(value->type()));
+            utility::Shared<bbt::Value> value = scope()->getTemporary(type_of.expression).getValue();
+            scope()->getTemporary(type_of.destination).setValue(bbt::TypeValue::make(value->type()));
         }
 
         void visit(bbt::OrderedScopeEnter const&) override
@@ -592,9 +595,6 @@ struct ance::cet::Runner::Implementation
         };
 
         IntrinsicsRunner intrinsics_ {source_tree_, reporter_, provide_, include_};
-
-        std::map<Variable const*, utility::Shared<bbt::Value>> variables_ = {};
-        std::map<bbt::Temporary const*, utility::Shared<bbt::Value>> temporaries_ = {};
 
         std::list<RunPoint> run_points_ = {};
         utility::List<utility::Owned<bbt::UnorderedScope>> roots_;

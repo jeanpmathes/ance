@@ -1,8 +1,15 @@
 #ifndef ANCE_CET_VARIABLE_H
 #define ANCE_CET_VARIABLE_H
 
+#include "ance/utility/Owners.h"
+
 #include "ance/core/Identifier.h"
 #include "ance/core/Type.h"
+
+namespace ance::bbt
+{
+    class Value;
+}
 
 namespace ance::cet
 {
@@ -22,11 +29,18 @@ namespace ance::cet
         [[nodiscard]] bool                    isFinal() const;
         [[nodiscard]] core::Location const&   location() const;
 
+        [[nodiscard]] bool isDefined() const;
+
+        utility::Shared<bbt::Value> getValue();
+        void setValue(utility::Shared<bbt::Value> value);
+
       private:
         core::Identifier  identifier_;
         core::Type const& type_;
         bool              is_final_;
         core::Location    location_;
+
+        utility::Optional<utility::Shared<bbt::Value>> value_;
     };
 }
 
