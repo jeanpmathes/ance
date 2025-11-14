@@ -27,7 +27,6 @@ namespace ance::cet
 
         IntrinsicsRunner(sources::SourceTree&                                                                    source_tree,
                          core::Reporter&                                                                         reporter,
-                         std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> provide,
                          std::function<void(std::filesystem::path const&)>                                       include);
 
         struct Result
@@ -64,7 +63,6 @@ namespace ance::cet
         sources::SourceTree& source_tree_;
         core::Reporter& reporter_;
 
-        std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> provide_;
         std::function<void(std::filesystem::path const&)> include_;
 
         struct State

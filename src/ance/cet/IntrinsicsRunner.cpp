@@ -4,11 +4,9 @@
 
 ance::cet::IntrinsicsRunner::IntrinsicsRunner(sources::SourceTree&                                                                    source_tree,
                                               core::Reporter&                                                                         reporter,
-                                              std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> provide,
                                               std::function<void(std::filesystem::path const&)>                                       include)
     : source_tree_(source_tree)
     , reporter_(reporter)
-    , provide_(std::move(provide))
     , include_(std::move(include))
 {}
 
@@ -98,7 +96,7 @@ void ance::cet::IntrinsicsRunner::visit(core::Resolve const&)
     Scope&            scope            = state_.arguments->at(0)->as<ScopeValue>().value();
     core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::IdentifierValue>().value();
 
-    utility::Optional<utility::Shared<bbt::Value>> variable = scope.find(identifier, provide_);
+    utility::Optional<utility::Shared<bbt::Value>> variable = scope.find(identifier);
 
     if (variable.hasValue()) { setResult(std::move(*variable)); }
     else { setPending(identifier); }

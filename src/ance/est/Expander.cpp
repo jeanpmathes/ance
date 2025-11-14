@@ -441,9 +441,9 @@ struct ance::est::Expander::Implementation
         void visit(ast::Call const& call) override
         {
             Statements before;
-            utility::List<utility::Owned<Expression>> arguments;
             Statements after;
 
+            utility::List<utility::Owned<Expression>> arguments;
             for (auto& argument : call.arguments)
             {
                 Expansion expansion = expand(*argument);
@@ -459,7 +459,7 @@ struct ance::est::Expander::Implementation
 
             setResultExpression({
                 .before = std::move(before),
-                .center = utility::makeOwned<Call>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), call.location), std::move(arguments), call.location),
+                .center = utility::makeOwned<Call>(utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), call.identifier.location()), call.identifier.location()), std::move(arguments), call.location),
                 .after  = std::move(after),
             });
         }

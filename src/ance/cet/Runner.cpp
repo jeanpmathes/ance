@@ -5,10 +5,7 @@
 #include <expected>
 #include <filesystem>
 #include <functional>
-#include <iostream>
 #include <list>
-#include <map>
-#include <set>
 #include <string>
 #include <vector>
 
@@ -71,7 +68,12 @@ struct ance::cet::Runner::Implementation
             core::Reporter& reporter,
             std::function<utility::Optional<utility::Owned<bbt::UnorderedScope>>(std::filesystem::path const&)> get_unordered_scope,
             utility::List<utility::Owned<Provider>>& providers)
-        : source_tree_(source_tree), reporter_(reporter), read_unordered_scope_(std::move(get_unordered_scope)), providers_(providers) {}
+        : source_tree_(source_tree)
+        , reporter_(reporter)
+        , read_unordered_scope_(std::move(get_unordered_scope))
+        , global_scope_(utility::makeOwned<GlobalScope>(providers))
+        {}
+        
         ~BBT() override = default;
 
         void schedule(bbt::Flow const& flow, Scope* scope)
@@ -186,7 +188,7 @@ struct ance::cet::Runner::Implementation
             return ok;
         }
 
-        [[nodiscard]] bool requireSignature(core::Signature const& signature, utility::List<std::reference_wrapper<bbt::Temporary const>> const& arguments, core::Location const& location) const
+        [[nodiscard]] bool requireSignature(core::Signature const& signature, utility::List<std::reference_wrapper<bbt::Temporary const>> const& arguments, core::Location const& location)
         {
             bool ok = true;
 
@@ -207,7 +209,7 @@ struct ance::cet::Runner::Implementation
             for (size_t i = 0; i < argument_count; ++i)
             {
                 auto const& argument = arguments[i];
-                Temporary& temporary = scope()->getTemporary(argument.get());
+                Temporary& temporary = scope().getTemporary(argument.get());
 
                 auto const& argument_value = temporary.getValue();
                 auto const& type = signature.parameters()[i].type.get();
@@ -239,9 +241,14 @@ struct ance::cet::Runner::Implementation
             state_.current_run_point->clearBlocker();
         }
 
-        [[nodiscard]] Scope* scope() const
+        [[nodiscard]] Scope& scope()
         {
-            return state_.current_scope;
+            if (state_.current_scope != nullptr)
+            {
+                return *state_.current_scope;
+            }
+
+            return *global_scope_;
         }
 
         void visit(bbt::UnorderedScope const& scope) override
@@ -287,7 +294,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Branch const& branch_link) override
         {
-            utility::Shared<bbt::Value> condition = scope()->getTemporary(branch_link.condition).getValue();
+            utility::Shared<bbt::Value> condition = scope().getTemporary(branch_link.condition).getValue();
 
             if (!requireType(core::Type::Bool(), condition->type(), branch_link.condition.location))
             {
@@ -324,8 +331,8 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Store const& store) override
         {
-            utility::Shared<bbt::Value> target = scope()->getTemporary(store.target).getValue();
-            utility::Shared<bbt::Value> value = scope()->getTemporary(store.value).getValue();
+            utility::Shared<bbt::Value> target = scope().getTemporary(store.target).getValue();
+            utility::Shared<bbt::Value> value = scope().getTemporary(store.value).getValue();
 
             if (!requireType(core::Type::VariableRef(), target->type(), store.target.location))
             {
@@ -357,13 +364,13 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Temporary const& temporary) override
         {
-            scope()->createTemporary(temporary);
+            scope().createTemporary(temporary);
         }
 
         void visit(bbt::CopyTemporary const& write_temporary) override
         {
-            utility::Shared<bbt::Value> value = scope()->getTemporary(write_temporary.source).getValue();
-            scope()->getTemporary(write_temporary.destination).setValue(value);
+            utility::Shared<bbt::Value> value = scope().getTemporary(write_temporary.source).getValue();
+            scope().getTemporary(write_temporary.destination).setValue(value);
         }
 
         void visit(bbt::Intrinsic const& intrinsic) override
@@ -376,7 +383,7 @@ struct ance::cet::Runner::Implementation
 
             utility::List<utility::Shared<bbt::Value>> arguments = {};
 
-            for (auto argument : intrinsic.arguments) { arguments.emplace_back(scope()->getTemporary(argument.get()).getValue()); }
+            for (auto argument : intrinsic.arguments) { arguments.emplace_back(scope().getTemporary(argument.get()).getValue()); }
 
             auto result = intrinsics_.run(intrinsic.intrinsic, arguments, intrinsic.location);
 
@@ -390,7 +397,7 @@ struct ance::cet::Runner::Implementation
             }
             else
             {
-                scope()->getTemporary(intrinsic.destination).setValue(result.getResult());
+                scope().getTemporary(intrinsic.destination).setValue(result.getResult());
             }
         }
 
@@ -400,13 +407,13 @@ struct ance::cet::Runner::Implementation
 
             if (run_point.return_value.hasValue())
             {
-                scope()->getTemporary(call.destination).setValue(run_point.return_value.value());
+                scope().getTemporary(call.destination).setValue(run_point.return_value.value());
                 run_point.return_value = std::nullopt;
 
                 return;
             }
 
-            utility::Shared<bbt::Value> called = scope()->getTemporary(call.called).getValue();
+            utility::Shared<bbt::Value> called = scope().getTemporary(call.called).getValue();
 
             if (!requireType(core::Type::Function(), called->type(), call.called.location))
             {
@@ -423,7 +430,7 @@ struct ance::cet::Runner::Implementation
             }
 
             utility::List<utility::Shared<bbt::Value>> arguments = {};
-            for (auto argument : call.arguments) { arguments.emplace_back(scope()->getTemporary(argument.get()).getValue()); }
+            for (auto argument : call.arguments) { arguments.emplace_back(scope().getTemporary(argument.get()).getValue()); }
 
             Scope* function_scope = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
 
@@ -450,7 +457,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Read const& read) override
         {
-            utility::Shared<bbt::Value> target = scope()->getTemporary(read.target).getValue();
+            utility::Shared<bbt::Value> target = scope().getTemporary(read.target).getValue();
 
             if (!requireType(core::Type::VariableRef(), target->type(), read.target.location))
             {
@@ -469,17 +476,17 @@ struct ance::cet::Runner::Implementation
             }
 
             utility::Shared<bbt::Value> value = variable.getValue();
-            scope()->getTemporary(read.destination).setValue(value);
+            scope().getTemporary(read.destination).setValue(value);
         }
 
         void visit(bbt::Constant const& constant) override
         {
-            scope()->getTemporary(constant.destination).setValue(constant.value->clone());
+            scope().getTemporary(constant.destination).setValue(constant.value->clone());
         }
 
         void visit(bbt::Default const& default_value) override
         {
-            utility::Shared<bbt::Value> type_value = scope()->getTemporary(default_value.type).getValue();
+            utility::Shared<bbt::Value> type_value = scope().getTemporary(default_value.type).getValue();
 
             if (!requireType(core::Type::Self(), type_value->type(), default_value.type.location))
             {
@@ -502,19 +509,17 @@ struct ance::cet::Runner::Implementation
             };
 
             utility::Shared<bbt::Value> value = get_default_value(type_value->as<bbt::TypeValue>().value());
-            scope()->getTemporary(default_value.destination).setValue(value);
+            scope().getTemporary(default_value.destination).setValue(value);
         }
 
         void visit(bbt::CurrentScope const& current_scope) override
         {
-            assert(this->scope() != nullptr);
-
-            scope()->getTemporary(current_scope.destination).setValue(ScopeValue::make(*this->scope()));
+            scope().getTemporary(current_scope.destination).setValue(ScopeValue::make(scope()));
         }
 
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
-            utility::Shared<bbt::Value> value = scope()->getTemporary(unary_operation.operand).getValue();
+            utility::Shared<bbt::Value> value = scope().getTemporary(unary_operation.operand).getValue();
 
             if (!requireType(core::Type::Bool(), value->type(), unary_operation.operand.location))
             {
@@ -525,15 +530,15 @@ struct ance::cet::Runner::Implementation
             switch (unary_operation.op)
             {
                 case core::UnaryOperator::NOT:
-                    scope()->getTemporary(unary_operation.destination).setValue(bbt::BoolValue::make(!value->as<bbt::BoolValue>().value()));
+                    scope().getTemporary(unary_operation.destination).setValue(bbt::BoolValue::make(!value->as<bbt::BoolValue>().value()));
                     break;
             }
         }
 
         void visit(bbt::TypeOf const& type_of) override
         {
-            utility::Shared<bbt::Value> value = scope()->getTemporary(type_of.expression).getValue();
-            scope()->getTemporary(type_of.destination).setValue(bbt::TypeValue::make(value->type()));
+            utility::Shared<bbt::Value> value = scope().getTemporary(type_of.expression).getValue();
+            scope().getTemporary(type_of.destination).setValue(bbt::TypeValue::make(value->type()));
         }
 
         void visit(bbt::OrderedScopeEnter const&) override
@@ -545,7 +550,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::OrderedScopeExit const&) override
         {
-            state_.current_scope = scope()->parent();
+            state_.current_scope = scope().parent();
 
             // todo: destructors and stuff, clean up value storage
             // todo: maybe deleting the scope instance is a good idea?
@@ -555,22 +560,10 @@ struct ance::cet::Runner::Implementation
         sources::SourceTree& source_tree_;
         core::Reporter& reporter_;
         std::function<utility::Optional<utility::Owned<bbt::UnorderedScope>>(std::filesystem::path const&)> read_unordered_scope_;
-        utility::List<utility::Owned<Provider>>& providers_;
-
-        std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> provide_ = [this](core::Identifier const& identifier) -> utility::Optional<utility::Shared<bbt::Value>> {
-            for (auto& provider : this->providers_)
-            {
-                utility::Optional<utility::Shared<bbt::Function>> provided = provider->provide(identifier);
-                if (provided.hasValue())
-                    return provided.value();
-            }
-
-            return std::nullopt;
-        };
 
         void scheduleUnorderedScope(bbt::UnorderedScope const& scope)
         {
-            Scope* unordered_scope = scopes_.emplace_back(utility::makeOwned<UnorderedScope>(nullptr)).get();
+            Scope* unordered_scope = scopes_.emplace_back(utility::makeOwned<UnorderedScope>(*global_scope_)).get();
 
             for (auto const& flow : scope.flows)
             {
@@ -594,11 +587,12 @@ struct ance::cet::Runner::Implementation
             scheduleUnorderedScope(scope_ref);
         };
 
-        IntrinsicsRunner intrinsics_ {source_tree_, reporter_, provide_, include_};
+        IntrinsicsRunner intrinsics_ {source_tree_, reporter_, include_};
 
         std::list<RunPoint> run_points_ = {};
         utility::List<utility::Owned<bbt::UnorderedScope>> roots_;
         std::vector<utility::Owned<Scope>> scopes_ = {};
+        utility::Owned<GlobalScope> global_scope_;
 
         struct State
         {

@@ -1,7 +1,9 @@
 #include "Scope.h"
 
-#include "ance/cet/ValueExtensions.h"
+#include "ance/bbt/Function.h"
+#include "ance/cet/Provider.h"
 #include "ance/cet/Temporary.h"
+#include "ance/cet/ValueExtensions.h"
 
 ance::cet::Scope::Scope(Scope* parent) : parent_(parent) {}
 
@@ -30,17 +32,15 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
     return VariableRefValue::make(variable_ref);
 }
 
-ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::find(
-    core::Identifier const&                                                                        identifier,
-    std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> const& provider)
+ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::find(core::Identifier const& identifier)
 {
     Variable * variable = onFind(identifier);
 
     if (variable != nullptr) { return VariableRefValue::make(*variable); }
 
-    if (parent_ != nullptr) { return parent_->find(identifier, provider); }
+    if (parent_ != nullptr) { return parent_->find(identifier); }
 
-    return provider(identifier);
+    return std::nullopt;
 }
 
 ance::cet::Temporary& ance::cet::Scope::createTemporary(bbt::Temporary const& bbt_temporary)
@@ -66,7 +66,45 @@ ance::cet::Temporary& ance::cet::Scope::getTemporary(bbt::Temporary const& bbt_t
     return *current_scope->temporaries_.at(&bbt_temporary);
 }
 
-ance::cet::OrderedScope::OrderedScope(Scope* parent) : Scope(parent) {}
+ance::cet::GlobalScope::GlobalScope(utility::List<utility::Owned<Provider>>& providers) : Scope(nullptr), providers_(providers) {}
+
+bool ance::cet::GlobalScope::canDeclare(core::Identifier const&) const
+{
+    return false;
+}
+
+void ance::cet::GlobalScope::onDeclare(utility::Owned<Variable>)
+{
+    assert(false);
+}
+
+ance::cet::Variable* ance::cet::GlobalScope::onFind(core::Identifier const& identifier)
+{
+    auto iterator = variables_.find(identifier);
+    if (iterator != variables_.end())
+    {
+        auto& [_, variable] = *iterator;
+        return variable.get();
+    }
+
+    for (auto& provider : this->providers_)
+    {
+        utility::Optional<utility::Shared<bbt::Function>> provided = provider->provide(identifier);
+        if (provided.hasValue())
+        {
+            auto variable = utility::makeShared<Variable>(identifier, core::Type::Function(), true, core::Location::global());
+            variables_.emplace(identifier, variable);
+
+            variable->setValue(*provided);
+
+            return variable.get();
+        }
+    }
+
+    return nullptr;
+}
+
+ance::cet::OrderedScope::OrderedScope(Scope& parent) : Scope(&parent) {}
 
 bool ance::cet::OrderedScope::canDeclare(core::Identifier const& identifier) const
 {
@@ -88,7 +126,7 @@ ance::cet::Variable* ance::cet::OrderedScope::onFind(core::Identifier const& ide
     return nullptr;
 }
 
-ance::cet::UnorderedScope::UnorderedScope(Scope* parent) : Scope(parent) {}
+ance::cet::UnorderedScope::UnorderedScope(Scope& parent) : Scope(&parent) {}
 
 bool ance::cet::UnorderedScope::canDeclare(core::Identifier const& identifier) const
 {

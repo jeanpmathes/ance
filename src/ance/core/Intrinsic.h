@@ -108,7 +108,7 @@ namespace ance::core
         /// - The scope to resolve the variable in.
         /// - The identifier of the variable to resolve.
         /// It returns a reference to the resolved variable.
-        Resolve() : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::Any()) {} // todo: instead of using any, some kind of inheritance would be better and the any could be removed?
+        Resolve() : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::VariableRef()) {}
 
     public:
         ~Resolve() override = default;

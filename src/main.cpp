@@ -194,17 +194,12 @@ namespace ance
 
         return exit_code;
 
-        // todo: put the variable storage (values) into the scope classes and not a global map,
-        // todo: also put temporary storage into scopes, so that there are NO global maps for values
+        // todo: instead of the scopes_ list in the runner, the scope base class should support adding child scopes
+        // todo: when a scope is exited, it should be removed from the parent scope
+        // todo: make sure that this does not cause issues with any dangling references
 
-        // todo: put the value storage into the variable class, instead of having maps or lists in scopes for values
-        // todo: might need changes in variable ref that it stores a pointer internally and one that is not const
-
-        // todo: instead of passing an allocate lambda to the intrinsics, the entity ref should have a read and write function with validation whether it is allowed, each variable thus stores the value instead of one large variable array
-
-        // todo: instead of having the any type, the resolve should always return values of variable type
-        // todo: functions should be stored in variables, which means function calls need to be split into not just resolve and call but also a read of the variable
-        // todo: and the provider has to create variables for all passed functions, and they have to be final
+        // todo: rename the value classes to no longer have the value suffix, e.g. StringValue -> String
+        // todo: only exception is that the scope value should be renamed ScopeRef, and VariableRefValue should be VariableRef
 
         // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
 

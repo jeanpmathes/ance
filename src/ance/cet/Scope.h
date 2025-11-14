@@ -20,6 +20,7 @@
 namespace ance::cet
 {
     class Temporary;
+    class Provider;
 }
 
 namespace ance::cet
@@ -40,9 +41,7 @@ namespace ance::cet
                                                                               core::Location const&   location,
                                                                               core::Reporter&         reporter);
 
-        [[nodiscard]] utility::Optional<utility::Shared<bbt::Value>> find(
-            core::Identifier const&                                                                       identifier,
-            std::function<utility::Optional<utility::Shared<bbt::Value>>(core::Identifier const&)> const& provider);
+        [[nodiscard]] utility::Optional<utility::Shared<bbt::Value>> find(core::Identifier const& identifier);
 
         Temporary& createTemporary(bbt::Temporary const& bbt_temporary);
         Temporary& getTemporary(bbt::Temporary const& bbt_temporary);
@@ -58,16 +57,34 @@ namespace ance::cet
         std::map<bbt::Temporary const*, utility::Owned<Temporary>> temporaries_ = {};
     };
 
+    class GlobalScope final : public Scope
+    {
+      public:
+        explicit GlobalScope(utility::List<utility::Owned<Provider>>& providers);
+
+        ~GlobalScope() override = default;
+
+      protected:
+        [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override;
+        void onDeclare(utility::Owned<Variable> variable) override;
+
+        [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;
+
+      private:
+        utility::List<utility::Owned<Provider>>& providers_;
+
+        std::map<core::Identifier, utility::Shared<Variable>> variables_ = {};
+    };
+
     class OrderedScope final : public Scope
     {
       public:
-        explicit OrderedScope(Scope* parent);
+        explicit OrderedScope(Scope& parent);
 
         ~OrderedScope() override = default;
 
       protected:
         [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override;
-
         void onDeclare(utility::Owned<Variable> variable) override;
 
         [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;
@@ -81,13 +98,12 @@ namespace ance::cet
     class UnorderedScope final : public Scope
     {
       public:
-        explicit UnorderedScope(Scope* parent);
+        explicit UnorderedScope(Scope& parent);
 
         ~UnorderedScope() override = default;
 
       protected:
         [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override;
-
         void onDeclare(utility::Owned<Variable> variable) override;
 
         [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;

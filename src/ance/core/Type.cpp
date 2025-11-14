@@ -79,19 +79,13 @@ namespace ance::core
 
     Type const& Type::Scope()
     {
-        static Type const type {Identifier::like("Scope")};
+        static Type const type {Identifier::like(".Scope")};
         return type;
     }
 
     Type const& Type::Location()
     {
         static Type const type {Identifier::like("Location")};
-        return type;
-    }
-
-    Type const& Type::Any()
-    {
-        static Type const type {Identifier::like("Any")};
         return type;
     }
 
@@ -117,9 +111,6 @@ namespace ance::core
 
     bool Type::isAssignableTo(Type const& other) const
     {
-        if (other == Any())
-            return true;
-
         return *this == other;
     }
 }

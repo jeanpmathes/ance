@@ -59,9 +59,6 @@ namespace ance::core
         /// Get the source location type.
         static Type const& Location();
 
-        /// Get the 'any' type, which can hold any value.
-        static Type const& Any();
-
         /// Get a type by its ID.
         [[nodiscard]] static Type const& byID(TypeID const& id) ;
 
