@@ -789,7 +789,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, UnitValue::make(), destination(), unit_literal.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, Unit::make(), destination(), unit_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -798,7 +798,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, SizeValue::make(std::stoull(size_literal.value)), destination(), size_literal.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, Size::make(std::stoull(size_literal.value)), destination(), size_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -807,7 +807,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, StringValue::make(string_literal.value), destination(), string_literal.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, String::make(string_literal.value), destination(), string_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -816,7 +816,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, BoolValue::make(bool_literal.value), destination(), bool_literal.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, Bool::make(bool_literal.value), destination(), bool_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -825,7 +825,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, TypeValue::make(type_literal.type), destination(), type_literal.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, Type::make(type_literal.type), destination(), type_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -855,7 +855,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, LocationValue::make(here.location), destination(), here.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, Location::make(here.location), destination(), here.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -922,7 +922,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, IdentifierValue::make(identifier_capture.identifier), destination(), identifier_capture.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, Identifier::make(identifier_capture.identifier), destination(), identifier_capture.location);
 
             setResult(std::move(blocks), inner, inner);
         }

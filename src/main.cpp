@@ -78,7 +78,7 @@ namespace ance
                 builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::B2Str::instance(), std::move(args), str_value, core::Location::global()));
             }
 
-            bbt::Temporary const& location = builder.pushConstant(bbt::LocationValue::make(core::Location::global()));
+            bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global()));
 
             bbt::Temporary const& result = builder.pushTemporary();
             {
@@ -123,7 +123,7 @@ namespace ance
         {
             bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
 
-            bbt::Temporary const& location = builder.pushConstant(bbt::LocationValue::make(core::Location::global()));
+            bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global()));
 
             bbt::Temporary const& result = builder.pushTemporary();
             {
@@ -194,10 +194,7 @@ namespace ance
 
         return exit_code;
 
-        // todo: rename the value classes to no longer have the value suffix, e.g. StringValue -> String
-        // todo: only exception is that the scope value should be renamed ScopeRef, and VariableRefValue should be VariableRef
-
-        // todo: add most expressions (both value and control flow) except runtime-only ones to grammar and support them in the compiler
+        // todo: add all non-cmp statements and expressions (see old grammar), if a statement/expression is cmp add a TODO in the old grammar file
 
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
         // todo: build a very minimal CET that heavily relies and uses intrinsics, should be close to LLVM IR in capability and nodes

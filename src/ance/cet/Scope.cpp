@@ -29,14 +29,14 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
 
     onDeclare(std::move(variable));
 
-    return VariableRefValue::make(variable_ref);
+    return VariableRef::make(variable_ref);
 }
 
 ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::find(core::Identifier const& identifier)
 {
     Variable * variable = onFind(identifier);
 
-    if (variable != nullptr) { return VariableRefValue::make(*variable); }
+    if (variable != nullptr) { return VariableRef::make(*variable); }
 
     if (parent_ != nullptr) { return parent_->find(identifier); }
 

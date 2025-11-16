@@ -47,27 +47,27 @@ namespace ance::bbt
         core::Type const& type_;
     };
 
-    class UnitValue final : public Value
+    class Unit final : public Value
     {
     public:
-        UnitValue();
+        Unit();
 
-        static utility::Shared<UnitValue> make();
+        static utility::Shared<Unit> make();
 
-        ~UnitValue() override = default;
+        ~Unit() override = default;
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;
     };
 
-    class BoolValue final : public Value
+    class Bool final : public Value
     {
     public:
-        explicit BoolValue(bool value);
+        explicit Bool(bool value);
 
-        static utility::Shared<BoolValue> make(bool value);
+        static utility::Shared<Bool> make(bool value);
 
-        ~BoolValue() override = default;
+        ~Bool() override = default;
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;
@@ -78,14 +78,14 @@ namespace ance::bbt
         bool value_;
     };
 
-    class SizeValue final : public Value
+    class Size final : public Value
     {
     public:
-        explicit SizeValue(size_t value);
+        explicit Size(size_t value);
 
-        static utility::Shared<SizeValue> make(size_t value);
+        static utility::Shared<Size> make(size_t value);
 
-        ~SizeValue() override = default;
+        ~Size() override = default;
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;
@@ -96,14 +96,14 @@ namespace ance::bbt
         size_t value_;
     };
 
-    class IdentifierValue final : public Value
+    class Identifier final : public Value
     {
     public:
-        explicit IdentifierValue(core::Identifier const& identifier);
+        explicit Identifier(core::Identifier const& identifier);
 
-        static utility::Shared<IdentifierValue> make(core::Identifier const& identifier);
+        static utility::Shared<Identifier> make(core::Identifier const& identifier);
 
-        ~IdentifierValue() override = default;
+        ~Identifier() override = default;
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;
@@ -114,14 +114,14 @@ namespace ance::bbt
         core::Identifier identifier_;
     };
 
-    class TypeValue final : public Value
+    class Type final : public Value
     {
     public:
-        explicit TypeValue(core::Type const& type);
+        explicit Type(core::Type const& type);
 
-        static utility::Shared<TypeValue> make(core::Type const& type);
+        static utility::Shared<Type> make(core::Type const& type);
 
-        ~TypeValue() override = default;
+        ~Type() override = default;
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;
@@ -132,14 +132,14 @@ namespace ance::bbt
         core::Type const& type_;
     };
 
-    class LocationValue final : public Value
+    class Location final : public Value
     {
     public:
-        explicit LocationValue(core::Location const& location);
+        explicit Location(core::Location const& location);
 
-        static utility::Shared<LocationValue> make(core::Location const& location);
+        static utility::Shared<Location> make(core::Location const& location);
 
-        ~LocationValue() override = default;
+        ~Location() override = default;
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;
@@ -150,14 +150,14 @@ namespace ance::bbt
         core::Location location_;
     };
 
-    class StringValue final : public Value
+    class String final : public Value
     {
     public:
-        explicit StringValue(std::string value);
+        explicit String(std::string value);
 
-        static utility::Shared<StringValue> make(std::string value);
+        static utility::Shared<String> make(std::string value);
 
-        ~StringValue() override = default;
+        ~String() override = default;
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;

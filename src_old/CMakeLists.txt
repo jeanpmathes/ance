@@ -24,7 +24,8 @@ set(ERROR_OPTIONS
     -Wno-global-constructors
     -Wno-unsafe-buffer-usage
     -Wno-switch-default
-    -Wno-switch-enum)
+    -Wno-switch-enum
+    -Wno-padded)
 
 target_compile_options(ance PRIVATE /EHsc -MDd ${ERROR_OPTIONS})
 

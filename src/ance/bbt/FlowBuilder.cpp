@@ -61,7 +61,7 @@ namespace ance::bbt
             pushStatement(utility::makeOwned<CurrentScope>(scope_arg, location_));
 
             Temporary const& identifier_arg = pushTemporary();
-            pushStatement(utility::makeOwned<Constant>(IdentifierValue::make(name), identifier_arg, location_));
+            pushStatement(utility::makeOwned<Constant>(Identifier::make(name), identifier_arg, location_));
 
             Temporary const& resolve_result = pushTemporary();
             utility::List<std::reference_wrapper<Temporary const>> resolve_arguments;

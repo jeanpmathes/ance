@@ -8,12 +8,12 @@ namespace ance::cet
     class Variable;
     class Scope;
 
-    class ScopeValue final : public bbt::Value
+    class ScopeRef final : public bbt::Value
     {
     public:
-        explicit ScopeValue(Scope& scope);
+        explicit ScopeRef(Scope& scope);
 
-        static utility::Shared<ScopeValue> make(Scope& scope);
+        static utility::Shared<ScopeRef> make(Scope& scope);
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;
@@ -24,14 +24,14 @@ namespace ance::cet
         Scope& scope_;
     };
 
-    class VariableRefValue final : public bbt::Value
+    class VariableRef final : public bbt::Value
     {
     public:
-        explicit VariableRefValue(Variable& variable);
+        explicit VariableRef(Variable& variable);
 
-        static utility::Shared<VariableRefValue> make(Variable& variable);
+        static utility::Shared<VariableRef> make(Variable& variable);
 
-        ~VariableRefValue() override = default;
+        ~VariableRef() override = default;
 
         [[nodiscard]] std::string            toString() const override;
         [[nodiscard]] utility::Shared<Value> clone() const override;

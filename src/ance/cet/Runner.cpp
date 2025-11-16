@@ -142,7 +142,7 @@ struct ance::cet::Runner::Implementation
 
             state_ = previous_state;
 
-            return {result, bbt::UnitValue::make()};
+            return {result, bbt::Unit::make()};
         }
 
         ExecutionResult execute(RunPoint& run_point)
@@ -302,7 +302,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            if (condition->as<bbt::BoolValue>().value())
+            if (condition->as<bbt::Bool>().value())
             {
                 state_.next = &branch_link.true_branch;
             }
@@ -340,7 +340,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            Variable& variable = target->as<VariableRefValue>().value();
+            Variable& variable = target->as<VariableRef>().value();
 
             bool const is_defined = variable.isDefined();
 
@@ -447,7 +447,7 @@ struct ance::cet::Runner::Implementation
                     return;
                 }
 
-                (*variable)->as<VariableRefValue>().value().setValue(argument);
+                (*variable)->as<VariableRef>().value().setValue(argument);
             }
 
             run_point.stack.emplace_back(function.body().entry, &function_scope);
@@ -465,7 +465,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            Variable& variable = target->as<VariableRefValue>().value();
+            Variable& variable = target->as<VariableRef>().value();
 
             bool const is_defined = variable.isDefined();
             if (!is_defined)
@@ -497,24 +497,24 @@ struct ance::cet::Runner::Implementation
             auto get_default_value = [&](core::Type const& type) -> utility::Shared<bbt::Value> {
                 // todo: should become default constructor call at some point
 
-                if (type == core::Type::Bool()) return bbt::BoolValue::make(false);
-                if (type == core::Type::Unit()) return bbt::UnitValue::make();
-                if (type == core::Type::Size()) return bbt::SizeValue::make(0);
-                if (type == core::Type::Location()) return bbt::LocationValue::make(core::Location::global());
-                if (type == core::Type::String()) return bbt::StringValue::make("");
+                if (type == core::Type::Bool()) return bbt::Bool::make(false);
+                if (type == core::Type::Unit()) return bbt::Unit::make();
+                if (type == core::Type::Size()) return bbt::Size::make(0);
+                if (type == core::Type::Location()) return bbt::Location::make(core::Location::global());
+                if (type == core::Type::String()) return bbt::String::make("");
 
                 reporter_.error("Cannot create default value for type '" + type.name() + "'", default_value.type.location);
 
-                return bbt::UnitValue::make();
+                return bbt::Unit::make();
             };
 
-            utility::Shared<bbt::Value> value = get_default_value(type_value->as<bbt::TypeValue>().value());
+            utility::Shared<bbt::Value> value = get_default_value(type_value->as<bbt::Type>().value());
             scope().getTemporary(default_value.destination).setValue(value);
         }
 
         void visit(bbt::CurrentScope const& current_scope) override
         {
-            scope().getTemporary(current_scope.destination).setValue(ScopeValue::make(scope()));
+            scope().getTemporary(current_scope.destination).setValue(ScopeRef::make(scope()));
         }
 
         void visit(bbt::UnaryOperation const& unary_operation) override
@@ -530,7 +530,7 @@ struct ance::cet::Runner::Implementation
             switch (unary_operation.op)
             {
                 case core::UnaryOperator::NOT:
-                    scope().getTemporary(unary_operation.destination).setValue(bbt::BoolValue::make(!value->as<bbt::BoolValue>().value()));
+                    scope().getTemporary(unary_operation.destination).setValue(bbt::Bool::make(!value->as<bbt::Bool>().value()));
                     break;
             }
         }
@@ -538,7 +538,7 @@ struct ance::cet::Runner::Implementation
         void visit(bbt::TypeOf const& type_of) override
         {
             utility::Shared<bbt::Value> value = scope().getTemporary(type_of.expression).getValue();
-            scope().getTemporary(type_of.destination).setValue(bbt::TypeValue::make(value->type()));
+            scope().getTemporary(type_of.destination).setValue(bbt::Type::make(value->type()));
         }
 
         void visit(bbt::OrderedScopeEnter const&) override

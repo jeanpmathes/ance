@@ -3,7 +3,7 @@
 #include "ance/bbt/Value.h"
 #include "ance/bbt/Node.h"
 
-ance::cet::Temporary::Temporary() : value_(bbt::UnitValue::make())
+ance::cet::Temporary::Temporary() : value_(bbt::Unit::make())
 {}
 
 void ance::cet::Temporary::setValue(utility::Shared<bbt::Value> value)

@@ -44,7 +44,7 @@ typeDescription
     ;
 
 aliasDescription
-    : accessModifier 'define' IDENTIFIER 'alias' type ';'
+    : accessModifier 'define' IDENTIFIER 'alias' type ';' // todo: think about how to do aliasing, test how well simple assignment works as a replacement, thing about providing good hints with assignment, then maybe aliasing is not needed, maybe add aliasing as a copy function for types as a later TODO
     ;
 
 structDescription

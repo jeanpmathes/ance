@@ -76,10 +76,10 @@ void ance::cet::IntrinsicsRunner::visit(core::Declare const&)
     assert(state_.arguments->at(2)->type() == core::Type::Bool());
     assert(state_.arguments->at(3)->type() == core::Type::Self());
 
-    Scope&                  scope      = state_.arguments->at(0)->as<ScopeValue>().value();
-    core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::IdentifierValue>().value();
-    bool const              is_final   = state_.arguments->at(2)->as<bbt::BoolValue>().value();
-    core::Type const&       type       = state_.arguments->at(3)->as<bbt::TypeValue>().value();
+    Scope&                  scope      = state_.arguments->at(0)->as<ScopeRef>().value();
+    core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
+    bool const              is_final   = state_.arguments->at(2)->as<bbt::Bool>().value();
+    core::Type const&       type       = state_.arguments->at(3)->as<bbt::Type>().value();
 
     auto variable = scope.declare(identifier, type, is_final, state_.location, reporter_);
 
@@ -93,8 +93,8 @@ void ance::cet::IntrinsicsRunner::visit(core::Resolve const&)
     assert(state_.arguments->at(0)->type() == core::Type::Scope());
     assert(state_.arguments->at(1)->type() == core::Type::Ident());
 
-    Scope&            scope            = state_.arguments->at(0)->as<ScopeValue>().value();
-    core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::IdentifierValue>().value();
+    Scope&            scope            = state_.arguments->at(0)->as<ScopeRef>().value();
+    core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
 
     utility::Optional<utility::Shared<bbt::Value>> variable = scope.find(identifier);
 
@@ -107,7 +107,7 @@ void ance::cet::IntrinsicsRunner::visit(core::GetParent const&)
     assert(state_.arguments->size() == 1);
     assert(state_.arguments->at(0)->type() == core::Type::Scope());
 
-    Scope const& scope = state_.arguments->at(0)->as<ScopeValue>().value();
+    Scope const& scope = state_.arguments->at(0)->as<ScopeRef>().value();
 
     if (scope.parent() == nullptr)
     {
@@ -116,7 +116,7 @@ void ance::cet::IntrinsicsRunner::visit(core::GetParent const&)
         return;
     }
 
-    setResult(ScopeValue::make(*scope.parent()));
+    setResult(ScopeRef::make(*scope.parent()));
 }
 
 void ance::cet::IntrinsicsRunner::visit(core::Log const&)
@@ -125,12 +125,12 @@ void ance::cet::IntrinsicsRunner::visit(core::Log const&)
     assert(state_.arguments->at(0)->type() == core::Type::String());
     assert(state_.arguments->at(1)->type() == core::Type::Location());
 
-    std::string const&    value = state_.arguments->at(0)->as<bbt::StringValue>().value();
-    core::Location const& loc   = state_.arguments->at(1)->as<bbt::LocationValue>().value();
+    std::string const&    value = state_.arguments->at(0)->as<bbt::String>().value();
+    core::Location const& loc   = state_.arguments->at(1)->as<bbt::Location>().value();
 
     reporter_.info(value, loc);
 
-    setResult(bbt::UnitValue::make());
+    setResult(bbt::Unit::make());
 }
 
 void ance::cet::IntrinsicsRunner::visit(core::B2Str const&)
@@ -138,9 +138,9 @@ void ance::cet::IntrinsicsRunner::visit(core::B2Str const&)
     assert(state_.arguments->size() == 1);
     assert(state_.arguments->at(0)->type() == core::Type::Bool());
 
-    bool const value = state_.arguments->at(0)->as<bbt::BoolValue>().value();
+    bool const value = state_.arguments->at(0)->as<bbt::Bool>().value();
 
-    setResult(bbt::StringValue::make(value ? "true" : "false"));
+    setResult(bbt::String::make(value ? "true" : "false"));
 }
 
 void ance::cet::IntrinsicsRunner::visit(core::Include const&)
@@ -149,14 +149,14 @@ void ance::cet::IntrinsicsRunner::visit(core::Include const&)
     assert(state_.arguments->at(0)->type() == core::Type::String());
     assert(state_.arguments->at(1)->type() == core::Type::Location());
 
-    std::string const&    file     = state_.arguments->at(0)->as<bbt::StringValue>().value();
-    core::Location const& location = state_.arguments->at(1)->as<bbt::LocationValue>().value();
+    std::string const&    file     = state_.arguments->at(0)->as<bbt::String>().value();
+    core::Location const& location = state_.arguments->at(1)->as<bbt::Location>().value();
 
     std::filesystem::path const path = source_tree_.getFile(location.fileIndex()).getDirectory() / file;
 
     include_(path);
 
-    setResult(bbt::UnitValue::make());
+    setResult(bbt::Unit::make());
 }
 
 void ance::cet::IntrinsicsRunner::setResult(utility::Shared<bbt::Value> value)
