@@ -194,10 +194,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: instead of the scopes_ list in the runner, the scope base class should support adding child scopes
-        // todo: when a scope is exited, it should be removed from the parent scope
-        // todo: make sure that this does not cause issues with any dangling references
-
         // todo: rename the value classes to no longer have the value suffix, e.g. StringValue -> String
         // todo: only exception is that the scope value should be renamed ScopeRef, and VariableRefValue should be VariableRef
 

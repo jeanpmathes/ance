@@ -78,7 +78,7 @@ struct ance::cet::Runner::Implementation
 
         void schedule(bbt::Flow const& flow, Scope* scope)
         {
-            run_points_.emplace_back(flow.entry, scope);
+            run_points_.emplace_back(flow.entry, scope != nullptr ? scope : global_scope_.get());
         }
 
         [[nodiscard]] bool hasRunPoints() const
@@ -432,14 +432,14 @@ struct ance::cet::Runner::Implementation
             utility::List<utility::Shared<bbt::Value>> arguments = {};
             for (auto argument : call.arguments) { arguments.emplace_back(scope().getTemporary(argument.get()).getValue()); }
 
-            Scope* function_scope = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
+            Scope& function_scope = global_scope_->addChildScope(utility::makeOwned<OrderedScope>(*global_scope_));
 
             for (size_t i = 0; i < function.signature().arity(); ++i)
             {
                 core::Signature::Parameter const& parameter = function.signature().parameters()[i];
                 utility::Shared<bbt::Value>& argument = arguments[i];
 
-                utility::Optional<utility::Shared<bbt::Value>> variable = function_scope->declare(parameter.name, parameter.type, true, core::Location::global(), reporter_);
+                utility::Optional<utility::Shared<bbt::Value>> variable = function_scope.declare(parameter.name, parameter.type, true, core::Location::global(), reporter_);
 
                 if (!variable.hasValue())
                 {
@@ -450,7 +450,7 @@ struct ance::cet::Runner::Implementation
                 (*variable)->as<VariableRefValue>().value().setValue(argument);
             }
 
-            run_point.stack.emplace_back(function.body().entry, function_scope);
+            run_point.stack.emplace_back(function.body().entry, &function_scope);
 
             yield();
         }
@@ -543,17 +543,17 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::OrderedScopeEnter const&) override
         {
-            state_.current_scope = scopes_.emplace_back(utility::makeOwned<OrderedScope>(this->scope())).get();
-
-            // todo: associate the value storage with the scope so that context switch works better
+            state_.current_scope = &scope().addChildScope(utility::makeOwned<OrderedScope>(scope()));
         }
 
         void visit(bbt::OrderedScopeExit const&) override
         {
-            state_.current_scope = scope().parent();
+            Scope& child_scope = scope();
+
+            state_.current_scope = child_scope.parent();
+            state_.current_scope->removeChildScope(child_scope);
 
             // todo: destructors and stuff, clean up value storage
-            // todo: maybe deleting the scope instance is a good idea?
         }
 
       private:
@@ -563,11 +563,11 @@ struct ance::cet::Runner::Implementation
 
         void scheduleUnorderedScope(bbt::UnorderedScope const& scope)
         {
-            Scope* unordered_scope = scopes_.emplace_back(utility::makeOwned<UnorderedScope>(*global_scope_)).get();
+            Scope& unordered_scope = global_scope_->addChildScope(utility::makeOwned<UnorderedScope>(*global_scope_));
 
             for (auto const& flow : scope.flows)
             {
-                schedule(*flow, unordered_scope);
+                schedule(*flow, &unordered_scope);
             }
         }
 
@@ -591,7 +591,6 @@ struct ance::cet::Runner::Implementation
 
         std::list<RunPoint> run_points_ = {};
         utility::List<utility::Owned<bbt::UnorderedScope>> roots_;
-        std::vector<utility::Owned<Scope>> scopes_ = {};
         utility::Owned<GlobalScope> global_scope_;
 
         struct State

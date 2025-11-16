@@ -46,6 +46,9 @@ namespace ance::cet
         Temporary& createTemporary(bbt::Temporary const& bbt_temporary);
         Temporary& getTemporary(bbt::Temporary const& bbt_temporary);
 
+        Scope& addChildScope(utility::Owned<Scope> child_scope);
+        void removeChildScope(Scope& scope);
+
       protected:
         [[nodiscard]] virtual bool                                                         canDeclare(core::Identifier const& identifier) const = 0;
         virtual void                                                                       onDeclare(utility::Owned<Variable> variable)   = 0;
@@ -55,6 +58,7 @@ namespace ance::cet
         Scope* parent_;
 
         std::map<bbt::Temporary const*, utility::Owned<Temporary>> temporaries_ = {};
+        std::list<utility::Owned<Scope>> child_scopes_ = {};
     };
 
     class GlobalScope final : public Scope

@@ -66,6 +66,22 @@ ance::cet::Temporary& ance::cet::Scope::getTemporary(bbt::Temporary const& bbt_t
     return *current_scope->temporaries_.at(&bbt_temporary);
 }
 
+ance::cet::Scope& ance::cet::Scope::addChildScope(utility::Owned<Scope> child_scope)
+{
+    assert(child_scope->parent() == this);
+
+    child_scopes_.emplace_back(std::move(child_scope));
+    return *child_scopes_.back();
+}
+
+void ance::cet::Scope::removeChildScope(Scope& scope)
+{
+    auto const iterator = std::ranges::find_if(child_scopes_, [&scope](utility::Owned<Scope> const& s) { return s.get() == &scope; });
+    assert(iterator != child_scopes_.end());
+
+    child_scopes_.erase(iterator);
+}
+
 ance::cet::GlobalScope::GlobalScope(utility::List<utility::Owned<Provider>>& providers) : Scope(nullptr), providers_(providers) {}
 
 bool ance::cet::GlobalScope::canDeclare(core::Identifier const&) const
