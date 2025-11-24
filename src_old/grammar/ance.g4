@@ -253,10 +253,11 @@ addressof
     : 'addressof' expression
     ;
 
-bindRef
-    : 'ref' expression # BindReference
-    | 'ref' 'to' expression # BindReferenceToAddress
-    ;
+// I think we do not actually want or need this.
+// bindRef
+//     : 'ref' expression # BindReference
+//     | 'ref' 'to' expression # BindReferenceToAddress
+//     ;
 
 sizeofType
     : 'sizeof' type

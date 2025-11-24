@@ -6,6 +6,8 @@
 #include "ance/core/Identifier.h"
 #include "ance/core/Type.h"
 
+#include "ance/cet/Memory.h"
+
 namespace ance::bbt
 {
     class Value;
@@ -14,7 +16,7 @@ namespace ance::bbt
 namespace ance::cet
 {
     /// Represents a variable.
-    class Variable
+    class Variable : public Memory
     {
       public:
         /// Creates a new variable.
@@ -29,10 +31,12 @@ namespace ance::cet
         [[nodiscard]] bool                    isFinal() const;
         [[nodiscard]] core::Location const&   location() const;
 
-        [[nodiscard]] bool isDefined() const;
+        [[nodiscard]] utility::Shared<bbt::Value> access() override;
 
-        utility::Shared<bbt::Value> getValue();
-        void setValue(utility::Shared<bbt::Value> value);
+        utility::Shared<bbt::Value> read(std::vector<size_t> const& indices = {}) override;
+        void write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices = {}) override;
+
+        [[nodiscard]] bool isDefined() const override;
 
       private:
         core::Identifier  identifier_;

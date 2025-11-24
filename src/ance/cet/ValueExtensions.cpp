@@ -1,5 +1,7 @@
 #include "ValueExtensions.h"
 
+#include <utility>
+
 #include "ance/cet/Scope.h"
 #include "ance/cet/Variable.h"
 
@@ -47,5 +49,27 @@ namespace ance::cet
     Variable& VariableRef::value() const
     {
         return variable_;
+    }
+
+    LReference::LReference(Address address) : Value(core::Type::LRef()), address_(std::move(address)) {}
+
+    utility::Shared<LReference> LReference::make(Address address)
+    {
+        return utility::makeShared<LReference>(std::move(address));
+    }
+
+    std::string LReference::toString() const
+    {
+        return address().read()->toString();
+    }
+
+    utility::Shared<bbt::Value> LReference::clone() const
+    {
+        return make(address_);
+    }
+
+    Address const& LReference::address() const
+    {
+        return address_;
     }
 }

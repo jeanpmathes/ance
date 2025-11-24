@@ -5,6 +5,8 @@
 
 #include "ance/core/Location.h"
 
+#include "ance/cet/Memory.h"
+
 namespace ance::bbt
 {
     class Value;
@@ -14,15 +16,17 @@ namespace ance::bbt
 namespace ance::cet
 {
     /// A wrapper of BBT temporaries for active use during execution.
-    class Temporary
+    class Temporary : public Memory
     {
     public:
         Temporary();
 
-        void setValue(utility::Shared<bbt::Value> value);
-        utility::Shared<bbt::Value> getValue();
+        [[nodiscard]] utility::Shared<bbt::Value> access() override;
 
-        [[nodiscard]] bbt::Value const& getValue() const;
+        utility::Shared<bbt::Value> read(std::vector<size_t> const& indices = {}) override;
+        void write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices = {}) override;
+
+        [[nodiscard]] bool isDefined() const override;
 
     private:
         utility::Shared<bbt::Value> value_;

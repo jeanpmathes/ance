@@ -111,7 +111,7 @@ ance::cet::Variable* ance::cet::GlobalScope::onFind(core::Identifier const& iden
             auto variable = utility::makeShared<Variable>(identifier, core::Type::Function(), true, core::Location::global());
             variables_.emplace(identifier, variable);
 
-            variable->setValue(*provided);
+            variable->write(*provided);
 
             return variable.get();
         }

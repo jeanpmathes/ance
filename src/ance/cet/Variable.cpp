@@ -1,47 +1,69 @@
 #include "Variable.h"
 
-ance::cet::Variable::Variable(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location)
+#include <cassert>
+
+#include "ance/cet/Address.h"
+#include "ance/cet/ValueExtensions.h"
+
+namespace ance::cet
+{
+    Variable::Variable(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location)
     : identifier_(identifier)
     , type_(type)
     , is_final_(is_final)
     , location_(location)
-{}
+    {}
 
-ance::core::Identifier const& ance::cet::Variable::name() const
-{
-    return identifier_;
-}
+    core::Identifier const& Variable::name() const
+    {
+        return identifier_;
+    }
 
-ance::core::Type const& ance::cet::Variable::type() const
-{
-    return type_;
-}
 
-bool ance::cet::Variable::isFinal() const
-{
-    return is_final_;
-}
+    bool Variable::isFinal() const
+    {
+        return is_final_;
+    }
 
-ance::core::Location const& ance::cet::Variable::location() const
-{
-    return location_;
-}
+    core::Location const& Variable::location() const
+    {
+        return location_;
+    }
 
-bool ance::cet::Variable::isDefined() const
-{
-    return value_.hasValue();
-}
+    utility::Shared<bbt::Value> Variable::access()
+    {
+        if (is_final_ && isDefined())
+        {
+            return value_.value();
+        }
 
-ance::utility::Shared<ance::bbt::Value> ance::cet::Variable::getValue()
-{
-    assert(isDefined());
+        return LReference::make(Address(*this));
+    }
 
-    return value_.value();
-}
+    utility::Shared<bbt::Value> Variable::read(std::vector<size_t> const& indices)
+    {
+        assert(isDefined());
+        assert(indices.empty());
 
-void ance::cet::Variable::setValue(utility::Shared<bbt::Value> value)
-{
-    assert(!is_final_ || !isDefined());
+        return value_.value();
+    }
 
-    value_ = std::move(value);
+    void Variable::write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices)
+    {
+        assert(!is_final_ || !isDefined());
+        assert(value->type() == type_);
+        assert(indices.empty());
+
+        value_ = std::move(value);
+    }
+
+    bool Variable::isDefined() const
+    {
+        return value_.hasValue();
+    }
+
+    core::Type const& Variable::type() const
+    {
+        return type_;
+    }
 }

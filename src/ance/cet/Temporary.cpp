@@ -1,22 +1,35 @@
 #include "Temporary.h"
 
+#include <cassert>
+
 #include "ance/bbt/Value.h"
-#include "ance/bbt/Node.h"
+
+#include "ance/cet/Address.h"
+#include "ance/cet/ValueExtensions.h"
 
 ance::cet::Temporary::Temporary() : value_(bbt::Unit::make())
 {}
 
-void ance::cet::Temporary::setValue(utility::Shared<bbt::Value> value)
+ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::access()
 {
-    value_ = value;
+    return LReference::make(Address(*this));
 }
 
-ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::getValue()
+ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::vector<size_t> const& indices)
 {
+    assert(indices.empty());
+
     return value_;
 }
 
-ance::bbt::Value const& ance::cet::Temporary::getValue() const
+void ance::cet::Temporary::write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices)
 {
-    return *value_;
+    assert(indices.empty());
+
+    value_ = std::move(value);
+}
+
+bool ance::cet::Temporary::isDefined() const
+{
+    return true;
 }

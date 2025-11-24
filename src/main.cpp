@@ -194,7 +194,18 @@ namespace ance
 
         return exit_code;
 
+        // todo: make LRef parameterized, look what the plan says about the type registries and do that
+        // todo: adapt the expect methods in runners to only take the type instead of the value, and add some utility methods to the type class
+
+        // todo: use the new LRef type to simplify assignment and such
+        // todo: bbt::Store should expect a reference, and simply write to that reference (might need expansion changes)
+        // todo: bbt::Read should be replaced with bbt::Access, which simply returns reference to the variable
+        // todo: go through all code that uses VariableRef and think whether it makes sense to go through LRef instead
+
         // todo: add all non-cmp statements and expressions (see old grammar), if a statement/expression is cmp add a TODO in the old grammar file
+        // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef
+        // todo: do it step by step, as e.g. the array things require more changes so that array ops have support on types that the temporary and variable classes can use
+        // todo: also reduce duplication between temporary and variable
 
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
         // todo: build a very minimal CET that heavily relies and uses intrinsics, should be close to LLVM IR in capability and nodes

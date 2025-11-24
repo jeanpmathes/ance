@@ -1,12 +1,14 @@
 #include "Runner.h"
 
 #include "Temporary.h"
+#include "Variable.h"
 
 #include <expected>
 #include <filesystem>
 #include <functional>
 #include <list>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ance/core/Intrinsic.h"
@@ -73,7 +75,7 @@ struct ance::cet::Runner::Implementation
         , read_unordered_scope_(std::move(get_unordered_scope))
         , global_scope_(utility::makeOwned<GlobalScope>(providers))
         {}
-        
+
         ~BBT() override = default;
 
         void schedule(bbt::Flow const& flow, Scope* scope)
@@ -175,21 +177,60 @@ struct ance::cet::Runner::Implementation
             return result;
         }
 
-        [[nodiscard]] bool requireType(core::Type const& expected, core::Type const& actual, core::Location const& location) const
+        bool expectType(core::Type const& expected, utility::Shared<bbt::Value> value, core::Location const& location) const
         {
+            // todo: as soon as l-refs are parameterized, this function needs to be updated to take the actual type instead of the value
+
             bool ok = true;
 
-            if (!actual.isAssignableTo(expected))
+            core::Type const* actual = &value->type();
+
+            while (*actual == core::Type::LRef())
             {
-                reporter_.error("Expected type '" + expected.name() + "' but got '" + actual.name() + "'", location);
+                auto const& reference = value->as<LReference>();
+                Address const& address = reference.address();
+
+                value = address.read();
+                actual = &value->type();
+            }
+
+            if (*actual != expected)
+            {
+                reporter_.error("Expected type '" + expected.name() + "' but got '" + actual->name() + "'", location);
                 ok = false;
             }
 
             return ok;
         }
 
-        [[nodiscard]] bool requireSignature(core::Signature const& signature, utility::List<std::reference_wrapper<bbt::Temporary const>> const& arguments, core::Location const& location)
+        static utility::Shared<bbt::Value> dereference(utility::Shared<bbt::Value> value)
         {
+            core::Type const* actual = &value->type();
+
+            while (*actual == core::Type::LRef())
+            {
+                auto const& reference = value->as<LReference>();
+                Address const& address = reference.address();
+
+                value = address.read();
+                actual = &value->type();
+            }
+
+            return value;
+        }
+
+        template <typename T>
+        static T const& dereference(utility::Shared<bbt::Value> value)
+        {
+            return dereference(value)->as<T>();
+        }
+
+        [[nodiscard]] bool expectSignature(core::Signature const& signature,
+                                           utility::List<std::reference_wrapper<bbt::Temporary const>> const& arguments,
+                                           core::Location const& location)
+        {
+            // todo: as soon as l-refs are parameterized, this function needs to be updated to take the actual types instead of the temporaries
+
             bool ok = true;
 
             size_t const arity = signature.arity();
@@ -211,10 +252,9 @@ struct ance::cet::Runner::Implementation
                 auto const& argument = arguments[i];
                 Temporary& temporary = scope().getTemporary(argument.get());
 
-                auto const& argument_value = temporary.getValue();
                 auto const& type = signature.parameters()[i].type.get();
 
-                ok &= requireType(type, argument_value->type(), argument.get().location);
+                ok &= expectType(type, temporary.read(), argument.get().location);
             }
 
             return ok;
@@ -294,15 +334,15 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Branch const& branch_link) override
         {
-            utility::Shared<bbt::Value> condition = scope().getTemporary(branch_link.condition).getValue();
+            utility::Shared<bbt::Value> condition = scope().getTemporary(branch_link.condition).read();
 
-            if (!requireType(core::Type::Bool(), condition->type(), branch_link.condition.location))
+            if (!expectType(core::Type::Bool(), condition, branch_link.condition.location))
             {
                 abort();
                 return;
             }
 
-            if (condition->as<bbt::Bool>().value())
+            if (dereference<bbt::Bool>(condition).value())
             {
                 state_.next = &branch_link.true_branch;
             }
@@ -331,10 +371,10 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Store const& store) override
         {
-            utility::Shared<bbt::Value> target = scope().getTemporary(store.target).getValue();
-            utility::Shared<bbt::Value> value = scope().getTemporary(store.value).getValue();
+            utility::Shared<bbt::Value> target = scope().getTemporary(store.target).read();
+            utility::Shared<bbt::Value> value = scope().getTemporary(store.value).read();
 
-            if (!requireType(core::Type::VariableRef(), target->type(), store.target.location))
+            if (!expectType(core::Type::VariableRef(), target, store.target.location))
             {
                 abort();
                 return;
@@ -353,13 +393,13 @@ struct ance::cet::Runner::Implementation
 
             core::Type const& type = variable.type();
 
-            if (!requireType(type, value->type(), store.value.location))
+            if (!expectType(type, value, store.value.location))
             {
                 abort();
                 return;
             }
 
-            variable.setValue(value);
+            variable.write(dereference(value));
         }
 
         void visit(bbt::Temporary const& temporary) override
@@ -369,13 +409,13 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::CopyTemporary const& write_temporary) override
         {
-            utility::Shared<bbt::Value> value = scope().getTemporary(write_temporary.source).getValue();
-            scope().getTemporary(write_temporary.destination).setValue(value);
+            utility::Shared<bbt::Value> value = scope().getTemporary(write_temporary.source).read();
+            scope().getTemporary(write_temporary.destination).write(dereference(value));
         }
 
         void visit(bbt::Intrinsic const& intrinsic) override
         {
-            if (!requireSignature(intrinsic.intrinsic.signature(), intrinsic.arguments, intrinsic.location))
+            if (!expectSignature(intrinsic.intrinsic.signature(), intrinsic.arguments, intrinsic.location))
             {
                 abort();
                 return;
@@ -383,7 +423,11 @@ struct ance::cet::Runner::Implementation
 
             utility::List<utility::Shared<bbt::Value>> arguments = {};
 
-            for (auto argument : intrinsic.arguments) { arguments.emplace_back(scope().getTemporary(argument.get()).getValue()); }
+            for (auto argument : intrinsic.arguments)
+            {
+                utility::Shared<bbt::Value> value = scope().getTemporary(argument.get()).read();
+                arguments.emplace_back(dereference(value));
+            }
 
             auto result = intrinsics_.run(intrinsic.intrinsic, arguments, intrinsic.location);
 
@@ -397,7 +441,7 @@ struct ance::cet::Runner::Implementation
             }
             else
             {
-                scope().getTemporary(intrinsic.destination).setValue(result.getResult());
+                scope().getTemporary(intrinsic.destination).write(dereference(result.getResult()));
             }
         }
 
@@ -407,15 +451,15 @@ struct ance::cet::Runner::Implementation
 
             if (run_point.return_value.hasValue())
             {
-                scope().getTemporary(call.destination).setValue(run_point.return_value.value());
+                scope().getTemporary(call.destination).write(run_point.return_value.value());
                 run_point.return_value = std::nullopt;
 
                 return;
             }
 
-            utility::Shared<bbt::Value> called = scope().getTemporary(call.called).getValue();
+            utility::Shared<bbt::Value> called = scope().getTemporary(call.called).read();
 
-            if (!requireType(core::Type::Function(), called->type(), call.called.location))
+            if (!expectType(core::Type::Function(), called, call.called.location))
             {
                 abort();
                 return;
@@ -423,14 +467,14 @@ struct ance::cet::Runner::Implementation
 
             bbt::Function const& function = called->as<bbt::Function>();
 
-            if (!requireSignature(function.signature(), call.arguments, call.location))
+            if (!expectSignature(function.signature(), call.arguments, call.location))
             {
                 abort();
                 return;
             }
 
             utility::List<utility::Shared<bbt::Value>> arguments = {};
-            for (auto argument : call.arguments) { arguments.emplace_back(scope().getTemporary(argument.get()).getValue()); }
+            for (auto argument : call.arguments) { arguments.emplace_back(scope().getTemporary(argument.get()).read()); }
 
             Scope& function_scope = global_scope_->addChildScope(utility::makeOwned<OrderedScope>(*global_scope_));
 
@@ -447,7 +491,7 @@ struct ance::cet::Runner::Implementation
                     return;
                 }
 
-                (*variable)->as<VariableRef>().value().setValue(argument);
+                (*variable)->as<VariableRef>().value().write(dereference(argument));
             }
 
             run_point.stack.emplace_back(function.body().entry, &function_scope);
@@ -457,9 +501,9 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Read const& read) override
         {
-            utility::Shared<bbt::Value> target = scope().getTemporary(read.target).getValue();
+            utility::Shared<bbt::Value> target = scope().getTemporary(read.target).read();
 
-            if (!requireType(core::Type::VariableRef(), target->type(), read.target.location))
+            if (!expectType(core::Type::VariableRef(), target, read.target.location))
             {
                 abort();
                 return;
@@ -475,20 +519,20 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::Shared<bbt::Value> value = variable.getValue();
-            scope().getTemporary(read.destination).setValue(value);
+            utility::Shared<bbt::Value> value = variable.read();
+            scope().getTemporary(read.destination).write(value);
         }
 
         void visit(bbt::Constant const& constant) override
         {
-            scope().getTemporary(constant.destination).setValue(constant.value->clone());
+            scope().getTemporary(constant.destination).write(constant.value->clone());
         }
 
         void visit(bbt::Default const& default_value) override
         {
-            utility::Shared<bbt::Value> type_value = scope().getTemporary(default_value.type).getValue();
+            utility::Shared<bbt::Value> type_value = scope().getTemporary(default_value.type).read();
 
-            if (!requireType(core::Type::Self(), type_value->type(), default_value.type.location))
+            if (!expectType(core::Type::Self(), type_value, default_value.type.location))
             {
                 abort();
                 return;
@@ -509,19 +553,19 @@ struct ance::cet::Runner::Implementation
             };
 
             utility::Shared<bbt::Value> value = get_default_value(type_value->as<bbt::Type>().value());
-            scope().getTemporary(default_value.destination).setValue(value);
+            scope().getTemporary(default_value.destination).write(value);
         }
 
         void visit(bbt::CurrentScope const& current_scope) override
         {
-            scope().getTemporary(current_scope.destination).setValue(ScopeRef::make(scope()));
+            scope().getTemporary(current_scope.destination).write(ScopeRef::make(scope()));
         }
 
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
-            utility::Shared<bbt::Value> value = scope().getTemporary(unary_operation.operand).getValue();
+            utility::Shared<bbt::Value> value = scope().getTemporary(unary_operation.operand).read();
 
-            if (!requireType(core::Type::Bool(), value->type(), unary_operation.operand.location))
+            if (!expectType(core::Type::Bool(), value, unary_operation.operand.location))
             {
                 abort();
                 return;
@@ -530,15 +574,15 @@ struct ance::cet::Runner::Implementation
             switch (unary_operation.op)
             {
                 case core::UnaryOperator::NOT:
-                    scope().getTemporary(unary_operation.destination).setValue(bbt::Bool::make(!value->as<bbt::Bool>().value()));
+                    scope().getTemporary(unary_operation.destination).write(bbt::Bool::make(!value->as<bbt::Bool>().value()));
                     break;
             }
         }
 
         void visit(bbt::TypeOf const& type_of) override
         {
-            utility::Shared<bbt::Value> value = scope().getTemporary(type_of.expression).getValue();
-            scope().getTemporary(type_of.destination).setValue(bbt::Type::make(value->type()));
+            utility::Shared<bbt::Value> value = scope().getTemporary(type_of.expression).read();
+            scope().getTemporary(type_of.destination).write(bbt::Type::make(value->type()));
         }
 
         void visit(bbt::OrderedScopeEnter const&) override

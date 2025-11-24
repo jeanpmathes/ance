@@ -3,6 +3,8 @@
 
 #include "ance/bbt/Value.h"
 
+#include "ance/cet/Address.h"
+
 namespace ance::cet
 {
     class Variable;
@@ -40,6 +42,24 @@ namespace ance::cet
 
     private:
         Variable& variable_;
+    };
+
+    class LReference final : public bbt::Value
+    {
+    public:
+        explicit LReference(Address address);
+
+        static utility::Shared<LReference> make(Address address);
+
+        ~LReference() override = default;
+
+        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] utility::Shared<Value> clone() const override;
+
+        [[nodiscard]] Address const& address() const;
+
+    private:
+        Address address_;
     };
 }
 

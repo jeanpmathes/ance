@@ -59,6 +59,12 @@ namespace ance::core
         return type;
     }
 
+    Type const& Type::LRef()
+    {
+        static Type const type {Identifier::like("&T")};
+        return type;
+    }
+
     Type const& Type::Ident()
     {
         static Type const type {Identifier::like("Identifier")};
