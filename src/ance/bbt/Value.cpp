@@ -3,21 +3,26 @@
 #include <sstream>
 #include <utility>
 
-#include "ance/core/Type.h"
+#include "ance/bbt/Type.h"
 
 namespace ance::bbt
 {
-    Value::Value(core::Type const& type) : type_(type)
+    Value::Value(utility::Optional<utility::Shared<Type>> type) : type_(std::move(type))
     {
 
     }
 
-    core::Type const& Value::type() const
+    utility::Shared<Type> Value::type()
     {
-        return type_;
+        return type_.valueOr(Type::Self());
     }
 
-    Unit::Unit() : Value(core::Type::Unit()) {}
+    Type const& Value::type() const
+    {
+        return type_.hasValue() ? *type_.value() : *Type::Self();
+    }
+
+    Unit::Unit() : Value(Type::Unit()) {}
 
     utility::Shared<Unit> Unit::make()
     {
@@ -29,12 +34,7 @@ namespace ance::bbt
         return "()";
     }
 
-    utility::Shared<Value> Unit::clone() const
-    {
-        return make();
-    }
-
-    Bool::Bool(bool const value) : Value(core::Type::Bool()), value_(value) {}
+    Bool::Bool(bool const value) : Value(Type::Bool()), value_(value) {}
 
     utility::Shared<Bool> Bool::make(bool const value)
     {
@@ -46,17 +46,12 @@ namespace ance::bbt
         return value_ ? "true" : "false";
     }
 
-    utility::Shared<Value> Bool::clone() const
-    {
-        return make(value_);
-    }
-
     bool Bool::value() const
     {
         return value_;
     }
 
-    Size::Size(size_t const value) : Value(core::Type::Size()), value_(value) {}
+    Size::Size(size_t const value) : Value(Type::Size()), value_(value) {}
 
     utility::Shared<Size> Size::make(size_t value)
     {
@@ -68,17 +63,12 @@ namespace ance::bbt
         return std::to_string(value_);
     }
 
-    utility::Shared<Value> Size::clone() const
-    {
-        return make(value_);
-    }
-
     size_t Size::value() const
     {
         return value_;
     }
 
-    Identifier::Identifier(core::Identifier const& identifier) : Value(core::Type::Ident()), identifier_(identifier) {}
+    Identifier::Identifier(core::Identifier const& identifier) : Value(Type::Ident()), identifier_(identifier) {}
 
     utility::Shared<Identifier> Identifier::make(core::Identifier const& identifier)
     {
@@ -90,39 +80,12 @@ namespace ance::bbt
         return "#" + std::string(identifier_.text());
     }
 
-    utility::Shared<Value> Identifier::clone() const
-    {
-        return make(identifier_);
-    }
-
     core::Identifier const& Identifier::value() const
     {
         return identifier_;
     }
 
-    Type::Type(core::Type const& type) : Value(core::Type::Self()), type_(type) {}
-
-    utility::Shared<Type> Type::make(core::Type const& type)
-    {
-        return utility::makeShared<Type>(type);
-    }
-
-    std::string Type::toString() const
-    {
-        return std::string(type_.name().text());
-    }
-
-    utility::Shared<Value> Type::clone() const
-    {
-        return make(type_);
-    }
-
-    core::Type const& Type::value() const
-    {
-        return type_;
-    }
-
-    Location::Location(core::Location const& location) : Value(core::Type::Location()), location_(location) {}
+    Location::Location(core::Location const& location) : Value(Type::Location()), location_(location) {}
 
     utility::Shared<Location> Location::make(core::Location const& location)
     {
@@ -136,17 +99,12 @@ namespace ance::bbt
         return ss.str();
     }
 
-    utility::Shared<Value> Location::clone() const
-    {
-        return make(location_);
-    }
-
     core::Location const& Location::value() const
     {
         return location_;
     }
 
-    String::String(std::string value) : Value(core::Type::String()), value_(std::move(value)) {}
+    String::String(std::string value) : Value(Type::String()), value_(std::move(value)) {}
 
     utility::Shared<String> String::make(std::string value)
     {
@@ -156,11 +114,6 @@ namespace ance::bbt
     std::string String::toString() const
     {
         return value_;
-    }
-
-    utility::Shared<Value> String::clone() const
-    {
-        return make(value_);
     }
 
     std::string const& String::value() const

@@ -5,11 +5,6 @@
 
 #include "ance/utility/Owners.h"
 
-namespace ance::core
-{
-    class Type;
-}
-
 namespace ance::bbt
 {
     class Value;

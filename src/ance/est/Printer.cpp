@@ -3,6 +3,8 @@
 #include "ance/core/Printer.h"
 #include "ance/est/Node.h"
 
+#include "ance/core/LiteralType.h"
+
 struct ance::est::Printer::Implementation
 {
     class EST final
@@ -211,7 +213,7 @@ struct ance::est::Printer::Implementation
 
         void visit(TypeLiteral const& type_literal) override
         {
-            print(type_literal.type.name());
+            print(type_literal.type.toString());
         }
 
         void visit(Default const& default_value) override

@@ -18,7 +18,6 @@ namespace ance::cet
         static utility::Shared<ScopeRef> make(Scope& scope);
 
         [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
 
         [[nodiscard]] Scope& value() const;
 
@@ -36,7 +35,6 @@ namespace ance::cet
         ~VariableRef() override = default;
 
         [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
 
         [[nodiscard]] Variable& value() const;
 
@@ -54,7 +52,6 @@ namespace ance::cet
         ~LReference() override = default;
 
         [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
 
         [[nodiscard]] Address const& address() const;
 

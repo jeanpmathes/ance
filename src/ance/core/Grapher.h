@@ -8,8 +8,6 @@
 
 namespace ance::core
 {
-    struct Intrinsic;
-
     /// Utility to simplify implementing code graphers for different trees.
     class Grapher
     {

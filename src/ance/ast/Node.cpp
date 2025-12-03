@@ -1,6 +1,6 @@
 #include "Node.h"
 
-#include "ance/core/Type.h"
+#include "ance/core/LiteralType.h"
 
 ance::ast::Node::Node(core::Location const& source_location) : location(source_location) {}
 
@@ -137,7 +137,7 @@ ance::ast::StringLiteral::StringLiteral(std::string text, core::Location const& 
 ance::ast::BoolLiteral::BoolLiteral(bool const v, core::Location const& source_location) : Node(source_location), Expression(), value(v)
 {}
 
-ance::ast::TypeLiteral::TypeLiteral(core::Type const& value, core::Location const& source_location)
+ance::ast::TypeLiteral::TypeLiteral(core::LiteralType value, core::Location const& source_location)
     : Node(source_location)
     , Expression()
     , type(value)

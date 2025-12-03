@@ -2,38 +2,27 @@
 
 #include <utility>
 
-#include "Type.h"
-
-ance::core::Intrinsic::Intrinsic(Signature signature, Type const& return_type)
-    : signature_(std::move(signature)), return_type_(return_type) {}
-
-ance::core::Signature const& ance::core::Intrinsic::signature() const
+ance::core::Intrinsic::Intrinsic(Identifier const& identifier) : identifier_(identifier)
 {
-    return signature_;
-}
 
-ance::core::Type const& ance::core::Intrinsic::returnType() const
-{
-    return return_type_;
 }
-
 ance::core::Identifier const& ance::core::Intrinsic::identifier() const
 {
-    return signature().name();
+    return identifier_;
 }
 
 void ance::core::Intrinsic::display(std::ostream& os) const
 {
-    os << signature().name();
+    os << identifier();
 }
+ance::core::Dynamic::Dynamic(Identifier const& identifier) : Intrinsic(identifier)
+{
 
-ance::core::Dynamic::Dynamic(Signature signature, Type const& return_type)
-    : Intrinsic(std::move(signature), return_type)
-{}
+}
 
 void ance::core::Dynamic::display(std::ostream& os) const
 {
-    os << "\"" << signature().name() << "\"";
+    os << "\"" << identifier() << "\"";
 }
 
 std::ostream& operator<<(std::ostream& os, ance::core::Intrinsic const& intrinsic)

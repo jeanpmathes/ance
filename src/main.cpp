@@ -3,26 +3,24 @@
 
 #include <boost/locale.hpp>
 
-#include "ance/core/Intrinsic.h"
-
 #include "ance/sources/SourceTree.h"
 
 #include "ance/ast/Node.h"
 #include "ance/ast/Parser.h"
 
-#include "ance/est/Expander.h"
-
-#include "ance/bbt/Node.h"
-#include "ance/bbt/Function.h"
-#include "ance/bbt/Value.h"
 #include "ance/bbt/FlowBuilder.h"
+#include "ance/bbt/Function.h"
+#include "ance/bbt/Node.h"
+#include "ance/bbt/Signature.h"
+#include "ance/bbt/Type.h"
+#include "ance/bbt/Value.h"
+#include "ance/core/Intrinsic.h"
 
 #include "ance/cet/Node.h"
-#include "ance/cet/Runner.h"
 #include "ance/cet/Provider.h"
+#include "ance/cet/Runner.h"
 
 #include "ance/build/Compiler.h"
-#include "ance/core/Type.h"
 
 namespace ance
 {
@@ -89,9 +87,9 @@ namespace ance
             }
             (void)result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1b",
-                core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool())),
-                core::Type::Unit(), builder.build()));
+        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("print1b",
+                bbt::Signature::Parameter(core::Identifier::like("value"), bbt::Type::Bool())),
+                bbt::Type::Unit(), builder.build()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
@@ -114,10 +112,10 @@ namespace ance
             }
             (void)result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2b",
-                core::Signature::Parameter(core::Identifier::like("value"), core::Type::Bool()),
-                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())),
-                core::Type::Unit(), builder.build()));
+        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("print2b",
+                bbt::Signature::Parameter(core::Identifier::like("value"), bbt::Type::Bool()),
+                bbt::Signature::Parameter(core::Identifier::like("location"), bbt::Type::Location())),
+                bbt::Type::Unit(), builder.build()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
@@ -134,9 +132,9 @@ namespace ance
             }
             (void)result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print1s",
-                core::Signature::Parameter(core::Identifier::like("value"), core::Type::String())),
-                core::Type::Unit(), builder.build()));
+        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("print1s",
+                bbt::Signature::Parameter(core::Identifier::like("value"), bbt::Type::String())),
+                bbt::Type::Unit(), builder.build()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
@@ -152,10 +150,10 @@ namespace ance
             }
             (void)result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("print2s",
-                core::Signature::Parameter(core::Identifier::like("value"), core::Type::String()),
-                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())),
-                core::Type::Unit(), builder.build()));
+        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("print2s",
+                bbt::Signature::Parameter(core::Identifier::like("value"), bbt::Type::String()),
+                bbt::Signature::Parameter(core::Identifier::like("location"), bbt::Type::Location())),
+                bbt::Type::Unit(), builder.build()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
@@ -171,10 +169,10 @@ namespace ance
             }
             (void)result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(core::Signature::like("include",
-                core::Signature::Parameter(core::Identifier::like("file"), core::Type::String()),
-                core::Signature::Parameter(core::Identifier::like("location"), core::Type::Location())),
-                core::Type::Unit(), builder.build()));
+        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("include",
+                bbt::Signature::Parameter(core::Identifier::like("file"), bbt::Type::String()),
+                bbt::Signature::Parameter(core::Identifier::like("location"), bbt::Type::Location())),
+                bbt::Type::Unit(), builder.build()));
 
         runner.add(cet::Provider::fromList(std::move(provider)));
 
@@ -193,8 +191,16 @@ namespace ance
         reporter.report(source_tree, out);
 
         return exit_code;
+        
+        // todo: instead of having static type methods to get the instances, add a type context class which provides all types (check old code)
+        // todo: the get methods should not be const
 
-        // todo: make LRef parameterized, look what the plan says about the type registries and do that
+        // todo: add the keyword types to the global scope so they can be found through resolution, adapt grammar to allow variable access in type expressions
+        // todo: this means they can be removed as special cases of grammar, and the literal type enum can also be removed
+
+        // todo: maybe remove the intrinsics as they are currently, instead replace them with an enum (SCREAMING_SNAKE_CASE)
+
+        // todo: make LRef parameterized, instead of type registries as previous now only type dictionaries are needed
         // todo: adapt the expect methods in runners to only take the type instead of the value, and add some utility methods to the type class
 
         // todo: use the new LRef type to simplify assignment and such
@@ -220,8 +226,8 @@ namespace ance
         // todo: correctly call copy and move functions for all linearized temporary using nodes in BBT and CET
         // todo: global variables with non-cmp initializers need an ordering determined using topological sort
         // todo: think about making the typeof node an intrinsic, would either require an any type or something else for the argument like overloading
-        // todo: the entity_ref type should instead become an entity type and the intrinsic simply returns a reference to that
-        // todo: when inheritance becomes a thing then entity should have subclasses like variable and function -> add that to the inheritance note in planning
+
+        // todo: maybe parametrized function types could be a thing now
     }
 }
 

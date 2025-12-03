@@ -2,54 +2,60 @@
 
 #include <utility>
 
-#include "ance/core/Type.h"
+#include "ance/bbt/Type.h"
 
-ance::bbt::Function::Function(core::Signature signature, core::Type const& return_type, utility::Shared<Flow> body)
-    : Value(core::Type::Function())
+namespace ance::bbt
+{
+    Function::Function(Signature signature, utility::Shared<Type> return_type, utility::Shared<Flow> body)
+    : Value(Type::Function())
     , signature_(std::move(signature))
-    , return_type_(return_type)
+    , return_type_(std::move(return_type))
     , body_(std::move(body))
-{
+    {
 
-}
+    }
 
-ance::bbt::Function::Function(core::Signature signature, core::Type const& return_type, utility::Owned<Flow> body)
-    : Value(core::Type::Function())
-    , signature_(std::move(signature))
-    , return_type_(return_type)
-    , body_(utility::Shared(*utility::Owned<Flow>::release(std::move(body))))
-{}
+    Function::Function(Signature signature, utility::Shared<Type> return_type, utility::Owned<Flow> body)
+        : Value(Type::Function())
+        , signature_(std::move(signature))
+        , return_type_(std::move(return_type))
+        , body_(utility::Shared(*utility::Owned<Flow>::release(std::move(body))))
+    {}
 
-ance::core::Identifier const& ance::bbt::Function::name() const
-{
-    return signature_.name();
-}
+    core::Identifier const& Function::name() const
+    {
+        return signature_.name();
+    }
 
-ance::core::Signature const& ance::bbt::Function::signature() const
-{
-    return signature_;
-}
+    Signature Function::signature()
+    {
+        return signature_;
+    }
 
-ance::core::Type const& ance::bbt::Function::returnType() const
-{
-    return return_type_;
-}
+    Signature const& Function::signature() const
+    {
+        return signature_;
+    }
 
-ance::bbt::Flow const& ance::bbt::Function::body() const
-{
-    return *body_;
-}
+    utility::Shared<Type> Function::returnType()
+    {
+        return return_type_;
+    }
 
-std::string ance::bbt::Function::toString() const
-{
-    return "@" + std::string(signature_.name().text());
-}
+    Type const& Function::returnType() const
+    {
+        return *return_type_;
+    }
 
-ance::utility::Shared<ance::bbt::Value> ance::bbt::Function::clone() const
-{
-    Function* mutable_this = const_cast<Function*>(this); // Because the value class is immutable, a clone does not violate constness.
+    Flow const& Function::body() const
+    {
+        return *body_;
+    }
 
-    return utility::makeShared<Function>(signature_, return_type_, mutable_this->body_);
+    std::string Function::toString() const
+    {
+        return "@" + std::string(signature_.name().text());
+    }
 }
 
 std::ostream& operator<<(std::ostream& out, ance::bbt::Function const& function)

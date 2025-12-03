@@ -4,30 +4,27 @@
 #include <string>
 
 #include "ance/utility/Owners.h"
-#include "ance/core/Type.h"
-#include "ance/core/Location.h"
 
-namespace ance::core
-{
-    class Type;
-    class Entity;
-}
+#include "ance/core/Location.h"
+#include "ance/core/Identifier.h"
 
 namespace ance::bbt
 {
+    class Type;
+
     /// Represents a value.
     class Value
     {
     protected:
-        explicit Value(core::Type const& type);
+        /// The concrete value class must supply its type, except when the type is "Type" when nullopt must be used to prevent infinite recursion.
+        explicit Value(utility::Optional<utility::Shared<Type>> type);
 
     public:
         virtual ~Value() = default;
 
-        [[nodiscard]] core::Type const& type() const;
+        utility::Shared<Type> type();
+        [[nodiscard]] Type const& type() const;
         [[nodiscard]] virtual std::string toString() const = 0;
-
-        [[nodiscard]] virtual utility::Shared<Value> clone() const = 0;
 
         template<typename T>
         bool is() const
@@ -44,7 +41,7 @@ namespace ance::bbt
         }
 
       private:
-        core::Type const& type_;
+        utility::Optional<utility::Shared<Type>> type_;
     };
 
     class Unit final : public Value
@@ -57,7 +54,6 @@ namespace ance::bbt
         ~Unit() override = default;
 
         [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
     };
 
     class Bool final : public Value
@@ -70,7 +66,6 @@ namespace ance::bbt
         ~Bool() override = default;
 
         [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
 
         [[nodiscard]] bool value() const;
 
@@ -88,7 +83,6 @@ namespace ance::bbt
         ~Size() override = default;
 
         [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
 
         [[nodiscard]] size_t value() const;
 
@@ -96,7 +90,7 @@ namespace ance::bbt
         size_t value_;
     };
 
-    class Identifier final : public Value
+    class Identifier final : public Value // todo: try to make the core::Identifier a value in some way
     {
     public:
         explicit Identifier(core::Identifier const& identifier);
@@ -106,30 +100,11 @@ namespace ance::bbt
         ~Identifier() override = default;
 
         [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
 
         [[nodiscard]] core::Identifier const& value() const;
 
     private:
         core::Identifier identifier_;
-    };
-
-    class Type final : public Value
-    {
-    public:
-        explicit Type(core::Type const& type);
-
-        static utility::Shared<Type> make(core::Type const& type);
-
-        ~Type() override = default;
-
-        [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
-
-        [[nodiscard]] core::Type const& value() const;
-
-    private:
-        core::Type const& type_;
     };
 
     class Location final : public Value
@@ -142,7 +117,6 @@ namespace ance::bbt
         ~Location() override = default;
 
         [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
 
         [[nodiscard]] core::Location const& value() const;
 
@@ -160,7 +134,6 @@ namespace ance::bbt
         ~String() override = default;
 
         [[nodiscard]] std::string            toString() const override;
-        [[nodiscard]] utility::Shared<Value> clone() const override;
 
         [[nodiscard]] std::string const& value() const;
     private:

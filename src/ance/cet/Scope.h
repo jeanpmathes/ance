@@ -8,7 +8,7 @@
 #include "ance/utility/Owners.h"
 
 #include "ance/core/Identifier.h"
-#include "ance/core/Type.h"
+#include "ance/bbt/Type.h"
 #include "ance/core/Location.h"
 #include "ance/core/Reporter.h"
 
@@ -36,7 +36,7 @@ namespace ance::cet
         [[nodiscard]] Scope* parent() const;
 
         [[nodiscard]] utility::Optional<utility::Shared<bbt::Value>> declare(core::Identifier const& identifier,
-                                                                              core::Type const&       type,
+                                                                              utility::Shared<bbt::Type>       type,
                                                                               bool                    is_final,
                                                                               core::Location const&   location,
                                                                               core::Reporter&         reporter);

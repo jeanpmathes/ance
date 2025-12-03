@@ -1,10 +1,11 @@
 #include "IntrinsicsRunner.h"
 
 #include "ValueExtensions.h"
+#include "ance/bbt/IntrinsicSignature.h"
 
-ance::cet::IntrinsicsRunner::IntrinsicsRunner(sources::SourceTree&                                                                    source_tree,
-                                              core::Reporter&                                                                         reporter,
-                                              std::function<void(std::filesystem::path const&)>                                       include)
+ance::cet::IntrinsicsRunner::IntrinsicsRunner(sources::SourceTree&                              source_tree,
+                                              core::Reporter&                                   reporter,
+                                              std::function<void(std::filesystem::path const&)> include)
     : source_tree_(source_tree)
     , reporter_(reporter)
     , include_(std::move(include))
@@ -33,27 +34,26 @@ ance::utility::Shared<ance::bbt::Value> ance::cet::IntrinsicsRunner::Result::get
 }
 
 ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intrinsic const&                             intrinsic,
-                                                                                                   utility::List<utility::Shared<bbt::Value>> const& arguments,
-                                                                                                   core::Location const&                              location)
+                                                                     utility::List<utility::Shared<bbt::Value>> & arguments,
+                                                                     core::Location const&                             location)
 {
-    state_ = State
-    {
-        .location = location,
-        .arguments = &arguments,
-        .expected_return_type = &intrinsic.returnType(),
-        .return_value_ = std::nullopt,
-        .pending_resolution = std::nullopt
-    };
+    auto [signature, return_type] = bbt::IntrinsicSignature::get(intrinsic);
+
+    state_ = State {.location             = location,
+                    .arguments            = &arguments,
+                    .expected_return_type = return_type,
+                    .return_value_        = std::nullopt,
+                    .pending_resolution   = std::nullopt};
+
+    assert(arguments.size() == signature.parameters().size());
+    for (size_t i = 0; i < arguments.size(); ++i)
+        assert(arguments[i]->type()->isAssignableTo(*signature.parameters()[i].type));
 
     this->visit(intrinsic);
 
-    Result result
-    {
-        .return_value_ = std::move(state_.return_value_),
-        .pending_resolution = std::move(state_.pending_resolution)
-    };
+    Result result {.return_value_ = std::move(state_.return_value_), .pending_resolution = std::move(state_.pending_resolution)};
 
-    state_ = State{};
+    state_ = State {};
 
     return result;
 }
@@ -70,16 +70,10 @@ void ance::cet::IntrinsicsRunner::visit(core::NoOp const&)
 
 void ance::cet::IntrinsicsRunner::visit(core::Declare const&)
 {
-    assert(state_.arguments->size() == 4);
-    assert(state_.arguments->at(0)->type() == core::Type::Scope());
-    assert(state_.arguments->at(1)->type() == core::Type::Ident());
-    assert(state_.arguments->at(2)->type() == core::Type::Bool());
-    assert(state_.arguments->at(3)->type() == core::Type::Self());
-
     Scope&                  scope      = state_.arguments->at(0)->as<ScopeRef>().value();
     core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
     bool const              is_final   = state_.arguments->at(2)->as<bbt::Bool>().value();
-    core::Type const&       type       = state_.arguments->at(3)->as<bbt::Type>().value();
+    utility::Shared<bbt::Type>        type       = state_.arguments->at(3).cast<bbt::Type>();
 
     auto variable = scope.declare(identifier, type, is_final, state_.location, reporter_);
 
@@ -89,11 +83,7 @@ void ance::cet::IntrinsicsRunner::visit(core::Declare const&)
 
 void ance::cet::IntrinsicsRunner::visit(core::Resolve const&)
 {
-    assert(state_.arguments->size() == 2);
-    assert(state_.arguments->at(0)->type() == core::Type::Scope());
-    assert(state_.arguments->at(1)->type() == core::Type::Ident());
-
-    Scope&            scope            = state_.arguments->at(0)->as<ScopeRef>().value();
+    Scope&                  scope      = state_.arguments->at(0)->as<ScopeRef>().value();
     core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
 
     utility::Optional<utility::Shared<bbt::Value>> variable = scope.find(identifier);
@@ -104,9 +94,6 @@ void ance::cet::IntrinsicsRunner::visit(core::Resolve const&)
 
 void ance::cet::IntrinsicsRunner::visit(core::GetParent const&)
 {
-    assert(state_.arguments->size() == 1);
-    assert(state_.arguments->at(0)->type() == core::Type::Scope());
-
     Scope const& scope = state_.arguments->at(0)->as<ScopeRef>().value();
 
     if (scope.parent() == nullptr)
@@ -121,10 +108,6 @@ void ance::cet::IntrinsicsRunner::visit(core::GetParent const&)
 
 void ance::cet::IntrinsicsRunner::visit(core::Log const&)
 {
-    assert(state_.arguments->size() == 2);
-    assert(state_.arguments->at(0)->type() == core::Type::String());
-    assert(state_.arguments->at(1)->type() == core::Type::Location());
-
     std::string const&    value = state_.arguments->at(0)->as<bbt::String>().value();
     core::Location const& loc   = state_.arguments->at(1)->as<bbt::Location>().value();
 
@@ -135,9 +118,6 @@ void ance::cet::IntrinsicsRunner::visit(core::Log const&)
 
 void ance::cet::IntrinsicsRunner::visit(core::B2Str const&)
 {
-    assert(state_.arguments->size() == 1);
-    assert(state_.arguments->at(0)->type() == core::Type::Bool());
-
     bool const value = state_.arguments->at(0)->as<bbt::Bool>().value();
 
     setResult(bbt::String::make(value ? "true" : "false"));
@@ -145,10 +125,6 @@ void ance::cet::IntrinsicsRunner::visit(core::B2Str const&)
 
 void ance::cet::IntrinsicsRunner::visit(core::Include const&)
 {
-    assert(state_.arguments->size() == 2);
-    assert(state_.arguments->at(0)->type() == core::Type::String());
-    assert(state_.arguments->at(1)->type() == core::Type::Location());
-
     std::string const&    file     = state_.arguments->at(0)->as<bbt::String>().value();
     core::Location const& location = state_.arguments->at(1)->as<bbt::Location>().value();
 
@@ -161,7 +137,7 @@ void ance::cet::IntrinsicsRunner::visit(core::Include const&)
 
 void ance::cet::IntrinsicsRunner::setResult(utility::Shared<bbt::Value> value)
 {
-    assert(value->type().isAssignableTo(*state_.expected_return_type));
+    assert(value->type()->isAssignableTo(**state_.expected_return_type));
 
     assert(!state_.return_value_.hasValue());
     assert(!state_.pending_resolution.hasValue());
@@ -182,6 +158,6 @@ void ance::cet::IntrinsicsRunner::abort()
     assert(!state_.return_value_.hasValue());
     assert(!state_.pending_resolution.hasValue());
 
-    state_.return_value_ = std::nullopt;
+    state_.return_value_      = std::nullopt;
     state_.pending_resolution = std::nullopt;
 }

@@ -5,14 +5,18 @@
 #include <set>
 #include <stack>
 #include <vector>
+#include <stdexcept>
 
-#include "ance/bbt/Node.h"
-#include "ance/core/Intrinsic.h"
+#include "ance/core/LiteralType.h"
+
 #include "ance/est/Expander.h"
 #include "ance/est/Node.h"
 
-#include "Printer.h"
+#include "ance/bbt/Node.h"
+
 #include "Grapher.h"
+#include "Printer.h"
+#include "Type.h"
 #include "Value.h"
 
 struct ance::bbt::Segmenter::Implementation
@@ -825,7 +829,22 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, Type::make(type_literal.type), destination(), type_literal.location);
+            static auto to_type = [](core::LiteralType const& literal_type) -> utility::Shared<Type>
+            {
+                switch (literal_type)
+                {
+                    case core::LiteralType::Bool: return Type::Bool();
+                    case core::LiteralType::Unit: return Type::Unit();
+                    case core::LiteralType::Size: return Type::Size();
+                    case core::LiteralType::String: return Type::String();
+                    case core::LiteralType::Type: return Type::Self();
+                }
+
+                throw std::logic_error("Invalid type literal");
+            };
+
+            std::reference_wrapper const inner =
+                addBlock<Constant>(blocks, to_type(type_literal.type), destination(), type_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }

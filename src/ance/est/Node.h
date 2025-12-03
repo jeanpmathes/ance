@@ -2,9 +2,9 @@
 #define ANCE_EST_NODE_H
 
 #include "ance/core/Identifier.h"
-#include "ance/core/Intrinsic.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
+#include "ance/core/LiteralType.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -12,7 +12,7 @@
 
 namespace ance::core
 {
-    class Type;
+    struct Intrinsic;
 }
 
 /// The expanded syntax tree (EST) namespace.
@@ -250,9 +250,9 @@ namespace ance::est
         : Expression
         , utility::ConcreteNode<TypeLiteral, Visitor>
     {
-        TypeLiteral(core::Type const& value, core::Location const& source_location);
+        TypeLiteral(core::LiteralType value, core::Location const& source_location);
 
-        core::Type const& type;
+        core::LiteralType type;
     };
 
     /// Provides the default value for a type.

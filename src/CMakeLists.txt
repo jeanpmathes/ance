@@ -17,7 +17,8 @@ set(ERROR_OPTIONS
     -Wno-unsafe-buffer-usage
     -Wno-ctad-maybe-unsupported
     -Wno-switch-default
-    -Wno-switch-enum)
+    -Wno-switch-enum
+    -Wno-padded)
 
 target_compile_options(ance PRIVATE /EHsc -MDd ${ERROR_OPTIONS})
 

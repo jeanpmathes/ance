@@ -13,7 +13,7 @@ ance::cet::Scope* ance::cet::Scope::parent() const
 }
 
 ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::declare(core::Identifier const& identifier,
-                                                                                            core::Type const&       type,
+                                                                                            utility::Shared<bbt::Type>       type,
                                                                                             bool                    is_final,
                                                                                             core::Location const&   location,
                                                                                             core::Reporter&         reporter)
@@ -108,7 +108,7 @@ ance::cet::Variable* ance::cet::GlobalScope::onFind(core::Identifier const& iden
         utility::Optional<utility::Shared<bbt::Function>> provided = provider->provide(identifier);
         if (provided.hasValue())
         {
-            auto variable = utility::makeShared<Variable>(identifier, core::Type::Function(), true, core::Location::global());
+            auto variable = utility::makeShared<Variable>(identifier, bbt::Type::Function(), true, core::Location::global());
             variables_.emplace(identifier, variable);
 
             variable->write(*provided);

@@ -7,7 +7,7 @@
 
 namespace ance::cet
 {
-    ScopeRef::ScopeRef(Scope& scope) : Value(core::Type::Scope()), scope_(scope) {}
+    ScopeRef::ScopeRef(Scope& scope) : Value(bbt::Type::ScopeRef()), scope_(scope) {}
 
     utility::Shared<ScopeRef> ScopeRef::make(Scope& scope)
     {
@@ -19,17 +19,12 @@ namespace ance::cet
         return "<scope>";
     }
 
-    utility::Shared<bbt::Value> ScopeRef::clone() const
-    {
-        return make(scope_);
-    }
-
     Scope& ScopeRef::value() const
     {
         return scope_;
     }
 
-    VariableRef::VariableRef(Variable& variable) : Value(core::Type::VariableRef()), variable_(variable) {}
+    VariableRef::VariableRef(Variable& variable) : Value(bbt::Type::VariableRef()), variable_(variable) {}
 
     utility::Shared<VariableRef> VariableRef::make(Variable& variable)
     {
@@ -41,17 +36,12 @@ namespace ance::cet
         return "@" + std::string(variable_.name().text());
     }
 
-    utility::Shared<bbt::Value> VariableRef::clone() const
-    {
-        return make(variable_);
-    }
-
     Variable& VariableRef::value() const
     {
         return variable_;
     }
 
-    LReference::LReference(Address address) : Value(core::Type::LRef()), address_(std::move(address)) {}
+    LReference::LReference(Address address) : Value(bbt::Type::LRef()), address_(std::move(address)) {}
 
     utility::Shared<LReference> LReference::make(Address address)
     {
@@ -61,11 +51,6 @@ namespace ance::cet
     std::string LReference::toString() const
     {
         return address().read()->toString();
-    }
-
-    utility::Shared<bbt::Value> LReference::clone() const
-    {
-        return make(address_);
     }
 
     Address const& LReference::address() const

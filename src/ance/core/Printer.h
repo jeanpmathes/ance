@@ -5,15 +5,15 @@
 
 #include "ance/utility/Owners.h"
 #include "ance/core/Identifier.h"
+#include "ance/core/LiteralType.h"
 #include "ance/core/AccessModifier.h"
+#include "ance/core/UnaryOperator.h"
 #include "ance/core/Assigner.h"
 
 namespace ance::core
 {
-    struct Intrinsic;
-
-    class Type;
     class Value;
+    struct Intrinsic;
 
     /// Utility to simplify implementing code printers for different trees.
     class Printer
@@ -35,14 +35,17 @@ namespace ance::core
         /// Print an access modifier to the output stream.
         void print(AccessModifier access_modifier);
 
+        /// Print a unary operator to the output stream.
+        void print(UnaryOperator unary_operator);
+
         /// Print an assigner to the output stream.
         void print(Assigner assigner);
 
+        /// Print a literal type to the output stream.
+        void print(LiteralType literal_type);
+
         /// Print an intrinsic to the output stream.
         void print(Intrinsic const& intrinsic);
-
-        /// Print a type to the output stream.
-        void print(Type const& type);
 
         /// Start a new line.
         void line();

@@ -3,30 +3,19 @@
 
 #include <ostream>
 
-#include "ance/core/Identifier.h"
-#include "ance/core/Signature.h"
-#include "ance/core/Type.h"
-
 #include "ance/utility/Node.h"
+
+#include "ance/core/Identifier.h"
 
 namespace ance::core
 {
     class IntrinsicVisitor;
 
-    class Type;
-
     /// Base class for all intrinsics.
     struct Intrinsic : virtual utility::AbstractNode<IntrinsicVisitor>
     {
-        Intrinsic(Signature signature, Type const& return_type);
+        explicit Intrinsic(Identifier const& identifier);
         ~Intrinsic() override = default;
-
-        /// Get the signature of this intrinsic.
-        /// \return The signature.
-        [[nodiscard]] Signature const& signature() const;
-
-        /// Get the return type of this intrinsic.
-        [[nodiscard]] Type const& returnType() const;
 
         /// Get the identifier of this intrinsic.
         /// \return The identifier.
@@ -37,8 +26,7 @@ namespace ance::core
         virtual void display(std::ostream& os) const;
 
     private:
-        Signature signature_;
-        Type const& return_type_;
+        Identifier identifier_;
     };
 
     /// Dynamic intrinsic that is identified by a name.
@@ -46,7 +34,7 @@ namespace ance::core
         : Intrinsic
         , utility::ConcreteNode<Dynamic, IntrinsicVisitor>
     {
-        Dynamic(Signature signature, Type const& return_type);
+        explicit Dynamic(Identifier const& identifier);
         ~Dynamic() override = default;
 
         void display(std::ostream& os) const override;
@@ -57,7 +45,7 @@ namespace ance::core
         : Intrinsic
         , utility::ConcreteNode<T, IntrinsicVisitor>
     {
-        Static(Signature signature, Type const& return_type) : Intrinsic(std::move(signature), return_type) {}
+        explicit Static(Identifier const& identifier) : Intrinsic(identifier) {}
         ~Static() override = default;
     };
 
@@ -65,8 +53,7 @@ namespace ance::core
     struct NoOp final : Static<NoOp>
     {
     private:
-        /// This intrinsic does not take any parameters and returns the unit type.
-        NoOp() : Static(Signature::like("nop"), Type::Unit()) {}
+        NoOp() : Static(Identifier::like("nop")) {}
 
     public:
         ~NoOp() override = default;
@@ -82,13 +69,7 @@ namespace ance::core
     struct Declare final : Static<Declare>
     {
     private:
-        /// This intrinsic takes the following parameters:
-        /// - The scope to declare the variable in.
-        /// - The identifier of the variable to declare.
-        /// - Whether the declaration is final.
-        /// - The type of the variable to declare.
-        /// It returns a reference to the declared variable.
-        Declare() : Static(Signature::likeUnnamed("declare", Type::Scope(), Type::Ident(), Type::Bool(), Type::Self()), Type::VariableRef()) {}
+        Declare() : Static(Identifier::like("declare")) {}
 
     public:
         ~Declare() override = default;
@@ -104,11 +85,7 @@ namespace ance::core
     struct Resolve final : Static<Resolve>
     {
     private:
-        /// This intrinsic takes the following parameters:
-        /// - The scope to resolve the variable in.
-        /// - The identifier of the variable to resolve.
-        /// It returns a reference to the resolved variable.
-        Resolve() : Static(Signature::likeUnnamed("resolve", Type::Scope(), Type::Ident()), Type::VariableRef()) {}
+        Resolve() : Static(Identifier::like("resolve")) {}
 
     public:
         ~Resolve() override = default;
@@ -124,10 +101,7 @@ namespace ance::core
     struct GetParent final : Static<GetParent>
     {
     private:
-        /// This intrinsic takes the following parameters:
-        /// - The scope to get the parent of.
-        /// It returns the parent scope.
-        GetParent() : Static(Signature::likeUnnamed("getparent", Type::Scope()), Type::Scope()) {}
+        GetParent() : Static(Identifier::like("getparent")) {}
 
     public:
         ~GetParent() override = default;
@@ -143,10 +117,7 @@ namespace ance::core
     struct B2Str final : Static<B2Str>
     {
     private:
-        /// This intrinsic takes the following parameters:
-        /// - The boolean to convert.
-        /// It returns the string representation of the boolean.
-        B2Str() : Static(Signature::likeUnnamed("b2str", Type::Bool()), Type::String()) {} // todo: path type
+        B2Str() : Static(Identifier::like("b2str")) {}
 
     public:
         ~B2Str() override = default;
@@ -162,11 +133,7 @@ namespace ance::core
     struct Log final : Static<Log>
     {
     private:
-        /// This intrinsic takes the following parameters:
-        /// - The string message to log.
-        /// - The location to log the message at.
-        /// It returns the unit type.
-        Log() : Static(Signature::likeUnnamed("log", Type::String(), Type::Location()), Type::Unit()) {}
+        Log() : Static(Identifier::like("log")) {}
 
     public:
         ~Log() override = default;
@@ -182,11 +149,7 @@ namespace ance::core
     struct Include final : Static<Include>
     {
     private:
-        /// This intrinsic takes the following parameters:
-        /// - The path of the file to include.
-        /// - The location of a file to use as base to resolve a relative path.
-        /// It returns the unit type.
-        Include() : Static(Signature::likeUnnamed("include", Type::String(), Type::Location()), Type::Unit()) {} // todo: path type
+        Include() : Static(Identifier::like("include")) {}
 
     public:
         ~Include() override = default;

@@ -3,7 +3,7 @@
 #include <cassert>
 #include <sstream>
 
-#include "ance/core/Intrinsic.h"
+#include "Intrinsic.h"
 
 ance::core::Grapher::Grapher(std::ostream& out) : out_(out) {}
 ance::core::Grapher::~Grapher() = default;

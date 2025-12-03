@@ -14,6 +14,7 @@
 #include "ance/core/Intrinsic.h"
 
 #include "ance/bbt/Function.h"
+#include "ance/bbt/IntrinsicSignature.h"
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Segmenter.h"
 
@@ -177,21 +178,21 @@ struct ance::cet::Runner::Implementation
             return result;
         }
 
-        bool expectType(core::Type const& expected, utility::Shared<bbt::Value> value, core::Location const& location) const
+        bool expectType(bbt::Type const& expected, utility::Shared<bbt::Value> value, core::Location const& location) const
         {
             // todo: as soon as l-refs are parameterized, this function needs to be updated to take the actual type instead of the value
 
             bool ok = true;
 
-            core::Type const* actual = &value->type();
+            utility::Shared<bbt::Type> actual = value->type();
 
-            while (*actual == core::Type::LRef())
+            while (*actual == *bbt::Type::LRef())
             {
                 auto const& reference = value->as<LReference>();
                 Address const& address = reference.address();
 
                 value = address.read();
-                actual = &value->type();
+                actual = value->type();
             }
 
             if (*actual != expected)
@@ -205,15 +206,15 @@ struct ance::cet::Runner::Implementation
 
         static utility::Shared<bbt::Value> dereference(utility::Shared<bbt::Value> value)
         {
-            core::Type const* actual = &value->type();
+            utility::Shared<bbt::Type> actual = value->type();
 
-            while (*actual == core::Type::LRef())
+            while (*actual == *bbt::Type::LRef())
             {
                 auto const& reference = value->as<LReference>();
                 Address const& address = reference.address();
 
                 value = address.read();
-                actual = &value->type();
+                actual = value->type();
             }
 
             return value;
@@ -225,7 +226,7 @@ struct ance::cet::Runner::Implementation
             return dereference(value)->as<T>();
         }
 
-        [[nodiscard]] bool expectSignature(core::Signature const& signature,
+        [[nodiscard]] bool expectSignature(bbt::Signature const& signature,
                                            utility::List<std::reference_wrapper<bbt::Temporary const>> const& arguments,
                                            core::Location const& location)
         {
@@ -252,7 +253,7 @@ struct ance::cet::Runner::Implementation
                 auto const& argument = arguments[i];
                 Temporary& temporary = scope().getTemporary(argument.get());
 
-                auto const& type = signature.parameters()[i].type.get();
+                auto const& type = *signature.parameters()[i].type;
 
                 ok &= expectType(type, temporary.read(), argument.get().location);
             }
@@ -336,7 +337,7 @@ struct ance::cet::Runner::Implementation
         {
             utility::Shared<bbt::Value> condition = scope().getTemporary(branch_link.condition).read();
 
-            if (!expectType(core::Type::Bool(), condition, branch_link.condition.location))
+            if (!expectType(*bbt::Type::Bool(), condition, branch_link.condition.location))
             {
                 abort();
                 return;
@@ -374,7 +375,7 @@ struct ance::cet::Runner::Implementation
             utility::Shared<bbt::Value> target = scope().getTemporary(store.target).read();
             utility::Shared<bbt::Value> value = scope().getTemporary(store.value).read();
 
-            if (!expectType(core::Type::VariableRef(), target, store.target.location))
+            if (!expectType(*bbt::Type::VariableRef(), target, store.target.location))
             {
                 abort();
                 return;
@@ -391,7 +392,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            core::Type const& type = variable.type();
+            bbt::Type const& type = *variable.type();
 
             if (!expectType(type, value, store.value.location))
             {
@@ -415,7 +416,9 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Intrinsic const& intrinsic) override
         {
-            if (!expectSignature(intrinsic.intrinsic.signature(), intrinsic.arguments, intrinsic.location))
+            auto [signature, _] = bbt::IntrinsicSignature::get(intrinsic.intrinsic);
+
+            if (!expectSignature(signature, intrinsic.arguments, intrinsic.location))
             {
                 abort();
                 return;
@@ -459,15 +462,16 @@ struct ance::cet::Runner::Implementation
 
             utility::Shared<bbt::Value> called = scope().getTemporary(call.called).read();
 
-            if (!expectType(core::Type::Function(), called, call.called.location))
+            if (!expectType(*bbt::Type::Function(), called, call.called.location))
             {
                 abort();
                 return;
             }
 
-            bbt::Function const& function = called->as<bbt::Function>();
+            utility::Shared<bbt::Function> function = called.cast<bbt::Function>();
+            bbt::Signature signature = function->signature();
 
-            if (!expectSignature(function.signature(), call.arguments, call.location))
+            if (!expectSignature(signature, call.arguments, call.location))
             {
                 abort();
                 return;
@@ -478,10 +482,10 @@ struct ance::cet::Runner::Implementation
 
             Scope& function_scope = global_scope_->addChildScope(utility::makeOwned<OrderedScope>(*global_scope_));
 
-            for (size_t i = 0; i < function.signature().arity(); ++i)
+            for (size_t index = 0; index < signature.arity(); ++index)
             {
-                core::Signature::Parameter const& parameter = function.signature().parameters()[i];
-                utility::Shared<bbt::Value>& argument = arguments[i];
+                bbt::Signature::Parameter& parameter = signature[index];
+                utility::Shared<bbt::Value> argument = arguments[index];
 
                 utility::Optional<utility::Shared<bbt::Value>> variable = function_scope.declare(parameter.name, parameter.type, true, core::Location::global(), reporter_);
 
@@ -494,7 +498,7 @@ struct ance::cet::Runner::Implementation
                 (*variable)->as<VariableRef>().value().write(dereference(argument));
             }
 
-            run_point.stack.emplace_back(function.body().entry, &function_scope);
+            run_point.stack.emplace_back(function->body().entry, &function_scope);
 
             yield();
         }
@@ -503,7 +507,7 @@ struct ance::cet::Runner::Implementation
         {
             utility::Shared<bbt::Value> target = scope().getTemporary(read.target).read();
 
-            if (!expectType(core::Type::VariableRef(), target, read.target.location))
+            if (!expectType(*bbt::Type::VariableRef(), target, read.target.location))
             {
                 abort();
                 return;
@@ -525,34 +529,37 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Constant const& constant) override
         {
-            scope().getTemporary(constant.destination).write(constant.value->clone());
+            // Because the value class is immutable, this operation is logically const, but requires mutability to copy the shared ownership.
+            bbt::Constant* mutable_constant = const_cast<bbt::Constant*>(&constant); // todo: think about a nicer way to do this
+
+            scope().getTemporary(constant.destination).write( mutable_constant->value);
         }
 
         void visit(bbt::Default const& default_value) override
         {
             utility::Shared<bbt::Value> type_value = scope().getTemporary(default_value.type).read();
 
-            if (!expectType(core::Type::Self(), type_value, default_value.type.location))
+            if (!expectType(*bbt::Type::Self(), type_value, default_value.type.location))
             {
                 abort();
                 return;
             }
 
-            auto get_default_value = [&](core::Type const& type) -> utility::Shared<bbt::Value> {
+            auto get_default_value = [&](bbt::Type const& type) -> utility::Shared<bbt::Value> {
                 // todo: should become default constructor call at some point
 
-                if (type == core::Type::Bool()) return bbt::Bool::make(false);
-                if (type == core::Type::Unit()) return bbt::Unit::make();
-                if (type == core::Type::Size()) return bbt::Size::make(0);
-                if (type == core::Type::Location()) return bbt::Location::make(core::Location::global());
-                if (type == core::Type::String()) return bbt::String::make("");
+                if (type == *bbt::Type::Bool()) return bbt::Bool::make(false);
+                if (type == *bbt::Type::Unit()) return bbt::Unit::make();
+                if (type == *bbt::Type::Size()) return bbt::Size::make(0);
+                if (type == *bbt::Type::Location()) return bbt::Location::make(core::Location::global());
+                if (type == *bbt::Type::String()) return bbt::String::make("");
 
                 reporter_.error("Cannot create default value for type '" + type.name() + "'", default_value.type.location);
 
                 return bbt::Unit::make();
             };
 
-            utility::Shared<bbt::Value> value = get_default_value(type_value->as<bbt::Type>().value());
+            utility::Shared<bbt::Value> value = get_default_value(*type_value.cast<bbt::Type>());
             scope().getTemporary(default_value.destination).write(value);
         }
 
@@ -565,7 +572,7 @@ struct ance::cet::Runner::Implementation
         {
             utility::Shared<bbt::Value> value = scope().getTemporary(unary_operation.operand).read();
 
-            if (!expectType(core::Type::Bool(), value, unary_operation.operand.location))
+            if (!expectType(*bbt::Type::Bool(), value, unary_operation.operand.location))
             {
                 abort();
                 return;
@@ -582,7 +589,7 @@ struct ance::cet::Runner::Implementation
         void visit(bbt::TypeOf const& type_of) override
         {
             utility::Shared<bbt::Value> value = scope().getTemporary(type_of.expression).read();
-            scope().getTemporary(type_of.destination).write(bbt::Type::make(value->type()));
+            scope().getTemporary(type_of.destination).write(value->type());
         }
 
         void visit(bbt::OrderedScopeEnter const&) override

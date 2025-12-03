@@ -1,23 +1,21 @@
-#ifndef ANCE_CORE_TYPE_H
-#define ANCE_CORE_TYPE_H
+#ifndef ANCE_BBT_TYPE_H
+#define ANCE_BBT_TYPE_H
+
+#include <ostream>
 
 #include "ance/core/Identifier.h"
 
-namespace ance::core
-{
-    /// Unique identifier for a type, allowing more compact referencing.
-    struct TypeID
-    {
-        uint32_t app;
-        uint32_t id;
-    };
+#include "Value.h"
 
+namespace ance::bbt
+{
     /// Represents a type.
-    class Type
+    class Type final : public Value
     {
+    public:
         /// Creates a new type.
         /// \param identifier The identifier of the type.
-        explicit Type(Identifier const& identifier);
+        explicit Type(core::Identifier const& identifier);
 
         Type(const Type&) = delete;
         Type& operator=(const Type&) = delete;
@@ -25,48 +23,41 @@ namespace ance::core
         Type(Type&&) = delete;
         Type& operator=(Type&&) = delete;
 
-      public:
         /// Gets the name of this type.
-        [[nodiscard]] Identifier const& name() const;
+        [[nodiscard]] core::Identifier const& name() const;
 
         /// Get the boolean type, which has two values: true and false.
-        static Type const& Bool();
+        static utility::Shared<Type> Bool();
 
         /// Get the unit type, which has one value: ().
-        static Type const& Unit();
+        static utility::Shared<Type> Unit();
 
         /// Get the size type, which has a platform-dependent size.
-        static Type const& Size();
+        static utility::Shared<Type> Size();
 
         /// Get the string type.
-        static Type const& String();
+        static utility::Shared<Type> String();
 
         /// Get the variable reference type, which is used to refer to variables.
-        static Type const& VariableRef(); // todo: should be split into variable type and reference type, variable type should be parameterized
+        static utility::Shared<Type> VariableRef(); // todo: should be split into variable type and reference type, variable type should be parameterized
 
         /// Get the untyped l-value reference type.
-        static Type const& LRef(); // todo: should be parameterized, typed, and be &T rather than .T
+        static utility::Shared<Type> LRef(); // todo: should be parameterized, typed, and be &T rather than .T
 
         /// Get the identifier type, which is the type of all identifiers.
-        static Type const& Ident();
+        static utility::Shared<Type> Ident();
 
         /// Get the function type.
-        static Type const& Function(); // TODO: function type should be parameterized (signature and return type)
+        static utility::Shared<Type> Function(); // TODO: function type should be parameterized (signature and return type)
 
         /// Get the type-type - the type of all types.
-        static Type const& Self();
+        static utility::Shared<Type> Self();
 
         /// Get the scope type, which refers to scope values.
-        static Type const& Scope();
+        static utility::Shared<Type> ScopeRef();
 
         /// Get the source location type.
-        static Type const& Location();
-
-        /// Get a type by its ID.
-        [[nodiscard]] static Type const& byID(TypeID const& id) ;
-
-        /// Get the ID of this type.
-        [[nodiscard]] TypeID id() const;
+        static utility::Shared<Type> Location();
 
         bool operator==(Type const& other) const;
         bool operator!=(Type const& other) const;
@@ -76,12 +67,13 @@ namespace ance::core
         /// Checks whether this type is assignable to another type.
         bool isAssignableTo(Type const& other) const; // todo: should also handle l-refs correctly
 
+        [[nodiscard]] std::string            toString() const override;
+
       private:
-        Identifier identifier_;
-        uint32_t index_;
+        core::Identifier identifier_;
     };
 }
 
-std::ostream& operator<<(std::ostream& out, ance::core::Type const& type);
+std::ostream& operator<<(std::ostream& out, ance::bbt::Type const& type);
 
 #endif

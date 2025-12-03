@@ -3,15 +3,22 @@
 
 #include <filesystem>
 
-#include "ance/core/Context.h"
 #include "ance/core/Reporter.h"
 #include "ance/utility/Owners.h"
+
+namespace ance::core
+{
+    class Context;
+}
 
 namespace ance::ast
 {
     struct File;
     struct Statement;
+}
 
+namespace ance::ast
+{
     /// Parses files into ASTs.
     class Parser
     {

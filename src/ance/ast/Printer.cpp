@@ -4,8 +4,6 @@
 
 #include "ance/core/Printer.h"
 
-#include "ance/core/Type.h"
-
 struct ance::ast::Printer::Implementation
 {
     class AST final
@@ -236,12 +234,12 @@ struct ance::ast::Printer::Implementation
 
         void visit(TypeLiteral const& type_literal) override
         {
-            print(type_literal.type.name());
+            print(type_literal.type);
         }
 
         void visit(UnaryOperation const& unary_operation) override
         {
-            print(unary_operation.op.toString());
+            print(unary_operation.op);
             print(" ");
             visit(*unary_operation.operand);
         }

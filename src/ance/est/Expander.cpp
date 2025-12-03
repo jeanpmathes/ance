@@ -1,10 +1,12 @@
 #include "Expander.h"
 
+#include "ance/core/Intrinsic.h"
+
 #include "ance/ast/Node.h"
 #include "ance/ast/Parser.h"
-#include "ance/est/Node.h"
 
-#include "Printer.h"
+#include "ance/est/Node.h"
+#include "ance/est/Printer.h"
 
 struct ance::est::Expander::Implementation
 {

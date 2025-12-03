@@ -7,9 +7,9 @@
 
 namespace ance::cet
 {
-    Variable::Variable(core::Identifier const& identifier, core::Type const& type, bool is_final, core::Location const& location)
+    Variable::Variable(core::Identifier const& identifier, utility::Shared<bbt::Type> type, bool is_final, core::Location const& location)
     : identifier_(identifier)
-    , type_(type)
+    , type_(std::move(type))
     , is_final_(is_final)
     , location_(location)
     {}
@@ -19,6 +19,15 @@ namespace ance::cet
         return identifier_;
     }
 
+    utility::Shared<bbt::Type> Variable::type()
+    {
+        return type_;
+    }
+
+    bbt::Type const& Variable::type() const
+    {
+        return *type_;
+    }
 
     bool Variable::isFinal() const
     {
@@ -60,10 +69,5 @@ namespace ance::cet
     bool Variable::isDefined() const
     {
         return value_.hasValue();
-    }
-
-    core::Type const& Variable::type() const
-    {
-        return type_;
     }
 }

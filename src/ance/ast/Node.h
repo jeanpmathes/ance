@@ -5,16 +5,12 @@
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
 #include "ance/core/AccessModifier.h"
+#include "ance/core/LiteralType.h"
 #include "ance/core/Assigner.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
-
-namespace ance::core
-{
-    class Type;
-}
 
 /// The abstract syntax tree (AST) namespace.
 namespace ance::ast
@@ -296,9 +292,9 @@ namespace ance::ast
         : Expression
         , utility::ConcreteNode<TypeLiteral, Visitor>
     {
-        TypeLiteral(core::Type const& value, core::Location const& source_location);
+        TypeLiteral(core::LiteralType value, core::Location const& source_location);
 
-        core::Type const& type;
+        core::LiteralType type;
     };
 
     /// An expression that resolves to its own source location.

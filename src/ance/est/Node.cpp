@@ -113,7 +113,11 @@ ance::est::StringLiteral::StringLiteral(std::string text, core::Location const& 
 
 ance::est::BoolLiteral::BoolLiteral(bool const v, core::Location const& source_location) : Node(source_location), Expression(), value(v) {}
 
-ance::est::TypeLiteral::TypeLiteral(core::Type const& value, core::Location const& source_location) : Node(source_location), Expression(), type(value) {}
+ance::est::TypeLiteral::TypeLiteral(core::LiteralType value, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , type(value)
+{}
 
 ance::est::Default::Default(utility::Owned<Expression> t, core::Location const& source_location)
     : Node(source_location)

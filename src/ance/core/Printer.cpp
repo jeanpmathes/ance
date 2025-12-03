@@ -1,7 +1,6 @@
 #include "Printer.h"
 
 #include "ance/core/Intrinsic.h"
-#include "ance/core/Type.h"
 
 ance::core::Printer::Printer(std::ostream& out) : out_(out) {}
 
@@ -12,6 +11,8 @@ void ance::core::Printer::print(std::string const& text)
     indent();
     out_ << text;
 }
+
+// todo: maybe just make it generic with concept for when << is defined
 
 void ance::core::Printer::print(char const* text)
 {
@@ -31,22 +32,28 @@ void ance::core::Printer::print(AccessModifier const access_modifier)
     out_ << access_modifier.toString();// todo: access modifier should provide operator<<
 }
 
+void ance::core::Printer::print(UnaryOperator unary_operator)
+{
+    indent();
+    out_ << unary_operator.toString();// todo: unary operator should provide operator<<
+}
+
 void ance::core::Printer::print(Assigner const assigner)
 {
     indent();
     out_ << assigner.getSymbol();// todo: assigner should provide operator<<
 }
 
+void ance::core::Printer::print(LiteralType literal_type)
+{
+    indent();
+    out_ << literal_type.toString();// todo: literal type should provide operator<<
+}
+
 void ance::core::Printer::print(Intrinsic const& intrinsic)
 {
     indent();
     out_ << intrinsic;
-}
-
-void ance::core::Printer::print(Type const& type)
-{
-    indent();
-    out_ << type;
 }
 
 void ance::core::Printer::line()
