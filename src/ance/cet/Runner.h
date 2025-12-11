@@ -4,12 +4,18 @@
 #include <filesystem>
 
 #include "ance/utility/Owners.h"
-#include "ance/core/Reporter.h"
+
 #include "ance/core/Context.h"
+#include "ance/core/Reporter.h"
 
 namespace ance::sources
 {
     class SourceTree;
+}
+
+namespace ance::bbt
+{
+    class TypeContext;
 }
 
 namespace ance::cet
@@ -21,7 +27,7 @@ namespace ance::cet
     /// Runs code in basic-block form (BBT) at compile-time, producing CETs.
     class Runner
     {
-    public:
+      public:
         Runner(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
         ~Runner();
 
@@ -34,7 +40,10 @@ namespace ance::cet
         /// \return The resulting compile-able unit.
         utility::Optional<utility::Owned<Unit>> runOrderedFile(std::filesystem::path const& file);
 
-    private:
+        /// Get the used type context of this runner.
+        bbt::TypeContext& types();
+
+      private:
         struct Implementation;
         utility::Owned<Implementation> implementation_;
     };

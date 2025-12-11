@@ -5,21 +5,19 @@
 
 ance::cet::IntrinsicsRunner::IntrinsicsRunner(sources::SourceTree&                              source_tree,
                                               core::Reporter&                                   reporter,
+                                              bbt::TypeContext&                                 type_context,
                                               std::function<void(std::filesystem::path const&)> include)
     : source_tree_(source_tree)
     , reporter_(reporter)
+    , type_context_(type_context)
     , include_(std::move(include))
 {}
 
 bool ance::cet::IntrinsicsRunner::Result::isPending() const
-{
-    return pending_resolution.hasValue();
-}
+{ return pending_resolution.hasValue(); }
 
 bool ance::cet::IntrinsicsRunner::Result::isFailed() const
-{
-    return !return_value_.hasValue() && !pending_resolution.hasValue();
-}
+{ return !return_value_.hasValue() && !pending_resolution.hasValue(); }
 
 ance::cet::PendingResolution const& ance::cet::IntrinsicsRunner::Result::getPending() const
 {
@@ -33,11 +31,11 @@ ance::utility::Shared<ance::bbt::Value> ance::cet::IntrinsicsRunner::Result::get
     return return_value_.value();
 }
 
-ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intrinsic const&                             intrinsic,
-                                                                     utility::List<utility::Shared<bbt::Value>> & arguments,
-                                                                     core::Location const&                             location)
+ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intrinsic const&                      intrinsic,
+                                                                     utility::List<utility::Shared<bbt::Value>>& arguments,
+                                                                     core::Location const&                       location)
 {
-    auto [signature, return_type] = bbt::IntrinsicSignature::get(intrinsic);
+    auto [signature, return_type] = bbt::IntrinsicSignature::get(intrinsic, type_context_);
 
     state_ = State {.location             = location,
                     .arguments            = &arguments,
@@ -46,8 +44,7 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
                     .pending_resolution   = std::nullopt};
 
     assert(arguments.size() == signature.parameters().size());
-    for (size_t i = 0; i < arguments.size(); ++i)
-        assert(arguments[i]->type()->isAssignableTo(*signature.parameters()[i].type));
+    for (size_t i = 0; i < arguments.size(); ++i) assert(arguments[i]->type()->isAssignableTo(*signature.parameters()[i].type));
 
     this->visit(intrinsic);
 
@@ -59,9 +56,7 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
 }
 
 void ance::cet::IntrinsicsRunner::visit(core::Dynamic const& dynamic)
-{
-    reporter_.error("Unsupported intrinsic '" + dynamic.identifier() + "'", state_.location);
-}
+{ reporter_.error("Unsupported intrinsic '" + dynamic.identifier() + "'", state_.location); }
 
 void ance::cet::IntrinsicsRunner::visit(core::NoOp const&)
 {
@@ -70,15 +65,17 @@ void ance::cet::IntrinsicsRunner::visit(core::NoOp const&)
 
 void ance::cet::IntrinsicsRunner::visit(core::Declare const&)
 {
-    Scope&                  scope      = state_.arguments->at(0)->as<ScopeRef>().value();
-    core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
-    bool const              is_final   = state_.arguments->at(2)->as<bbt::Bool>().value();
-    utility::Shared<bbt::Type>        type       = state_.arguments->at(3).cast<bbt::Type>();
+    Scope&                     scope      = state_.arguments->at(0)->as<ScopeRef>().value();
+    core::Identifier const&    identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
+    bool const                 is_final   = state_.arguments->at(2)->as<bbt::Bool>().value();
+    utility::Shared<bbt::Type> type       = state_.arguments->at(3).cast<bbt::Type>();
 
     auto variable = scope.declare(identifier, type, is_final, state_.location, reporter_);
 
     if (variable.hasValue()) { setResult(std::move(*variable)); }
-    else { abort(); }
+    else {
+        abort();
+    }
 }
 
 void ance::cet::IntrinsicsRunner::visit(core::Resolve const&)
@@ -89,7 +86,9 @@ void ance::cet::IntrinsicsRunner::visit(core::Resolve const&)
     utility::Optional<utility::Shared<bbt::Value>> variable = scope.find(identifier);
 
     if (variable.hasValue()) { setResult(std::move(*variable)); }
-    else { setPending(identifier); }
+    else {
+        setPending(identifier);
+    }
 }
 
 void ance::cet::IntrinsicsRunner::visit(core::GetParent const&)
@@ -103,7 +102,7 @@ void ance::cet::IntrinsicsRunner::visit(core::GetParent const&)
         return;
     }
 
-    setResult(ScopeRef::make(*scope.parent()));
+    setResult(ScopeRef::make(*scope.parent(), type_context_));
 }
 
 void ance::cet::IntrinsicsRunner::visit(core::Log const&)
@@ -113,14 +112,14 @@ void ance::cet::IntrinsicsRunner::visit(core::Log const&)
 
     reporter_.info(value, loc);
 
-    setResult(bbt::Unit::make());
+    setResult(bbt::Unit::make(type_context_));
 }
 
 void ance::cet::IntrinsicsRunner::visit(core::B2Str const&)
 {
     bool const value = state_.arguments->at(0)->as<bbt::Bool>().value();
 
-    setResult(bbt::String::make(value ? "true" : "false"));
+    setResult(bbt::String::make(value ? "true" : "false", type_context_));
 }
 
 void ance::cet::IntrinsicsRunner::visit(core::Include const&)
@@ -132,7 +131,7 @@ void ance::cet::IntrinsicsRunner::visit(core::Include const&)
 
     include_(path);
 
-    setResult(bbt::Unit::make());
+    setResult(bbt::Unit::make(type_context_));
 }
 
 void ance::cet::IntrinsicsRunner::setResult(utility::Shared<bbt::Value> value)

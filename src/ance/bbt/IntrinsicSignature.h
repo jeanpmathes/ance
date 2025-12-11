@@ -9,11 +9,13 @@
 
 namespace ance::bbt
 {
+    class TypeContext;
+
     /// Provides the signatures of the intrinsics.
     class IntrinsicSignature
     {
-    public:
-        static std::tuple<Signature, utility::Shared<Type>> get(core::Intrinsic const& intrinsic);
+      public:
+        static std::tuple<Signature, utility::Shared<Type>> get(core::Intrinsic const& intrinsic, TypeContext& type_context);
     };
 }
 

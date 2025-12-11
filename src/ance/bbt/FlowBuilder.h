@@ -13,6 +13,7 @@ namespace ance::core
 namespace ance::bbt
 {
     class Value;
+    class TypeContext;
 }
 
 namespace ance::bbt
@@ -21,7 +22,7 @@ namespace ance::bbt
     class FlowBuilder
     {
       public:
-        explicit FlowBuilder(core::Location const& location);
+        FlowBuilder(core::Location const& location, TypeContext& type_context);
         ~FlowBuilder();
 
         /// Creates a new basic block and returns its ID.

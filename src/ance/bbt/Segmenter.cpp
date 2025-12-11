@@ -4,8 +4,8 @@
 #include <map>
 #include <set>
 #include <stack>
-#include <vector>
 #include <stdexcept>
+#include <vector>
 
 #include "ance/core/LiteralType.h"
 
@@ -27,14 +27,10 @@ struct ance::bbt::Segmenter::Implementation
         virtual ~BaseBB() = default;
 
         void enter(BaseBB& incoming)
-        {
-            incoming_.insert(&incoming);
-        }
+        { incoming_.insert(&incoming); }
 
         void push(utility::Owned<Statement> statement)
-        {
-            statements_.emplace_back(std::move(statement));
-        }
+        { statements_.emplace_back(std::move(statement)); }
 
         utility::Owned<BasicBlock> createBlock(size_t id)
         {
@@ -49,19 +45,13 @@ struct ance::bbt::Segmenter::Implementation
         [[nodiscard]] virtual utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) = 0;
 
         [[nodiscard]] bool isCreated() const
-        {
-            return id_ != 0;
-        }
+        { return id_ != 0; }
 
         [[nodiscard]] size_t index() const
-        {
-            return id_ - 1;
-        }
+        { return id_ - 1; }
 
         [[nodiscard]] bool hasCode() const
-        {
-            return !statements_.empty();
-        }
+        { return !statements_.empty(); }
 
         [[nodiscard]] core::Location location() const
         {
@@ -140,9 +130,7 @@ struct ance::bbt::Segmenter::Implementation
         ~SimpleBB() override = default;
 
         explicit SimpleBB(utility::Owned<Statement> statement)
-        {
-            push(std::move(statement));
-        }
+        { push(std::move(statement)); }
 
         void link(BaseBB& next)
         {
@@ -193,9 +181,7 @@ struct ance::bbt::Segmenter::Implementation
         }
 
         [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) override
-        {
-            return utility::makeOwned<Branch>(condition_, *blocks[true_.get().index()], *blocks[false_.get().index()], core::Location::global());
-        }
+        { return utility::makeOwned<Branch>(condition_, *blocks[true_.get().index()], *blocks[false_.get().index()], core::Location::global()); }
 
         [[nodiscard]] std::set<BaseBB*> next() const override
         {
@@ -225,19 +211,14 @@ struct ance::bbt::Segmenter::Implementation
       public:
         using Visitor::visit;
 
-        explicit RET(core::Reporter& reporter)
-            : reporter_(reporter)
-        {}
+        RET(core::Reporter& reporter, TypeContext& type_context) : reporter_(reporter), type_context_(type_context) {}
         ~RET() override = default;
 
         utility::Owned<UnorderedScope> apply(est::File const& file)
         {
             utility::List<utility::Owned<Flow>> flows;
 
-            for (auto const& statement : file.statements)
-            {
-                flows.emplace_back(apply(*statement));
-            }
+            for (auto const& statement : file.statements) { flows.emplace_back(apply(*statement)); }
 
             return utility::makeOwned<UnorderedScope>(std::move(flows), file.location);
         }
@@ -735,7 +716,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const entry    = addEmptyBlock(blocks);
+            std::reference_wrapper const entry = addEmptyBlock(blocks);
 
             auto [called_temporary, called] = addBlockAndGetInner<Temporary>(blocks, call.called->location);
             link(entry, called_temporary);
@@ -793,7 +774,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, Unit::make(), destination(), unit_literal.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, Unit::make(type_context_), destination(), unit_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -802,7 +783,8 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, Size::make(std::stoull(size_literal.value)), destination(), size_literal.location);
+            std::reference_wrapper const inner =
+                addBlock<Constant>(blocks, Size::make(std::stoull(size_literal.value), type_context_), destination(), size_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -811,7 +793,8 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, String::make(string_literal.value), destination(), string_literal.location);
+            std::reference_wrapper const inner =
+                addBlock<Constant>(blocks, String::make(string_literal.value, type_context_), destination(), string_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -820,7 +803,8 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, Bool::make(bool_literal.value), destination(), bool_literal.location);
+            std::reference_wrapper const inner =
+                addBlock<Constant>(blocks, Bool::make(bool_literal.value, type_context_), destination(), bool_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -829,22 +813,25 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            static auto to_type = [](core::LiteralType const& literal_type) -> utility::Shared<Type>
-            {
+            static auto to_type = [](core::LiteralType const& literal_type, TypeContext& type_context) -> utility::Shared<Type> {
                 switch (literal_type)
                 {
-                    case core::LiteralType::Bool: return Type::Bool();
-                    case core::LiteralType::Unit: return Type::Unit();
-                    case core::LiteralType::Size: return Type::Size();
-                    case core::LiteralType::String: return Type::String();
-                    case core::LiteralType::Type: return Type::Self();
+                    case core::LiteralType::Bool:
+                        return type_context.getBool();
+                    case core::LiteralType::Unit:
+                        return type_context.getUnit();
+                    case core::LiteralType::Size:
+                        return type_context.getSize();
+                    case core::LiteralType::String:
+                        return type_context.getString();
+                    case core::LiteralType::Type:
+                        return type_context.getType();
                 }
 
                 throw std::logic_error("Invalid type literal");
             };
 
-            std::reference_wrapper const inner =
-                addBlock<Constant>(blocks, to_type(type_literal.type), destination(), type_literal.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, to_type(type_literal.type, type_context_), destination(), type_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -874,7 +861,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, Location::make(here.location), destination(), here.location);
+            std::reference_wrapper const inner = addBlock<Constant>(blocks, Location::make(here.location, type_context_), destination(), here.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -941,7 +928,8 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<BaseBB>> blocks;
 
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, Identifier::make(identifier_capture.identifier), destination(), identifier_capture.location);
+            std::reference_wrapper const inner =
+                addBlock<Constant>(blocks, Identifier::make(identifier_capture.identifier, type_context_), destination(), identifier_capture.location);
 
             setResult(std::move(blocks), inner, inner);
         }
@@ -969,33 +957,34 @@ struct ance::bbt::Segmenter::Implementation
         SimpleBB*        current_exit_bb_     = nullptr;
         Temporary const* current_destination_ = nullptr;
 
-        std::vector<Loop>   loops_  = {};
+        std::vector<Loop>                     loops_  = {};
         std::vector<OrderedScopeEnter const*> scopes_ = {};
 
         core::Reporter& reporter_;
+        TypeContext&    type_context_;
 
         std::map<est::Temporary const*, Temporary const*> temporaries_;
     };
-    
-    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context, TypeContext& type_context)
         : source_tree_(source_tree)
         , reporter_(reporter)
         , expander_(source_tree, reporter, context)
         , context_(context)
+        , type_context_(type_context)
     {}
 
-    utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file) // todo: reduce duplication with below (templates)
+    utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (templates)
     {
-        (void)source_tree_; // todo: use or remove
+        (void) source_tree_;// todo: use or remove
 
         utility::Optional<utility::Owned<est::Statement>> expanded = expander_.expandOrderedFile(file);
         if (!expanded.hasValue()) return std::nullopt;
 
-        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
+        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
 
         utility::Owned<Flow> flow = ret->apply(**expanded);
-        if (reporter_.isFailed())
-            return std::nullopt;
+        if (reporter_.isFailed()) return std::nullopt;
 
         context_.print<Printer>(*flow, "bbt", file);
         context_.graph<Grapher>(*flow, "bbt", file);
@@ -1008,11 +997,10 @@ struct ance::bbt::Segmenter::Implementation
         utility::Optional<utility::Owned<est::File>> expanded = expander_.expandUnorderedFile(file);
         if (!expanded.hasValue()) return std::nullopt;
 
-        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_);
+        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
 
         utility::Owned<UnorderedScope> scope = ret->apply(**expanded);
-        if (reporter_.isFailed())
-            return std::nullopt;
+        if (reporter_.isFailed()) return std::nullopt;
 
         context_.print<Printer>(*scope, "bbt", file);
         context_.graph<Grapher>(*scope, "bbt", file);
@@ -1022,23 +1010,20 @@ struct ance::bbt::Segmenter::Implementation
 
   private:
     sources::SourceTree& source_tree_;
-    core::Reporter& reporter_;
-    est::Expander   expander_;
-    core::Context& context_;
+    core::Reporter&      reporter_;
+    est::Expander        expander_;
+    core::Context&       context_;
+    TypeContext&         type_context_;
 };
 
-ance::bbt::Segmenter::Segmenter(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
-    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
+ance::bbt::Segmenter::Segmenter(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context, TypeContext& type_context)
+    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context, type_context))
 {}
 
 ance::bbt::Segmenter::~Segmenter() = default;
 
 ance::utility::Optional<ance::utility::Owned<ance::bbt::Flow>> ance::bbt::Segmenter::segmentOrderedFile(std::filesystem::path const& file)
-{
-    return implementation_->segmentOrderedFile(file);
-}
+{ return implementation_->segmentOrderedFile(file); }
 
 ance::utility::Optional<ance::utility::Owned<ance::bbt::UnorderedScope>> ance::bbt::Segmenter::segmentUnorderedFile(std::filesystem::path const& file)
-{
-    return implementation_->segmentUnorderedFile(file);
-}
+{ return implementation_->segmentUnorderedFile(file); }

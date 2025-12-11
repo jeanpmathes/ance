@@ -5,6 +5,7 @@
 
 #include "ance/core/Intrinsic.h"
 
+#include "ance/bbt/Type.h"
 #include "ance/bbt/Value.h"
 
 namespace ance::bbt
@@ -17,11 +18,12 @@ namespace ance::bbt
         };
 
         core::Location location_;
+        TypeContext&   type_context_;
 
         std::vector<BlockInfo> blocks_;
         size_t                 active_id_ = std::numeric_limits<size_t>::max();
 
-        explicit Implementation(core::Location const& location) : location_(location) {}
+        Implementation(core::Location const& location, TypeContext& type_context) : location_(location), type_context_(type_context) {}
 
         size_t createBasicBlock()
         {
@@ -48,7 +50,7 @@ namespace ance::bbt
         Temporary const& pushTemporary()
         {
             utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(location_);
-            Temporary&                ref         = *temporary;
+            Temporary&                ref       = *temporary;
 
             pushStatement(std::move(temporary));
 
@@ -61,9 +63,9 @@ namespace ance::bbt
             pushStatement(utility::makeOwned<CurrentScope>(scope_arg, location_));
 
             Temporary const& identifier_arg = pushTemporary();
-            pushStatement(utility::makeOwned<Constant>(Identifier::make(name), identifier_arg, location_));
+            pushStatement(utility::makeOwned<Constant>(Identifier::make(name, type_context_), identifier_arg, location_));
 
-            Temporary const& resolve_result = pushTemporary();
+            Temporary const&                                       resolve_result = pushTemporary();
             utility::List<std::reference_wrapper<Temporary const>> resolve_arguments;
             resolve_arguments.emplace_back(scope_arg);
             resolve_arguments.emplace_back(identifier_arg);
@@ -101,43 +103,31 @@ namespace ance::bbt
         }
     };
 
-    FlowBuilder::FlowBuilder(core::Location const& location) : implementation_(utility::makeOwned<Implementation>(location)) {}
+    FlowBuilder::FlowBuilder(core::Location const& location, TypeContext& type_context)
+        : implementation_(utility::makeOwned<Implementation>(location, type_context))
+    {}
 
     FlowBuilder::~FlowBuilder() = default;
 
     size_t FlowBuilder::createBasicBlock()
-    {
-        return implementation_->createBasicBlock();
-    }
+    { return implementation_->createBasicBlock(); }
 
     void FlowBuilder::setActiveBasicBlock(size_t const id)
-    {
-        implementation_->setActiveBasicBlock(id);
-    }
+    { implementation_->setActiveBasicBlock(id); }
 
     void FlowBuilder::pushStatement(utility::Owned<Statement> statement)
-    {
-        implementation_->pushStatement(std::move(statement));
-    }
+    { implementation_->pushStatement(std::move(statement)); }
 
     Temporary const& FlowBuilder::pushTemporary()
-    {
-        return implementation_->pushTemporary();
-    }
+    { return implementation_->pushTemporary(); }
 
     Temporary const& FlowBuilder::pushVariableRead(core::Identifier const& name)
-    {
-        return implementation_->pushVariableRead(name);
-    }
+    { return implementation_->pushVariableRead(name); }
 
     Temporary const& FlowBuilder::pushConstant(utility::Shared<Value> value)
-    {
-        return implementation_->pushConstant(std::move(value));
-    }
+    { return implementation_->pushConstant(std::move(value)); }
 
     utility::Owned<Flow> FlowBuilder::build()
-    {
-        return implementation_->build();
-    }
+    { return implementation_->build(); }
 
 }

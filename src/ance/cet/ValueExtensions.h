@@ -12,50 +12,50 @@ namespace ance::cet
 
     class ScopeRef final : public bbt::Value
     {
-    public:
-        explicit ScopeRef(Scope& scope);
+      public:
+        ScopeRef(Scope& scope, bbt::TypeContext& type_context);
 
-        static utility::Shared<ScopeRef> make(Scope& scope);
+        static utility::Shared<ScopeRef> make(Scope& scope, bbt::TypeContext& type_context);
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
         [[nodiscard]] Scope& value() const;
 
-    private:
+      private:
         Scope& scope_;
     };
 
     class VariableRef final : public bbt::Value
     {
-    public:
-        explicit VariableRef(Variable& variable);
+      public:
+        VariableRef(Variable& variable, bbt::TypeContext& type_context);
 
-        static utility::Shared<VariableRef> make(Variable& variable);
+        static utility::Shared<VariableRef> make(Variable& variable, bbt::TypeContext& type_context);
 
         ~VariableRef() override = default;
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
         [[nodiscard]] Variable& value() const;
 
-    private:
+      private:
         Variable& variable_;
     };
 
     class LReference final : public bbt::Value
     {
-    public:
-        explicit LReference(Address address);
+      public:
+        explicit LReference(Address address, bbt::TypeContext& type_context);
 
-        static utility::Shared<LReference> make(Address address);
+        static utility::Shared<LReference> make(Address address, bbt::TypeContext& type_context);
 
         ~LReference() override = default;
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
         [[nodiscard]] Address const& address() const;
 
-    private:
+      private:
         Address address_;
     };
 }

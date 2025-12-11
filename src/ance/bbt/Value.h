@@ -5,32 +5,31 @@
 
 #include "ance/utility/Owners.h"
 
-#include "ance/core/Location.h"
 #include "ance/core/Identifier.h"
+#include "ance/core/Location.h"
 
 namespace ance::bbt
 {
     class Type;
+    class TypeContext;
 
     /// Represents a value.
     class Value
     {
-    protected:
+      protected:
         /// The concrete value class must supply its type, except when the type is "Type" when nullopt must be used to prevent infinite recursion.
-        explicit Value(utility::Optional<utility::Shared<Type>> type);
+        explicit Value(utility::Optional<utility::Shared<Type>> type, TypeContext& type_context);
 
-    public:
+      public:
         virtual ~Value() = default;
 
-        utility::Shared<Type> type();
-        [[nodiscard]] Type const& type() const;
+        utility::Shared<Type>             type();
+        [[nodiscard]] Type const&         type() const;
         [[nodiscard]] virtual std::string toString() const = 0;
 
         template<typename T>
         bool is() const
-        {
-            return dynamic_cast<T const*>(this) != nullptr;
-        }
+        { return dynamic_cast<T const*>(this) != nullptr; }
 
         template<typename T>
         T const& as() const
@@ -42,101 +41,103 @@ namespace ance::bbt
 
       private:
         utility::Optional<utility::Shared<Type>> type_;
+        TypeContext&                             type_context_;
     };
 
     class Unit final : public Value
     {
-    public:
-        Unit();
+      public:
+        explicit Unit(TypeContext& type_context);
 
-        static utility::Shared<Unit> make();
+        static utility::Shared<Unit> make(TypeContext& type_context);
 
         ~Unit() override = default;
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
     };
 
     class Bool final : public Value
     {
-    public:
-        explicit Bool(bool value);
+      public:
+        Bool(bool value, TypeContext& type_context);
 
-        static utility::Shared<Bool> make(bool value);
+        static utility::Shared<Bool> make(bool value, TypeContext& type_context);
 
         ~Bool() override = default;
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
         [[nodiscard]] bool value() const;
 
-    private:
+      private:
         bool value_;
     };
 
     class Size final : public Value
     {
-    public:
-        explicit Size(size_t value);
+      public:
+        Size(size_t value, TypeContext& type_context);
 
-        static utility::Shared<Size> make(size_t value);
+        static utility::Shared<Size> make(size_t value, TypeContext& type_context);
 
         ~Size() override = default;
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
         [[nodiscard]] size_t value() const;
 
-    private:
+      private:
         size_t value_;
     };
 
-    class Identifier final : public Value // todo: try to make the core::Identifier a value in some way
+    class Identifier final : public Value// todo: try to make the core::Identifier a value in some way
     {
-    public:
-        explicit Identifier(core::Identifier const& identifier);
+      public:
+        Identifier(core::Identifier const& identifier, TypeContext& type_context);
 
-        static utility::Shared<Identifier> make(core::Identifier const& identifier);
+        static utility::Shared<Identifier> make(core::Identifier const& identifier, TypeContext& type_context);
 
         ~Identifier() override = default;
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
         [[nodiscard]] core::Identifier const& value() const;
 
-    private:
+      private:
         core::Identifier identifier_;
     };
 
     class Location final : public Value
     {
-    public:
-        explicit Location(core::Location const& location);
+      public:
+        explicit Location(core::Location const& location, TypeContext& type_context);
 
-        static utility::Shared<Location> make(core::Location const& location);
+        static utility::Shared<Location> make(core::Location const& location, TypeContext& type_context);
 
         ~Location() override = default;
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
         [[nodiscard]] core::Location const& value() const;
 
-    private:
+      private:
         core::Location location_;
     };
 
     class String final : public Value
     {
-    public:
-        explicit String(std::string value);
+      public:
+        String(std::string value, TypeContext& type_context);
 
-        static utility::Shared<String> make(std::string value);
+        static utility::Shared<String> make(std::string value, TypeContext& type_context);
 
         ~String() override = default;
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
         [[nodiscard]] std::string const& value() const;
-    private:
+
+      private:
         std::string value_;
     };
 }

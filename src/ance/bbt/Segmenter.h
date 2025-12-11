@@ -7,6 +7,8 @@
 #include "ance/core/Reporter.h"
 #include "ance/utility/Owners.h"
 
+#include "ance/bbt/Type.h"
+
 namespace ance::sources
 {
     class SourceTree;
@@ -21,7 +23,7 @@ namespace ance::bbt
     class Segmenter
     {
       public:
-        Segmenter(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
+        Segmenter(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context, TypeContext& type_context);
         ~Segmenter();
 
         /// Segment an ordered file into a basic block control flow.

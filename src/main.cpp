@@ -60,10 +60,10 @@ namespace ance
         core::Context       context {debug_path};
 
         cet::Runner     runner {source_tree, reporter, context};
-        build::Compiler compiler {source_tree, reporter, context}; // todo: consider using the runner internally
+        build::Compiler compiler {source_tree, reporter, context};// todo: consider using the runner internally
 
-        utility::List<utility::Shared<bbt::Function>> provider; // todo: remove / improve the functions
-        bbt::FlowBuilder builder (core::Location::global());
+        utility::List<utility::Shared<bbt::Function>> provider;// todo: remove / improve the functions
+        bbt::FlowBuilder                              builder(core::Location::global(), runner.types());
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
@@ -76,7 +76,7 @@ namespace ance
                 builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::B2Str::instance(), std::move(args), str_value, core::Location::global()));
             }
 
-            bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global()));
+            bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
 
             bbt::Temporary const& result = builder.pushTemporary();
             {
@@ -85,15 +85,17 @@ namespace ance
                 args.emplace_back(location);
                 builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
             }
-            (void)result;
+            (void) result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("print1b",
-                bbt::Signature::Parameter(core::Identifier::like("value"), bbt::Type::Bool())),
-                bbt::Type::Unit(), builder.build()));
+        provider.emplace_back(utility::makeShared<bbt::Function>(
+            bbt::Signature::like("print1b", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getBool())),
+            runner.types().getUnit(),
+            builder.build(),
+            runner.types()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
-            bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
+            bbt::Temporary const& value    = builder.pushVariableRead(core::Identifier::like("value"));
             bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
 
             bbt::Temporary const& str_value = builder.pushTemporary();
@@ -110,18 +112,22 @@ namespace ance
                 args.emplace_back(location);
                 builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
             }
-            (void)result;
+            (void) result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("print2b",
-                bbt::Signature::Parameter(core::Identifier::like("value"), bbt::Type::Bool()),
-                bbt::Signature::Parameter(core::Identifier::like("location"), bbt::Type::Location())),
-                bbt::Type::Unit(), builder.build()));
+        provider.emplace_back(
+            utility::makeShared<bbt::Function>(
+            bbt::Signature::like("print2b",
+                                 bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getBool()),
+                                 bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
+            runner.types().getUnit(),
+            builder.build(),
+            runner.types()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
             bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
 
-            bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global()));
+            bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
 
             bbt::Temporary const& result = builder.pushTemporary();
             {
@@ -130,15 +136,17 @@ namespace ance
                 args.emplace_back(location);
                 builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
             }
-            (void)result;
+            (void) result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("print1s",
-                bbt::Signature::Parameter(core::Identifier::like("value"), bbt::Type::String())),
-                bbt::Type::Unit(), builder.build()));
+        provider.emplace_back(
+            utility::makeShared<bbt::Function>(bbt::Signature::like("print1s", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString())),
+            runner.types().getUnit(),
+            builder.build(),
+            runner.types()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
-            bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
+            bbt::Temporary const& value    = builder.pushVariableRead(core::Identifier::like("value"));
             bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
 
             bbt::Temporary const& result = builder.pushTemporary();
@@ -148,16 +156,19 @@ namespace ance
                 args.emplace_back(location);
                 builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
             }
-            (void)result;
+            (void) result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("print2s",
-                bbt::Signature::Parameter(core::Identifier::like("value"), bbt::Type::String()),
-                bbt::Signature::Parameter(core::Identifier::like("location"), bbt::Type::Location())),
-                bbt::Type::Unit(), builder.build()));
+        provider.emplace_back(
+            utility::makeShared<bbt::Function>(bbt::Signature::like("print2s",
+                                                                    bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString()),
+                                                                    bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
+            runner.types().getUnit(),
+            builder.build(),
+            runner.types()));
 
         builder.setActiveBasicBlock(builder.createBasicBlock());
         {
-            bbt::Temporary const& file = builder.pushVariableRead(core::Identifier::like("file"));
+            bbt::Temporary const& file     = builder.pushVariableRead(core::Identifier::like("file"));
             bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
 
             bbt::Temporary const& result = builder.pushTemporary();
@@ -167,12 +178,15 @@ namespace ance
                 args.emplace_back(location);
                 builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Include::instance(), std::move(args), result, core::Location::global()));
             }
-            (void)result;
+            (void) result;
         }
-        provider.emplace_back(utility::makeShared<bbt::Function>(bbt::Signature::like("include",
-                bbt::Signature::Parameter(core::Identifier::like("file"), bbt::Type::String()),
-                bbt::Signature::Parameter(core::Identifier::like("location"), bbt::Type::Location())),
-                bbt::Type::Unit(), builder.build()));
+        provider.emplace_back(
+            utility::makeShared<bbt::Function>(bbt::Signature::like("include",
+                                                                    bbt::Signature::Parameter(core::Identifier::like("file"), runner.types().getString()),
+                                                                    bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
+            runner.types().getUnit(),
+            builder.build(),
+            runner.types()));
 
         runner.add(cet::Provider::fromList(std::move(provider)));
 
@@ -182,18 +196,16 @@ namespace ance
 
         if (unit.hasValue())
         {
-            if (compiler.compile(**unit))
-            {
-                exit_code = EXIT_SUCCESS;
-            }
+            if (compiler.compile(**unit)) { exit_code = EXIT_SUCCESS; }
         }
 
         reporter.report(source_tree, out);
 
         return exit_code;
-        
-        // todo: instead of having static type methods to get the instances, add a type context class which provides all types (check old code)
-        // todo: the get methods should not be const
+
+        // todo: refactor expander code
+
+        // todo: move the definitions of functions from this file into another file
 
         // todo: add the keyword types to the global scope so they can be found through resolution, adapt grammar to allow variable access in type expressions
         // todo: this means they can be removed as special cases of grammar, and the literal type enum can also be removed

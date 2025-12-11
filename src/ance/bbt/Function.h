@@ -14,24 +14,25 @@
 namespace ance::bbt
 {
     class Type;
+    class TypeContext;
 
     /// Represents a function.
     class Function final : public Value
     {
       public:
-        Function(Signature signature, utility::Shared<Type> return_type, utility::Shared<Flow> body);
-        Function(Signature signature, utility::Shared<Type> return_type, utility::Owned<Flow> body);
+        Function(Signature signature, utility::Shared<Type> return_type, utility::Shared<Flow> body, TypeContext& type_context);
+        Function(Signature signature, utility::Shared<Type> return_type, utility::Owned<Flow> body, TypeContext& type_context);
         ~Function() override = default;
 
         [[nodiscard]] core::Identifier const& name() const;
-        [[nodiscard]] Signature        signature();
+        [[nodiscard]] Signature               signature();
         [[nodiscard]] Signature const&        signature() const;
-        [[nodiscard]] utility::Shared<Type>            returnType() ;
+        [[nodiscard]] utility::Shared<Type>   returnType();
         [[nodiscard]] Type const&             returnType() const;
 
         [[nodiscard]] Flow const& body() const;
 
-        [[nodiscard]] std::string            toString() const override;
+        [[nodiscard]] std::string toString() const override;
 
       private:
         Signature             signature_;

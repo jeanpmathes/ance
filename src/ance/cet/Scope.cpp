@@ -1,22 +1,22 @@
 #include "Scope.h"
 
 #include "ance/bbt/Function.h"
+#include "ance/bbt/Type.h"
+
 #include "ance/cet/Provider.h"
 #include "ance/cet/Temporary.h"
 #include "ance/cet/ValueExtensions.h"
 
-ance::cet::Scope::Scope(Scope* parent) : parent_(parent) {}
+ance::cet::Scope::Scope(Scope* parent, bbt::TypeContext& type_context) : parent_(parent), type_context_(type_context) {}
 
 ance::cet::Scope* ance::cet::Scope::parent() const
-{
-    return parent_;
-}
+{ return parent_; }
 
-ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::declare(core::Identifier const& identifier,
-                                                                                            utility::Shared<bbt::Type>       type,
-                                                                                            bool                    is_final,
-                                                                                            core::Location const&   location,
-                                                                                            core::Reporter&         reporter)
+ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::declare(core::Identifier const&    identifier,
+                                                                                           utility::Shared<bbt::Type> type,
+                                                                                           bool                       is_final,
+                                                                                           core::Location const&      location,
+                                                                                           core::Reporter&            reporter)
 {
     if (!canDeclare(identifier))
     {
@@ -24,19 +24,19 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
         return std::nullopt;
     }
 
-    utility::Owned<Variable> variable     = utility::makeOwned<Variable>(identifier, type, is_final, location);
+    utility::Owned<Variable> variable     = utility::makeOwned<Variable>(identifier, type, is_final, location, type_context_);
     Variable&                variable_ref = *variable;
 
     onDeclare(std::move(variable));
 
-    return VariableRef::make(variable_ref);
+    return VariableRef::make(variable_ref, type_context_);
 }
 
 ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::find(core::Identifier const& identifier)
 {
-    Variable * variable = onFind(identifier);
+    Variable* variable = onFind(identifier);
 
-    if (variable != nullptr) { return VariableRef::make(*variable); }
+    if (variable != nullptr) { return VariableRef::make(*variable, type_context_); }
 
     if (parent_ != nullptr) { return parent_->find(identifier); }
 
@@ -45,7 +45,7 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
 
 ance::cet::Temporary& ance::cet::Scope::createTemporary(bbt::Temporary const& bbt_temporary)
 {
-    auto [iterator, inserted] = temporaries_.emplace(&bbt_temporary, utility::makeOwned<Temporary>());
+    auto [iterator, inserted] = temporaries_.emplace(&bbt_temporary, utility::makeOwned<Temporary>(type_context_));
 
     assert(inserted);
 
@@ -56,10 +56,7 @@ ance::cet::Temporary& ance::cet::Scope::getTemporary(bbt::Temporary const& bbt_t
 {
     Scope* current_scope = this;
 
-    while (current_scope != nullptr && !current_scope->temporaries_.contains(&bbt_temporary))
-    {
-        current_scope = current_scope->parent();
-    }
+    while (current_scope != nullptr && !current_scope->temporaries_.contains(&bbt_temporary)) { current_scope = current_scope->parent(); }
 
     assert(current_scope != nullptr);
 
@@ -82,17 +79,19 @@ void ance::cet::Scope::removeChildScope(Scope& scope)
     child_scopes_.erase(iterator);
 }
 
-ance::cet::GlobalScope::GlobalScope(utility::List<utility::Owned<Provider>>& providers) : Scope(nullptr), providers_(providers) {}
+ance::bbt::TypeContext& ance::cet::Scope::types()
+{ return type_context_; }
+
+ance::cet::GlobalScope::GlobalScope(utility::List<utility::Owned<Provider>>& providers, bbt::TypeContext& type_context)
+    : Scope(nullptr, type_context)
+    , providers_(providers)
+{}
 
 bool ance::cet::GlobalScope::canDeclare(core::Identifier const&) const
-{
-    return false;
-}
+{ return false; }
 
 void ance::cet::GlobalScope::onDeclare(utility::Owned<Variable>)
-{
-    assert(false);
-}
+{ assert(false); }
 
 ance::cet::Variable* ance::cet::GlobalScope::onFind(core::Identifier const& identifier)
 {
@@ -108,7 +107,7 @@ ance::cet::Variable* ance::cet::GlobalScope::onFind(core::Identifier const& iden
         utility::Optional<utility::Shared<bbt::Function>> provided = provider->provide(identifier);
         if (provided.hasValue())
         {
-            auto variable = utility::makeShared<Variable>(identifier, bbt::Type::Function(), true, core::Location::global());
+            auto variable = utility::makeShared<Variable>(identifier, types().getFunction(), true, core::Location::global(), types());
             variables_.emplace(identifier, variable);
 
             variable->write(*provided);
@@ -120,12 +119,10 @@ ance::cet::Variable* ance::cet::GlobalScope::onFind(core::Identifier const& iden
     return nullptr;
 }
 
-ance::cet::OrderedScope::OrderedScope(Scope& parent) : Scope(&parent) {}
+ance::cet::OrderedScope::OrderedScope(Scope& parent, bbt::TypeContext& type_context) : Scope(&parent, type_context) {}
 
 bool ance::cet::OrderedScope::canDeclare(core::Identifier const& identifier) const
-{
-    return !outer_identifiers_.contains(identifier);
-}
+{ return !outer_identifiers_.contains(identifier); }
 
 void ance::cet::OrderedScope::onDeclare(utility::Owned<Variable> variable)
 {
@@ -142,12 +139,10 @@ ance::cet::Variable* ance::cet::OrderedScope::onFind(core::Identifier const& ide
     return nullptr;
 }
 
-ance::cet::UnorderedScope::UnorderedScope(Scope& parent) : Scope(&parent) {}
+ance::cet::UnorderedScope::UnorderedScope(Scope& parent, bbt::TypeContext& type_context) : Scope(&parent, type_context) {}
 
 bool ance::cet::UnorderedScope::canDeclare(core::Identifier const& identifier) const
-{
-    return !variables_.contains(identifier);
-}
+{ return !variables_.contains(identifier); }
 
 void ance::cet::UnorderedScope::onDeclare(utility::Owned<Variable> variable)
 {

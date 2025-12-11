@@ -6,6 +6,7 @@
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Reporter.h"
 
+#include "ance/bbt/Type.h"
 #include "ance/sources/SourceTree.h"
 
 #include "ance/bbt/Value.h"
@@ -25,7 +26,10 @@ namespace ance::cet
       public:
         using IntrinsicVisitor::visit;
 
-        IntrinsicsRunner(sources::SourceTree& source_tree, core::Reporter& reporter, std::function<void(std::filesystem::path const&)> include);
+        IntrinsicsRunner(sources::SourceTree&                              source_tree,
+                         core::Reporter&                                   reporter,
+                         bbt::TypeContext&                                 type_context,
+                         std::function<void(std::filesystem::path const&)> include);
 
         struct Result
         {
@@ -40,7 +44,7 @@ namespace ance::cet
         };
 
         /// Run an intrinsic with the given arguments.
-        Result run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<bbt::Value>> & arguments, core::Location const& location);
+        Result run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<bbt::Value>>& arguments, core::Location const& location);
 
         void visit(core::Dynamic const& dynamic) override;
         void visit(core::NoOp const&) override;
@@ -59,6 +63,7 @@ namespace ance::cet
 
         sources::SourceTree& source_tree_;
         core::Reporter&      reporter_;
+        bbt::TypeContext&    type_context_;
 
         std::function<void(std::filesystem::path const&)> include_;
 

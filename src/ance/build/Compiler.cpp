@@ -8,7 +8,7 @@ struct ance::build::Compiler::Implementation
 {
     class Intrinsics final : core::IntrinsicVisitor
     {
-    public:
+      public:
         using IntrinsicVisitor::visit;
 
         explicit Intrinsics(core::Reporter& reporter) : reporter_(reporter) {}
@@ -23,14 +23,10 @@ struct ance::build::Compiler::Implementation
         }
 
         void unsupported(core::Intrinsic const& intrinsic) const
-        {
-            reporter_.error("Unsupported intrinsic '" + intrinsic.identifier() + "'", location_);
-        }
+        { reporter_.error("Unsupported intrinsic '" + intrinsic.identifier() + "'", location_); }
 
         void visit(core::Dynamic const& dynamic) override
-        {
-            unsupported(dynamic);
-        }
+        { unsupported(dynamic); }
 
         void visit(core::NoOp const&) override
         {
@@ -38,36 +34,24 @@ struct ance::build::Compiler::Implementation
         }
 
         void visit(core::Declare const& declare) override
-        {
-            unsupported(declare);
-        }
+        { unsupported(declare); }
 
         void visit(core::Resolve const& resolve) override
-        {
-            unsupported(resolve);
-        }
+        { unsupported(resolve); }
 
         void visit(core::GetParent const& get_parent) override
-        {
-            unsupported(get_parent);
-        }
+        { unsupported(get_parent); }
 
         void visit(core::Log const& log) override
-        {
-            unsupported(log);
-        }
+        { unsupported(log); }
 
         void visit(core::Include const& include) override
-        {
-            unsupported(include);
-        }
+        { unsupported(include); }
 
         void visit(core::B2Str const& b2str) override
-        {
-            unsupported(b2str);
-        }
+        { unsupported(b2str); }
 
-    private:
+      private:
         core::Reporter& reporter_;
 
         core::Location location_ = core::Location::global();
@@ -75,7 +59,7 @@ struct ance::build::Compiler::Implementation
 
     class CET final : public cet::Visitor
     {
-    public:
+      public:
         using Visitor::visit;
 
         explicit CET(core::Reporter& reporter) : reporter_(reporter) {}
@@ -92,7 +76,11 @@ struct ance::build::Compiler::Implementation
         Intrinsics intrinsics_ {reporter_};
     };
 
-    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context) : source_tree_(source_tree), reporter_(reporter), context_(context) {}
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+        : source_tree_(source_tree)
+        , reporter_(reporter)
+        , context_(context)
+    {}
 
     bool compile(cet::Unit const& unit)
     {
@@ -100,23 +88,23 @@ struct ance::build::Compiler::Implementation
 
         cet->visit(unit);
 
-        (void) context_; // todo: use or remove
-        (void) source_tree_; // todo: use or remove
+        (void) context_;    // todo: use or remove
+        (void) source_tree_;// todo: use or remove
 
         return reporter_.isFailed();
     }
 
-private:
+  private:
     sources::SourceTree& source_tree_;
-    core::Reporter& reporter_;
-    core::Context& context_;
+    core::Reporter&      reporter_;
+    core::Context&       context_;
 };
 
-ance::build::Compiler::Compiler(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context) : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context)) {}
+ance::build::Compiler::Compiler(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
+{}
 
 ance::build::Compiler::~Compiler() = default;
 
 bool ance::build::Compiler::compile(cet::Unit const& unit)
-{
-    return implementation_->compile(unit);
-}
+{ return implementation_->compile(unit); }

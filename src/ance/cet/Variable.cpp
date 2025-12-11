@@ -7,46 +7,38 @@
 
 namespace ance::cet
 {
-    Variable::Variable(core::Identifier const& identifier, utility::Shared<bbt::Type> type, bool is_final, core::Location const& location)
-    : identifier_(identifier)
-    , type_(std::move(type))
-    , is_final_(is_final)
-    , location_(location)
+    Variable::Variable(core::Identifier const&    identifier,
+                       utility::Shared<bbt::Type> type,
+                       bool                       is_final,
+                       core::Location const&      location,
+                       bbt::TypeContext&          type_context)
+        : identifier_(identifier)
+        , type_(std::move(type))
+        , is_final_(is_final)
+        , location_(location)
+        , type_context_(type_context)
     {}
 
     core::Identifier const& Variable::name() const
-    {
-        return identifier_;
-    }
+    { return identifier_; }
 
     utility::Shared<bbt::Type> Variable::type()
-    {
-        return type_;
-    }
+    { return type_; }
 
     bbt::Type const& Variable::type() const
-    {
-        return *type_;
-    }
+    { return *type_; }
 
     bool Variable::isFinal() const
-    {
-        return is_final_;
-    }
+    { return is_final_; }
 
     core::Location const& Variable::location() const
-    {
-        return location_;
-    }
+    { return location_; }
 
     utility::Shared<bbt::Value> Variable::access()
     {
-        if (is_final_ && isDefined())
-        {
-            return value_.value();
-        }
+        if (is_final_ && isDefined()) { return value_.value(); }
 
-        return LReference::make(Address(*this));
+        return LReference::make(Address(*this), type_context_);
     }
 
     utility::Shared<bbt::Value> Variable::read(std::vector<size_t> const& indices)
@@ -67,7 +59,5 @@ namespace ance::cet
     }
 
     bool Variable::isDefined() const
-    {
-        return value_.hasValue();
-    }
+    { return value_.hasValue(); }
 }

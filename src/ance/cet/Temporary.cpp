@@ -7,13 +7,10 @@
 #include "ance/cet/Address.h"
 #include "ance/cet/ValueExtensions.h"
 
-ance::cet::Temporary::Temporary() : value_(bbt::Unit::make())
-{}
+ance::cet::Temporary::Temporary(bbt::TypeContext& type_context) : value_(bbt::Unit::make(type_context)), type_context_(type_context) {}
 
 ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::access()
-{
-    return LReference::make(Address(*this));
-}
+{ return LReference::make(Address(*this), type_context_); }
 
 ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::vector<size_t> const& indices)
 {
@@ -29,7 +26,11 @@ void ance::cet::Temporary::write(utility::Shared<bbt::Value> value, std::vector<
     value_ = std::move(value);
 }
 
+ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read()
+{ return read({}); }
+
+void ance::cet::Temporary::write(utility::Shared<bbt::Value> value)
+{ write(std::move(value), {}); }
+
 bool ance::cet::Temporary::isDefined() const
-{
-    return true;
-}
+{ return true; }
