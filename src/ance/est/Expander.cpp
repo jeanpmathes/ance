@@ -432,8 +432,9 @@ struct ance::est::Expander::Implementation
 
             result_.setExpression(
                 {.before = {},
-                 .center = utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location), access.location),
-                .after  = {}
+                 .center = utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location),
+                                                    access.location),
+                 .after  = {}
             });
         }
 
