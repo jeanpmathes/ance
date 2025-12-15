@@ -27,13 +27,18 @@ struct ance::est::Expander::Implementation
 
     class Result
     {
-    public:
-        void reset() { result_ = std::nullopt; }
+      public:
+        void reset()
+        { result_ = std::nullopt; }
 
-        void setFile(utility::Owned<File> file) { setResult(std::move(file)); }
-        void setDeclaration(utility::Owned<Statement> statement) { setResult(std::move(statement)); }
-        void setStatements(Statements statements) { setResult(std::move(statements)); }
-        void setExpression(Expansion expansion) { setResult(std::move(expansion)); }
+        void setFile(utility::Owned<File> file)
+        { setResult(std::move(file)); }
+        void setDeclaration(utility::Owned<Statement> statement)
+        { setResult(std::move(statement)); }
+        void setStatements(Statements statements)
+        { setResult(std::move(statements)); }
+        void setExpression(Expansion expansion)
+        { setResult(std::move(expansion)); }
 
         template<typename T>
         T take()
@@ -46,7 +51,7 @@ struct ance::est::Expander::Implementation
             return value;
         }
 
-    private:
+      private:
         using ResultVariant = std::variant<utility::Owned<File>, utility::Owned<Statement>, Statements, Expansion>;
 
         template<typename T>
@@ -100,8 +105,7 @@ struct ance::est::Expander::Implementation
 
         static void append(Statements& target, Statements&& source)
         {
-            target.insert(target.end(), make_move_iterator(source.begin()), make_move_iterator(source.end()));
-        }
+            target.insert(target.end(), make_move_iterator(source.begin()), make_move_iterator(source.end())); }
 
         static Statements makeStatements(utility::Owned<Statement> statement)
         {
@@ -140,8 +144,7 @@ struct ance::est::Expander::Implementation
         }
 
         void visit(ast::ErrorDeclaration const& error) override
-        {
-            result_.setDeclaration(utility::makeOwned<ErrorStatement>(error.location));
+        { result_.setDeclaration(utility::makeOwned<ErrorStatement>(error.location));
         }
 
         void visit(ast::RunnableDeclaration const& runnable) override
@@ -218,8 +221,7 @@ struct ance::est::Expander::Implementation
         }
 
         void visit(ast::ErrorStatement const& error_statement) override
-        {
-            result_.setStatements(makeStatements(utility::makeOwned<ErrorStatement>(error_statement.location)));
+        { result_.setStatements(makeStatements(utility::makeOwned<ErrorStatement>(error_statement.location)));
         }
 
         void visit(ast::Block const& block) override
@@ -397,8 +399,7 @@ struct ance::est::Expander::Implementation
         }
 
         void visit(ast::ErrorExpression const& error_expression) override
-        {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<ErrorExpression>(error_expression.location), .after = {}});
+        { result_.setExpression({.before = {}, .center = utility::makeOwned<ErrorExpression>(error_expression.location), .after = {}});
         }
 
         void visit(ast::Call const& call) override
@@ -433,42 +434,35 @@ struct ance::est::Expander::Implementation
             resolve_arguments.emplace_back(utility::makeOwned<CurrentScope>(access.location));
             resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(access.identifier, access.location));
 
-            result_.setExpression({
-                .before = {},
+            result_.setExpression(
+                {.before = {},
                 .center = utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location), access.location),
                 .after  = {}
             });
         }
 
         void visit(ast::Here const& here) override
-        {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<Here>(here.location), .after = {}});
-        }
+        { result_.setExpression({.before = {}, .center = utility::makeOwned<Here>(here.location), .after = {}}); }
 
         void visit(ast::UnitLiteral const& unit_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<UnitLiteral>(unit_literal.location), .after = {}});
-        }
+            result_.setExpression({.before = {}, .center = utility::makeOwned<UnitLiteral>(unit_literal.location), .after = {}}); }
 
         void visit(ast::SizeLiteral const& size_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<SizeLiteral>(size_literal.value, size_literal.location), .after = {}});
-        }
+            result_.setExpression({.before = {}, .center = utility::makeOwned<SizeLiteral>(size_literal.value, size_literal.location), .after = {}}); }
 
         void visit(ast::StringLiteral const& string_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<StringLiteral>(string_literal.value, string_literal.location), .after = {}});
-        }
+            result_.setExpression({.before = {}, .center = utility::makeOwned<StringLiteral>(string_literal.value, string_literal.location), .after = {}}); }
 
         void visit(ast::BoolLiteral const& bool_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<BoolLiteral>(bool_literal.value, bool_literal.location), .after = {}});
-        }
+            result_.setExpression({.before = {}, .center = utility::makeOwned<BoolLiteral>(bool_literal.value, bool_literal.location), .after = {}}); }
 
         void visit(ast::TypeLiteral const& type_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<TypeLiteral>(type_literal.type, type_literal.location), .after = {}});
-        }
+            result_.setExpression({.before = {}, .center = utility::makeOwned<TypeLiteral>(type_literal.type, type_literal.location), .after = {}}); }
 
         void visit(ast::UnaryOperation const& unary_operation) override
         {
