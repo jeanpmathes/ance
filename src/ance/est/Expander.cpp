@@ -104,8 +104,7 @@ struct ance::est::Expander::Implementation
         }
 
         static void append(Statements& target, Statements&& source)
-        {
-            target.insert(target.end(), make_move_iterator(source.begin()), make_move_iterator(source.end())); }
+        { target.insert(target.end(), make_move_iterator(source.begin()), make_move_iterator(source.end())); }
 
         static Statements makeStatements(utility::Owned<Statement> statement)
         {
@@ -144,8 +143,7 @@ struct ance::est::Expander::Implementation
         }
 
         void visit(ast::ErrorDeclaration const& error) override
-        { result_.setDeclaration(utility::makeOwned<ErrorStatement>(error.location));
-        }
+        { result_.setDeclaration(utility::makeOwned<ErrorStatement>(error.location)); }
 
         void visit(ast::RunnableDeclaration const& runnable) override
         {
@@ -221,8 +219,7 @@ struct ance::est::Expander::Implementation
         }
 
         void visit(ast::ErrorStatement const& error_statement) override
-        { result_.setStatements(makeStatements(utility::makeOwned<ErrorStatement>(error_statement.location)));
-        }
+        { result_.setStatements(makeStatements(utility::makeOwned<ErrorStatement>(error_statement.location))); }
 
         void visit(ast::Block const& block) override
         {
@@ -399,8 +396,7 @@ struct ance::est::Expander::Implementation
         }
 
         void visit(ast::ErrorExpression const& error_expression) override
-        { result_.setExpression({.before = {}, .center = utility::makeOwned<ErrorExpression>(error_expression.location), .after = {}});
-        }
+        { result_.setExpression({.before = {}, .center = utility::makeOwned<ErrorExpression>(error_expression.location), .after = {}}); }
 
         void visit(ast::Call const& call) override
         {
@@ -436,7 +432,7 @@ struct ance::est::Expander::Implementation
 
             result_.setExpression(
                 {.before = {},
-                .center = utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location), access.location),
+                 .center = utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location), access.location),
                 .after  = {}
             });
         }
