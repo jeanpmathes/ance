@@ -26,6 +26,8 @@ namespace ance
 {
     static int program(int const argc, char** argv)
     {
+        core::Reporter::print(std::cout, "Copyright (c) 2025 Jean Patrick Mathes");
+
         if (argc != 2)
         {
             core::Reporter::print(std::cout, "command", "Requires exactly one argument");
@@ -114,8 +116,7 @@ namespace ance
             }
             (void) result;
         }
-        provider.emplace_back(
-            utility::makeShared<bbt::Function>(
+        provider.emplace_back(utility::makeShared<bbt::Function>(
             bbt::Signature::like("print2b",
                                  bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getBool()),
                                  bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
@@ -138,8 +139,8 @@ namespace ance
             }
             (void) result;
         }
-        provider.emplace_back(
-            utility::makeShared<bbt::Function>(bbt::Signature::like("print1s", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString())),
+        provider.emplace_back(utility::makeShared<bbt::Function>(
+            bbt::Signature::like("print1s", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString())),
             runner.types().getUnit(),
             builder.build(),
             runner.types()));
@@ -158,10 +159,10 @@ namespace ance
             }
             (void) result;
         }
-        provider.emplace_back(
-            utility::makeShared<bbt::Function>(bbt::Signature::like("print2s",
-                                                                    bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString()),
-                                                                    bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
+        provider.emplace_back(utility::makeShared<bbt::Function>(
+            bbt::Signature::like("print2s",
+                                 bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString()),
+                                 bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
             runner.types().getUnit(),
             builder.build(),
             runner.types()));
@@ -180,10 +181,10 @@ namespace ance
             }
             (void) result;
         }
-        provider.emplace_back(
-            utility::makeShared<bbt::Function>(bbt::Signature::like("include",
-                                                                    bbt::Signature::Parameter(core::Identifier::like("file"), runner.types().getString()),
-                                                                    bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
+        provider.emplace_back(utility::makeShared<bbt::Function>(
+            bbt::Signature::like("include",
+                                 bbt::Signature::Parameter(core::Identifier::like("file"), runner.types().getString()),
+                                 bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
             runner.types().getUnit(),
             builder.build(),
             runner.types()));
@@ -203,9 +204,9 @@ namespace ance
 
         return exit_code;
 
-        // todo: refactor expander code
-
         // todo: move the definitions of functions from this file into another file
+
+        // todo: the reporter should print immediately if it does not do so already, instead of collecting messages and printing them later
 
         // todo: add the keyword types to the global scope so they can be found through resolution, adapt grammar to allow variable access in type expressions
         // todo: this means they can be removed as special cases of grammar, and the literal type enum can also be removed

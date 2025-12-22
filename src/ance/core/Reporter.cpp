@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include <boost/locale/encoding_utf.hpp>
 #include <boost/locale/boundary/index.hpp>
+#include <boost/locale/encoding_utf.hpp>
 #include <boost/regex/v5/unicode_iterator.hpp>
 
 #include <icu.h>
@@ -14,7 +14,7 @@ namespace ansi
 {
     inline auto ColorRed    = "\x1B[31m";
     inline auto ColorYellow = "\x1B[33m";
-    inline auto ColorBlue  = "\x1B[34m";
+    inline auto ColorBlue   = "\x1B[34m";
 
     inline auto ColorReset = "\x1B[0m";
 }
@@ -23,8 +23,7 @@ namespace text
 {
     static std::u32string_view trim(std::u32string_view const str, size_t& start)
     {
-        if (str.empty())
-            return str;
+        if (str.empty()) return str;
 
         size_t begin = str.find_first_not_of(U" \t");
         size_t end   = str.find_last_not_of(U" \t");
@@ -40,8 +39,7 @@ namespace text
 
     static size_t estimateWidth(std::u32string_view const& str)
     {
-        if (str.empty())
-            return 0;
+        if (str.empty()) return 0;
 
         size_t width = 0;
 
@@ -63,14 +61,18 @@ namespace text
             char32_t const code_point = *code_point_it;
 
             int const width_type = u_getIntPropertyValue(static_cast<UChar32>(code_point), UCHAR_EAST_ASIAN_WIDTH);
-            if ((width_type == U_EA_FULLWIDTH) || (width_type == U_EA_WIDE)) { width += 1; }
+            if ((width_type == U_EA_FULLWIDTH) || (width_type == U_EA_WIDE))
+            {
+                width += 1;
+            }
         }
 
         return width;
     }
 }
 
-struct ance::core::Reporter::Implementation {
+struct ance::core::Reporter::Implementation
+{
     enum class Level
     {
         INFO,
@@ -78,17 +80,14 @@ struct ance::core::Reporter::Implementation {
         ERROR
     };
 
-    struct Entry {
+    struct Entry
+    {
         Level    level_;
         Location location_;
 
         std::string message_;
 
-        Entry(Level const level, std::string message, Location const& location)
-            : level_(level)
-            , location_(location)
-            , message_(std::move(message))
-        {}
+        Entry(Level const level, std::string message, Location const& location) : level_(level), location_(location), message_(std::move(message)) {}
     };
 
     void report(Level level, std::string const& message, Location location)
@@ -144,7 +143,7 @@ struct ance::core::Reporter::Implementation {
                 size_t const length_to_mark = entry.location_.column() - start - 1;
                 size_t const length_of_mark = entry.location_.columnEnd() - entry.location_.column() + 1;
 
-                std::u32string_view const text_to_mark = line_view.substr(0, length_to_mark);
+                std::u32string_view const text_to_mark   = line_view.substr(0, length_to_mark);
                 std::u32string_view const text_with_mark = length_to_mark >= line_view.size() ? U"" : line_view.substr(length_to_mark, length_of_mark);
 
                 size_t const missing_to_mark   = length_to_mark - text_to_mark.size();
@@ -195,8 +194,14 @@ struct ance::core::Reporter::Implementation {
         return errorCount() > 0 || (warnings_as_errors && warningCount() > 0);
     }
 
-    [[nodiscard]] size_t errorCount() const { return error_count_; }
-    [[nodiscard]] size_t warningCount() const { return warning_count_; }
+    [[nodiscard]] size_t errorCount() const
+    {
+        return error_count_;
+    }
+    [[nodiscard]] size_t warningCount() const
+    {
+        return warning_count_;
+    }
 
   private:
     std::vector<Entry> entries_;
@@ -252,6 +257,11 @@ size_t ance::core::Reporter::errorCount() const
 size_t ance::core::Reporter::warningCount() const
 {
     return implementation_->warningCount();
+}
+
+void ance::core::Reporter::print(std::ostream& out, std::string const& message)
+{
+    out << "ance: " << message << std::endl;
 }
 
 void ance::core::Reporter::print(std::ostream& out, std::string const& prefix, std::string const& message)

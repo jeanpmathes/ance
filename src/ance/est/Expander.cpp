@@ -13,7 +13,10 @@
 struct ance::est::Expander::Implementation
 {
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
-        : source_tree_(source_tree), reporter_(reporter), parser_(source_tree, reporter, context), context_(context)
+        : source_tree_(source_tree)
+        , reporter_(reporter)
+        , parser_(source_tree, reporter, context)
+        , context_(context)
     {}
 
     using Statements = utility::List<utility::Owned<Statement>>;
@@ -29,16 +32,42 @@ struct ance::est::Expander::Implementation
     {
       public:
         void reset()
-        { result_ = std::nullopt; }
+        {
+            result_ = std::nullopt;
+        }
 
         void setFile(utility::Owned<File> file)
-        { setResult(std::move(file)); }
+        {
+            setResult(std::move(file));
+        }
+
         void setDeclaration(utility::Owned<Statement> statement)
-        { setResult(std::move(statement)); }
+        {
+            setResult(std::move(statement));
+        }
+
         void setStatements(Statements statements)
-        { setResult(std::move(statements)); }
+        {
+            setResult(std::move(statements));
+        }
+
+        void setStatements(utility::Owned<Statement> statement)
+        {
+            Statements statements;
+            statements.emplace_back(std::move(statement));
+            setResult(std::move(statements));
+        }
+
         void setExpression(Expansion expansion)
-        { setResult(std::move(expansion)); }
+        {
+            setResult(std::move(expansion));
+        }
+
+        void setExpression(utility::Owned<Expression> expression)
+        {
+            Expansion expansion = {.before = {}, .center = std::move(expression), .after = {}};
+            setResult(std::move(expansion));
+        }
 
         template<typename T>
         T take()
@@ -72,6 +101,107 @@ struct ance::est::Expander::Implementation
         explicit AST(core::Reporter& reporter) : reporter_(reporter) {}
         ~AST() override = default;
 
+        class SBuilder final
+        {
+          public:
+            explicit SBuilder(AST& ast) : ast_(ast) {}
+
+            [[nodiscard]] utility::Owned<Expression> pushExpansion(ast::Expression const& expression)
+            {
+                Expansion expansion = ast_.expand(expression);
+
+                append(statements_, std::move(expansion.before));
+                cleanup_statements_.emplace_back(std::move(expansion.after));
+
+                return std::move(expansion.center);
+            }
+
+            void pushExpansion(ast::Statement const& statement)
+            {
+                Statements expanded = ast_.expand(statement);
+                append(statements_, std::move(expanded));
+            }
+
+            void pushStatement(utility::Owned<Statement> statement)
+            {
+                statements_.emplace_back(std::move(statement));
+            }
+
+            Temporary const& pushTemporary(utility::Optional<utility::Owned<Expression>> definition, core::Location const& location)
+            {
+                utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(std::move(definition), location);
+                Temporary const&          tmp       = *temporary;
+                statements_.emplace_back(std::move(temporary));
+                return tmp;
+            }
+
+            Statements&& take()
+            {
+                for (size_t index = cleanup_statements_.size(); index > 0; index--)
+                {
+                    append(statements_, std::move(cleanup_statements_[index - 1]));
+                }
+
+                cleanup_statements_.clear();
+
+                return std::move(statements_);
+            }
+
+            void reset()
+            {
+                statements_.clear();
+                cleanup_statements_.clear();
+            }
+
+          private:
+            AST& ast_;
+
+            Statements                statements_;
+            utility::List<Statements> cleanup_statements_;
+        };
+
+        class EBuilder final
+        {
+          public:
+            explicit EBuilder(AST& ast) : ast_(ast) {}
+
+            [[nodiscard]] utility::Owned<Expression> pushExpansion(ast::Expression const& expression)
+            {
+                Expansion expansion = ast_.expand(expression);
+
+                append(before_, std::move(expansion.before));
+                after_.emplace_back(std::move(expansion.after));
+
+                return std::move(expansion.center);
+            }
+
+            Expansion take(utility::Owned<Expression> expression)
+            {
+                Statements after;
+                for (size_t index = after_.size(); index > 0; index--)
+                {
+                    append(after, std::move(after_[index - 1]));
+                }
+
+                Expansion expansion = {
+                    .before = std::move(before_),
+                    .center = std::move(expression),
+                    .after  = std::move(after),
+                };
+
+                before_.clear();
+                after_.clear();
+
+                return expansion;
+            }
+
+          private:
+            AST& ast_;
+
+            Statements                before_;
+            utility::List<Statements> after_;
+        };
+
         utility::Owned<File> expand(ast::File const& file)
         {
             result_.reset();
@@ -104,18 +234,24 @@ struct ance::est::Expander::Implementation
         }
 
         static void append(Statements& target, Statements&& source)
-        { target.insert(target.end(), make_move_iterator(source.begin()), make_move_iterator(source.end())); }
-
-        static Statements makeStatements(utility::Owned<Statement> statement)
         {
-            Statements statements;
-            statements.emplace_back(std::move(statement));
-            return statements;
+            target.insert(target.end(), make_move_iterator(source.begin()), make_move_iterator(source.end()));
+        }
+
+        template<typename... Args>
+        static utility::Owned<Expression> intrinsic(core::Intrinsic const& called, core::Location const& source_location, Args&&... args)
+        {
+            utility::List<utility::Owned<Expression>> arguments;
+            (arguments.emplace_back(std::forward<Args>(args)), ...);
+            return utility::makeOwned<Intrinsic>(called, std::move(arguments), source_location);
         }
 
         static utility::Owned<Statement> wrap(Statements&& statements)
         {
-            if (statements.empty()) { return utility::makeOwned<Pass>(core::Location::global()); }
+            if (statements.empty())
+            {
+                return utility::makeOwned<Pass>(core::Location::global());
+            }
 
             if (statements.size() == 1 && statements.front()->isCompound())
             {
@@ -124,7 +260,10 @@ struct ance::est::Expander::Implementation
 
             core::Location location = statements.front()->location;
 
-            for (auto& statement : statements) { location.extend(statement->location); }
+            for (auto& statement : statements)
+            {
+                location.extend(statement->location);
+            }
 
             return utility::makeOwned<Block>(std::move(statements), location);
         }
@@ -143,349 +282,285 @@ struct ance::est::Expander::Implementation
         }
 
         void visit(ast::ErrorDeclaration const& error) override
-        { result_.setDeclaration(utility::makeOwned<ErrorStatement>(error.location)); }
+        {
+            result_.setDeclaration(utility::makeOwned<ErrorStatement>(error.location));
+        }
 
         void visit(ast::RunnableDeclaration const& runnable) override
         {
-            Statements statements = expand(*runnable.body);
-
-            result_.setDeclaration(wrap(std::move(statements)));
+            result_.setDeclaration(wrap(expand(*runnable.body)));
         }
 
         void visit(ast::VariableDeclaration const& variable_declaration) override
         {
-            Statements statements;
+            SBuilder builder(*this);
 
-            Expansion type_expansion = expand(*variable_declaration.type);
+            utility::Owned<Expression> type = builder.pushExpansion(*variable_declaration.type);
 
-            append(statements, std::move(type_expansion.before));
+            utility::Owned<Expression> parent_scope =
+                intrinsic(core::GetParent::instance(), variable_declaration.location, utility::makeOwned<CurrentScope>(variable_declaration.location));
 
-            utility::List<utility::Owned<Expression>> parent_arguments;
-            parent_arguments.emplace_back(utility::makeOwned<CurrentScope>(variable_declaration.location));
-
-            utility::Owned<Expression> parent_scope = utility::makeOwned<Intrinsic>(
-                core::GetParent::instance(), std::move(parent_arguments), variable_declaration.location);
-
-            utility::Owned<Temporary> temporary_type = utility::makeOwned<Temporary>(std::move(type_expansion.center), variable_declaration.location);
-            Temporary const&        tmp_type       = *temporary_type;
-            statements.emplace_back(std::move(temporary_type));
+            Temporary const& tmp_type = builder.pushTemporary(std::move(type), variable_declaration.location);
 
             // We need to go through the initializer expression first, otherwise the name would already be declared.
             // If we then yield in the initializer other run points could access the undefined variable.
 
             Temporary const* tmp_initial_value;
-            Statements initial_value_after_statements;
 
             if (variable_declaration.value.hasValue())
             {
-                Expansion value_expansion = expand(**variable_declaration.value);
-
-                append(statements, std::move(value_expansion.before));
-
-                utility::Owned<Temporary> temporary_value = utility::makeOwned<Temporary>(std::move(value_expansion.center), variable_declaration.location);
-                tmp_initial_value = temporary_value.get();
-                statements.emplace_back(std::move(temporary_value));
-
-                initial_value_after_statements = std::move(value_expansion.after);
+                utility::Owned<Expression> value = builder.pushExpansion(**variable_declaration.value);
+                tmp_initial_value                = &builder.pushTemporary(std::move(value), variable_declaration.location);
             }
             else
             {
-                utility::Owned<Temporary> temporary_value = utility::makeOwned<Temporary>(utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location), variable_declaration.location), variable_declaration.location);
-                tmp_initial_value = temporary_value.get();
-                statements.emplace_back(std::move(temporary_value));
+                tmp_initial_value = &builder.pushTemporary(
+                    utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location), variable_declaration.location),
+                    variable_declaration.location);
             }
 
-            utility::List<utility::Owned<Expression>> declare_arguments;
-            declare_arguments.emplace_back(std::move(parent_scope));
-            declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(variable_declaration.identifier, variable_declaration.location));
-            declare_arguments.emplace_back(utility::makeOwned<BoolLiteral>(variable_declaration.assigner.isFinal(), variable_declaration.location));
-            declare_arguments.emplace_back(utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location));
+            utility::Owned<Expression> declared =
+                intrinsic(core::Declare::instance(),
+                          variable_declaration.location,
+                          std::move(parent_scope),
+                          utility::makeOwned<IdentifierCapture>(variable_declaration.identifier, variable_declaration.location),
+                          utility::makeOwned<BoolLiteral>(variable_declaration.assigner.isFinal(), variable_declaration.location),
+                          utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location));
 
-            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(
-                utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), variable_declaration.location),
-                variable_declaration.location);
-            Temporary const& tmp_entity = *temporary_entity;
-            statements.emplace_back(std::move(temporary_entity));
+            Temporary const& tmp_entity = builder.pushTemporary(std::move(declared), variable_declaration.location);
 
-            statements.emplace_back(utility::makeOwned<Write>(
-                    utility::makeOwned<ReadTemporary>(tmp_entity, variable_declaration.location),
-                    utility::makeOwned<ReadTemporary>(*tmp_initial_value, variable_declaration.location),
-                    variable_declaration.location));
+            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, variable_declaration.location),
+                                                            utility::makeOwned<ReadTemporary>(*tmp_initial_value, variable_declaration.location),
+                                                            variable_declaration.location));
 
-            append(statements, std::move(initial_value_after_statements));
-            append(statements, std::move(type_expansion.after));
-
-            result_.setDeclaration(wrap(std::move(statements)));
+            result_.setDeclaration(wrap(builder.take()));
         }
 
         void visit(ast::ErrorStatement const& error_statement) override
-        { result_.setStatements(makeStatements(utility::makeOwned<ErrorStatement>(error_statement.location))); }
+        {
+            result_.setStatements(utility::makeOwned<ErrorStatement>(error_statement.location));
+        }
 
         void visit(ast::Block const& block) override
         {
-            Statements statements;
+            SBuilder builder(*this);
 
             for (auto& statement : block.statements)
             {
-                Statements expanded = expand(*statement);
-                append(statements, std::move(expanded));
+                builder.pushExpansion(*statement);
             }
 
-            result_.setStatements(makeStatements(utility::makeOwned<Block>(std::move(statements), block.location)));
+            result_.setStatements(utility::makeOwned<Block>(builder.take(), block.location));
         }
 
         void visit(ast::Independent const& independent) override
         {
-            Statements statements;
+            SBuilder builder(*this);
 
-            Expansion expansion = expand(*independent.expression);
+            utility::Owned<Expression> expression = builder.pushExpansion(*independent.expression);
+            builder.pushStatement(utility::makeOwned<Independent>(std::move(expression), independent.location));
 
-            append(statements, std::move(expansion.before));
-            statements.emplace_back(utility::makeOwned<Independent>(std::move(expansion.center), independent.location));
-            append(statements, std::move(expansion.after));
-
-            result_.setStatements(std::move(statements));
+            result_.setStatements(builder.take());
         }
 
         void visit(ast::Let const& let) override
         {
-            Statements statements;
+            SBuilder builder(*this);
 
-            Expansion type_expansion = expand(*let.type);
-
-            append(statements, std::move(type_expansion.before));
-
-            utility::Owned<Temporary> temporary_type = utility::makeOwned<Temporary>(std::move(type_expansion.center), let.location);
-            Temporary const&        tmp_type       = *temporary_type;
-            statements.emplace_back(std::move(temporary_type));
+            utility::Owned<Expression> type     = builder.pushExpansion(*let.type);
+            Temporary const&           tmp_type = builder.pushTemporary(std::move(type), let.location);
 
             Temporary const* tmp_initial_value;
-            Statements after;
 
             if (let.value.hasValue())
             {
-                Expansion expansion = expand(**let.value);
-
-                append(statements, std::move(expansion.before));
-
-                utility::Owned<Temporary> temporary_value = utility::makeOwned<Temporary>(std::move(expansion.center), let.location);
-                tmp_initial_value = temporary_value.get();
-                statements.emplace_back(std::move(temporary_value));
-
-                after = std::move(expansion.after);
+                utility::Owned<Expression> value = builder.pushExpansion(**let.value);
+                tmp_initial_value                = &builder.pushTemporary(std::move(value), let.location);
             }
             else
             {
-                utility::Owned<Temporary> temporary_value = utility::makeOwned<Temporary>(utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, let.location), let.location), let.location);
-                tmp_initial_value = temporary_value.get();
-                statements.emplace_back(std::move(temporary_value));
+                tmp_initial_value =
+                    &builder.pushTemporary(utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, let.location), let.location), let.location);
             }
 
-            utility::List<utility::Owned<Expression>> declare_arguments;
-            declare_arguments.emplace_back(utility::makeOwned<CurrentScope>(let.location));
-            declare_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(let.identifier, let.location));
-            declare_arguments.emplace_back(utility::makeOwned<BoolLiteral>(let.assigner.isFinal(), let.location));
-            declare_arguments.emplace_back(utility::makeOwned<ReadTemporary>(tmp_type, let.location));
-            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Declare::instance(), std::move(declare_arguments), let.location), let.location); // todo: the core::Declare feels kinda ugly because it does not show it to be an intrinsic
-            Temporary const& tmp_entity = *temporary_entity;
-            statements.emplace_back(std::move(temporary_entity));
+            utility::Owned<Expression> declared =
+                intrinsic(core::Declare::instance(),
+                          let.location,// todo: the core::Declare feels kinda ugly because it does not show it to be an intrinsic
+                          utility::makeOwned<CurrentScope>(let.location),
+                          utility::makeOwned<IdentifierCapture>(let.identifier, let.location),
+                          utility::makeOwned<BoolLiteral>(let.assigner.isFinal(), let.location),
+                          utility::makeOwned<ReadTemporary>(tmp_type, let.location));
 
-            statements.emplace_back(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, let.location),
-                                                                utility::makeOwned<ReadTemporary>(*tmp_initial_value, let.location),
-                                                                 let.location));
+            Temporary const& tmp_entity = builder.pushTemporary(std::move(declared), let.location);
 
-            append(statements, std::move(after));
-            append(statements, std::move(type_expansion.after));
+            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, let.location),
+                                                            utility::makeOwned<ReadTemporary>(*tmp_initial_value, let.location),
+                                                            let.location));
 
-            result_.setStatements(std::move(statements));
+            result_.setStatements(builder.take());
         }
 
         void visit(ast::Assignment const& assignment) override
         {
-            Statements statements;
+            SBuilder builder(*this);
 
-            Expansion expansion = expand(*assignment.value);
+            utility::Owned<Expression> value = builder.pushExpansion(*assignment.value);
 
-            append(statements, std::move(expansion.before));
+            utility::Owned<Expression> resolved = intrinsic(core::Resolve::instance(),
+                                                            assignment.location,
+                                                            utility::makeOwned<CurrentScope>(assignment.location),
+                                                            utility::makeOwned<IdentifierCapture>(assignment.identifier, assignment.location));
 
-            utility::List<utility::Owned<Expression>> resolve_arguments;
-            resolve_arguments.emplace_back(utility::makeOwned<CurrentScope>(assignment.location));
-            resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(assignment.identifier, assignment.location));
-            utility::Owned<Temporary> temporary_entity = utility::makeOwned<Temporary>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), assignment.location), assignment.location);
-            Temporary const& tmp_entity = *temporary_entity;
-            statements.emplace_back(std::move(temporary_entity));
+            Temporary const& tmp_entity = builder.pushTemporary(std::move(resolved), assignment.location);
 
-            statements.emplace_back(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, assignment.location), std::move(expansion.center), assignment.location));
+            builder.pushStatement(
+                utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, assignment.location), std::move(value), assignment.location));
 
-            append(statements, std::move(expansion.after));
-
-            result_.setStatements(std::move(statements));
+            result_.setStatements(builder.take());
         }
 
         void visit(ast::If const& if_statement) override
         {
-            Statements statements;
+            SBuilder builder(*this);
 
-            Expansion condition_expansion = expand(*if_statement.condition);
-            append(statements, std::move(condition_expansion.before));
+            utility::Owned<Expression> condition = builder.pushExpansion(*if_statement.condition);
 
             Statements true_statements  = expand(*if_statement.true_part);
             Statements false_statements = if_statement.false_part.hasValue() ? expand(**if_statement.false_part) : Statements();
 
-            statements.emplace_back(utility::makeOwned<If>(std::move(condition_expansion.center),
-                                                           wrap(std::move(true_statements)),
-                                                           wrap(std::move(false_statements)),
-                                                           if_statement.location));
+            builder.pushStatement(
+                utility::makeOwned<If>(std::move(condition), wrap(std::move(true_statements)), wrap(std::move(false_statements)), if_statement.location));
 
-            append(statements, std::move(condition_expansion.after));
-
-            result_.setStatements(std::move(statements));
+            result_.setStatements(builder.take());
         }
 
         void visit(ast::Loop const& loop) override
         {
-            Statements statements;
-
-            Statements block = expand(*loop.body);
-            statements.emplace_back(utility::makeOwned<Loop>(wrap(std::move(block)), loop.location));
-
-            result_.setStatements(std::move(statements));
+            result_.setStatements(utility::makeOwned<Loop>(wrap(expand(*loop.body)), loop.location));
         }
 
         void visit(ast::Break const& break_statement) override
         {
-            Statements statements;
-            statements.emplace_back(utility::makeOwned<Break>(break_statement.location));
-            result_.setStatements(std::move(statements));
+            result_.setStatements(utility::makeOwned<Break>(break_statement.location));
         }
 
         void visit(ast::Continue const& continue_statement) override
         {
-            Statements statements;
-            statements.emplace_back(utility::makeOwned<Continue>(continue_statement.location));
-            result_.setStatements(std::move(statements));
+            result_.setStatements(utility::makeOwned<Continue>(continue_statement.location));
         }
 
         void visit(ast::While const& while_statement) override
         {
-            Statements loop_body;
+            SBuilder builder(*this);
 
-            Expansion condition = expand(*while_statement.condition);
+            {
+                SBuilder exit_builder(*this);
 
-            Statements exit_body;
+                utility::Owned<Expression> condition     = exit_builder.pushExpansion(*while_statement.condition);
+                Temporary const&           tmp_condition = exit_builder.pushTemporary(std::move(condition), while_statement.location);
 
-            append(exit_body, std::move(condition.before));
-            utility::Owned<Temporary> temporary_condition = utility::makeOwned<Temporary>(std::move(condition.center), while_statement.location);
-            Temporary const& tmp_condition = *temporary_condition;
-            exit_body.emplace_back(std::move(temporary_condition));
-            append(exit_body, std::move(condition.after));
+                exit_builder.pushStatement(utility::makeOwned<If>(
+                    utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT,
+                                                       utility::makeOwned<ReadTemporary>(tmp_condition, while_statement.condition->location),
+                                                       while_statement.location),
+                    utility::makeOwned<Break>(while_statement.location),
+                    utility::makeOwned<Pass>(while_statement.location),
+                    while_statement.location));
 
-            exit_body.emplace_back(utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, utility::makeOwned<ReadTemporary>(tmp_condition, while_statement.condition->location), while_statement.location),
-                     utility::makeOwned<Break>(while_statement.location),
-                     utility::makeOwned<Pass>(while_statement.location),
-                     while_statement.location));
+                builder.pushStatement(utility::makeOwned<Block>(exit_builder.take(), while_statement.location));
+            }
 
-            loop_body.emplace_back(utility::makeOwned<Block>(std::move(exit_body), while_statement.location));
+            builder.pushExpansion(*while_statement.body);
 
-            Statements inner_body = expand(*while_statement.body);
-            append(loop_body, std::move(inner_body));
-
-            Statements statements;
-            statements.emplace_back(utility::makeOwned<Loop>(wrap(std::move(loop_body)), while_statement.location));
-            result_.setStatements(std::move(statements));
+            result_.setStatements(utility::makeOwned<Loop>(wrap(builder.take()), while_statement.location));
         }
 
         void visit(ast::ErrorExpression const& error_expression) override
-        { result_.setExpression({.before = {}, .center = utility::makeOwned<ErrorExpression>(error_expression.location), .after = {}}); }
+        {
+            result_.setExpression(utility::makeOwned<ErrorExpression>(error_expression.location));
+        }
 
         void visit(ast::Call const& call) override
         {
-            Statements before;
-            Statements after;
+            EBuilder builder(*this);
 
             utility::List<utility::Owned<Expression>> arguments;
             for (auto& argument : call.arguments)
             {
-                Expansion expansion = expand(*argument);
-
-                append(before, std::move(expansion.before));
-                arguments.emplace_back(std::move(expansion.center));
-                append(after, std::move(expansion.after)); // todo: maybe prepend?
+                arguments.emplace_back(builder.pushExpansion(*argument));
             }
 
-            utility::List<utility::Owned<Expression>> resolve_arguments;
-            resolve_arguments.emplace_back(utility::makeOwned<CurrentScope>(call.location));
-            resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(call.identifier, call.location));
+            utility::Owned<Expression> resolved = intrinsic(core::Resolve::instance(),
+                                                            call.location,
+                                                            utility::makeOwned<CurrentScope>(call.location),
+                                                            utility::makeOwned<IdentifierCapture>(call.identifier, call.location));
 
-            result_.setExpression({
-                .before = std::move(before),
-                .center = utility::makeOwned<Call>(utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), call.identifier.location()), call.identifier.location()), std::move(arguments), call.location),
-                .after  = std::move(after),
-            });
+            result_.setExpression(builder.take(
+                utility::makeOwned<Call>(utility::makeOwned<Read>(std::move(resolved), call.identifier.location()), std::move(arguments), call.location)));
         }
 
         void visit(ast::Access const& access) override
         {
-            utility::List<utility::Owned<Expression>> resolve_arguments;
-            resolve_arguments.emplace_back(utility::makeOwned<CurrentScope>(access.location));
-            resolve_arguments.emplace_back(utility::makeOwned<IdentifierCapture>(access.identifier, access.location));
+            utility::Owned<Expression> resolved = intrinsic(core::Resolve::instance(), access.location,
+                                                            utility::makeOwned<CurrentScope>(access.location),
+                                                            utility::makeOwned<IdentifierCapture>(access.identifier, access.location));
 
-            result_.setExpression(
-                {.before = {},
-                 .center = utility::makeOwned<Read>(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), access.location),
-                                                    access.location),
-                 .after  = {}
-            });
+            result_.setExpression(utility::makeOwned<Read>(std::move(resolved), access.location));
         }
 
         void visit(ast::Here const& here) override
-        { result_.setExpression({.before = {}, .center = utility::makeOwned<Here>(here.location), .after = {}}); }
+        {
+            result_.setExpression(utility::makeOwned<Here>(here.location));
+        }
 
         void visit(ast::UnitLiteral const& unit_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<UnitLiteral>(unit_literal.location), .after = {}}); }
+            result_.setExpression(utility::makeOwned<UnitLiteral>(unit_literal.location));
+        }
 
         void visit(ast::SizeLiteral const& size_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<SizeLiteral>(size_literal.value, size_literal.location), .after = {}}); }
+            result_.setExpression(utility::makeOwned<SizeLiteral>(size_literal.value, size_literal.location));
+        }
 
         void visit(ast::StringLiteral const& string_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<StringLiteral>(string_literal.value, string_literal.location), .after = {}}); }
+            result_.setExpression(utility::makeOwned<StringLiteral>(string_literal.value, string_literal.location));
+        }
 
         void visit(ast::BoolLiteral const& bool_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<BoolLiteral>(bool_literal.value, bool_literal.location), .after = {}}); }
+            result_.setExpression(utility::makeOwned<BoolLiteral>(bool_literal.value, bool_literal.location));
+        }
 
         void visit(ast::TypeLiteral const& type_literal) override
         {
-            result_.setExpression({.before = {}, .center = utility::makeOwned<TypeLiteral>(type_literal.type, type_literal.location), .after = {}}); }
+            result_.setExpression(utility::makeOwned<TypeLiteral>(type_literal.type, type_literal.location));
+        }
 
         void visit(ast::UnaryOperation const& unary_operation) override
         {
-            Expansion operand = expand(*unary_operation.operand);
+            EBuilder builder(*this);
 
-            result_.setExpression({
-                .before = std::move(operand.before),
-                .center = utility::makeOwned<UnaryOperation>(unary_operation.op, std::move(operand.center), unary_operation.location),
-                .after  = std::move(operand.after),
-            });
+            utility::Owned<Expression> operand = builder.pushExpansion(*unary_operation.operand);
+
+            result_.setExpression(builder.take(utility::makeOwned<UnaryOperation>(unary_operation.op, std::move(operand), unary_operation.location)));
         }
 
       private:
-        Result          result_;
         core::Reporter& reporter_;
+        Result          result_;
     };
 
-    utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file) // todo: reduce duplication with below (template)
+    utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (template)
     {
-        (void)source_tree_;//todo: use or remove
+        (void) source_tree_;//todo: use or remove
 
         utility::Optional<utility::Owned<ast::Statement>> parsed = parser_.parseOrderedFile(file);
         if (!parsed.hasValue()) return std::nullopt;
 
-        utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
-        Statements statements = ast->expand(**parsed);
+        utility::Owned<AST> ast        = utility::makeOwned<AST>(reporter_);
+        Statements          statements = ast->expand(**parsed);
 
         if (reporter_.isFailed()) return std::nullopt;
 
@@ -501,7 +576,7 @@ struct ance::est::Expander::Implementation
         utility::Optional<utility::Owned<ast::File>> parsed = parser_.parseUnorderedFile(file);
         if (!parsed.hasValue()) return std::nullopt;
 
-        utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
+        utility::Owned<AST>  ast = utility::makeOwned<AST>(reporter_);
         utility::Owned<File> est = ast->expand(**parsed);
 
         if (reporter_.isFailed()) return std::nullopt;
@@ -513,9 +588,9 @@ struct ance::est::Expander::Implementation
 
   private:
     sources::SourceTree& source_tree_;
-    core::Reporter& reporter_;
-    ast::Parser     parser_;
-    core::Context& context_;
+    core::Reporter&      reporter_;
+    ast::Parser          parser_;
+    core::Context&       context_;
 };
 
 ance::est::Expander::Expander(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)

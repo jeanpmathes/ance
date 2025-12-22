@@ -17,7 +17,7 @@ namespace ance::core
     /// Serves to report errors and warnings.
     class Reporter
     {
-    public:
+      public:
         Reporter();
         ~Reporter();
 
@@ -60,6 +60,12 @@ namespace ance::core
         /// \return The warning count.
         [[nodiscard]] size_t warningCount() const;
 
+        /// Print a message to the given output stream.
+        /// It uses the formatting of the reporter.
+        /// \param out The output stream to print to.
+        /// \param message The message to print.
+        static void print(std::ostream& out, std::string const& message);
+
         /// Print a message to the given output stream with the given prefix.
         /// It uses the formatting of the reporter.
         /// \param out The output stream to print to.
@@ -67,7 +73,7 @@ namespace ance::core
         /// \param message The message to print.
         static void print(std::ostream& out, std::string const& prefix, std::string const& message);
 
-    private:
+      private:
         struct Implementation;
         utility::Owned<Implementation> implementation_;
     };
