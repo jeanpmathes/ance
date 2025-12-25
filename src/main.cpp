@@ -8,19 +8,16 @@
 #include "ance/ast/Node.h"
 #include "ance/ast/Parser.h"
 
-#include "ance/bbt/FlowBuilder.h"
 #include "ance/bbt/Function.h"
-#include "ance/bbt/Node.h"
-#include "ance/bbt/Signature.h"
 #include "ance/bbt/Type.h"
-#include "ance/bbt/Value.h"
-#include "ance/core/Intrinsic.h"
 
 #include "ance/cet/Node.h"
 #include "ance/cet/Provider.h"
 #include "ance/cet/Runner.h"
 
 #include "ance/build/Compiler.h"
+
+#include "CoreDefinitions.h"
 
 namespace ance
 {
@@ -64,132 +61,7 @@ namespace ance
         cet::Runner     runner {source_tree, reporter, context};
         build::Compiler compiler {source_tree, reporter, context};// todo: consider using the runner internally
 
-        utility::List<utility::Shared<bbt::Function>> provider;// todo: remove / improve the functions
-        bbt::FlowBuilder                              builder(core::Location::global(), runner.types());
-
-        builder.setActiveBasicBlock(builder.createBasicBlock());
-        {
-            bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
-
-            bbt::Temporary const& str_value = builder.pushTemporary();
-            {
-                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-                args.emplace_back(value);
-                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::B2Str::instance(), std::move(args), str_value, core::Location::global()));
-            }
-
-            bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
-
-            bbt::Temporary const& result = builder.pushTemporary();
-            {
-                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-                args.emplace_back(str_value);
-                args.emplace_back(location);
-                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
-            }
-            (void) result;
-        }
-        provider.emplace_back(utility::makeShared<bbt::Function>(
-            bbt::Signature::like("print1b", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getBool())),
-            runner.types().getUnit(),
-            builder.build(),
-            runner.types()));
-
-        builder.setActiveBasicBlock(builder.createBasicBlock());
-        {
-            bbt::Temporary const& value    = builder.pushVariableRead(core::Identifier::like("value"));
-            bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
-
-            bbt::Temporary const& str_value = builder.pushTemporary();
-            {
-                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-                args.emplace_back(value);
-                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::B2Str::instance(), std::move(args), str_value, core::Location::global()));
-            }
-
-            bbt::Temporary const& result = builder.pushTemporary();
-            {
-                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-                args.emplace_back(str_value);
-                args.emplace_back(location);
-                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
-            }
-            (void) result;
-        }
-        provider.emplace_back(utility::makeShared<bbt::Function>(
-            bbt::Signature::like("print2b",
-                                 bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getBool()),
-                                 bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
-            runner.types().getUnit(),
-            builder.build(),
-            runner.types()));
-
-        builder.setActiveBasicBlock(builder.createBasicBlock());
-        {
-            bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
-
-            bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
-
-            bbt::Temporary const& result = builder.pushTemporary();
-            {
-                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-                args.emplace_back(value);
-                args.emplace_back(location);
-                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
-            }
-            (void) result;
-        }
-        provider.emplace_back(utility::makeShared<bbt::Function>(
-            bbt::Signature::like("print1s", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString())),
-            runner.types().getUnit(),
-            builder.build(),
-            runner.types()));
-
-        builder.setActiveBasicBlock(builder.createBasicBlock());
-        {
-            bbt::Temporary const& value    = builder.pushVariableRead(core::Identifier::like("value"));
-            bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
-
-            bbt::Temporary const& result = builder.pushTemporary();
-            {
-                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-                args.emplace_back(value);
-                args.emplace_back(location);
-                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
-            }
-            (void) result;
-        }
-        provider.emplace_back(utility::makeShared<bbt::Function>(
-            bbt::Signature::like("print2s",
-                                 bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString()),
-                                 bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
-            runner.types().getUnit(),
-            builder.build(),
-            runner.types()));
-
-        builder.setActiveBasicBlock(builder.createBasicBlock());
-        {
-            bbt::Temporary const& file     = builder.pushVariableRead(core::Identifier::like("file"));
-            bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
-
-            bbt::Temporary const& result = builder.pushTemporary();
-            {
-                utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-                args.emplace_back(file);
-                args.emplace_back(location);
-                builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Include::instance(), std::move(args), result, core::Location::global()));
-            }
-            (void) result;
-        }
-        provider.emplace_back(utility::makeShared<bbt::Function>(
-            bbt::Signature::like("include",
-                                 bbt::Signature::Parameter(core::Identifier::like("file"), runner.types().getString()),
-                                 bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
-            runner.types().getUnit(),
-            builder.build(),
-            runner.types()));
-
-        runner.add(cet::Provider::fromList(std::move(provider)));
+        defineCoreLanguage(runner);
 
         int exit_code = EXIT_FAILURE;
 
@@ -203,10 +75,6 @@ namespace ance
         reporter.report(source_tree, out);
 
         return exit_code;
-
-        // todo: move the definitions of functions from this file into another file
-
-        // todo: the reporter should print immediately if it does not do so already, instead of collecting messages and printing them later
 
         // todo: add the keyword types to the global scope so they can be found through resolution, adapt grammar to allow variable access in type expressions
         // todo: this means they can be removed as special cases of grammar, and the literal type enum can also be removed

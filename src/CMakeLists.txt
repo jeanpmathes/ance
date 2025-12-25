@@ -3,7 +3,7 @@ add_executable(ance)
 add_subdirectory(ance)
 add_subdirectory(grammar)
 
-target_sources(ance PRIVATE main.cpp)
+target_sources(ance PRIVATE main.cpp CoreDefinitions.cpp)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reserved-macro-identifier -Wno-unused-macros")
 

@@ -501,7 +501,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Access const& access) override
         {
-            utility::Owned<Expression> resolved = intrinsic(core::Resolve::instance(), access.location,
+            utility::Owned<Expression> resolved = intrinsic(core::Resolve::instance(),
+                                                            access.location,
                                                             utility::makeOwned<CurrentScope>(access.location),
                                                             utility::makeOwned<IdentifierCapture>(access.identifier, access.location));
 

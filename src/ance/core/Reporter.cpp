@@ -93,7 +93,6 @@ struct ance::core::Reporter::Implementation
     void report(Level level, std::string const& message, Location location)
     {
         if (level == Level::ERROR) error_count_++;
-
         if (level == Level::WARNING) warning_count_++;
 
         entries_.emplace_back(level, message, location);
