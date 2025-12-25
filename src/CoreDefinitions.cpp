@@ -12,7 +12,7 @@
 #include "ance/cet/Provider.h"
 #include "ance/cet/Runner.h"
 
-void ance::defineCoreLanguage(cet::Runner& runner)
+void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 {
     utility::List<utility::Shared<bbt::Function>> provider;// todo: remove / improve the functions
     bbt::FlowBuilder                              builder(core::Location::global(), runner.types());

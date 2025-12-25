@@ -5,7 +5,6 @@
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
 #include "ance/core/AccessModifier.h"
-#include "ance/core/LiteralType.h"
 #include "ance/core/Assigner.h"
 
 #include "ance/utility/Containers.h"
@@ -287,16 +286,6 @@ namespace ance::ast
         bool value;
     };
 
-    /// A type literal.
-    struct TypeLiteral final
-        : Expression
-        , utility::ConcreteNode<TypeLiteral, Visitor>
-    {
-        TypeLiteral(core::LiteralType value, core::Location const& source_location);
-
-        core::LiteralType type;
-    };
-
     /// An expression that resolves to its own source location.
     struct Here final
         : Expression
@@ -347,7 +336,6 @@ namespace ance::ast
         virtual void visit(SizeLiteral const& size_literal) = 0;
         virtual void visit(StringLiteral const& string_literal) = 0;
         virtual void visit(BoolLiteral const& bool_literal) = 0;
-        virtual void visit(TypeLiteral const& type_literal) = 0;
         virtual void visit(Here const& here)             = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
     };

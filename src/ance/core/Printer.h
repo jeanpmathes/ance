@@ -3,9 +3,7 @@
 
 #include <ostream>
 
-#include "ance/utility/Owners.h"
 #include "ance/core/Identifier.h"
-#include "ance/core/LiteralType.h"
 #include "ance/core/AccessModifier.h"
 #include "ance/core/UnaryOperator.h"
 #include "ance/core/Assigner.h"
@@ -40,9 +38,6 @@ namespace ance::core
 
         /// Print an assigner to the output stream.
         void print(Assigner assigner);
-
-        /// Print a literal type to the output stream.
-        void print(LiteralType literal_type);
 
         /// Print an intrinsic to the output stream.
         void print(Intrinsic const& intrinsic);

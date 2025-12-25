@@ -12,7 +12,6 @@
 
 #include "ance/core/Identifier.h"
 #include "ance/core/UnaryOperator.h"
-#include "ance/core/LiteralType.h"
 #include "ance/core/Context.h"
 
 #include "ance/sources/SourceFile.h"
@@ -487,36 +486,6 @@ namespace ance::ast
             text = text.substr(1, text.size() - 2); // Remove quotes.
 
             Expression* expression = new StringLiteral(text, location(context));
-            return expression;
-        }
-
-        std::any visitBoolType(anceParser::BoolTypeContext* context) override
-        {
-            Expression* expression = new TypeLiteral(core::LiteralType::Bool, location(context));
-            return expression;
-        }
-
-        std::any visitUnitType(anceParser::UnitTypeContext* context) override
-        {
-            Expression* expression = new TypeLiteral(core::LiteralType::Unit, location(context));
-            return expression;
-        }
-
-        std::any visitSizeType(anceParser::SizeTypeContext* context) override
-        {
-            Expression* expression = new TypeLiteral(core::LiteralType::Size, location(context));
-            return expression;
-        }
-
-        std::any visitTypeType(anceParser::TypeTypeContext* context) override
-        {
-            Expression* expression = new TypeLiteral(core::LiteralType::Type, location(context));
-            return expression;
-        }
-
-        std::any visitStringType(anceParser::StringTypeContext* context) override
-        {
-            Expression* expression = new TypeLiteral(core::LiteralType::String, location(context));
             return expression;
         }
 

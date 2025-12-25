@@ -38,10 +38,18 @@ namespace ance::cet
 
         [[nodiscard]] utility::Shared<bbt::Value> access() override;
 
-        utility::Shared<bbt::Value> read(std::vector<size_t> const& indices = {}) override;
-        void                        write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices = {}) override;
+        utility::Shared<bbt::Value> read(std::vector<size_t> const& indices) override;
+        void                        write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices) override;
+
+        utility::Shared<bbt::Value> read();
+        void                        write(utility::Shared<bbt::Value> value);
 
         [[nodiscard]] bool isDefined() const override;
+
+        /**
+         * Create a final variable that holds a passed value as constant.
+         */
+        static utility::Shared<Variable> createConstant(core::Identifier const& name, utility::Shared<bbt::Value> value, bbt::TypeContext& type_context);
 
       private:
         core::Identifier           identifier_;

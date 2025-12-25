@@ -37,16 +37,7 @@ literal
     : boolean # BooleanLiteral
     | INTEGER # SizeLiteral
     | '(' ')' # UnitLiteral
-    | type # TypeLiteral
     | STRING # StringLiteral
-    ;
-
-type
-    : 'Bool' # BoolType
-    | 'Unit' # UnitType
-    | 'Size' # SizeType
-    | 'String' # StringType
-    | 'Type' # TypeType
     ;
 
 boolean

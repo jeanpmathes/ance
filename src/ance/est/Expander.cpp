@@ -534,11 +534,6 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<BoolLiteral>(bool_literal.value, bool_literal.location));
         }
 
-        void visit(ast::TypeLiteral const& type_literal) override
-        {
-            result_.setExpression(utility::makeOwned<TypeLiteral>(type_literal.type, type_literal.location));
-        }
-
         void visit(ast::UnaryOperation const& unary_operation) override
         {
             EBuilder builder(*this);

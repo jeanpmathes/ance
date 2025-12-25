@@ -44,12 +44,6 @@ void ance::core::Printer::print(Assigner const assigner)
     out_ << assigner.getSymbol();// todo: assigner should provide operator<<
 }
 
-void ance::core::Printer::print(LiteralType literal_type)
-{
-    indent();
-    out_ << literal_type.toString();// todo: literal type should provide operator<<
-}
-
 void ance::core::Printer::print(Intrinsic const& intrinsic)
 {
     indent();

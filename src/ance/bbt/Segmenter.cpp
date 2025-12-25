@@ -7,8 +7,6 @@
 #include <stdexcept>
 #include <vector>
 
-#include "ance/core/LiteralType.h"
-
 #include "ance/est/Expander.h"
 #include "ance/est/Node.h"
 
@@ -805,33 +803,6 @@ struct ance::bbt::Segmenter::Implementation
 
             std::reference_wrapper const inner =
                 addBlock<Constant>(blocks, Bool::make(bool_literal.value, type_context_), destination(), bool_literal.location);
-
-            setResult(std::move(blocks), inner, inner);
-        }
-
-        void visit(est::TypeLiteral const& type_literal) override
-        {
-            utility::List<utility::Owned<BaseBB>> blocks;
-
-            static auto to_type = [](core::LiteralType const& literal_type, TypeContext& type_context) -> utility::Shared<Type> {
-                switch (literal_type)
-                {
-                    case core::LiteralType::Bool:
-                        return type_context.getBool();
-                    case core::LiteralType::Unit:
-                        return type_context.getUnit();
-                    case core::LiteralType::Size:
-                        return type_context.getSize();
-                    case core::LiteralType::String:
-                        return type_context.getString();
-                    case core::LiteralType::Type:
-                        return type_context.getType();
-                }
-
-                throw std::logic_error("Invalid type literal");
-            };
-
-            std::reference_wrapper const inner = addBlock<Constant>(blocks, to_type(type_literal.type, type_context_), destination(), type_literal.location);
 
             setResult(std::move(blocks), inner, inner);
         }

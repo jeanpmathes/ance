@@ -4,7 +4,6 @@
 #include "ance/core/Identifier.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
-#include "ance/core/LiteralType.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -245,16 +244,6 @@ namespace ance::est
         bool value;
     };
 
-    /// A type literal.
-    struct TypeLiteral final
-        : Expression
-        , utility::ConcreteNode<TypeLiteral, Visitor>
-    {
-        TypeLiteral(core::LiteralType value, core::Location const& source_location);
-
-        core::LiteralType type;
-    };
-
     /// Provides the default value for a type.
     struct Default final
         : Expression
@@ -351,7 +340,6 @@ namespace ance::est
         virtual void visit(SizeLiteral const& size_literal) = 0;
         virtual void visit(StringLiteral const& string_literal) = 0;
         virtual void visit(BoolLiteral const& bool_literal) = 0;
-        virtual void visit(TypeLiteral const& type_literal) = 0;
         virtual void visit(Default const& default_value) = 0;
         virtual void visit(Here const& here)              = 0;
         virtual void visit(CurrentScope const& current_scope)              = 0;

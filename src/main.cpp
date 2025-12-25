@@ -61,7 +61,7 @@ namespace ance
         cet::Runner     runner {source_tree, reporter, context};
         build::Compiler compiler {source_tree, reporter, context};// todo: consider using the runner internally
 
-        defineCoreLanguage(runner);
+        defineCoreLanguageFunctions(runner);
 
         int exit_code = EXIT_FAILURE;
 
@@ -76,10 +76,7 @@ namespace ance
 
         return exit_code;
 
-        // todo: add the keyword types to the global scope so they can be found through resolution, adapt grammar to allow variable access in type expressions
-        // todo: this means they can be removed as special cases of grammar, and the literal type enum can also be removed
-
-        // todo: maybe remove the intrinsics as they are currently, instead replace them with an enum (SCREAMING_SNAKE_CASE)
+        // todo: maybe remove the intrinsics as they are currently, instead replace them with a value enum (SCREAMING_SNAKE_CASE)
 
         // todo: make LRef parameterized, instead of type registries as previous now only type dictionaries are needed
         // todo: adapt the expect methods in runners to only take the type instead of the value, and add some utility methods to the type class

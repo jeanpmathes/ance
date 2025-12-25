@@ -232,11 +232,6 @@ struct ance::ast::Printer::Implementation
             print(bool_literal.value ? "true" : "false");
         }
 
-        void visit(TypeLiteral const& type_literal) override
-        {
-            print(type_literal.type);
-        }
-
         void visit(UnaryOperation const& unary_operation) override
         {
             print(unary_operation.op);
