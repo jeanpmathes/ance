@@ -25,7 +25,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         {
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(value);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::B2Str::instance(), std::move(args), str_value, core::Location::global()));
+            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::B_2_STR, std::move(args), str_value, core::Location::global()));
         }
 
         bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
@@ -35,7 +35,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(str_value);
             args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::LOG, std::move(args), result, core::Location::global()));
         }
         (void) result;
     }
@@ -54,7 +54,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         {
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(value);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::B2Str::instance(), std::move(args), str_value, core::Location::global()));
+            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::B_2_STR, std::move(args), str_value, core::Location::global()));
         }
 
         bbt::Temporary const& result = builder.pushTemporary();
@@ -62,7 +62,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(str_value);
             args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::LOG, std::move(args), result, core::Location::global()));
         }
         (void) result;
     }
@@ -85,7 +85,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(value);
             args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::LOG, std::move(args), result, core::Location::global()));
         }
         (void) result;
     }
@@ -105,7 +105,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(value);
             args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Log::instance(), std::move(args), result, core::Location::global()));
+            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::LOG, std::move(args), result, core::Location::global()));
         }
         (void) result;
     }
@@ -127,7 +127,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(file);
             args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Include::instance(), std::move(args), result, core::Location::global()));
+            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::INCLUDE, std::move(args), result, core::Location::global()));
         }
         (void) result;
     }

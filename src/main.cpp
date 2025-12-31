@@ -76,8 +76,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: maybe remove the intrinsics as they are currently, instead replace them with a value enum (SCREAMING_SNAKE_CASE)
-
         // todo: make LRef parameterized, instead of type registries as previous now only type dictionaries are needed
         // todo: adapt the expect methods in runners to only take the type instead of the value, and add some utility methods to the type class
 

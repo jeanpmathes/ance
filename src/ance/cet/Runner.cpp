@@ -51,7 +51,9 @@ struct ance::cet::Runner::Implementation
             RunPoint(bbt::BasicBlock const& start, Scope* initial_scope) : block(&start), scope(initial_scope) {}
 
             void clearBlocker()
-            { blocker = std::nullopt; }
+            {
+                blocker = std::nullopt;
+            }
 
             bbt::BasicBlock const*               block           = nullptr;
             size_t                               statement_index = 0;
@@ -77,19 +79,29 @@ struct ance::cet::Runner::Implementation
         ~BBT() override = default;
 
         void schedule(bbt::Flow const& flow, Scope* scope)
-        { run_points_.emplace_back(flow.entry, scope != nullptr ? scope : global_scope_.get()); }
+        {
+            run_points_.emplace_back(flow.entry, scope != nullptr ? scope : global_scope_.get());
+        }
 
         [[nodiscard]] bool hasRunPoints() const
-        { return !run_points_.empty(); }
+        {
+            return !run_points_.empty();
+        }
 
         std::list<RunPoint>::iterator getRunPointBegin()
-        { return run_points_.begin(); }
+        {
+            return run_points_.begin();
+        }
 
         std::list<RunPoint>::iterator getRunPointEnd()
-        { return run_points_.end(); }
+        {
+            return run_points_.end();
+        }
 
         std::list<RunPoint>::iterator removeRunPoint(std::list<RunPoint>::iterator const& index)
-        { return run_points_.erase(index); }
+        {
+            return run_points_.erase(index);
+        }
 
         void reportBlockers() const
         {
@@ -153,7 +165,10 @@ struct ance::cet::Runner::Implementation
                 result = ExecutionResult::Yield;
 
                 RunPoint* next = &run_point;
-                if (!run_point.stack.empty()) { next = &run_point.stack.back(); }
+                if (!run_point.stack.empty())
+                {
+                    next = &run_point.stack.back();
+                }
 
                 next->return_value = return_value;
             }
@@ -205,7 +220,9 @@ struct ance::cet::Runner::Implementation
 
         template<typename T>
         T const& dereference(utility::Shared<bbt::Value> value)
-        { return dereference(value)->as<T>(); }
+        {
+            return dereference(value)->as<T>();
+        }
 
         [[nodiscard]] bool expectSignature(bbt::Signature const&                                              signature,
                                            utility::List<std::reference_wrapper<bbt::Temporary const>> const& arguments,
@@ -264,16 +281,23 @@ struct ance::cet::Runner::Implementation
 
         [[nodiscard]] Scope& scope()
         {
-            if (state_.current_scope != nullptr) { return *state_.current_scope; }
+            if (state_.current_scope != nullptr)
+            {
+                return *state_.current_scope;
+            }
 
             return *global_scope_;
         }
 
         void visit(bbt::UnorderedScope const& scope) override
-        { scheduleUnorderedScope(scope); }
+        {
+            scheduleUnorderedScope(scope);
+        }
 
         void visit(bbt::Flow const&) override
-        { assert(false); }
+        {
+            assert(false);
+        }
 
         void visit(bbt::BasicBlock const& basic_block) override
         {
@@ -302,7 +326,9 @@ struct ance::cet::Runner::Implementation
         }
 
         void visit(bbt::Return const&) override
-        { state_.next = nullptr; }
+        {
+            state_.next = nullptr;
+        }
 
         void visit(bbt::Branch const& branch_link) override
         {
@@ -314,14 +340,20 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            if (dereference<bbt::Bool>(condition).value()) { state_.next = &branch_link.true_branch; }
-            else {
+            if (dereference<bbt::Bool>(condition).value())
+            {
+                state_.next = &branch_link.true_branch;
+            }
+            else
+            {
                 state_.next = &branch_link.false_branch;
             }
         }
 
         void visit(bbt::Jump const& jump_link) override
-        { state_.next = &jump_link.target; }
+        {
+            state_.next = &jump_link.target;
+        }
 
         void visit(bbt::ErrorStatement const& error_statement) override
         {
@@ -369,7 +401,9 @@ struct ance::cet::Runner::Implementation
         }
 
         void visit(bbt::Temporary const& temporary) override
-        { scope().createTemporary(temporary); }
+        {
+            scope().createTemporary(temporary);
+        }
 
         void visit(bbt::CopyTemporary const& write_temporary) override
         {
@@ -379,7 +413,7 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Intrinsic const& intrinsic) override
         {
-            auto [signature, _] = bbt::IntrinsicSignature::get(intrinsic.intrinsic, type_context_);
+            auto [signature, _] = bbt::getIntrinsicSignature(intrinsic.intrinsic, type_context_);
 
             if (!expectSignature(signature, intrinsic.arguments, intrinsic.location))
             {
@@ -397,9 +431,16 @@ struct ance::cet::Runner::Implementation
 
             auto result = intrinsics_.run(intrinsic.intrinsic, arguments, intrinsic.location);
 
-            if (result.isFailed()) { abort(); }
-            else if (result.isPending()) { block(result.getPending()); }
-            else {
+            if (result.isFailed())
+            {
+                abort();
+            }
+            else if (result.isPending())
+            {
+                block(result.getPending());
+            }
+            else
+            {
                 scope().getTemporary(intrinsic.destination).write(dereference(result.getResult()));
             }
         }
@@ -434,7 +475,10 @@ struct ance::cet::Runner::Implementation
             }
 
             utility::List<utility::Shared<bbt::Value>> arguments = {};
-            for (auto argument : call.arguments) { arguments.emplace_back(scope().getTemporary(argument.get()).read()); }
+            for (auto argument : call.arguments)
+            {
+                arguments.emplace_back(scope().getTemporary(argument.get()).read());
+            }
 
             Scope& function_scope = global_scope_->addChildScope(utility::makeOwned<OrderedScope>(*global_scope_, type_context_));
 
@@ -521,7 +565,9 @@ struct ance::cet::Runner::Implementation
         }
 
         void visit(bbt::CurrentScope const& current_scope) override
-        { scope().getTemporary(current_scope.destination).write(ScopeRef::make(scope(), type_context_)); }
+        {
+            scope().getTemporary(current_scope.destination).write(ScopeRef::make(scope(), type_context_));
+        }
 
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
@@ -548,7 +594,9 @@ struct ance::cet::Runner::Implementation
         }
 
         void visit(bbt::OrderedScopeEnter const&) override
-        { state_.current_scope = &scope().addChildScope(utility::makeOwned<OrderedScope>(scope(), type_context_)); }
+        {
+            state_.current_scope = &scope().addChildScope(utility::makeOwned<OrderedScope>(scope(), type_context_));
+        }
 
         void visit(bbt::OrderedScopeExit const&) override
         {
@@ -570,7 +618,10 @@ struct ance::cet::Runner::Implementation
         {
             Scope& unordered_scope = global_scope_->addChildScope(utility::makeOwned<UnorderedScope>(*global_scope_, type_context_));
 
-            for (auto const& flow : scope.flows) { schedule(*flow, &unordered_scope); }
+            for (auto const& flow : scope.flows)
+            {
+                schedule(*flow, &unordered_scope);
+            }
         }
 
         std::function<void(std::filesystem::path const&)> include_ = [this](std::filesystem::path const& path) {
@@ -655,7 +706,10 @@ struct ance::cet::Runner::Implementation
                     continue;
                 }
 
-                if (result == BBT::ExecutionResult::Error) { return std::nullopt; }
+                if (result == BBT::ExecutionResult::Error)
+                {
+                    return std::nullopt;
+                }
             }
 
             if (!progress && bbt->hasRunPoints())
@@ -676,13 +730,19 @@ struct ance::cet::Runner::Implementation
     }
 
     utility::Optional<utility::Owned<bbt::UnorderedScope>> readUnorderedScope(std::filesystem::path const& file)
-    { return segmenter_.segmentUnorderedFile(file); }
+    {
+        return segmenter_.segmentUnorderedFile(file);
+    }
 
     void add(utility::Owned<Provider> provider)
-    { providers_.emplace_back(std::move(provider)); }
+    {
+        providers_.emplace_back(std::move(provider));
+    }
 
     bbt::TypeContext& getTypeContext()
-    { return type_context_; }
+    {
+        return type_context_;
+    }
 
   private:
     sources::SourceTree&                    source_tree_;
@@ -700,10 +760,16 @@ ance::cet::Runner::Runner(sources::SourceTree& source_tree, core::Reporter& repo
 ance::cet::Runner::~Runner() = default;
 
 void ance::cet::Runner::add(utility::Owned<Provider> provider)
-{ implementation_->add(std::move(provider)); }
+{
+    implementation_->add(std::move(provider));
+}
 
 ance::utility::Optional<ance::utility::Owned<ance::cet::Unit>> ance::cet::Runner::runOrderedFile(std::filesystem::path const& file)
-{ return implementation_->runOrderedFile(file); }
+{
+    return implementation_->runOrderedFile(file);
+}
 
 ance::bbt::TypeContext& ance::cet::Runner::types()
-{ return implementation_->getTypeContext(); }
+{
+    return implementation_->getTypeContext();
+}

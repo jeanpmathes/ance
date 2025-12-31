@@ -2,17 +2,13 @@
 #define ANCE_EST_NODE_H
 
 #include "ance/core/Identifier.h"
+#include "ance/core/Intrinsic.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
-
-namespace ance::core
-{
-    struct Intrinsic;
-}
 
 /// The expanded syntax tree (EST) namespace.
 /// The EST is similar to the AST, but without syntactic sugar.
@@ -21,7 +17,8 @@ namespace ance::est
     class Visitor;
 
     /// Base class for all nodes in the EST.
-    struct Node : virtual utility::AbstractNode<Visitor> {
+    struct Node : virtual utility::AbstractNode<Visitor>
+    {
         explicit Node(core::Location const& source_location);
 
         core::Location location;
@@ -44,7 +41,8 @@ namespace ance::est
     /// Statement node in the EST.
     struct Statement
         : virtual Node
-        , virtual utility::AbstractNode<Visitor> {
+        , virtual utility::AbstractNode<Visitor>
+    {
         /// Check if the statement is a compound statement, e.g. a block.
         [[nodiscard]] virtual bool isCompound() const;
     };
@@ -52,7 +50,8 @@ namespace ance::est
     /// Error statement, mostly as pass-through from the AST.
     struct ErrorStatement final
         : Statement
-        , utility::ConcreteNode<ErrorStatement, Visitor> {
+        , utility::ConcreteNode<ErrorStatement, Visitor>
+    {
         explicit ErrorStatement(core::Location const& source_location);
     };
 
@@ -67,7 +66,8 @@ namespace ance::est
     /// Block statement, containing multiple statements.
     struct Block final
         : Statement
-        , utility::ConcreteNode<Block, Visitor> {
+        , utility::ConcreteNode<Block, Visitor>
+    {
         Block(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location);
 
         [[nodiscard]] bool isCompound() const override;
@@ -80,7 +80,8 @@ namespace ance::est
     /// Statement that simply wraps an expression.
     struct Independent final
         : Statement
-        , utility::ConcreteNode<Independent, Visitor> {
+        , utility::ConcreteNode<Independent, Visitor>
+    {
         Independent(utility::Owned<Expression> independent_expression, core::Location const& source_location);
 
         utility::Owned<Expression> expression;
@@ -91,9 +92,7 @@ namespace ance::est
         : Statement
         , utility::ConcreteNode<Write, Visitor>
     {
-        Write(utility::Owned<Expression>               variable,
-                    utility::Owned<Expression>                    expression,
-                    core::Location const&                         source_location);
+        Write(utility::Owned<Expression> variable, utility::Owned<Expression> expression, core::Location const& source_location);
 
         utility::Owned<Expression> target;
         utility::Owned<Expression> value;
@@ -110,8 +109,8 @@ namespace ance::est
            core::Location const&      source_location);
 
         utility::Owned<Expression> condition;
-        utility::Owned<Statement>      true_block;
-        utility::Owned<Statement>      false_block;
+        utility::Owned<Statement>  true_block;
+        utility::Owned<Statement>  false_block;
     };
 
     /// A loop statement executes a block of code repeatedly and unconditionally.
@@ -119,10 +118,9 @@ namespace ance::est
         : Statement
         , utility::ConcreteNode<Loop, Visitor>
     {
-        Loop(utility::Owned<Statement>  statement,
-             core::Location const&      source_location);
-        
-        utility::Owned<Statement>      body;
+        Loop(utility::Owned<Statement> statement, core::Location const& source_location);
+
+        utility::Owned<Statement> body;
     };
 
     /// Break statement exits the nearest enclosing loop.
@@ -160,47 +158,52 @@ namespace ance::est
     {
         WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location);
 
-        Temporary const& temporary;
+        Temporary const&           temporary;
         utility::Owned<Expression> value;
     };
 
     /// Expression node in the EST.
     struct Expression
         : virtual Node
-        , virtual utility::AbstractNode<Visitor> {
+        , virtual utility::AbstractNode<Visitor>
+    {
     };
 
     /// Error expression, mostly as pass-through from the AST.
     struct ErrorExpression final
         : Expression
-        , utility::ConcreteNode<ErrorExpression, Visitor> {
+        , utility::ConcreteNode<ErrorExpression, Visitor>
+    {
         explicit ErrorExpression(core::Location const& source_location);
     };
 
     /// An intrinsic expression.
     struct Intrinsic final
         : Expression
-        , utility::ConcreteNode<Intrinsic, Visitor> {
-        Intrinsic(core::Intrinsic const& called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
+        , utility::ConcreteNode<Intrinsic, Visitor>
+    {
+        Intrinsic(core::Intrinsic called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
-        core::Intrinsic const& intrinsic;
+        core::Intrinsic                           intrinsic;
         utility::List<utility::Owned<Expression>> arguments;
     };
 
     /// A call expression.
     struct Call final
         : Expression
-        , utility::ConcreteNode<Call, Visitor> {
+        , utility::ConcreteNode<Call, Visitor>
+    {
         Call(utility::Owned<Expression> callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
-        utility::Owned<Expression> called;
+        utility::Owned<Expression>                called;
         utility::List<utility::Owned<Expression>> arguments;
     };
 
     /// Reads the value of a variable.
     struct Read final
         : Expression
-        , utility::ConcreteNode<Read, Visitor> {
+        , utility::ConcreteNode<Read, Visitor>
+    {
         Read(utility::Owned<Expression> accessed, core::Location const& source_location);
 
         utility::Owned<Expression> target;
@@ -277,7 +280,7 @@ namespace ance::est
     {
         UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location);
 
-        core::UnaryOperator op;
+        core::UnaryOperator        op;
         utility::Owned<Expression> operand;
     };
 
@@ -320,32 +323,32 @@ namespace ance::est
 
         virtual void visit(File const& file) = 0;
 
-        virtual void visit(ErrorStatement const& error)    = 0;
-        virtual void visit(Pass const& pass_statement)     = 0;
-        virtual void visit(Block const& block)             = 0;
-        virtual void visit(Independent const& independent) = 0;
-        virtual void visit(Write const& assignment)   = 0;
-        virtual void visit(If const& if_statement)         = 0;
-        virtual void visit(Loop const& loop)               = 0;
-        virtual void visit(Break const& break_statement)   = 0;
-        virtual void visit(Continue const& continue_statement) = 0;
-        virtual void visit(Temporary const& temporary)     = 0;
+        virtual void visit(ErrorStatement const& error)           = 0;
+        virtual void visit(Pass const& pass_statement)            = 0;
+        virtual void visit(Block const& block)                    = 0;
+        virtual void visit(Independent const& independent)        = 0;
+        virtual void visit(Write const& assignment)               = 0;
+        virtual void visit(If const& if_statement)                = 0;
+        virtual void visit(Loop const& loop)                      = 0;
+        virtual void visit(Break const& break_statement)          = 0;
+        virtual void visit(Continue const& continue_statement)    = 0;
+        virtual void visit(Temporary const& temporary)            = 0;
         virtual void visit(WriteTemporary const& write_temporary) = 0;
 
-        virtual void visit(ErrorExpression const& error) = 0;
-        virtual void visit(Intrinsic const& intrinsic)   = 0;
-        virtual void visit(Call const& call)             = 0;
-        virtual void visit(Read const& access)         = 0;
-        virtual void visit(UnitLiteral const& unit_literal) = 0;
-        virtual void visit(SizeLiteral const& size_literal) = 0;
-        virtual void visit(StringLiteral const& string_literal) = 0;
-        virtual void visit(BoolLiteral const& bool_literal) = 0;
-        virtual void visit(Default const& default_value) = 0;
-        virtual void visit(Here const& here)              = 0;
-        virtual void visit(CurrentScope const& current_scope)              = 0;
-        virtual void visit(UnaryOperation const& unary_operation) = 0;
-        virtual void visit(ReadTemporary const& read_temporary) = 0;
-        virtual void visit(TypeOf const& type_of)       = 0;
+        virtual void visit(ErrorExpression const& error)                = 0;
+        virtual void visit(Intrinsic const& intrinsic)                  = 0;
+        virtual void visit(Call const& call)                            = 0;
+        virtual void visit(Read const& access)                          = 0;
+        virtual void visit(UnitLiteral const& unit_literal)             = 0;
+        virtual void visit(SizeLiteral const& size_literal)             = 0;
+        virtual void visit(StringLiteral const& string_literal)         = 0;
+        virtual void visit(BoolLiteral const& bool_literal)             = 0;
+        virtual void visit(Default const& default_value)                = 0;
+        virtual void visit(Here const& here)                            = 0;
+        virtual void visit(CurrentScope const& current_scope)           = 0;
+        virtual void visit(UnaryOperation const& unary_operation)       = 0;
+        virtual void visit(ReadTemporary const& read_temporary)         = 0;
+        virtual void visit(TypeOf const& type_of)                       = 0;
         virtual void visit(IdentifierCapture const& identifier_capture) = 0;
     };
 }

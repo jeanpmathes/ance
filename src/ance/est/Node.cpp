@@ -1,7 +1,7 @@
 #include "Node.h"
 
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 #include "ance/utility/ID.h"
 
@@ -12,7 +12,10 @@ ance::est::File::File(utility::List<utility::Owned<Statement>> statement_list, c
     , statements(std::move(statement_list))
 {}
 
-bool ance::est::Statement::isCompound() const { return false; }
+bool ance::est::Statement::isCompound() const
+{
+    return false;
+}
 
 ance::est::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}
 
@@ -63,8 +66,7 @@ ance::est::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::est::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
-ance::est::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> expression,
-                                core::Location const&                         source_location)
+ance::est::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , definition(std::move(expression))
@@ -84,7 +86,7 @@ ance::est::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owne
 
 ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
-ance::est::Intrinsic::Intrinsic(core::Intrinsic const& called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
+ance::est::Intrinsic::Intrinsic(core::Intrinsic called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
     : Node(source_location)
     , Expression()
     , intrinsic(called)
@@ -113,16 +115,9 @@ ance::est::StringLiteral::StringLiteral(std::string text, core::Location const& 
 
 ance::est::BoolLiteral::BoolLiteral(bool const v, core::Location const& source_location) : Node(source_location), Expression(), value(v) {}
 
-ance::est::Default::Default(utility::Owned<Expression> t, core::Location const& source_location)
-    : Node(source_location)
-    , Expression()
-    , type(std::move(t))
-{}
+ance::est::Default::Default(utility::Owned<Expression> t, core::Location const& source_location) : Node(source_location), Expression(), type(std::move(t)) {}
 
-ance::est::Here::Here(core::Location const& source_location)
-    : Node(source_location)
-    , Expression()
-{}
+ance::est::Here::Here(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
@@ -138,10 +133,9 @@ ance::est::TypeOf::TypeOf(utility::Owned<Expression> e, core::Location const& so
 {}
 
 ance::est::IdentifierCapture::IdentifierCapture(core::Identifier const& ident, core::Location const& source_location)
-    : Node(source_location), Expression(), identifier(ident)
-{}
-
-ance::est::CurrentScope::CurrentScope(core::Location const& source_location)
     : Node(source_location)
     , Expression()
+    , identifier(ident)
 {}
+
+ance::est::CurrentScope::CurrentScope(core::Location const& source_location) : Node(source_location), Expression() {}

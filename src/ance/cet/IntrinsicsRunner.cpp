@@ -14,10 +14,14 @@ ance::cet::IntrinsicsRunner::IntrinsicsRunner(sources::SourceTree&              
 {}
 
 bool ance::cet::IntrinsicsRunner::Result::isPending() const
-{ return pending_resolution.hasValue(); }
+{
+    return pending_resolution.hasValue();
+}
 
 bool ance::cet::IntrinsicsRunner::Result::isFailed() const
-{ return !return_value_.hasValue() && !pending_resolution.hasValue(); }
+{
+    return !return_value_.hasValue() && !pending_resolution.hasValue();
+}
 
 ance::cet::PendingResolution const& ance::cet::IntrinsicsRunner::Result::getPending() const
 {
@@ -35,7 +39,7 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
                                                                      utility::List<utility::Shared<bbt::Value>>& arguments,
                                                                      core::Location const&                       location)
 {
-    auto [signature, return_type] = bbt::IntrinsicSignature::get(intrinsic, type_context_);
+    auto [signature, return_type] = bbt::getIntrinsicSignature(intrinsic, type_context_);
 
     state_ = State {.location             = location,
                     .arguments            = &arguments,
@@ -46,7 +50,30 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
     assert(arguments.size() == signature.parameters().size());
     for (size_t i = 0; i < arguments.size(); ++i) assert(arguments[i]->type()->isAssignableTo(*signature.parameters()[i].type));
 
-    this->visit(intrinsic);
+    switch (intrinsic.value())
+    {
+        case core::Intrinsic::NO_OPERATION:
+            runNoOp();
+            break;
+        case core::Intrinsic::DECLARE:
+            runDeclare();
+            break;
+        case core::Intrinsic::RESOLVE:
+            runResolve();
+            break;
+        case core::Intrinsic::GET_PARENT:
+            runGetParent();
+            break;
+        case core::Intrinsic::LOG:
+            runLog();
+            break;
+        case core::Intrinsic::B_2_STR:
+            runB2Str();
+            break;
+        case core::Intrinsic::INCLUDE:
+            runInclude();
+            break;
+    }
 
     Result result {.return_value_ = std::move(state_.return_value_), .pending_resolution = std::move(state_.pending_resolution)};
 
@@ -55,15 +82,12 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
     return result;
 }
 
-void ance::cet::IntrinsicsRunner::visit(core::Dynamic const& dynamic)
-{ reporter_.error("Unsupported intrinsic '" + dynamic.identifier() + "'", state_.location); }
-
-void ance::cet::IntrinsicsRunner::visit(core::NoOp const&)
+void ance::cet::IntrinsicsRunner::runNoOp()
 {
     // Do nothing.
 }
 
-void ance::cet::IntrinsicsRunner::visit(core::Declare const&)
+void ance::cet::IntrinsicsRunner::runDeclare()
 {
     Scope&                     scope      = state_.arguments->at(0)->as<ScopeRef>().value();
     core::Identifier const&    identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
@@ -72,26 +96,34 @@ void ance::cet::IntrinsicsRunner::visit(core::Declare const&)
 
     auto variable = scope.declare(identifier, type, is_final, state_.location, reporter_);
 
-    if (variable.hasValue()) { setResult(std::move(*variable)); }
-    else {
+    if (variable.hasValue())
+    {
+        setResult(std::move(*variable));
+    }
+    else
+    {
         abort();
     }
 }
 
-void ance::cet::IntrinsicsRunner::visit(core::Resolve const&)
+void ance::cet::IntrinsicsRunner::runResolve()
 {
     Scope&                  scope      = state_.arguments->at(0)->as<ScopeRef>().value();
     core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
 
     utility::Optional<utility::Shared<bbt::Value>> variable = scope.find(identifier);
 
-    if (variable.hasValue()) { setResult(std::move(*variable)); }
-    else {
+    if (variable.hasValue())
+    {
+        setResult(std::move(*variable));
+    }
+    else
+    {
         setPending(identifier);
     }
 }
 
-void ance::cet::IntrinsicsRunner::visit(core::GetParent const&)
+void ance::cet::IntrinsicsRunner::runGetParent()
 {
     Scope const& scope = state_.arguments->at(0)->as<ScopeRef>().value();
 
@@ -105,7 +137,7 @@ void ance::cet::IntrinsicsRunner::visit(core::GetParent const&)
     setResult(ScopeRef::make(*scope.parent(), type_context_));
 }
 
-void ance::cet::IntrinsicsRunner::visit(core::Log const&)
+void ance::cet::IntrinsicsRunner::runLog()
 {
     std::string const&    value = state_.arguments->at(0)->as<bbt::String>().value();
     core::Location const& loc   = state_.arguments->at(1)->as<bbt::Location>().value();
@@ -115,14 +147,14 @@ void ance::cet::IntrinsicsRunner::visit(core::Log const&)
     setResult(bbt::Unit::make(type_context_));
 }
 
-void ance::cet::IntrinsicsRunner::visit(core::B2Str const&)
+void ance::cet::IntrinsicsRunner::runB2Str()
 {
     bool const value = state_.arguments->at(0)->as<bbt::Bool>().value();
 
     setResult(bbt::String::make(value ? "true" : "false", type_context_));
 }
 
-void ance::cet::IntrinsicsRunner::visit(core::Include const&)
+void ance::cet::IntrinsicsRunner::runInclude()
 {
     std::string const&    file     = state_.arguments->at(0)->as<bbt::String>().value();
     core::Location const& location = state_.arguments->at(1)->as<bbt::Location>().value();

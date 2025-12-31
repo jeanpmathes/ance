@@ -21,11 +21,9 @@ namespace ance::cet
         core::Identifier identifier;
     };
 
-    class IntrinsicsRunner final : core::IntrinsicVisitor
+    class IntrinsicsRunner final
     {
       public:
-        using IntrinsicVisitor::visit;
-
         IntrinsicsRunner(sources::SourceTree&                              source_tree,
                          core::Reporter&                                   reporter,
                          bbt::TypeContext&                                 type_context,
@@ -46,16 +44,15 @@ namespace ance::cet
         /// Run an intrinsic with the given arguments.
         Result run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<bbt::Value>>& arguments, core::Location const& location);
 
-        void visit(core::Dynamic const& dynamic) override;
-        void visit(core::NoOp const&) override;
-        void visit(core::Declare const&) override;
-        void visit(core::Resolve const&) override;
-        void visit(core::GetParent const&) override;
-        void visit(core::Log const&) override;
-        void visit(core::B2Str const&) override;
-        void visit(core::Include const&) override;
-
       private:
+        void runNoOp();
+        void runDeclare();
+        void runResolve();
+        void runGetParent();
+        void runLog();
+        void runB2Str();
+        void runInclude();
+
         void setResult(utility::Shared<bbt::Value> value);
         void setPending(core::Identifier const& identifier);
 

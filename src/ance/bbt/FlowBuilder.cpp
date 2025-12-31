@@ -69,7 +69,7 @@ namespace ance::bbt
             utility::List<std::reference_wrapper<Temporary const>> resolve_arguments;
             resolve_arguments.emplace_back(scope_arg);
             resolve_arguments.emplace_back(identifier_arg);
-            pushStatement(utility::makeOwned<Intrinsic>(core::Resolve::instance(), std::move(resolve_arguments), resolve_result, location_));
+            pushStatement(utility::makeOwned<Intrinsic>(core::Intrinsic::RESOLVE, std::move(resolve_arguments), resolve_result, location_));
 
             Temporary const& read_result = pushTemporary();
             pushStatement(utility::makeOwned<Read>(resolve_result, read_result, location_));
@@ -110,24 +110,38 @@ namespace ance::bbt
     FlowBuilder::~FlowBuilder() = default;
 
     size_t FlowBuilder::createBasicBlock()
-    { return implementation_->createBasicBlock(); }
+    {
+        return implementation_->createBasicBlock();
+    }
 
     void FlowBuilder::setActiveBasicBlock(size_t const id)
-    { implementation_->setActiveBasicBlock(id); }
+    {
+        implementation_->setActiveBasicBlock(id);
+    }
 
     void FlowBuilder::pushStatement(utility::Owned<Statement> statement)
-    { implementation_->pushStatement(std::move(statement)); }
+    {
+        implementation_->pushStatement(std::move(statement));
+    }
 
     Temporary const& FlowBuilder::pushTemporary()
-    { return implementation_->pushTemporary(); }
+    {
+        return implementation_->pushTemporary();
+    }
 
     Temporary const& FlowBuilder::pushVariableRead(core::Identifier const& name)
-    { return implementation_->pushVariableRead(name); }
+    {
+        return implementation_->pushVariableRead(name);
+    }
 
     Temporary const& FlowBuilder::pushConstant(utility::Shared<Value> value)
-    { return implementation_->pushConstant(std::move(value)); }
+    {
+        return implementation_->pushConstant(std::move(value));
+    }
 
     utility::Owned<Flow> FlowBuilder::build()
-    { return implementation_->build(); }
+    {
+        return implementation_->build();
+    }
 
 }

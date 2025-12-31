@@ -1,17 +1,13 @@
 #ifndef ANCE_BBT_NODE_H
 #define ANCE_BBT_NODE_H
 
-#include "ance/core/UnaryOperator.h"
+#include "ance/core/Intrinsic.h"
 #include "ance/core/Location.h"
+#include "ance/core/UnaryOperator.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
-
-namespace ance::core
-{
-    struct Intrinsic;
-}
 
 /// The basic-block tree (BBT) namespace.
 namespace ance::bbt
@@ -179,12 +175,12 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Intrinsic, Visitor>
     {
-        Intrinsic(core::Intrinsic const&                                 used,
+        Intrinsic(core::Intrinsic                                        used,
                   utility::List<std::reference_wrapper<Temporary const>> args,
                   Temporary const&                                       result,
                   core::Location const&                                  source_location);
 
-        core::Intrinsic const&                                 intrinsic;
+        core::Intrinsic                                        intrinsic;
         utility::List<std::reference_wrapper<Temporary const>> arguments;
         Temporary const&                                       destination;
     };
@@ -205,12 +201,12 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Call, Visitor>
     {
-        Call(Temporary const&                                  function,
+        Call(Temporary const&                                       function,
              utility::List<std::reference_wrapper<Temporary const>> args,
              Temporary const&                                       result,
              core::Location const&                                  source_location);
 
-        Temporary const& called;
+        Temporary const&                                       called;
         utility::List<std::reference_wrapper<Temporary const>> arguments;
         Temporary const&                                       destination;
     };
@@ -316,11 +312,11 @@ namespace ance::bbt
         virtual void visit(Read const& read)                      = 0;
         virtual void visit(Constant const& constant)              = 0;
         virtual void visit(Default const& default_value)          = 0;
-        virtual void visit(CurrentScope const& current_scope)                      = 0;
+        virtual void visit(CurrentScope const& current_scope)     = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
         virtual void visit(TypeOf const& type_of)                 = 0;
-        virtual void visit(OrderedScopeEnter const& scope_enter)         = 0;
-        virtual void visit(OrderedScopeExit const& scope_exit)           = 0;
+        virtual void visit(OrderedScopeEnter const& scope_enter)  = 0;
+        virtual void visit(OrderedScopeExit const& scope_exit)    = 0;
 
         ~Visitor() override = default;
     };

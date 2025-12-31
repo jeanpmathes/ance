@@ -1,7 +1,7 @@
 #include "Node.h"
 
-#include <sstream>
 #include <iomanip>
+#include <sstream>
 
 #include "ance/utility/ID.h"
 
@@ -72,7 +72,7 @@ ance::bbt::CopyTemporary::CopyTemporary(Temporary const& target, Temporary const
     , source(value)
 {}
 
-ance::bbt::Intrinsic::Intrinsic(core::Intrinsic const&                                 used,
+ance::bbt::Intrinsic::Intrinsic(core::Intrinsic                                        used,
                                 utility::List<std::reference_wrapper<Temporary const>> args,
                                 Temporary const&                                       result,
                                 core::Location const&                                  source_location)
@@ -90,7 +90,7 @@ ance::bbt::Read::Read(Temporary const& var, Temporary const& result, core::Locat
     , destination(result)
 {}
 
-ance::bbt::Call::Call(Temporary const&                                  function,
+ance::bbt::Call::Call(Temporary const&                                       function,
                       utility::List<std::reference_wrapper<Temporary const>> args,
                       Temporary const&                                       result,
                       core::Location const&                                  source_location)
@@ -115,10 +115,7 @@ ance::bbt::Default::Default(Temporary const& t, Temporary const& result, core::L
     , destination(result)
 {}
 
-ance::bbt::CurrentScope::CurrentScope(Temporary const& result, core::Location const& source_location)
-    : Node(source_location)
-    , Statement()
-    , destination(result)
+ance::bbt::CurrentScope::CurrentScope(Temporary const& result, core::Location const& source_location) : Node(source_location), Statement(), destination(result)
 {}
 
 ance::bbt::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind,
@@ -136,11 +133,13 @@ ance::bbt::TypeOf::TypeOf(Temporary const& expr, Temporary const& result, core::
     : Node(source_location)
     , Statement()
     , expression(expr)
-    , destination(result) {}
+    , destination(result)
+{}
 
-ance::bbt::OrderedScopeEnter::OrderedScopeEnter(core::Location const& source_location)
-    : Node(source_location), Statement() {}
+ance::bbt::OrderedScopeEnter::OrderedScopeEnter(core::Location const& source_location) : Node(source_location), Statement() {}
 
 ance::bbt::OrderedScopeExit::OrderedScopeExit(OrderedScopeEnter const& entry, core::Location const& source_location)
-    : Node(source_location), Statement(), enter(entry) {}
-
+    : Node(source_location)
+    , Statement()
+    , enter(entry)
+{}

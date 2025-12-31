@@ -2,31 +2,33 @@
 
 #include <utility>
 
-ance::core::Intrinsic::Intrinsic(Identifier const& identifier) : identifier_(identifier)
+ance::core::Intrinsic::Value ance::core::Intrinsic::value() const
 {
-
-}
-ance::core::Identifier const& ance::core::Intrinsic::identifier() const
-{
-    return identifier_;
+    return value_;
 }
 
-void ance::core::Intrinsic::display(std::ostream& os) const
+ance::core::Identifier ance::core::Intrinsic::identifier() const
 {
-    os << identifier();
-}
-ance::core::Dynamic::Dynamic(Identifier const& identifier) : Intrinsic(identifier)
-{
-
+    return Identifier::like(toString());
 }
 
-void ance::core::Dynamic::display(std::ostream& os) const
+std::string ance::core::Intrinsic::toString() const
 {
-    os << "\"" << identifier() << "\"";
-}
-
-std::ostream& operator<<(std::ostream& os, ance::core::Intrinsic const& intrinsic)
-{
-    intrinsic.display(os);
-    return os;
+    switch (value_)
+    {
+        case NO_OPERATION:
+            return "nop";
+        case DECLARE:
+            return "declare";
+        case RESOLVE:
+            return "resolve";
+        case GET_PARENT:
+            return "get_parent";
+        case B_2_STR:
+            return "b2str";
+        case LOG:
+            return "log";
+        case INCLUDE:
+            return "include";
+    }
 }

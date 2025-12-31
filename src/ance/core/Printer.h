@@ -3,15 +3,15 @@
 
 #include <ostream>
 
-#include "ance/core/Identifier.h"
 #include "ance/core/AccessModifier.h"
-#include "ance/core/UnaryOperator.h"
 #include "ance/core/Assigner.h"
+#include "ance/core/Identifier.h"
+#include "ance/core/UnaryOperator.h"
 
 namespace ance::core
 {
     class Value;
-    struct Intrinsic;
+    class Intrinsic;
 
     /// Utility to simplify implementing code printers for different trees.
     class Printer
@@ -56,7 +56,7 @@ namespace ance::core
 
         std::ostream& out_;
 
-        bool in_new_line_ = true;
+        bool   in_new_line_  = true;
         size_t indent_level_ = 0;
     };
 }

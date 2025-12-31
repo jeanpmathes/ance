@@ -298,7 +298,7 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> type = builder.pushExpansion(*variable_declaration.type);
 
             utility::Owned<Expression> parent_scope =
-                intrinsic(core::GetParent::instance(), variable_declaration.location, utility::makeOwned<CurrentScope>(variable_declaration.location));
+                intrinsic(core::Intrinsic::GET_PARENT, variable_declaration.location, utility::makeOwned<CurrentScope>(variable_declaration.location));
 
             Temporary const& tmp_type = builder.pushTemporary(std::move(type), variable_declaration.location);
 
@@ -320,7 +320,7 @@ struct ance::est::Expander::Implementation
             }
 
             utility::Owned<Expression> declared =
-                intrinsic(core::Declare::instance(),
+                intrinsic(core::Intrinsic::DECLARE,
                           variable_declaration.location,
                           std::move(parent_scope),
                           utility::makeOwned<IdentifierCapture>(variable_declaration.identifier, variable_declaration.location),
@@ -383,13 +383,12 @@ struct ance::est::Expander::Implementation
                     &builder.pushTemporary(utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, let.location), let.location), let.location);
             }
 
-            utility::Owned<Expression> declared =
-                intrinsic(core::Declare::instance(),
-                          let.location,// todo: the core::Declare feels kinda ugly because it does not show it to be an intrinsic
-                          utility::makeOwned<CurrentScope>(let.location),
-                          utility::makeOwned<IdentifierCapture>(let.identifier, let.location),
-                          utility::makeOwned<BoolLiteral>(let.assigner.isFinal(), let.location),
-                          utility::makeOwned<ReadTemporary>(tmp_type, let.location));
+            utility::Owned<Expression> declared = intrinsic(core::Intrinsic::DECLARE,
+                                                            let.location,
+                                                            utility::makeOwned<CurrentScope>(let.location),
+                                                            utility::makeOwned<IdentifierCapture>(let.identifier, let.location),
+                                                            utility::makeOwned<BoolLiteral>(let.assigner.isFinal(), let.location),
+                                                            utility::makeOwned<ReadTemporary>(tmp_type, let.location));
 
             Temporary const& tmp_entity = builder.pushTemporary(std::move(declared), let.location);
 
@@ -406,7 +405,7 @@ struct ance::est::Expander::Implementation
 
             utility::Owned<Expression> value = builder.pushExpansion(*assignment.value);
 
-            utility::Owned<Expression> resolved = intrinsic(core::Resolve::instance(),
+            utility::Owned<Expression> resolved = intrinsic(core::Intrinsic::RESOLVE,
                                                             assignment.location,
                                                             utility::makeOwned<CurrentScope>(assignment.location),
                                                             utility::makeOwned<IdentifierCapture>(assignment.identifier, assignment.location));
@@ -490,7 +489,7 @@ struct ance::est::Expander::Implementation
                 arguments.emplace_back(builder.pushExpansion(*argument));
             }
 
-            utility::Owned<Expression> resolved = intrinsic(core::Resolve::instance(),
+            utility::Owned<Expression> resolved = intrinsic(core::Intrinsic::RESOLVE,
                                                             call.location,
                                                             utility::makeOwned<CurrentScope>(call.location),
                                                             utility::makeOwned<IdentifierCapture>(call.identifier, call.location));
@@ -501,7 +500,7 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Access const& access) override
         {
-            utility::Owned<Expression> resolved = intrinsic(core::Resolve::instance(),
+            utility::Owned<Expression> resolved = intrinsic(core::Intrinsic::RESOLVE,
                                                             access.location,
                                                             utility::makeOwned<CurrentScope>(access.location),
                                                             utility::makeOwned<IdentifierCapture>(access.identifier, access.location));

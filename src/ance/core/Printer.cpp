@@ -47,7 +47,7 @@ void ance::core::Printer::print(Assigner const assigner)
 void ance::core::Printer::print(Intrinsic const& intrinsic)
 {
     indent();
-    out_ << intrinsic;
+    out_ << intrinsic.toString();// todo: intrinsic should provide operator<<
 }
 
 void ance::core::Printer::line()
