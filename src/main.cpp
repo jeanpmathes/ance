@@ -23,7 +23,7 @@ namespace ance
 {
     static int program(int const argc, char** argv)
     {
-        core::Reporter::print(std::cout, "Copyright (c) 2025 Jean Patrick Mathes");
+        core::Reporter::print(std::cout, "Copyright (c) 2026 Jean Patrick Mathes");
 
         if (argc != 2)
         {
