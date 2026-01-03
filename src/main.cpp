@@ -76,13 +76,12 @@ namespace ance
 
         return exit_code;
 
-        // todo: make LRef parameterized, instead of type registries as previous now only type dictionaries are needed
-        // todo: adapt the expect methods in runners to only take the type instead of the value, and add some utility methods to the type class
-
         // todo: use the new LRef type to simplify assignment and such
         // todo: bbt::Store should expect a reference, and simply write to that reference (might need expansion changes)
         // todo: bbt::Read should be replaced with bbt::Access, which simply returns reference to the variable
         // todo: go through all code that uses VariableRef and think whether it makes sense to go through LRef instead
+
+        // todo: make isAssignableTo work correctly and either use it or remove it
 
         // todo: add all non-cmp statements and expressions (see old grammar), if a statement/expression is cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef

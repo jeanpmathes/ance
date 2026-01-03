@@ -45,9 +45,9 @@ namespace ance::cet
     class LReference final : public bbt::Value
     {
       public:
-        explicit LReference(Address address, bbt::TypeContext& type_context);
+        LReference(Address address, utility::Shared<bbt::Type> referenced_type, bbt::TypeContext& type_context);
 
-        static utility::Shared<LReference> make(Address address, bbt::TypeContext& type_context);
+        static utility::Shared<LReference> make(Address address, utility::Shared<bbt::Type> referenced_type, bbt::TypeContext& type_context);
 
         ~LReference() override = default;
 

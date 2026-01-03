@@ -176,64 +176,54 @@ struct ance::cet::Runner::Implementation
             return result;
         }
 
-        bool expectType(bbt::Type const& expected, utility::Shared<bbt::Value> value, core::Location const& location) const
+        [[nodiscard]] bool expectType(bbt::Type const& expected, bbt::Type const& actual, core::Location const& location) const
         {
-            // todo: as soon as l-refs are parameterized, this function needs to be updated to take the actual type instead of the value
-
             bool ok = true;
 
-            utility::Shared<bbt::Type> actual = value->type();
+            bbt::Type const* actual_ptr = &actual;
 
-            while (*actual == *type_context_.getLRef())
+            while (actual_ptr->isLReference())
             {
-                auto const&    reference = value->as<LReference>();
-                Address const& address   = reference.address();
-
-                value  = address.read();
-                actual = value->type();
+                actual_ptr = &actual_ptr->getConstructorType(0);
             }
 
-            if (*actual != expected)
+            if (*actual_ptr != expected)
             {
-                reporter_.error("Expected type '" + expected.name() + "' but got '" + actual->name() + "'", location);
+                reporter_.error("Expected type '" + expected.name() + "' but got '" + actual_ptr->name() + "'", location);
                 ok = false;
             }
 
             return ok;
         }
 
-        [[nodiscard]] utility::Shared<bbt::Value> dereference(utility::Shared<bbt::Value> value) const
+        [[nodiscard]] static utility::Shared<bbt::Value> dereference(utility::Shared<bbt::Value> value)
         {
-            utility::Shared<bbt::Type> actual = value->type();
-
-            while (*actual == *type_context_.getLRef())
+            while (value->type()->isLReference())
             {
                 auto const&    reference = value->as<LReference>();
                 Address const& address   = reference.address();
 
-                value  = address.read();
-                actual = value->type();
+                value = address.read();
             }
 
             return value;
         }
 
         template<typename T>
-        T const& dereference(utility::Shared<bbt::Value> value)
+        static T const& dereference(utility::Shared<bbt::Value> value)
         {
             return dereference(value)->as<T>();
         }
 
-        [[nodiscard]] bool expectSignature(bbt::Signature const&                                              signature,
-                                           utility::List<std::reference_wrapper<bbt::Temporary const>> const& arguments,
-                                           core::Location const&                                              location)
+        [[nodiscard]] bool expectSignature(bbt::Signature const&                                         signature,
+                                           utility::List<std::reference_wrapper<bbt::Type const>> const& argument_types,
+                                           utility::List<core::Location> const&                          argument_locations,
+                                           core::Location const&                                         location)
         {
-            // todo: as soon as l-refs are parameterized, this function needs to be updated to take the actual types instead of the temporaries
-
             bool ok = true;
 
             size_t const arity          = signature.arity();
-            size_t const argument_count = arguments.size();
+            size_t const argument_count = argument_types.size();
 
             if (arity != argument_count)
             {
@@ -247,12 +237,11 @@ struct ance::cet::Runner::Implementation
 
             for (size_t i = 0; i < argument_count; ++i)
             {
-                auto const& argument  = arguments[i];
-                Temporary&  temporary = scope().getTemporary(argument.get());
+                bbt::Type const&      parameter_type    = *signature.parameters()[i].type;
+                bbt::Type const&      argument_type     = argument_types[i].get();
+                core::Location const& argument_location = argument_locations[i];
 
-                auto const& type = *signature.parameters()[i].type;
-
-                ok &= expectType(type, temporary.read(), argument.get().location);
+                ok &= expectType(parameter_type, argument_type, argument_location);
             }
 
             return ok;
@@ -334,7 +323,7 @@ struct ance::cet::Runner::Implementation
         {
             utility::Shared<bbt::Value> condition = scope().getTemporary(branch_link.condition).read();
 
-            if (!expectType(*type_context_.getBool(), condition, branch_link.condition.location))
+            if (!expectType(*type_context_.getBool(), *condition->type(), branch_link.condition.location))
             {
                 abort();
                 return;
@@ -372,7 +361,7 @@ struct ance::cet::Runner::Implementation
             utility::Shared<bbt::Value> target = scope().getTemporary(store.target).read();
             utility::Shared<bbt::Value> value  = scope().getTemporary(store.value).read();
 
-            if (!expectType(*type_context_.getVariableRef(), target, store.target.location))
+            if (!expectType(*type_context_.getVariableRef(), *target->type(), store.target.location))
             {
                 abort();
                 return;
@@ -391,7 +380,7 @@ struct ance::cet::Runner::Implementation
 
             bbt::Type const& type = *variable.type();
 
-            if (!expectType(type, value, store.value.location))
+            if (!expectType(type, *value->type(), store.value.location))
             {
                 abort();
                 return;
@@ -415,7 +404,17 @@ struct ance::cet::Runner::Implementation
         {
             auto [signature, _] = bbt::getIntrinsicSignature(intrinsic.intrinsic, type_context_);
 
-            if (!expectSignature(signature, intrinsic.arguments, intrinsic.location))
+            utility::List<std::reference_wrapper<bbt::Type const>> argument_types     = {};
+            utility::List<core::Location>                          argument_locations = {};
+
+            for (auto argument : intrinsic.arguments)
+            {
+                utility::Shared<bbt::Value> value = scope().getTemporary(argument.get()).read();
+                argument_types.emplace_back(*value->type());
+                argument_locations.emplace_back(argument.get().location);
+            }
+
+            if (!expectSignature(signature, argument_types, argument_locations, intrinsic.location))
             {
                 abort();
                 return;
@@ -459,7 +458,7 @@ struct ance::cet::Runner::Implementation
 
             utility::Shared<bbt::Value> called = scope().getTemporary(call.called).read();
 
-            if (!expectType(*type_context_.getFunction(), called, call.called.location))
+            if (!expectType(*type_context_.getFunction(), *called->type(), call.called.location))
             {
                 abort();
                 return;
@@ -468,7 +467,17 @@ struct ance::cet::Runner::Implementation
             utility::Shared<bbt::Function> function  = called.cast<bbt::Function>();
             bbt::Signature                 signature = function->signature();
 
-            if (!expectSignature(signature, call.arguments, call.location))
+            utility::List<std::reference_wrapper<bbt::Type const>> argument_types     = {};
+            utility::List<core::Location>                          argument_locations = {};
+
+            for (auto argument : call.arguments)
+            {
+                utility::Shared<bbt::Value> value = scope().getTemporary(argument.get()).read();
+                argument_types.emplace_back(*value->type());
+                argument_locations.emplace_back(argument.get().location);
+            }
+
+            if (!expectSignature(signature, argument_types, argument_locations, call.location))
             {
                 abort();
                 return;
@@ -508,7 +517,7 @@ struct ance::cet::Runner::Implementation
         {
             utility::Shared<bbt::Value> target = scope().getTemporary(read.target).read();
 
-            if (!expectType(*type_context_.getVariableRef(), target, read.target.location))
+            if (!expectType(*type_context_.getVariableRef(), *target->type(), read.target.location))
             {
                 abort();
                 return;
@@ -540,7 +549,7 @@ struct ance::cet::Runner::Implementation
         {
             utility::Shared<bbt::Value> type_value = scope().getTemporary(default_value.type).read();
 
-            if (!expectType(*type_context_.getType(), type_value, default_value.type.location))
+            if (!expectType(*type_context_.getType(), *type_value->type(), default_value.type.location))
             {
                 abort();
                 return;
@@ -573,7 +582,7 @@ struct ance::cet::Runner::Implementation
         {
             utility::Shared<bbt::Value> value = scope().getTemporary(unary_operation.operand).read();
 
-            if (!expectType(*type_context_.getBool(), value, unary_operation.operand.location))
+            if (!expectType(*type_context_.getBool(), *value->type(), unary_operation.operand.location))
             {
                 abort();
                 return;

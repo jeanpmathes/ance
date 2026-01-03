@@ -51,7 +51,7 @@ namespace ance::cet
             return value_.value();
         }
 
-        return LReference::make(Address(*this), type_context_);
+        return LReference::make(Address(*this), type_, type_context_);
     }
 
     utility::Shared<bbt::Value> Variable::read(std::vector<size_t> const& indices)

@@ -11,33 +11,54 @@ namespace ance::cet
     ScopeRef::ScopeRef(Scope& scope, bbt::TypeContext& type_context) : Value(type_context.getScopeRef(), type_context), scope_(scope) {}
 
     utility::Shared<ScopeRef> ScopeRef::make(Scope& scope, bbt::TypeContext& type_context)
-    { return utility::makeShared<ScopeRef>(scope, type_context); }
+    {
+        return utility::makeShared<ScopeRef>(scope, type_context);
+    }
 
     std::string ScopeRef::toString() const
-    { return "<scope>"; }
+    {
+        return "<scope>";
+    }
 
     Scope& ScopeRef::value() const
-    { return scope_; }
+    {
+        return scope_;
+    }
 
     VariableRef::VariableRef(Variable& variable, bbt::TypeContext& type_context) : Value(type_context.getVariableRef(), type_context), variable_(variable) {}
 
     utility::Shared<VariableRef> VariableRef::make(Variable& variable, bbt::TypeContext& type_context)
-    { return utility::makeShared<VariableRef>(variable, type_context); }
+    {
+        return utility::makeShared<VariableRef>(variable, type_context);
+    }
 
     std::string VariableRef::toString() const
-    { return "@" + std::string(variable_.name().text()); }
+    {
+        return "@" + std::string(variable_.name().text());
+    }
 
     Variable& VariableRef::value() const
-    { return variable_; }
+    {
+        return variable_;
+    }
 
-    LReference::LReference(Address address, bbt::TypeContext& type_context) : Value(type_context.getLRef(), type_context), address_(std::move(address)) {}
+    LReference::LReference(Address address, utility::Shared<bbt::Type> referenced_type, bbt::TypeContext& type_context)
+        : Value(type_context.getLRef(std::move(referenced_type)), type_context)
+        , address_(std::move(address))
+    {}
 
-    utility::Shared<LReference> LReference::make(Address address, bbt::TypeContext& type_context)
-    { return utility::makeShared<LReference>(std::move(address), type_context); }
+    utility::Shared<LReference> LReference::make(Address address, utility::Shared<bbt::Type> referenced_type, bbt::TypeContext& type_context)
+    {
+        return utility::makeShared<LReference>(std::move(address), referenced_type, type_context);
+    }
 
     std::string LReference::toString() const
-    { return address().read()->toString(); }
+    {
+        return address().read()->toString();
+    }
 
     Address const& LReference::address() const
-    { return address_; }
+    {
+        return address_;
+    }
 }

@@ -10,7 +10,9 @@
 ance::cet::Temporary::Temporary(bbt::TypeContext& type_context) : value_(bbt::Unit::make(type_context)), type_context_(type_context) {}
 
 ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::access()
-{ return LReference::make(Address(*this), type_context_); }
+{
+    return LReference::make(Address(*this), value_->type(), type_context_);
+}
 
 ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::vector<size_t> const& indices)
 {
@@ -27,10 +29,16 @@ void ance::cet::Temporary::write(utility::Shared<bbt::Value> value, std::vector<
 }
 
 ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read()
-{ return read({}); }
+{
+    return read({});
+}
 
 void ance::cet::Temporary::write(utility::Shared<bbt::Value> value)
-{ write(std::move(value), {}); }
+{
+    write(std::move(value), {});
+}
 
 bool ance::cet::Temporary::isDefined() const
-{ return true; }
+{
+    return true;
+}

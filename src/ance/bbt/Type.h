@@ -4,6 +4,7 @@
 #include <ostream>
 
 #include "ance/core/Identifier.h"
+#include "ance/utility/Containers.h"
 
 #include "Value.h"
 
@@ -12,12 +13,19 @@ namespace ance::bbt
     class TypeContext;
 
     /// Represents a type.
-    class Type final : public Value
+    class Type : public Value
     {
       public:
         /// Creates a new type.
         /// \param identifier The identifier of the type.
-        explicit Type(core::Identifier const& identifier, TypeContext& type_context);
+        /// \param type_context The type context in which this type is created.
+        Type(core::Identifier const& identifier, TypeContext& type_context);
+
+        /// Creates a new type.
+        /// \param identifier The identifier of the type.
+        /// \param constructor_type The types used to construct this type.
+        /// \param type_context The type context in which this type is created.
+        Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructor_type, TypeContext& type_context);
 
         Type(Type const&)            = delete;
         Type& operator=(Type const&) = delete;
@@ -36,16 +44,46 @@ namespace ance::bbt
         /// Checks whether this type is assignable to another type.
         [[nodiscard]] bool isAssignableTo(Type const& other) const;// todo: should also handle l-refs correctly
 
+        [[nodiscard]] virtual bool isLReference() const;
+
+        /// Gets the number of types used to construct this type.
+        /// Note that member types (e.g. for structs) are not considered constructor types.
+        [[nodiscard]] size_t getConstructorTypeCount() const;
+
+        /// Gets the i-th constructor type of this type.
+        [[nodiscard]] utility::Shared<Type> getConstructorType(size_t index);
+        /// Gets the i-th constructor type of this type.
+        [[nodiscard]] Type const& getConstructorType(size_t index) const;
+
         [[nodiscard]] std::string toString() const override;
 
       private:
-        core::Identifier identifier_;
+        core::Identifier                     identifier_;
+        utility::List<utility::Shared<Type>> constructor_types_;
+    };
+
+    /// Represents an assignable reference type.
+    class LReferenceType : public Type
+    {
+      public:
+        /// Creates a new l-value reference type.
+        /// \param referenced_type The type being referenced.
+        /// \param type_context The type context in which this type is created.
+        LReferenceType(utility::Shared<Type> referenced_type, TypeContext& type_context);
+
+        [[nodiscard]] bool isLReference() const override;
+
+      private:
+        utility::Shared<Type> referenced_type_;
     };
 
     /// Context providing access to all built-in types.
     class TypeContext
     {
       public:
+        TypeContext();
+        ~TypeContext();
+
         /// Get the boolean type, which has two values: true and false.
         utility::Shared<Type> getBool();
 
@@ -59,10 +97,11 @@ namespace ance::bbt
         utility::Shared<Type> getString();
 
         /// Get the variable reference type, which is used to refer to variables.
-        utility::Shared<Type> getVariableRef();// todo: should be split into variable type and reference type, variable type should be parameterized
+        utility::Shared<Type> getVariableRef();// todo: should be split into variable type and reference type (not lref), variable type should be parameterized
 
         /// Get the untyped l-value reference type.
-        utility::Shared<Type> getLRef();// todo: should be parameterized, typed, and be &T rather than .T
+        /// \param referenced_type The type being referenced.
+        utility::Shared<Type> getLRef(utility::Shared<Type> referenced_type);
 
         /// Get the identifier type, which is the type of all identifiers.
         utility::Shared<Type> getIdentifier();
@@ -78,6 +117,10 @@ namespace ance::bbt
 
         /// Get the source location type.
         utility::Shared<Type> getLocation();
+
+      private:
+        struct Implementation;
+        utility::Owned<Implementation> implementation_;
     };
 }
 
