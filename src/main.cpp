@@ -76,14 +76,14 @@ namespace ance
 
         return exit_code;
 
-        // todo: use the new LRef type to simplify assignment and such
-        // todo: bbt::Store should expect a reference, and simply write to that reference (might need expansion changes)
-        // todo: bbt::Read should be replaced with bbt::Access, which simply returns reference to the variable
-        // todo: go through all code that uses VariableRef and think whether it makes sense to go through LRef instead
-
+        // todo: go through all code in runner that uses VariableRef and think whether it makes sense to go through LRef instead
         // todo: make isAssignableTo work correctly and either use it or remove it
 
-        // todo: add all non-cmp statements and expressions (see old grammar), if a statement/expression is cmp add a TODO in the old grammar file
+        // todo: refactor segmenter using new builder and utilities
+
+        // todo: improve naming of temporaries - do it numbered per flow, append operations to the name like I did with llvm IR values - also do it through post processor define as done back then
+
+        // todo: add all cmp statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef
         // todo: do it step by step, as e.g. the array things require more changes so that array ops have support on types that the temporary and variable classes can use
         // todo: also reduce duplication between temporary and variable

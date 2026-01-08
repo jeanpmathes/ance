@@ -51,11 +51,18 @@ ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location)
 
 ance::bbt::Pass::Pass(core::Location const& source_location) : Node(source_location), Statement() {}
 
-ance::bbt::Store::Store(Temporary const& var, Temporary const& stored, core::Location const& source_location)
+ance::bbt::Store::Store(Temporary const& lref, Temporary const& stored, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , target(var)
+    , target(lref)
     , value(stored)
+{}
+
+ance::bbt::Access::Access(Temporary const& var, Temporary const& result, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , variable(var)
+    , destination(result)
 {}
 
 ance::bbt::Temporary::Temporary(core::Location const& source_location) : Node(source_location), Statement() {}
@@ -80,13 +87,6 @@ ance::bbt::Intrinsic::Intrinsic(core::Intrinsic                                 
     , Statement()
     , intrinsic(used)
     , arguments(std::move(args))
-    , destination(result)
-{}
-
-ance::bbt::Read::Read(Temporary const& var, Temporary const& result, core::Location const& source_location)
-    : Node(source_location)
-    , Statement()
-    , target(var)
     , destination(result)
 {}
 

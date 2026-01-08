@@ -97,44 +97,58 @@ struct ance::bbt::Printer::Implementation
             print(")");
         }
 
-        void visit(ErrorStatement const&) override { print("// error"); }
+        void visit(ErrorStatement const&) override
+        {
+            print("// error");
+        }
 
-        void visit(Pass const&) override { print("pass;"); }
+        void visit(Pass const&) override
+        {
+            print("pass;");
+        }
 
         void visit(Store const& store) override
         {
-            print("store temporary ");
+            print("store ");
             print(store.value.id());
             print(" at ");
             print(store.target.id());
             print(";");
         }
 
+        void visit(Access const& access) override
+        {
+            print(access.destination.id());
+            print(" ");
+            print(core::Assigner::COPY_ASSIGNMENT);
+            print(" access ");
+            print(access.variable.id());
+            print(";");
+        }
+
         void visit(Temporary const& temporary) override
         {
-            print("declare temporary ");
+            print("temporary ");
             print(temporary.id());
             print(";");
         }
 
         void visit(CopyTemporary const& write_temporary) override
         {
-            print("temporary ");
             print(write_temporary.destination.id());
             print(" ");
             print(core::Assigner::COPY_ASSIGNMENT);
-            print(" temporary ");
+            print(" ");
             print(write_temporary.source.id());
             print(";");
         }
 
         void visit(Intrinsic const& intrinsic) override
         {
-            print("temporary ");
             print(intrinsic.destination.id());
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
-            print(" intrinsic(");
+            print(" intrinsic (");
             print(intrinsic.intrinsic);
             for (auto const argument : intrinsic.arguments)
             {
@@ -146,13 +160,12 @@ struct ance::bbt::Printer::Implementation
 
         void visit(Call const& call) override
         {
-            print("temporary ");
             print(call.destination.id());
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
-            print(" temporary ");
+            print(" call ");
             print(call.called.id());
-            print(" call (");
+            print(" (");
             for (size_t i = 0; i < call.arguments.size(); ++i)
             {
                 print(call.arguments[i].get().id());
@@ -161,20 +174,8 @@ struct ance::bbt::Printer::Implementation
             print(");");
         }
 
-        void visit(Read const& read) override
-        {
-            print("temporary ");
-            print(read.destination.id());
-            print(" ");
-            print(core::Assigner::COPY_ASSIGNMENT);
-            print(" read at ");
-            print(read.target.id());
-            print(";");
-        }
-
         void visit(Constant const& constant) override
         {
-            print("temporary ");
             print(constant.destination.id());
             print(" ");
             print(core::Assigner::COPY_ASSIGNMENT);
@@ -185,18 +186,16 @@ struct ance::bbt::Printer::Implementation
 
         void visit(Default const& default_value) override
         {
-            print("temporary ");
             print(default_value.destination.id());
             print(" ");
             print(core::Assigner::COPY_ASSIGNMENT);
-            print(" default (temporary ");
+            print(" default ( ");
             print(default_value.type.id());
             print(");");
         }
 
         void visit(CurrentScope const& current_scope) override
         {
-            print("temporary ");
             print(current_scope.destination.id());
             print(" ");
             print(core::Assigner::COPY_ASSIGNMENT);
@@ -205,7 +204,6 @@ struct ance::bbt::Printer::Implementation
 
         void visit(UnaryOperation const& unary_operation) override
         {
-            print("temporary ");
             print(unary_operation.destination.id());
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
@@ -218,19 +216,23 @@ struct ance::bbt::Printer::Implementation
 
         void visit(TypeOf const& type_of) override
         {
-            print("temporary ");
             print(type_of.destination.id());
             print(" ");
             print(core::Assigner::COPY_ASSIGNMENT);
-            print(" typeof (temporary ");
+            print(" typeof ( ");
             print(type_of.expression.id());
             print(");");
         }
 
-        void visit(OrderedScopeEnter const&) override { print("// enter scope"); }
+        void visit(OrderedScopeEnter const&) override
+        {
+            print("// enter scope");
+        }
 
-        void visit(OrderedScopeExit const&) override { print("// exit scope"); }
-
+        void visit(OrderedScopeExit const&) override
+        {
+            print("// exit scope");
+        }
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}

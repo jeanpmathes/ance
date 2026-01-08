@@ -45,7 +45,7 @@ struct ance::bbt::Grapher::Implementation
             // todo: print meta blocks differently (use the other style)
 
             std::stringstream code;
-            Printer const code_printer(code);
+            Printer const     code_printer(code);
             code_printer.print(block);
 
             addNode(code.str(), block.id, Style::CODE);
@@ -75,48 +75,27 @@ struct ance::bbt::Grapher::Implementation
             addEdge(current_id_, jump_link.target.id);
         }
 
-        void visit(ErrorStatement const&) override {  }
+        void visit(ErrorStatement const&) override {}
 
-        void visit(Pass const&) override { }
+        void visit(Pass const&) override {}
 
-        void visit(Store const& ) override
-        {
+        void visit(Store const&) override {}
 
-        }
+        void visit(Access const&) override {}
 
-        void visit(Temporary const& ) override {}
+        void visit(Temporary const&) override {}
 
-        void visit(CopyTemporary const& ) override {}
+        void visit(CopyTemporary const&) override {}
 
-        void visit(Intrinsic const& ) override
-        {
+        void visit(Intrinsic const&) override {}
 
-        }
+        void visit(Call const&) override {}
 
-        void visit(Call const&) override
-        {
+        void visit(Constant const&) override {}
 
-        }
+        void visit(Default const&) override {}
 
-        void visit(Read const& ) override
-        {
-
-        }
-
-        void visit(Constant const& ) override
-        {
-
-        }
-
-        void visit(Default const&) override
-        {
-
-        }
-
-        void visit(CurrentScope const&) override
-        {
-
-        }
+        void visit(CurrentScope const&) override {}
 
         void visit(UnaryOperation const&) override {}
 
@@ -156,7 +135,6 @@ struct ance::bbt::Grapher::Implementation
 
 ance::bbt::Grapher::Grapher(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
 ance::bbt::Grapher::~Grapher() = default;
-
 
 void ance::bbt::Grapher::graph(UnorderedScope const& scope) const
 {

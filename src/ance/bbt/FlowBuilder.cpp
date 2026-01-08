@@ -57,7 +57,7 @@ namespace ance::bbt
             return ref;
         }
 
-        Temporary const& pushVariableRead(core::Identifier const& name)
+        Temporary const& pushVariableAccess(core::Identifier const& name)
         {
             Temporary const& scope_arg = pushTemporary();
             pushStatement(utility::makeOwned<CurrentScope>(scope_arg, location_));
@@ -71,10 +71,10 @@ namespace ance::bbt
             resolve_arguments.emplace_back(identifier_arg);
             pushStatement(utility::makeOwned<Intrinsic>(core::Intrinsic::RESOLVE, std::move(resolve_arguments), resolve_result, location_));
 
-            Temporary const& read_result = pushTemporary();
-            pushStatement(utility::makeOwned<Read>(resolve_result, read_result, location_));
+            Temporary const& access_result = pushTemporary();
+            pushStatement(utility::makeOwned<Access>(resolve_result, access_result, location_));
 
-            return read_result;
+            return access_result;
         }
 
         Temporary const& pushConstant(utility::Shared<Value> value)
@@ -129,9 +129,9 @@ namespace ance::bbt
         return implementation_->pushTemporary();
     }
 
-    Temporary const& FlowBuilder::pushVariableRead(core::Identifier const& name)
+    Temporary const& FlowBuilder::pushVariableAccess(core::Identifier const& name)
     {
-        return implementation_->pushVariableRead(name);
+        return implementation_->pushVariableAccess(name);
     }
 
     Temporary const& FlowBuilder::pushConstant(utility::Shared<Value> value)

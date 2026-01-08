@@ -37,8 +37,8 @@ namespace ance::bbt
         /// Pushes a statement to create a new temporary variable to the currently active basic block and returns the created temporary.
         Temporary const& pushTemporary();
 
-        /// Pushes the statements needed to resolve and read a variable with the given name to the currently active basic block and returns the temporary holding the read value.
-        Temporary const& pushVariableRead(core::Identifier const& name);
+        /// Pushes the statements needed to resolve and access a variable with the given name to the currently active basic block and returns the temporary holding the access result.
+        Temporary const& pushVariableAccess(core::Identifier const& name);
 
         /// Pushes the statements needed to create a constant value to the currently active basic block and returns the temporary holding the value.
         Temporary const& pushConstant(utility::Shared<Value> value);

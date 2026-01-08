@@ -138,15 +138,26 @@ namespace ance::bbt
         explicit Pass(core::Location const& source_location);
     };
 
-    /// Stores a value to a variable.
+    /// Stores a value to an l-reference.
     struct Store final
         : Statement
         , utility::ConcreteNode<Store, Visitor>
     {
-        Store(Temporary const& var, Temporary const& stored, core::Location const& source_location);
+        Store(Temporary const& lref, Temporary const& stored, core::Location const& source_location);
 
         Temporary const& target;
         Temporary const& value;
+    };
+
+    /// Provides the value of or an l-ref to a variable.
+    struct Access final
+        : Statement
+        , utility::ConcreteNode<Access, Visitor>
+    {
+        Access(Temporary const& var, Temporary const& result, core::Location const& source_location);
+
+        Temporary const& variable;
+        Temporary const& destination;
     };
 
     /// Introduce a temporary variable, which works similar to any other local variable but does not have a name.
@@ -183,17 +194,6 @@ namespace ance::bbt
         core::Intrinsic                                        intrinsic;
         utility::List<std::reference_wrapper<Temporary const>> arguments;
         Temporary const&                                       destination;
-    };
-
-    /// Reads a variable.
-    struct Read final
-        : Statement
-        , utility::ConcreteNode<Read, Visitor>
-    {
-        Read(Temporary const& var, Temporary const& result, core::Location const& source_location);
-
-        Temporary const& target;
-        Temporary const& destination;
     };
 
     /// Calls a function.
@@ -304,12 +304,12 @@ namespace ance::bbt
         virtual void visit(ErrorStatement const& error_statement) = 0;
         virtual void visit(Pass const& pass_statement)            = 0;
         virtual void visit(Store const& store)                    = 0;
+        virtual void visit(Access const& access)                  = 0;
         virtual void visit(Temporary const& temporary)            = 0;
         virtual void visit(CopyTemporary const& write_temporary)  = 0;
 
         virtual void visit(Intrinsic const& intrinsic)            = 0;
         virtual void visit(Call const& call)                      = 0;
-        virtual void visit(Read const& read)                      = 0;
         virtual void visit(Constant const& constant)              = 0;
         virtual void visit(Default const& default_value)          = 0;
         virtual void visit(CurrentScope const& current_scope)     = 0;

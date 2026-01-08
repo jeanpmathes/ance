@@ -361,7 +361,31 @@ struct ance::cet::Runner::Implementation
             utility::Shared<bbt::Value> target = scope().getTemporary(store.target).read();
             utility::Shared<bbt::Value> value  = scope().getTemporary(store.value).read();
 
-            if (!expectType(*type_context_.getVariableRef(), *target->type(), store.target.location))
+            if (!target->type()->isLReference())
+            {
+                reporter_.error("Cannot store to non-l-value", store.target.location);
+                abort();
+                return;
+            }
+
+            // todo: this is not ideal with final variables, technically we could get an l-ref to it when it is not defined yet but then write twice to it through the same l-ref
+
+            utility::Shared<LReference> reference = target.cast<LReference>();
+
+            if (!expectType(*target->type()->getConstructorType(0), *value->type(), store.value.location))
+            {
+                abort();
+                return;
+            }
+
+            reference->address().write(dereference(value));
+        }
+
+        void visit(bbt::Access const& access) override
+        {
+            utility::Shared<bbt::Value> target = scope().getTemporary(access.variable).read();
+
+            if (!expectType(*type_context_.getVariableRef(), *target->type(), access.variable.location))
             {
                 abort();
                 return;
@@ -369,24 +393,12 @@ struct ance::cet::Runner::Implementation
 
             Variable& variable = target->as<VariableRef>().value();
 
-            bool const is_defined = variable.isDefined();
+            // todo: using type inference, we could determine whether we want to later write to it or if not, if yes and final we could output an error here
+            // todo: we could also check whether it is already defined if we want to read later, catching reads from undefined variables
 
-            if (variable.isFinal() && is_defined)
-            {
-                reporter_.error("Cannot store to final variable '" + variable.name() + "'", store.target.location);
-                abort();
-                return;
-            }
+            // todo: right now, reading from this lref would be possible even if the variable is not defined
 
-            bbt::Type const& type = *variable.type();
-
-            if (!expectType(type, *value->type(), store.value.location))
-            {
-                abort();
-                return;
-            }
-
-            variable.write(dereference(value));
+            scope().getTemporary(access.destination).write(variable.access());
         }
 
         void visit(bbt::Temporary const& temporary) override
@@ -513,34 +525,10 @@ struct ance::cet::Runner::Implementation
             yield();
         }
 
-        void visit(bbt::Read const& read) override
-        {
-            utility::Shared<bbt::Value> target = scope().getTemporary(read.target).read();
-
-            if (!expectType(*type_context_.getVariableRef(), *target->type(), read.target.location))
-            {
-                abort();
-                return;
-            }
-
-            Variable& variable = target->as<VariableRef>().value();
-
-            bool const is_defined = variable.isDefined();
-            if (!is_defined)
-            {
-                reporter_.error("Reading from undefined variable '" + variable.name() + "'", read.target.location);
-                abort();
-                return;
-            }
-
-            utility::Shared<bbt::Value> value = variable.read();
-            scope().getTemporary(read.destination).write(value);
-        }
-
         void visit(bbt::Constant const& constant) override
         {
             // Because the value class is immutable, this operation is logically const, but requires mutability to copy the shared ownership.
-            bbt::Constant* mutable_constant = const_cast<bbt::Constant*>(&constant);// todo: think about a nicer way to do this
+            auto* mutable_constant = const_cast<bbt::Constant*>(&constant);// todo: think about a nicer way to do this
 
             scope().getTemporary(constant.destination).write(mutable_constant->value);
         }

@@ -19,7 +19,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
+        bbt::Temporary const& value = builder.pushVariableAccess(core::Identifier::like("value"));
 
         bbt::Temporary const& str_value = builder.pushTemporary();
         {
@@ -47,8 +47,8 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& value    = builder.pushVariableRead(core::Identifier::like("value"));
-        bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
+        bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::like("value"));
+        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::like("location"));
 
         bbt::Temporary const& str_value = builder.pushTemporary();
         {
@@ -76,7 +76,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& value = builder.pushVariableRead(core::Identifier::like("value"));
+        bbt::Temporary const& value = builder.pushVariableAccess(core::Identifier::like("value"));
 
         bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
 
@@ -97,8 +97,8 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& value    = builder.pushVariableRead(core::Identifier::like("value"));
-        bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
+        bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::like("value"));
+        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::like("location"));
 
         bbt::Temporary const& result = builder.pushTemporary();
         {
@@ -119,8 +119,8 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& file     = builder.pushVariableRead(core::Identifier::like("file"));
-        bbt::Temporary const& location = builder.pushVariableRead(core::Identifier::like("location"));
+        bbt::Temporary const& file     = builder.pushVariableAccess(core::Identifier::like("file"));
+        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::like("location"));
 
         bbt::Temporary const& result = builder.pushTemporary();
         {
