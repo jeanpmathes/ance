@@ -41,9 +41,6 @@ namespace ance::bbt
 
         // todo: add a function stripped() that removes all l-refs, e.g. &T -> T, &&T -> T, &&&T -> T, etc.
 
-        /// Checks whether this type is assignable to another type.
-        [[nodiscard]] bool isAssignableTo(Type const& other) const;// todo: should also handle l-refs correctly
-
         [[nodiscard]] virtual bool isLReference() const;
 
         /// Gets the number of types used to construct this type.

@@ -87,11 +87,6 @@ namespace ance::bbt
         return !(*this == other);
     }
 
-    bool Type::isAssignableTo(Type const& other) const
-    {
-        return *this == other;
-    }
-
     bool Type::isLReference() const
     {
         return false;

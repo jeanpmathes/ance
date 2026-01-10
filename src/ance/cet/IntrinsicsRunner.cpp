@@ -48,7 +48,7 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
                     .pending_resolution   = std::nullopt};
 
     assert(arguments.size() == signature.parameters().size());
-    for (size_t i = 0; i < arguments.size(); ++i) assert(arguments[i]->type()->isAssignableTo(*signature.parameters()[i].type));
+    for (size_t i = 0; i < arguments.size(); ++i) assert(*arguments[i]->type() == *signature.parameters()[i].type);
 
     switch (intrinsic.value())
     {
@@ -168,7 +168,7 @@ void ance::cet::IntrinsicsRunner::runInclude()
 
 void ance::cet::IntrinsicsRunner::setResult(utility::Shared<bbt::Value> value)
 {
-    assert(value->type()->isAssignableTo(**state_.expected_return_type));
+    assert(*value->type() == **state_.expected_return_type);
 
     assert(!state_.return_value_.hasValue());
     assert(!state_.pending_resolution.hasValue());

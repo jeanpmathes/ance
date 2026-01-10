@@ -76,9 +76,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: go through all code in runner that uses VariableRef and think whether it makes sense to go through LRef instead
-        // todo: make isAssignableTo work correctly and either use it or remove it
-
         // todo: refactor segmenter using new builder and utilities
 
         // todo: improve naming of temporaries - do it numbered per flow, append operations to the name like I did with llvm IR values - also do it through post processor define as done back then
