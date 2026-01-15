@@ -262,11 +262,11 @@ struct ance::bbt::Segmenter::Implementation
             template<typename StatementType, typename... Args>
             StatementType& addStatement(Args&&... args)
             {
-                utility::Owned<StatementType> inner = utility::makeOwned<StatementType>(std::forward<Args>(args)...);
-                StatementType& inner_ref            = *inner;
+                utility::Owned<StatementType> inner     = utility::makeOwned<StatementType>(std::forward<Args>(args)...);
+                StatementType&                inner_ref = *inner;
 
-                utility::Owned<SimpleBB>               block = utility::makeOwned<SimpleBB>(std::move(inner));
-                std::reference_wrapper block_ref   = *block;
+                utility::Owned<SimpleBB> block     = utility::makeOwned<SimpleBB>(std::move(inner));
+                std::reference_wrapper   block_ref = *block;
                 blocks_.emplace_back(std::move(block));
 
                 link(exit_.value(), block_ref);
@@ -295,7 +295,7 @@ struct ance::bbt::Segmenter::Implementation
             BlockType& addSpecialBlock(Args&&... args)
             {
                 utility::Owned<BlockType> block = utility::makeOwned<BlockType>(std::forward<Args>(args)...);
-                BlockType& ref = *block;
+                BlockType&                ref   = *block;
                 blocks_.emplace_back(std::move(block));
 
                 link(exit_.value(), ref);
