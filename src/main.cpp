@@ -76,14 +76,14 @@ namespace ance
 
         return exit_code;
 
-        // todo: refactor segmenter using new builder and utilities
-
         // todo: improve naming of temporaries - do it numbered per flow, append operations to the name like I did with llvm IR values - also do it through post processor define as done back then
 
         // todo: add all cmp statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef
         // todo: do it step by step, as e.g. the array things require more changes so that array ops have support on types that the temporary and variable classes can use
         // todo: also reduce duplication between temporary and variable
+
+        // todo: rework SourceFile class to read into single string buffer, then use string views instead of line-by-line reading
 
         // todo: add first non-cmp code (and declarable functions) and do actual compilation
         // todo: build a very minimal CET that heavily relies and uses intrinsics, should be close to LLVM IR in capability and nodes
