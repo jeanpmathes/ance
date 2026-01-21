@@ -76,8 +76,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: refactor segmenter to have state in state struct instead of all the separate variables
-
         // todo: improve naming in expander
         // todo: improve naming in segmenter
 

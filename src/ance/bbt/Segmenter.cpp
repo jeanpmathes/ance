@@ -282,7 +282,7 @@ struct ance::bbt::Segmenter::Implementation
 
             Temporary& addTemporary(core::Location const& location)
             {
-                return addTemporary(std::to_string(ret_.temporary_counter_++), location);
+                return addTemporary(std::to_string(ret_.state_.temporary_counter++), location);
             }
 
             void addSegmented(est::Statement const& statement)
@@ -371,17 +371,14 @@ struct ance::bbt::Segmenter::Implementation
 
         utility::Owned<Flow> apply(est::Statement const& statement)
         {
-            assert(bbs_.empty());
-            assert(temporaries_.empty());
-            assert(loops_.empty());
-            assert(scopes_.empty());
+            state_ = {};
 
             utility::Owned<SimpleBB> entry_block = utility::makeOwned<SimpleBB>();
             std::reference_wrapper   entry       = *entry_block;
 
-            current_entry_bb_ = entry_block.get();
-            current_exit_bb_  = current_entry_bb_;
-            bbs_.emplace_back(std::move(entry_block));
+            state_.segment.entry_bb = entry_block.get();
+            state_.segment.exit_bb  = state_.segment.entry_bb;
+            state_.bbs.emplace_back(std::move(entry_block));
 
             auto [statement_entry, statement_exit] = segment(statement);
 
@@ -430,19 +427,12 @@ struct ance::bbt::Segmenter::Implementation
 
             utility::Owned<Flow> flow = utility::makeOwned<Flow>(std::move(basic_blocks), first_block, std::to_string(flow_counter_++), statement.location);
 
-            bbs_.clear();
-            temporaries_.clear();
-            loops_.clear();
-            scopes_.clear();
-
-            discard_counter_ = 0;
-
             return flow;
         }
 
         std::reference_wrapper<BaseBB> simplify(std::reference_wrapper<BaseBB> entry)
         {
-            for (auto& block : bbs_)
+            for (auto& block : state_.bbs)
             {
                 block.get()->prune();
             }
@@ -480,7 +470,7 @@ struct ance::bbt::Segmenter::Implementation
             bool           has_unreachable_code       = false;
             core::Location first_unreachable_location = core::Location::global();
 
-            for (auto& block : bbs_)
+            for (auto& block : state_.bbs)
             {
                 if (block.get()->hasCode() && !simplified.contains(block.get()))
                 {
@@ -506,71 +496,61 @@ struct ance::bbt::Segmenter::Implementation
 
         std::pair<std::reference_wrapper<SimpleBB>, std::reference_wrapper<SimpleBB>> segment(est::Statement const& statement)
         {
-            SimpleBB* previous_entry = current_entry_bb_;
-            SimpleBB* previous_exit  = current_exit_bb_;
-
-            current_entry_bb_ = nullptr;
-            current_exit_bb_  = nullptr;
+            SegmentState const previous_segment = state_.segment;
+            state_.segment                      = {};
 
             visit(statement);
 
-            assert(current_entry_bb_ != nullptr);
-            assert(current_exit_bb_ != nullptr);
+            assert(state_.segment.entry_bb != nullptr);
+            assert(state_.segment.exit_bb != nullptr);
 
-            std::pair<SimpleBB&, SimpleBB&> const result = {*current_entry_bb_, *current_exit_bb_};
+            std::pair<SimpleBB&, SimpleBB&> const result = {*state_.segment.entry_bb, *state_.segment.exit_bb};
 
-            current_entry_bb_ = previous_entry;
-            current_exit_bb_  = previous_exit;
+            state_.segment = previous_segment;
 
             return result;
         }
 
         std::pair<std::reference_wrapper<SimpleBB>, std::reference_wrapper<SimpleBB>> segment(est::Expression const& expression, Temporary const& destination)
         {
-            SimpleBB*        previous_entry       = current_entry_bb_;
-            SimpleBB*        previous_exit        = current_exit_bb_;
-            Temporary const* previous_destination = current_destination_;
+            SegmentState const previous_segment = state_.segment;
+            state_.segment                      = {};
+            state_.segment.destination          = &destination;
 
-            current_entry_bb_    = nullptr;
-            current_exit_bb_     = nullptr;
-            current_destination_ = &destination;
-
-            assert(current_destination_ != nullptr);
+            assert(state_.segment.destination != nullptr);
 
             visit(expression);
 
-            assert(current_entry_bb_ != nullptr);
-            assert(current_exit_bb_ != nullptr);
+            assert(state_.segment.entry_bb != nullptr);
+            assert(state_.segment.exit_bb != nullptr);
 
-            std::pair<SimpleBB&, SimpleBB&> const result = {*current_entry_bb_, *current_exit_bb_};
+            std::pair<SimpleBB&, SimpleBB&> const result = {*state_.segment.entry_bb, *state_.segment.exit_bb};
 
-            current_entry_bb_    = previous_entry;
-            current_exit_bb_     = previous_exit;
-            current_destination_ = previous_destination;
+            state_.segment = previous_segment;
 
             return result;
         }
 
         [[nodiscard]] Temporary const& destination() const
         {
-            assert(current_destination_ != nullptr);
-            return *current_destination_;
+            assert(state_.segment.destination != nullptr);
+            return *state_.segment.destination;
         }
 
         void setResult(utility::List<utility::Owned<BaseBB>>&& blocks, SimpleBB& entry, SimpleBB& exit)
         {
-            bbs_.insert(bbs_.end(), std::make_move_iterator(blocks.begin()), std::make_move_iterator(blocks.end()));
+            state_.bbs.insert(state_.bbs.end(), std::make_move_iterator(blocks.begin()), std::make_move_iterator(blocks.end()));
 
-            current_entry_bb_ = &entry;
-            current_exit_bb_  = &exit;
+            state_.segment.entry_bb = &entry;
+            state_.segment.exit_bb  = &exit;
         }
 
         void setResult(Result&& result)
         {
-            bbs_.insert(bbs_.end(), std::make_move_iterator(result.blocks.begin()), std::make_move_iterator(result.blocks.end()));
+            state_.bbs.insert(state_.bbs.end(), std::make_move_iterator(result.blocks.begin()), std::make_move_iterator(result.blocks.end()));
 
-            current_entry_bb_ = &result.entry.get();
-            current_exit_bb_  = &result.exit.get();
+            state_.segment.entry_bb = &result.entry.get();
+            state_.segment.exit_bb  = &result.exit.get();
         }
 
         void visit(est::File const&) override
@@ -601,14 +581,14 @@ struct ance::bbt::Segmenter::Implementation
             Builder builder(*this);
 
             auto& scope_enter = builder.addStatement<OrderedScopeEnter>(block.location);
-            scopes_.emplace_back(&scope_enter);
+            state_.scopes.emplace_back(&scope_enter);
 
             for (auto& statement : block.statements)
             {
                 builder.addSegmented(*statement);
             }
 
-            scopes_.pop_back();
+            state_.scopes.pop_back();
             builder.addStatement<OrderedScopeExit>(scope_enter, block.location);
 
             setResult(builder.take());
@@ -618,7 +598,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& value = builder.addTemporary(std::format("discard_{}", discard_counter_++), independent.location);
+            auto& value = builder.addTemporary(std::format("discard_{}", state_.discard_counter++), independent.location);
             builder.addSegmented(*independent.expression, value);
 
             setResult(builder.take());
@@ -671,11 +651,11 @@ struct ance::bbt::Segmenter::Implementation
             std::reference_wrapper const entry = builder.getEntry();
             std::reference_wrapper const exit  = builder.getExit();
 
-            loops_.emplace_back(Loop {.entry = entry, .exit = exit, .scope_depth = scopes_.size()});
+            state_.loops.emplace_back(Loop {.entry = entry, .exit = exit, .scope_depth = state_.scopes.size()});
 
             auto [loop_entry, loop_exit] = segment(*loop.body);
 
-            loops_.pop_back();
+            state_.loops.pop_back();
 
             link(entry, loop_entry);
             link(loop_exit, entry);
@@ -685,20 +665,20 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Break const& break_statement) override
         {
-            if (loops_.empty())
+            if (state_.loops.empty())
             {
                 reporter_.error("Break statement outside of loop", break_statement.location);
             }
 
             Builder builder(*this);
 
-            size_t const target_depth = loops_.back().scope_depth;
-            for (size_t i = scopes_.size(); i > target_depth; i--)
+            size_t const target_depth = state_.loops.back().scope_depth;
+            for (size_t i = state_.scopes.size(); i > target_depth; i--)
             {
-                builder.addStatement<OrderedScopeExit>(*scopes_[i - 1], break_statement.location);
+                builder.addStatement<OrderedScopeExit>(*state_.scopes[i - 1], break_statement.location);
             }
 
-            link(builder.getExit(), loops_.back().exit);
+            link(builder.getExit(), state_.loops.back().exit);
 
             builder.addDisconnectedExitBlock();
 
@@ -707,20 +687,20 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Continue const& continue_statement) override
         {
-            if (loops_.empty())
+            if (state_.loops.empty())
             {
                 reporter_.error("Continue statement outside of loop", continue_statement.location);
             }
 
             Builder builder(*this);
 
-            size_t const target_depth = loops_.back().scope_depth;
-            for (size_t i = scopes_.size(); i > target_depth; i--)
+            size_t const target_depth = state_.loops.back().scope_depth;
+            for (size_t i = state_.scopes.size(); i > target_depth; i--)
             {
-                builder.addStatement<OrderedScopeExit>(*scopes_[i - 1], continue_statement.location);
+                builder.addStatement<OrderedScopeExit>(*state_.scopes[i - 1], continue_statement.location);
             }
 
-            link(builder.getExit(), loops_.back().entry);
+            link(builder.getExit(), state_.loops.back().entry);
 
             builder.addDisconnectedExitBlock();
 
@@ -732,7 +712,7 @@ struct ance::bbt::Segmenter::Implementation
             Builder builder(*this);
 
             auto& value = builder.addTemporary(temporary.location);
-            temporaries_.emplace(&temporary, &value);
+            state_.temporaries.emplace(&temporary, &value);
 
             if (temporary.definition.hasValue())
             {
@@ -746,7 +726,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            Temporary const& destination = *temporaries_.at(&write.temporary);
+            Temporary const& destination = *state_.temporaries.at(&write.temporary);
             builder.addSegmented(*write.value, destination);
 
             setResult(builder.take());
@@ -886,7 +866,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            builder.addStatement<CopyTemporary>(destination(), *temporaries_.at(&read_temporary.temporary), read_temporary.location);
+            builder.addStatement<CopyTemporary>(destination(), *state_.temporaries.at(&read_temporary.temporary), read_temporary.location);
 
             setResult(builder.take());
         }
@@ -929,18 +909,29 @@ struct ance::bbt::Segmenter::Implementation
         };
 
       private:
-        utility::List<utility::Owned<BaseBB>> bbs_;
+        struct SegmentState
+        {
+            SimpleBB*        entry_bb    = nullptr;
+            SimpleBB*        exit_bb     = nullptr;
+            Temporary const* destination = nullptr;
+        };
 
-        SimpleBB*        current_entry_bb_    = nullptr;
-        SimpleBB*        current_exit_bb_     = nullptr;
-        Temporary const* current_destination_ = nullptr;
+        struct FlowState
+        {
+            utility::List<utility::Owned<BaseBB>> bbs;
 
-        std::vector<Loop>                     loops_  = {};
-        std::vector<OrderedScopeEnter const*> scopes_ = {};
+            SegmentState segment = {};
 
-        std::map<est::Temporary const*, Temporary const*> temporaries_;
-        size_t                                            discard_counter_   = 0;
-        size_t                                            temporary_counter_ = 0;
+            std::vector<Loop>                     loops  = {};
+            std::vector<OrderedScopeEnter const*> scopes = {};
+
+            std::map<est::Temporary const*, Temporary const*> temporaries;
+
+            size_t discard_counter   = 0;
+            size_t temporary_counter = 0;
+        };
+
+        FlowState state_;
 
         core::Reporter& reporter_;
         TypeContext&    type_context_;
