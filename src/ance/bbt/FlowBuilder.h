@@ -35,7 +35,7 @@ namespace ance::bbt
         void pushStatement(utility::Owned<Statement> statement);
 
         /// Pushes a statement to create a new temporary variable to the currently active basic block and returns the created temporary.
-        Temporary const& pushTemporary();
+        Temporary const& pushTemporary(std::string id);
 
         /// Pushes the statements needed to resolve and access a variable with the given name to the currently active basic block and returns the temporary holding the access result.
         Temporary const& pushVariableAccess(core::Identifier const& name);
@@ -44,7 +44,7 @@ namespace ance::bbt
         Temporary const& pushConstant(utility::Shared<Value> value);
 
         /// Builds the flow from the added basic blocks and statements.
-        utility::Owned<Flow> build();
+        utility::Owned<Flow> build(std::string id);
 
       private:
         struct Implementation;

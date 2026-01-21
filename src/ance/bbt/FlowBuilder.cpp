@@ -47,45 +47,51 @@ namespace ance::bbt
             blocks_[active_id_].statements.emplace_back(std::move(statement));
         }
 
-        Temporary const& pushTemporary()
+        Temporary const& pushTemporary(std::string id)
         {
-            utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(location_);
-            Temporary&                ref       = *temporary;
+            utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(id, location_);
+            Temporary const&          ref       = *temporary;
 
             pushStatement(std::move(temporary));
 
             return ref;
         }
 
+        std::map<std::string_view, size_t> variable_access_counters_;
+
         Temporary const& pushVariableAccess(core::Identifier const& name)
         {
-            Temporary const& scope_arg = pushTemporary();
+            size_t count = variable_access_counters_[name.text()]++;
+
+            Temporary const& scope_arg = pushTemporary(std::format("access_'{}'_{}_scope", name.text(), count));
             pushStatement(utility::makeOwned<CurrentScope>(scope_arg, location_));
 
-            Temporary const& identifier_arg = pushTemporary();
+            Temporary const& identifier_arg = pushTemporary(std::format("access_'{}'_{}_identifier", name.text(), count));
             pushStatement(utility::makeOwned<Constant>(Identifier::make(name, type_context_), identifier_arg, location_));
 
-            Temporary const&                                       resolve_result = pushTemporary();
+            Temporary const&                                       resolve_result = pushTemporary(std::format("access_'{}'_{}_resolve", name.text(), count));
             utility::List<std::reference_wrapper<Temporary const>> resolve_arguments;
             resolve_arguments.emplace_back(scope_arg);
             resolve_arguments.emplace_back(identifier_arg);
             pushStatement(utility::makeOwned<Intrinsic>(core::Intrinsic::RESOLVE, std::move(resolve_arguments), resolve_result, location_));
 
-            Temporary const& access_result = pushTemporary();
+            Temporary const& access_result = pushTemporary(std::format("access_'{}'_{}_result", name.text(), count));
             pushStatement(utility::makeOwned<Access>(resolve_result, access_result, location_));
 
             return access_result;
         }
 
+        size_t constant_counter_ = 0;
+
         Temporary const& pushConstant(utility::Shared<Value> value)
         {
-            Temporary const& constant_result = pushTemporary();
+            Temporary const& constant_result = pushTemporary(std::format("constant_{}", constant_counter_++));
             pushStatement(utility::makeOwned<Constant>(std::move(value), constant_result, location_));
 
             return constant_result;
         }
 
-        utility::Owned<Flow> build()
+        utility::Owned<Flow> build(std::string identifier)
         {
             utility::List<utility::Owned<BasicBlock>> blocks;
 
@@ -99,7 +105,7 @@ namespace ance::bbt
 
             BasicBlock& entry = *blocks[0];
 
-            return utility::makeOwned<Flow>(std::move(blocks), entry, location_);
+            return utility::makeOwned<Flow>(std::move(blocks), entry, std::move(identifier), location_);
         }
     };
 
@@ -124,9 +130,9 @@ namespace ance::bbt
         implementation_->pushStatement(std::move(statement));
     }
 
-    Temporary const& FlowBuilder::pushTemporary()
+    Temporary const& FlowBuilder::pushTemporary(std::string id)
     {
-        return implementation_->pushTemporary();
+        return implementation_->pushTemporary(std::move(id));
     }
 
     Temporary const& FlowBuilder::pushVariableAccess(core::Identifier const& name)
@@ -139,9 +145,9 @@ namespace ance::bbt
         return implementation_->pushConstant(std::move(value));
     }
 
-    utility::Owned<Flow> FlowBuilder::build()
+    utility::Owned<Flow> FlowBuilder::build(std::string id)
     {
-        return implementation_->build();
+        return implementation_->build(std::move(id));
     }
 
 }

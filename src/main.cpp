@@ -76,7 +76,12 @@ namespace ance
 
         return exit_code;
 
-        // todo: improve naming of temporaries - do it numbered per flow, append operations to the name like I did with llvm IR values - also do it through post processor define as done back then
+        // todo: refactor segmenter to have state in state struct instead of all the separate variables
+
+        // todo: improve naming in expander
+        // todo: improve naming in segmenter
+
+        // todo: improve naming of flows by passing name in expander, adding it as annotation to file node in EST, remove the flow counter in segmenter
 
         // todo: add all cmp statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef

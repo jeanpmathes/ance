@@ -21,7 +21,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
     {
         bbt::Temporary const& value = builder.pushVariableAccess(core::Identifier::like("value"));
 
-        bbt::Temporary const& str_value = builder.pushTemporary();
+        bbt::Temporary const& str_value = builder.pushTemporary("str_value");
         {
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(value);
@@ -30,7 +30,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 
         bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
 
-        bbt::Temporary const& result = builder.pushTemporary();
+        bbt::Temporary const& result = builder.pushTemporary("result");
         {
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(str_value);
@@ -42,7 +42,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
     provider.emplace_back(utility::makeShared<bbt::Function>(
         bbt::Signature::like("print1b", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getBool())),
         runner.types().getUnit(),
-        builder.build(),
+        builder.build("main"),
         runner.types()));
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
@@ -50,14 +50,14 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::like("value"));
         bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::like("location"));
 
-        bbt::Temporary const& str_value = builder.pushTemporary();
+        bbt::Temporary const& str_value = builder.pushTemporary("str_value");
         {
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(value);
             builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::B_2_STR, std::move(args), str_value, core::Location::global()));
         }
 
-        bbt::Temporary const& result = builder.pushTemporary();
+        bbt::Temporary const& result = builder.pushTemporary("result");
         {
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(str_value);
@@ -71,7 +71,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
                                                                 bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getBool()),
                                                                 bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
                                            runner.types().getUnit(),
-                                           builder.build(),
+                                           builder.build("main"),
                                            runner.types()));
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
@@ -80,7 +80,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 
         bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
 
-        bbt::Temporary const& result = builder.pushTemporary();
+        bbt::Temporary const& result = builder.pushTemporary("result");
         {
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(value);
@@ -92,7 +92,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
     provider.emplace_back(utility::makeShared<bbt::Function>(
         bbt::Signature::like("print1s", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString())),
         runner.types().getUnit(),
-        builder.build(),
+        builder.build("main"),
         runner.types()));
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
@@ -100,7 +100,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::like("value"));
         bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::like("location"));
 
-        bbt::Temporary const& result = builder.pushTemporary();
+        bbt::Temporary const& result = builder.pushTemporary("result");
         {
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(value);
@@ -114,7 +114,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
                                                                 bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString()),
                                                                 bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
                                            runner.types().getUnit(),
-                                           builder.build(),
+                                           builder.build("main"),
                                            runner.types()));
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
@@ -122,7 +122,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         bbt::Temporary const& file     = builder.pushVariableAccess(core::Identifier::like("file"));
         bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::like("location"));
 
-        bbt::Temporary const& result = builder.pushTemporary();
+        bbt::Temporary const& result = builder.pushTemporary("result");
         {
             utility::List<std::reference_wrapper<bbt::Temporary const>> args;
             args.emplace_back(file);
@@ -136,7 +136,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
                                                                 bbt::Signature::Parameter(core::Identifier::like("file"), runner.types().getString()),
                                                                 bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
                                            runner.types().getUnit(),
-                                           builder.build(),
+                                           builder.build("main"),
                                            runner.types()));
 
     runner.add(cet::Provider::fromList(std::move(provider)));

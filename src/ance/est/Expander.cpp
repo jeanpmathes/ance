@@ -129,7 +129,9 @@ struct ance::est::Expander::Implementation
 
             Temporary const& pushTemporary(utility::Optional<utility::Owned<Expression>> definition, core::Location const& location)
             {
-                utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(std::move(definition), location);
+                std::string const temporary_id = std::to_string(ast_.temporary_counter_++);
+
+                utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(std::move(definition), temporary_id, location);
                 Temporary const&          tmp       = *temporary;
                 statements_.emplace_back(std::move(temporary));
                 return tmp;
@@ -212,7 +214,10 @@ struct ance::est::Expander::Implementation
         utility::Owned<Statement> expand(ast::Declaration const& declaration)
         {
             result_.reset();
+            temporary_counter_ = 0;
+
             visit(declaration);
+
             return result_.take<utility::Owned<Statement>>();
         }
 
@@ -545,6 +550,8 @@ struct ance::est::Expander::Implementation
       private:
         core::Reporter& reporter_;
         Result          result_;
+
+        size_t temporary_counter_ = 0;
     };
 
     utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (template)

@@ -2,8 +2,7 @@
 
 #include <iomanip>
 #include <sstream>
-
-#include "ance/utility/ID.h"
+#include <utility>
 
 ance::est::Node::Node(core::Location const& source_location) : location(source_location) {}
 
@@ -66,15 +65,16 @@ ance::est::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::est::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
-ance::est::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
+ance::est::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> expression, std::string id, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , definition(std::move(expression))
+    , identifier(std::move(id))
 {}
 
 std::string ance::est::Temporary::id() const
 {
-    return utility::id(this);
+    return std::format("t\"{}\"", identifier);
 }
 
 ance::est::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location)

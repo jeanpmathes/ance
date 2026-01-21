@@ -275,6 +275,16 @@ struct ance::bbt::Segmenter::Implementation
                 return inner_ref;
             }
 
+            Temporary& addTemporary(std::string id, core::Location const& location)
+            {
+                return addStatement<Temporary>(std::move(id), location);
+            }
+
+            Temporary& addTemporary(core::Location const& location)
+            {
+                return addTemporary(std::to_string(ret_.temporary_counter_++), location);
+            }
+
             void addSegmented(est::Statement const& statement)
             {
                 auto [result_entry, result_exit] = ret_.segment(statement);
@@ -418,12 +428,14 @@ struct ance::bbt::Segmenter::Implementation
 
             BasicBlock& first_block = *basic_blocks[current_entry.get().index()];
 
-            utility::Owned<Flow> flow = utility::makeOwned<Flow>(std::move(basic_blocks), first_block, statement.location);
+            utility::Owned<Flow> flow = utility::makeOwned<Flow>(std::move(basic_blocks), first_block, std::to_string(flow_counter_++), statement.location);
 
             bbs_.clear();
             temporaries_.clear();
             loops_.clear();
             scopes_.clear();
+
+            discard_counter_ = 0;
 
             return flow;
         }
@@ -606,7 +618,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& value = builder.addStatement<Temporary>(independent.location);
+            auto& value = builder.addTemporary(std::format("discard_{}", discard_counter_++), independent.location);
             builder.addSegmented(*independent.expression, value);
 
             setResult(builder.take());
@@ -616,15 +628,15 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& target = builder.addStatement<Temporary>(assignment.target->location);
+            auto& target = builder.addTemporary(assignment.target->location);
             builder.addSegmented(*assignment.target, target);
 
-            auto& value = builder.addStatement<Temporary>(assignment.value->location);
+            auto& value = builder.addTemporary(assignment.value->location);
             builder.addSegmented(*assignment.value, value);
 
             // We also need an access and a temporary to store the result of that.
 
-            auto& accessed = builder.addStatement<Temporary>(assignment.value->location);
+            auto& accessed = builder.addTemporary(assignment.value->location);
             builder.addStatement<Access>(target, accessed, assignment.location);
             builder.addStatement<Store>(accessed, value, assignment.location);
 
@@ -635,7 +647,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& condition = builder.addStatement<Temporary>(if_statement.condition->location);
+            auto& condition = builder.addTemporary(if_statement.condition->location);
             builder.addSegmented(*if_statement.condition, condition);
 
             auto [true_entry, true_exit]   = segment(*if_statement.true_block);
@@ -719,7 +731,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& value = builder.addStatement<Temporary>(temporary.location);
+            auto& value = builder.addTemporary(temporary.location);
             temporaries_.emplace(&temporary, &value);
 
             if (temporary.definition.hasValue())
@@ -756,7 +768,7 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (auto const& index : intrinsic.arguments)
             {
-                auto& value = builder.addStatement<Temporary>(index->location);
+                auto& value = builder.addTemporary(index->location);
                 builder.addSegmented(*index, value);
 
                 arguments.emplace_back(value);
@@ -771,14 +783,14 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& called = builder.addStatement<Temporary>(call.called->location);
+            auto& called = builder.addTemporary(call.called->location);
 
             builder.addSegmented(*call.called, called);
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (auto const& index : call.arguments)
             {
-                auto& value = builder.addStatement<Temporary>(index->location);
+                auto& value = builder.addTemporary(index->location);
                 builder.addSegmented(*index, value);
 
                 arguments.emplace_back(value);
@@ -793,7 +805,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& target = builder.addStatement<Temporary>(access.target->location);
+            auto& target = builder.addTemporary(access.target->location);
             builder.addSegmented(*access.target, target);
 
             builder.addStatement<Access>(target, destination(), access.location);
@@ -841,7 +853,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& type = builder.addStatement<Temporary>(default_value.type->location);
+            auto& type = builder.addTemporary(default_value.type->location);
             builder.addSegmented(*default_value.type, type);
 
             builder.addStatement<Default>(type, destination(), default_value.location);
@@ -862,7 +874,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& operand = builder.addStatement<Temporary>(unary_operation.operand->location);
+            auto& operand = builder.addTemporary(unary_operation.operand->location);
             builder.addSegmented(*unary_operation.operand, operand);
 
             builder.addStatement<UnaryOperation>(unary_operation.op, operand, destination(), unary_operation.location);
@@ -883,7 +895,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& value = builder.addStatement<Temporary>(type_of.expression->location);
+            auto& value = builder.addTemporary(type_of.expression->location);
             builder.addSegmented(*type_of.expression, value);
 
             builder.addStatement<TypeOf>(value, destination(), type_of.location);
@@ -926,10 +938,14 @@ struct ance::bbt::Segmenter::Implementation
         std::vector<Loop>                     loops_  = {};
         std::vector<OrderedScopeEnter const*> scopes_ = {};
 
+        std::map<est::Temporary const*, Temporary const*> temporaries_;
+        size_t                                            discard_counter_   = 0;
+        size_t                                            temporary_counter_ = 0;
+
         core::Reporter& reporter_;
         TypeContext&    type_context_;
 
-        std::map<est::Temporary const*, Temporary const*> temporaries_;
+        size_t flow_counter_ = 0;
     };
 
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context, TypeContext& type_context)

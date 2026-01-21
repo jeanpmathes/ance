@@ -77,7 +77,7 @@ namespace ance::est
 
     struct Expression;
 
-    /// Statement that simply wraps an expression.
+    /// Statement that simply wraps an expression, discarding its result.
     struct Independent final
         : Statement
         , utility::ConcreteNode<Independent, Visitor>
@@ -139,16 +139,17 @@ namespace ance::est
         explicit Continue(core::Location const& source_location);
     };
 
-    /// Introduce a temporary variable, which works similar to any other local variable but does not have a name.
+    /// Introduce a temporary variable, which works similar to any other local variable but does not have a name it is bound to.
     struct Temporary final
         : Statement
         , utility::ConcreteNode<Temporary, Visitor>
     {
-        Temporary(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
+        Temporary(utility::Optional<utility::Owned<Expression>> expression, std::string id, core::Location const& source_location);
 
         [[nodiscard]] std::string id() const;
 
         utility::Optional<utility::Owned<Expression>> definition;
+        std::string                                   identifier;
     };
 
     /// Writes a value to a temporary variable.

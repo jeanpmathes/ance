@@ -44,12 +44,13 @@ namespace ance::bbt
         : Node
         , utility::ConcreteNode<Flow, Visitor>
     {
-        Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBlock& start, core::Location const& source_location);
+        Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBlock& start, std::string id, core::Location const& source_location);
+
+        [[nodiscard]] std::string id() const;
 
         utility::List<utility::Owned<BasicBlock>> blocks;
         BasicBlock&                               entry;
-
-        [[nodiscard]] std::string id() const;
+        std::string                               identifier;
     };
 
     struct Statement;
@@ -160,14 +161,16 @@ namespace ance::bbt
         Temporary const& destination;
     };
 
-    /// Introduce a temporary variable, which works similar to any other local variable but does not have a name.
+    /// Introduce a temporary variable, which works similar to any other local variable but does not have a name it is bound to.
     struct Temporary final
         : Statement
         , utility::ConcreteNode<Temporary, Visitor>
     {
-        explicit Temporary(core::Location const& source_location);
+        Temporary(std::string id, core::Location const& source_location);
 
         [[nodiscard]] std::string id() const;
+
+        std::string identifier;
     };
 
     /// Writes a value to a temporary variable.

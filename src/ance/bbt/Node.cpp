@@ -1,9 +1,6 @@
 #include "Node.h"
 
 #include <iomanip>
-#include <sstream>
-
-#include "ance/utility/ID.h"
 
 ance::bbt::Node::Node(core::Location const& source_location) : location(source_location) {}
 
@@ -12,15 +9,16 @@ ance::bbt::UnorderedScope::UnorderedScope(utility::List<utility::Owned<Flow>> fl
     , flows(std::move(flow_list))
 {}
 
-ance::bbt::Flow::Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBlock& start, core::Location const& source_location)
+ance::bbt::Flow::Flow(utility::List<utility::Owned<BasicBlock>> content, BasicBlock& start, std::string id, core::Location const& source_location)
     : Node(source_location)
     , blocks(std::move(content))
     , entry(start)
+    , identifier(std::move(id))
 {}
 
 std::string ance::bbt::Flow::id() const
 {
-    return utility::id(this);
+    return identifier;
 }
 
 ance::bbt::BasicBlock::BasicBlock(size_t const                             number,
@@ -65,11 +63,11 @@ ance::bbt::Access::Access(Temporary const& var, Temporary const& result, core::L
     , destination(result)
 {}
 
-ance::bbt::Temporary::Temporary(core::Location const& source_location) : Node(source_location), Statement() {}
+ance::bbt::Temporary::Temporary(std::string id, core::Location const& source_location) : Node(source_location), Statement(), identifier(std::move(id)) {}
 
 std::string ance::bbt::Temporary::id() const
 {
-    return utility::id(this);
+    return std::format("t\"{}\"", identifier);
 }
 
 ance::bbt::CopyTemporary::CopyTemporary(Temporary const& target, Temporary const& value, core::Location const& source_location)
