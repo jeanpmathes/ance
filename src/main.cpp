@@ -76,18 +76,35 @@ namespace ance
 
         return exit_code;
 
-        // todo: check for all current expressions whether they correctly work with direct/indirect values as it was in the past
+        // todo: add lambda syntax (no or only basic capture, e.g. global vars or copy only), should work in cmp in source code
+        // \[](args...) : type => expr
+        // \[](args...) : type { statements... }
+        // \(args...) : type => expr
+        // \(args...) : type { statements... }
+
+        // todo: add function declarations (for now cmp only, must be in syntax)
+
+        // todo: add a way to call intrinsics from source code with the intrinsic expression intrinsic "name" (args...)
+        // todo: but also add a core function intrinsic("name", args...) that does the same thing but is a normal function call
+
+        // todo: define the core language functions using code instead of hardcoding the trees - code would be a string in C++ file, would need an entire chain to parse and transform into flows
+        // todo: this requires that the type context is shared between all runers, so create a global type context instead of one per runner
+        // todo: the intrinsic function can currently probably not be created in source code because of the varargs, so add a TODO there, or maybe add some more stuff
 
         // todo: add all cmp statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef
         // todo: do it step by step, as e.g. the array things require more changes so that array ops have support on types that the temporary and variable classes can use
-        // todo: also reduce duplication between temporary and variable
+        // todo: WHEN WORKING ON TYPES: TYPES SHOULD DEFINE THEIR OPS USING SOURCE CODE (HARDCODED IN C++), just like the core functions, using intrinsics
+
+        // todo: reduce duplication between temporary and variable
 
         // todo: rework SourceFile class to read into single string buffer, then use string views instead of line-by-line reading
 
-        // todo: add first non-cmp code (and declarable functions) and do actual compilation
+        // todo: add first non-cmp code and do actual compilation, maybe have a Lowerer visitor that works in tandem with the runner
         // todo: build a very minimal CET that heavily relies and uses intrinsics, should be close to LLVM IR in capability and nodes
-        // todo: needs its own value type (defined in CET namespace), do not use the one from BBT or LLVM
+        // todo: might need its own value type (defined in CET namespace), do not use the one from BBT or LLVM
+        // todo: this is the point where the tests should be brought back in, maybe deactivate those that certainly won't work yet and maybe prioritize them, add TODOs to bring them back
+        // todo: also add loads of tests for all the new things, e.g. lambdas, better cmp, different types, etc.
 
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
@@ -99,7 +116,10 @@ namespace ance
         // todo: global variables with non-cmp initializers need an ordering determined using topological sort
         // todo: think about making the typeof node an intrinsic, would either require an any type or something else for the argument like overloading
 
-        // todo: maybe parametrized function types could be a thing now
+        // todo: maybe parametrized function types could be a thing now, could also need generics or at least varargs
+
+        // todo: when adding serialization of trees for cmp libraries, also serialize the trees of the core language functions and of the types
+        // todo: this means on first run the compiler has to build the core language functions and types, serialize them, and later it just loads them (add a command line flag to force rebuild)
     }
 }
 

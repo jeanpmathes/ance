@@ -196,7 +196,7 @@ struct ance::cet::Runner::Implementation
             return ok;
         }
 
-        [[nodiscard]] static utility::Shared<bbt::Value> dereference(utility::Shared<bbt::Value> value)
+        [[nodiscard]] static utility::Shared<bbt::Value> deLReference(utility::Shared<bbt::Value> value)
         {
             while (value->type()->isLReference())
             {
@@ -210,9 +210,9 @@ struct ance::cet::Runner::Implementation
         }
 
         template<typename T>
-        static T const& dereference(utility::Shared<bbt::Value> value)
+        static T const& deLReference(utility::Shared<bbt::Value> value)
         {
-            return dereference(value)->as<T>();
+            return deLReference(value)->as<T>();
         }
 
         [[nodiscard]] bool expectSignature(bbt::Signature const&                                         signature,
@@ -329,7 +329,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            if (dereference<bbt::Bool>(condition).value())
+            if (deLReference<bbt::Bool>(condition).value())
             {
                 state_.next = &branch_link.true_branch;
             }
@@ -378,7 +378,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            reference->address().write(dereference(value));
+            reference->address().write(deLReference(value));
         }
 
         void visit(bbt::Access const& access) override
@@ -409,7 +409,7 @@ struct ance::cet::Runner::Implementation
         void visit(bbt::CopyTemporary const& write_temporary) override
         {
             utility::Shared<bbt::Value> value = scope().getTemporary(write_temporary.source).read();
-            scope().getTemporary(write_temporary.destination).write(dereference(value));
+            scope().getTemporary(write_temporary.destination).write(deLReference(value));
         }
 
         void visit(bbt::Intrinsic const& intrinsic) override
@@ -437,7 +437,7 @@ struct ance::cet::Runner::Implementation
             for (auto argument : intrinsic.arguments)
             {
                 utility::Shared<bbt::Value> value = scope().getTemporary(argument.get()).read();
-                arguments.emplace_back(dereference(value));
+                arguments.emplace_back(deLReference(value));
             }
 
             auto result = intrinsics_.run(intrinsic.intrinsic, arguments, intrinsic.location);
@@ -452,7 +452,7 @@ struct ance::cet::Runner::Implementation
             }
             else
             {
-                scope().getTemporary(intrinsic.destination).write(dereference(result.getResult()));
+                scope().getTemporary(intrinsic.destination).write(deLReference(result.getResult()));
             }
         }
 
@@ -462,7 +462,7 @@ struct ance::cet::Runner::Implementation
 
             if (run_point.return_value.hasValue())
             {
-                scope().getTemporary(call.destination).write(run_point.return_value.value());
+                scope().getTemporary(call.destination).write(deLReference(run_point.return_value.value()));
                 run_point.return_value = std::nullopt;
 
                 return;
@@ -517,7 +517,7 @@ struct ance::cet::Runner::Implementation
                     return;
                 }
 
-                (*variable)->as<VariableRef>().value().write(dereference(argument));
+                (*variable)->as<VariableRef>().value().write(deLReference(argument));
             }
 
             run_point.stack.emplace_back(function->body().entry, &function_scope);
@@ -579,7 +579,7 @@ struct ance::cet::Runner::Implementation
             switch (unary_operation.op)
             {
                 case core::UnaryOperator::NOT:
-                    scope().getTemporary(unary_operation.destination).write(bbt::Bool::make(!value->as<bbt::Bool>().value(), type_context_));
+                    scope().getTemporary(unary_operation.destination).write(bbt::Bool::make(!deLReference<bbt::Bool>(value).value(), type_context_));
                     break;
             }
         }

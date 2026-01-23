@@ -435,6 +435,7 @@ COMPILETIME : 'cmp' ;
 IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )
            | [\p{Emoji}] ;
 
+LAMBDA : '\\' ;
 SEMICOLON : ';' ;
 
 WHITESPACE : [\p{White_Space}] -> skip ;
