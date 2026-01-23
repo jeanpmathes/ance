@@ -21,7 +21,10 @@ struct ance::est::Printer::Implementation
 
             for (auto const& statement : file.statements)
             {
-                if (!first) { line(); }
+                if (!first)
+                {
+                    line();
+                }
                 first = false;
 
                 print("do ");
@@ -38,7 +41,10 @@ struct ance::est::Printer::Implementation
             }
         }
 
-        void visit(ErrorStatement const&) override { print("// error"); }
+        void visit(ErrorStatement const&) override
+        {
+            print("// error");
+        }
 
         void visit(Pass const&) override
         {
@@ -125,7 +131,10 @@ struct ance::est::Printer::Implementation
             }
         }
 
-        void visit(Break const&) override { print("break;"); }
+        void visit(Break const&) override
+        {
+            print("break;");
+        }
 
         void visit(Continue const&) override
         {
@@ -157,7 +166,10 @@ struct ance::est::Printer::Implementation
             print(");");
         }
 
-        void visit(ErrorExpression const&) override { print("/* error */"); }
+        void visit(ErrorExpression const&) override
+        {
+            print("/* error */");
+        }
 
         void visit(Intrinsic const& intrinsic) override
         {
@@ -185,8 +197,9 @@ struct ance::est::Printer::Implementation
 
         void visit(Read const& access) override
         {
-            print("read ");
+            print("(read ");
             visit(*access.target);
+            print(")");
         }
 
         void visit(UnitLiteral const&) override

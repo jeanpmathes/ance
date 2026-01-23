@@ -76,9 +76,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: improve naming in expander
-        // todo: improve naming in segmenter
-
         // todo: improve naming of flows by passing name in expander, adding it as annotation to file node in EST, remove the flow counter in segmenter
 
         // todo: add all cmp statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file

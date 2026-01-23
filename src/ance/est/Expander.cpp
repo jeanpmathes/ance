@@ -1,5 +1,6 @@
 #include "Expander.h"
 
+#include <map>
 #include <variant>
 
 #include "ance/core/Intrinsic.h"
@@ -127,11 +128,12 @@ struct ance::est::Expander::Implementation
                 statements_.emplace_back(std::move(statement));
             }
 
-            Temporary const& pushTemporary(utility::Optional<utility::Owned<Expression>> definition, core::Location const& location)
+            Temporary const& pushTemporary(utility::Optional<utility::Owned<Expression>> definition, std::string id, core::Location const& location)
             {
-                std::string const temporary_id = std::to_string(ast_.temporary_counter_++);
+                size_t&     counter      = ast_.temporary_name_counters_[id];
+                std::string temporary_id = std::format("{}'{}", id, counter++);
 
-                utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(std::move(definition), temporary_id, location);
+                utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(std::move(definition), std::move(temporary_id), location);
                 Temporary const&          tmp       = *temporary;
                 statements_.emplace_back(std::move(temporary));
                 return tmp;
@@ -214,7 +216,7 @@ struct ance::est::Expander::Implementation
         utility::Owned<Statement> expand(ast::Declaration const& declaration)
         {
             result_.reset();
-            temporary_counter_ = 0;
+            temporary_name_counters_.clear();
 
             visit(declaration);
 
@@ -305,26 +307,27 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> parent_scope =
                 intrinsic(core::Intrinsic::GET_PARENT, variable_declaration.location, utility::makeOwned<CurrentScope>(variable_declaration.location));
 
-            Temporary const& tmp_type = builder.pushTemporary(std::move(type), variable_declaration.location);
+            Temporary const& tmp_type = builder.pushTemporary(std::move(type), "VariableDeclaration_Type", variable_declaration.location);
 
             // We need to go through the initializer expression first, otherwise the name would already be declared.
             // If we then yield in the initializer other run points could access the undefined variable.
 
-            Temporary const* tmp_initial_value;
+            Temporary const* initial_value;
 
             if (variable_declaration.value.hasValue())
             {
                 utility::Owned<Expression> value = builder.pushExpansion(**variable_declaration.value);
-                tmp_initial_value                = &builder.pushTemporary(std::move(value), variable_declaration.location);
+                initial_value                    = &builder.pushTemporary(std::move(value), "VariableDeclaration_InitialValue", variable_declaration.location);
             }
             else
             {
-                tmp_initial_value = &builder.pushTemporary(
+                initial_value = &builder.pushTemporary(
                     utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location), variable_declaration.location),
+                    "VariableDeclaration_DefaultValue",
                     variable_declaration.location);
             }
 
-            utility::Owned<Expression> declared =
+            utility::Owned<Expression> declared_expression =
                 intrinsic(core::Intrinsic::DECLARE,
                           variable_declaration.location,
                           std::move(parent_scope),
@@ -332,10 +335,11 @@ struct ance::est::Expander::Implementation
                           utility::makeOwned<BoolLiteral>(variable_declaration.assigner.isFinal(), variable_declaration.location),
                           utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location));
 
-            Temporary const& tmp_entity = builder.pushTemporary(std::move(declared), variable_declaration.location);
+            Temporary const& declared =
+                builder.pushTemporary(std::move(declared_expression), "VariableDeclaration_DefaultValue", variable_declaration.location);
 
-            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, variable_declaration.location),
-                                                            utility::makeOwned<ReadTemporary>(*tmp_initial_value, variable_declaration.location),
+            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(declared, variable_declaration.location),
+                                                            utility::makeOwned<ReadTemporary>(*initial_value, variable_declaration.location),
                                                             variable_declaration.location));
 
             result_.setDeclaration(wrap(builder.take()));
@@ -372,33 +376,34 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
-            utility::Owned<Expression> type     = builder.pushExpansion(*let.type);
-            Temporary const&           tmp_type = builder.pushTemporary(std::move(type), let.location);
+            utility::Owned<Expression> type_expression = builder.pushExpansion(*let.type);
+            Temporary const&           type            = builder.pushTemporary(std::move(type_expression), "Let_Type", let.location);
 
-            Temporary const* tmp_initial_value;
+            Temporary const* initial_value;
 
             if (let.value.hasValue())
             {
                 utility::Owned<Expression> value = builder.pushExpansion(**let.value);
-                tmp_initial_value                = &builder.pushTemporary(std::move(value), let.location);
+                initial_value                    = &builder.pushTemporary(std::move(value), "Let_InitialValue", let.location);
             }
             else
             {
-                tmp_initial_value =
-                    &builder.pushTemporary(utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, let.location), let.location), let.location);
+                initial_value = &builder.pushTemporary(utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(type, let.location), let.location),
+                                                       "Let_DefaultValue",
+                                                       let.location);
             }
 
-            utility::Owned<Expression> declared = intrinsic(core::Intrinsic::DECLARE,
-                                                            let.location,
-                                                            utility::makeOwned<CurrentScope>(let.location),
-                                                            utility::makeOwned<IdentifierCapture>(let.identifier, let.location),
-                                                            utility::makeOwned<BoolLiteral>(let.assigner.isFinal(), let.location),
-                                                            utility::makeOwned<ReadTemporary>(tmp_type, let.location));
+            utility::Owned<Expression> declared_expression = intrinsic(core::Intrinsic::DECLARE,
+                                                                       let.location,
+                                                                       utility::makeOwned<CurrentScope>(let.location),
+                                                                       utility::makeOwned<IdentifierCapture>(let.identifier, let.location),
+                                                                       utility::makeOwned<BoolLiteral>(let.assigner.isFinal(), let.location),
+                                                                       utility::makeOwned<ReadTemporary>(type, let.location));
 
-            Temporary const& tmp_entity = builder.pushTemporary(std::move(declared), let.location);
+            Temporary const& declared = builder.pushTemporary(std::move(declared_expression), "Let_Declared", let.location);
 
-            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, let.location),
-                                                            utility::makeOwned<ReadTemporary>(*tmp_initial_value, let.location),
+            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(declared, let.location),
+                                                            utility::makeOwned<ReadTemporary>(*initial_value, let.location),
                                                             let.location));
 
             result_.setStatements(builder.take());
@@ -410,15 +415,15 @@ struct ance::est::Expander::Implementation
 
             utility::Owned<Expression> value = builder.pushExpansion(*assignment.value);
 
-            utility::Owned<Expression> resolved = intrinsic(core::Intrinsic::RESOLVE,
-                                                            assignment.location,
-                                                            utility::makeOwned<CurrentScope>(assignment.location),
-                                                            utility::makeOwned<IdentifierCapture>(assignment.identifier, assignment.location));
+            utility::Owned<Expression> resolved_expression = intrinsic(core::Intrinsic::RESOLVE,
+                                                                       assignment.location,
+                                                                       utility::makeOwned<CurrentScope>(assignment.location),
+                                                                       utility::makeOwned<IdentifierCapture>(assignment.identifier, assignment.location));
 
-            Temporary const& tmp_entity = builder.pushTemporary(std::move(resolved), assignment.location);
+            Temporary const& resolved = builder.pushTemporary(std::move(resolved_expression), "Assignment_Resolved", assignment.location);
 
             builder.pushStatement(
-                utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(tmp_entity, assignment.location), std::move(value), assignment.location));
+                utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(resolved, assignment.location), std::move(value), assignment.location));
 
             result_.setStatements(builder.take());
         }
@@ -460,16 +465,16 @@ struct ance::est::Expander::Implementation
             {
                 SBuilder exit_builder(*this);
 
-                utility::Owned<Expression> condition     = exit_builder.pushExpansion(*while_statement.condition);
-                Temporary const&           tmp_condition = exit_builder.pushTemporary(std::move(condition), while_statement.location);
+                utility::Owned<Expression> condition_expression = exit_builder.pushExpansion(*while_statement.condition);
+                Temporary const&           condition = exit_builder.pushTemporary(std::move(condition_expression), "While_Condition", while_statement.location);
 
-                exit_builder.pushStatement(utility::makeOwned<If>(
-                    utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT,
-                                                       utility::makeOwned<ReadTemporary>(tmp_condition, while_statement.condition->location),
-                                                       while_statement.location),
-                    utility::makeOwned<Break>(while_statement.location),
-                    utility::makeOwned<Pass>(while_statement.location),
-                    while_statement.location));
+                exit_builder.pushStatement(
+                    utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT,
+                                                                              utility::makeOwned<ReadTemporary>(condition, while_statement.condition->location),
+                                                                              while_statement.location),
+                                           utility::makeOwned<Break>(while_statement.location),
+                                           utility::makeOwned<Pass>(while_statement.location),
+                                           while_statement.location));
 
                 builder.pushStatement(utility::makeOwned<Block>(exit_builder.take(), while_statement.location));
             }
@@ -551,7 +556,7 @@ struct ance::est::Expander::Implementation
         core::Reporter& reporter_;
         Result          result_;
 
-        size_t temporary_counter_ = 0;
+        std::map<std::string, size_t> temporary_name_counters_;
     };
 
     utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (template)
