@@ -76,7 +76,7 @@ namespace ance
 
         return exit_code;
 
-        // todo: improve naming of flows by passing name in expander, adding it as annotation to file node in EST, remove the flow counter in segmenter
+        // todo: check for all current expressions whether they correctly work with direct/indirect values as it was in the past
 
         // todo: add all cmp statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef

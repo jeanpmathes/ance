@@ -42,9 +42,9 @@ struct ance::est::Expander::Implementation
             setResult(std::move(file));
         }
 
-        void setDeclaration(utility::Owned<Statement> statement)
+        void setDeclaration(DeclarationStatement declaration_statement)
         {
-            setResult(std::move(statement));
+            setResult(std::move(declaration_statement));
         }
 
         void setStatements(Statements statements)
@@ -82,7 +82,7 @@ struct ance::est::Expander::Implementation
         }
 
       private:
-        using ResultVariant = std::variant<utility::Owned<File>, utility::Owned<Statement>, Statements, Expansion>;
+        using ResultVariant = std::variant<utility::Owned<File>, DeclarationStatement, Statements, Expansion>;
 
         template<typename T>
         void setResult(T value)
@@ -213,14 +213,14 @@ struct ance::est::Expander::Implementation
             return result_.take<utility::Owned<File>>();
         }
 
-        utility::Owned<Statement> expand(ast::Declaration const& declaration)
+        DeclarationStatement expand(ast::Declaration const& declaration)
         {
             result_.reset();
             temporary_name_counters_.clear();
 
             visit(declaration);
 
-            return result_.take<utility::Owned<Statement>>();
+            return result_.take<DeclarationStatement>();
         }
 
         Statements expand(ast::Statement const& statement)
@@ -277,11 +277,11 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::File const& file) override
         {
-            utility::List<utility::Owned<Statement>> declaration_statements;
+            utility::List<DeclarationStatement> declaration_statements;
 
             for (auto const& declaration : file.declarations)
             {
-                utility::Owned<Statement> expanded = expand(*declaration);
+                DeclarationStatement expanded = expand(*declaration);
                 declaration_statements.emplace_back(std::move(expanded));
             }
 
@@ -290,12 +290,18 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::ErrorDeclaration const& error) override
         {
-            result_.setDeclaration(utility::makeOwned<ErrorStatement>(error.location));
+            result_.setDeclaration({
+                .statement = utility::makeOwned<ErrorStatement>(error.location),
+                .name      = "ErrorDeclaration",
+            });
         }
 
         void visit(ast::RunnableDeclaration const& runnable) override
         {
-            result_.setDeclaration(wrap(expand(*runnable.body)));
+            result_.setDeclaration({
+                .statement = wrap(expand(*runnable.body)),
+                .name      = "RunnableDeclaration",
+            });
         }
 
         void visit(ast::VariableDeclaration const& variable_declaration) override
@@ -342,7 +348,10 @@ struct ance::est::Expander::Implementation
                                                             utility::makeOwned<ReadTemporary>(*initial_value, variable_declaration.location),
                                                             variable_declaration.location));
 
-            result_.setDeclaration(wrap(builder.take()));
+            result_.setDeclaration({
+                .statement = wrap(builder.take()),
+                .name      = std::format("VariableDeclaration({})", variable_declaration.identifier.text()),
+            });
         }
 
         void visit(ast::ErrorStatement const& error_statement) override

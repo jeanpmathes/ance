@@ -26,6 +26,13 @@ namespace ance::est
 
     struct Statement;
 
+    /// Describes a declaration statement, which is a top-level statement.
+    struct DeclarationStatement
+    {
+        utility::Owned<Statement> statement;
+        std::string               name;
+    };
+
     /// Represents a source file creating an unordered scope.
     /// Note that actual source files may contain a top-level ordered scope,
     /// which would be represented as a statement node instead of a file node.
@@ -33,9 +40,9 @@ namespace ance::est
         : Node
         , utility::ConcreteNode<File, Visitor>
     {
-        File(utility::List<utility::Owned<Statement>> statement_list, core::Location const& source_location);
+        File(utility::List<DeclarationStatement> declaration_statement_list, core::Location const& source_location);
 
-        utility::List<utility::Owned<Statement>> statements = {};
+        utility::List<DeclarationStatement> declaration_statements = {};
     };
 
     /// Statement node in the EST.

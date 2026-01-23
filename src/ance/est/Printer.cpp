@@ -19,7 +19,7 @@ struct ance::est::Printer::Implementation
         {
             bool first = true;
 
-            for (auto const& statement : file.statements)
+            for (auto const& declaration_statement : file.declaration_statements)
             {
                 if (!first)
                 {
@@ -27,16 +27,18 @@ struct ance::est::Printer::Implementation
                 }
                 first = false;
 
-                print("do ");
+                print("do /* ");
+                print(declaration_statement.name);
+                print(" */ ");
 
-                if (statement->isCompound())
+                if (declaration_statement.statement->isCompound())
                 {
                     line();
-                    visit(*statement);
+                    visit(*declaration_statement.statement);
                 }
                 else
                 {
-                    visit(*statement);
+                    visit(*declaration_statement.statement);
                 }
             }
         }

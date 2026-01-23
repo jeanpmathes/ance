@@ -359,15 +359,15 @@ struct ance::bbt::Segmenter::Implementation
         {
             utility::List<utility::Owned<Flow>> flows;
 
-            for (auto const& statement : file.statements)
+            for (auto const& declaration : file.declaration_statements)
             {
-                flows.emplace_back(apply(*statement));
+                flows.emplace_back(apply(*declaration.statement, declaration.name));
             }
 
             return utility::makeOwned<UnorderedScope>(std::move(flows), file.location);
         }
 
-        utility::Owned<Flow> apply(est::Statement const& statement)
+        utility::Owned<Flow> apply(est::Statement const& statement, std::string id)
         {
             state_ = {};
 
@@ -423,7 +423,10 @@ struct ance::bbt::Segmenter::Implementation
 
             BasicBlock& first_block = *basic_blocks[current_entry.get().index()];
 
-            utility::Owned<Flow> flow = utility::makeOwned<Flow>(std::move(basic_blocks), first_block, std::to_string(flow_counter_++), statement.location);
+            size_t&     counter = flow_name_counters_[id];
+            std::string flow_id = std::format("{}'{}", id, counter++);
+
+            utility::Owned<Flow> flow = utility::makeOwned<Flow>(std::move(basic_blocks), first_block, std::move(flow_id), statement.location);
 
             return flow;
         }
@@ -932,7 +935,7 @@ struct ance::bbt::Segmenter::Implementation
         core::Reporter& reporter_;
         TypeContext&    type_context_;
 
-        size_t flow_counter_ = 0;
+        std::map<std::string, size_t> flow_name_counters_;
     };
 
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context, TypeContext& type_context)
@@ -952,7 +955,7 @@ struct ance::bbt::Segmenter::Implementation
 
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
 
-        utility::Owned<Flow> flow = ret->apply(**expanded);
+        utility::Owned<Flow> flow = ret->apply(**expanded, "Ordered");
         if (reporter_.isFailed()) return std::nullopt;
 
         context_.print<Printer>(*flow, "bbt", file);
