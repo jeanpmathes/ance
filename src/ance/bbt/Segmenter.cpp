@@ -132,7 +132,7 @@ struct ance::bbt::Segmenter::Implementation
 
         virtual void swap(std::reference_wrapper<BaseBB> original, std::reference_wrapper<BaseBB> replacement) = 0;
 
-      private:
+      public:// todo: undo
         std::set<BaseBB*>                        incoming_;
         utility::List<utility::Owned<Statement>> statements_;
 
@@ -162,7 +162,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             if (next_ == nullptr)
             {
-                return utility::makeOwned<Return>(core::Location::global());// todo: should not be here but in the correct block maybe?
+                return utility::makeOwned<Return>(nullptr, core::Location::global());// todo: should not be here but in the correct block maybe?
             }
 
             return utility::makeOwned<Jump>(*blocks[next_->index()], core::Location::global());
@@ -195,7 +195,11 @@ struct ance::bbt::Segmenter::Implementation
         BranchBB()           = delete;
         ~BranchBB() override = default;
 
-        BranchBB(Temporary const& condition, BaseBB& true_bb, BaseBB& false_bb) : condition_(condition), true_(true_bb), false_(false_bb)
+        BranchBB(Temporary const& condition, BaseBB& true_bb, BaseBB& false_bb, core::Location const& source_location)
+            : condition_(condition)
+            , true_(true_bb)
+            , false_(false_bb)
+            , source_location_(source_location)
         {
             true_.get().enter(*this);
             false_.get().enter(*this);
@@ -203,7 +207,7 @@ struct ance::bbt::Segmenter::Implementation
 
         [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) override
         {
-            return utility::makeOwned<Branch>(condition_, *blocks[true_.get().index()], *blocks[false_.get().index()], core::Location::global());
+            return utility::makeOwned<Branch>(condition_, *blocks[true_.get().index()], *blocks[false_.get().index()], source_location_);
         }
 
         [[nodiscard]] std::set<BaseBB*> next() const override
@@ -233,6 +237,37 @@ struct ance::bbt::Segmenter::Implementation
         Temporary const&               condition_;
         std::reference_wrapper<BaseBB> true_;
         std::reference_wrapper<BaseBB> false_;
+
+        core::Location source_location_;
+    };
+
+    class ReturnBB final : public BaseBB
+    {
+      public:
+        ReturnBB()           = delete;
+        ~ReturnBB() override = default;
+
+        ReturnBB(Temporary const* return_value, core::Location const& source_location) : return_value_(return_value), source_location_(source_location) {}
+
+        [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const&) override
+        {
+            return utility::makeOwned<Return>(return_value_, core::Location::global());
+        }
+
+        [[nodiscard]] std::set<BaseBB*> next() const override
+        {
+            return {};
+        }
+
+        void swap(std::reference_wrapper<BaseBB> const, std::reference_wrapper<BaseBB> const) override
+        {
+            // Nothing to do.
+        }
+
+      private:
+        Temporary const* return_value_;
+
+        core::Location source_location_;
     };
 
     class RET final : public est::Visitor
@@ -361,13 +396,13 @@ struct ance::bbt::Segmenter::Implementation
 
             for (auto const& declaration : file.declaration_statements)
             {
-                flows.emplace_back(apply(*declaration.statement, declaration.name));
+                flows.emplace_back(apply(*declaration.statement, false, declaration.name));
             }
 
             return utility::makeOwned<UnorderedScope>(std::move(flows), file.location);
         }
 
-        utility::Owned<Flow> apply(est::Statement const& statement, std::string id)
+        utility::Owned<Flow> apply(est::Statement const& statement, bool is_function, std::string id)
         {
             state_ = {};
 
@@ -377,6 +412,8 @@ struct ance::bbt::Segmenter::Implementation
             state_.segment.entry_bb = entry_block.get();
             state_.segment.exit_bb  = state_.segment.entry_bb;
             state_.bbs.emplace_back(std::move(entry_block));
+
+            state_.is_function = is_function;
 
             auto [statement_entry, statement_exit] = segment(statement);
 
@@ -475,6 +512,15 @@ struct ance::bbt::Segmenter::Implementation
             {
                 if (block.get()->hasCode() && !simplified.contains(block.get()))
                 {
+                    SimpleBB*  UnreachableBlock     = dynamic_cast<SimpleBB*>(block.get());
+                    Statement* UnreachableStatement = UnreachableBlock->statements_.front().get();
+                    if (UnreachableStatement->location.line() == 1)
+                    {
+                        std::string x = typeid(*UnreachableStatement).name();
+                        (void) x;
+                        continue;
+                    }
+
                     has_unreachable_code       = true;
                     first_unreachable_location = core::Location::getFirst(first_unreachable_location, block.get()->location());
                 }
@@ -554,6 +600,13 @@ struct ance::bbt::Segmenter::Implementation
             state_.segment.exit_bb  = &result.exit.get();
         }
 
+        void setEmptyResult()
+        {
+            Builder builder(*this);
+
+            setResult(builder.take());
+        }
+
         void visit(est::File const&) override
         {
             // See the respective apply method.
@@ -581,7 +634,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& scope_enter = builder.addStatement<OrderedScopeEnter>(block.location);
+            auto& scope_enter = builder.addStatement<OrderedScopeEnter>(block.location.first());
             state_.scopes.emplace_back(&scope_enter);
 
             for (auto& statement : block.statements)
@@ -590,7 +643,7 @@ struct ance::bbt::Segmenter::Implementation
             }
 
             state_.scopes.pop_back();
-            builder.addStatement<OrderedScopeExit>(scope_enter, block.location);
+            builder.addStatement<OrderedScopeExit>(scope_enter, block.location.last());
 
             setResult(builder.take());
         }
@@ -634,7 +687,7 @@ struct ance::bbt::Segmenter::Implementation
             auto [true_entry, true_exit]   = segment(*if_statement.true_block);
             auto [false_entry, false_exit] = segment(*if_statement.false_block);
 
-            builder.addSpecialBlock<BranchBB>(condition, true_entry.get(), false_entry.get());
+            builder.addSpecialBlock<BranchBB>(condition, true_entry.get(), false_entry.get(), if_statement.location);
 
             std::reference_wrapper exit = builder.addDisconnectedExitBlock();
             link(true_exit, exit);
@@ -669,6 +722,10 @@ struct ance::bbt::Segmenter::Implementation
             if (state_.loops.empty())
             {
                 reporter_.error("Break statement outside of loop", break_statement.location);
+
+                setEmptyResult();
+
+                return;
             }
 
             Builder builder(*this);
@@ -691,6 +748,10 @@ struct ance::bbt::Segmenter::Implementation
             if (state_.loops.empty())
             {
                 reporter_.error("Continue statement outside of loop", continue_statement.location);
+
+                setEmptyResult();
+
+                return;
             }
 
             Builder builder(*this);
@@ -704,6 +765,35 @@ struct ance::bbt::Segmenter::Implementation
             link(builder.getExit(), state_.loops.back().entry);
 
             builder.addDisconnectedExitBlock();
+
+            setResult(builder.take());
+        }
+
+        void visit(est::Return const& return_statement) override
+        {
+            if (!state_.is_function)
+            {
+                reporter_.error("Return statement outside of function", return_statement.location);
+            }
+
+            Builder builder(*this);
+
+            for (size_t i = state_.scopes.size(); i > 0; i--)
+            {
+                builder.addStatement<OrderedScopeExit>(*state_.scopes[i - 1], return_statement.location);
+            }
+
+            if (return_statement.value.hasValue())
+            {
+                auto& return_value = builder.addTemporary("Return_Value", return_statement.value->get()->location);
+                builder.addSegmented(**return_statement.value, return_value);
+
+                builder.addSpecialBlock<ReturnBB>(&return_value, return_statement.location);
+            }
+            else
+            {
+                builder.addSpecialBlock<ReturnBB>(nullptr, return_statement.location);
+            }
 
             setResult(builder.take());
         }
@@ -925,6 +1015,8 @@ struct ance::bbt::Segmenter::Implementation
             std::vector<Loop>                     loops  = {};
             std::vector<OrderedScopeEnter const*> scopes = {};
 
+            bool is_function = false;
+
             std::map<est::Temporary const*, Temporary const*> temporaries;
 
             std::map<std::string, size_t> temporary_name_counters;
@@ -955,11 +1047,12 @@ struct ance::bbt::Segmenter::Implementation
 
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
 
-        utility::Owned<Flow> flow = ret->apply(**expanded, "Ordered");
-        if (reporter_.isFailed()) return std::nullopt;
+        utility::Owned<Flow> flow = ret->apply(**expanded, false, "Ordered");
 
         context_.print<Printer>(*flow, "bbt", file);
         context_.graph<Grapher>(*flow, "bbt", file);
+
+        if (reporter_.isFailed()) return std::nullopt;
 
         return flow;
     }
@@ -972,10 +1065,11 @@ struct ance::bbt::Segmenter::Implementation
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
 
         utility::Owned<UnorderedScope> scope = ret->apply(**expanded);
-        if (reporter_.isFailed()) return std::nullopt;
 
         context_.print<Printer>(*scope, "bbt", file);
         context_.graph<Grapher>(*scope, "bbt", file);
+
+        if (reporter_.isFailed()) return std::nullopt;
 
         return scope;
     }

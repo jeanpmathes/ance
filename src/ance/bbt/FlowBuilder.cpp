@@ -97,7 +97,8 @@ namespace ance::bbt
 
             for (size_t id = 0; id < blocks_.size(); id++)
             {
-                blocks.emplace_back(utility::makeOwned<BasicBlock>(id, std::move(blocks_[id].statements), utility::makeOwned<Return>(location_), location_));
+                blocks.emplace_back(
+                    utility::makeOwned<BasicBlock>(id, std::move(blocks_[id].statements), utility::makeOwned<Return>(nullptr, location_), location_));
             }
 
             blocks_.clear();

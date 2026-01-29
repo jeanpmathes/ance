@@ -65,6 +65,12 @@ ance::est::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::est::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::est::Return::Return(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , value(std::move(expression))
+{}
+
 ance::est::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> expression, std::string id, core::Location const& source_location)
     : Node(source_location)
     , Statement()

@@ -31,22 +31,23 @@ class anceParser : public antlr4::Parser
         T__18                = 19,
         T__19                = 20,
         T__20                = 21,
-        IDENTIFIER           = 22,
-        INTEGER              = 23,
-        STRING               = 24,
-        SEMICOLON            = 25,
-        WHITESPACE           = 26,
-        BLOCK_COMMENT        = 27,
-        LINE_COMMENT         = 28,
-        BRACKET_OPEN         = 29,
-        BRACKET_CLOSE        = 30,
-        CURLY_BRACKET_OPEN   = 31,
-        CURLY_BRACKET_CLOSE  = 32,
-        SQUARE_BRACKET_OPEN  = 33,
-        SQUARE_BRACKET_CLOSE = 34,
-        POINTY_BRACKET_OPEN  = 35,
-        POINTY_BRACKET_CLOSE = 36,
-        ERROR_CHAR           = 37
+        T__21                = 22,
+        IDENTIFIER           = 23,
+        INTEGER              = 24,
+        STRING               = 25,
+        SEMICOLON            = 26,
+        WHITESPACE           = 27,
+        BLOCK_COMMENT        = 28,
+        LINE_COMMENT         = 29,
+        BRACKET_OPEN         = 30,
+        BRACKET_CLOSE        = 31,
+        CURLY_BRACKET_OPEN   = 32,
+        CURLY_BRACKET_CLOSE  = 33,
+        SQUARE_BRACKET_OPEN  = 34,
+        SQUARE_BRACKET_CLOSE = 35,
+        POINTY_BRACKET_OPEN  = 36,
+        POINTY_BRACKET_CLOSE = 37,
+        ERROR_CHAR           = 38
     };
 
     enum
@@ -216,6 +217,17 @@ class anceParser : public antlr4::Parser
 
         ExpressionContext*          expression();
         antlr4::tree::TerminalNode* SEMICOLON();
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    class ReturnStatementContext : public StatementContext
+    {
+      public:
+        ReturnStatementContext(StatementContext* ctx);
+
+        antlr4::tree::TerminalNode* SEMICOLON();
+        ExpressionContext*          expression();
 
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };

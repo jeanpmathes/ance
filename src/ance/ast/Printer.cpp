@@ -22,7 +22,10 @@ struct ance::ast::Printer::Implementation
 
             for (auto const& declaration : file.declarations)
             {
-                if (!first) { line(); }
+                if (!first)
+                {
+                    line();
+                }
                 first = false;
 
                 visit(*declaration);
@@ -62,7 +65,10 @@ struct ance::ast::Printer::Implementation
             print(";");
         }
 
-        void visit(ErrorStatement const&) override { print("// error"); }
+        void visit(ErrorStatement const&) override
+        {
+            print("// error");
+        }
 
         void visit(Block const& block) override
         {
@@ -167,9 +173,26 @@ struct ance::ast::Printer::Implementation
             }
         }
 
-        void visit(Break const&) override { print("break;"); }
+        void visit(Break const&) override
+        {
+            print("break;");
+        }
 
-        void visit(Continue const&) override { print("continue;"); }
+        void visit(Continue const&) override
+        {
+            print("continue;");
+        }
+
+        void visit(Return const& return_statement) override
+        {
+            print("return");
+            if (return_statement.value.hasValue())
+            {
+                print(" ");
+                visit(**return_statement.value);
+            }
+            print(";");
+        }
 
         void visit(While const& while_statement) override
         {
@@ -188,7 +211,10 @@ struct ance::ast::Printer::Implementation
             }
         }
 
-        void visit(ErrorExpression const&) override { print("/* error */"); }
+        void visit(ErrorExpression const&) override
+        {
+            print("/* error */");
+        }
 
         void visit(Call const& call) override
         {

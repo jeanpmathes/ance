@@ -467,6 +467,23 @@ struct ance::est::Expander::Implementation
             result_.setStatements(utility::makeOwned<Continue>(continue_statement.location));
         }
 
+        void visit(ast::Return const& return_statement) override
+        {
+            SBuilder builder(*this);
+
+            if (return_statement.value.hasValue())
+            {
+                utility::Owned<Expression> value = builder.pushExpansion(**return_statement.value);
+                builder.pushStatement(utility::makeOwned<Return>(std::move(value), return_statement.location));
+            }
+            else
+            {
+                builder.pushStatement(utility::makeOwned<Return>(std::nullopt, return_statement.location));
+            }
+
+            result_.setStatements(builder.take());
+        }
+
         void visit(ast::While const& while_statement) override
         {
             SBuilder builder(*this);
@@ -578,11 +595,11 @@ struct ance::est::Expander::Implementation
         utility::Owned<AST> ast        = utility::makeOwned<AST>(reporter_);
         Statements          statements = ast->expand(**parsed);
 
-        if (reporter_.isFailed()) return std::nullopt;
-
         auto block = utility::makeOwned<Block>(std::move(statements), parsed.value()->location);
 
         context_.print<Printer>(*block, "est", file);
+
+        if (reporter_.isFailed()) return std::nullopt;
 
         return block;
     }
@@ -595,9 +612,9 @@ struct ance::est::Expander::Implementation
         utility::Owned<AST>  ast = utility::makeOwned<AST>(reporter_);
         utility::Owned<File> est = ast->expand(**parsed);
 
-        if (reporter_.isFailed()) return std::nullopt;
-
         context_.print<Printer>(*est, "est", file);
+
+        if (reporter_.isFailed()) return std::nullopt;
 
         return est;
     }

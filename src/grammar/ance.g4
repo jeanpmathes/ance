@@ -18,6 +18,7 @@ statement
     | 'loop' statement # LoopStatement
     | 'break' ';' # BreakStatement
     | 'continue' ';' # ContinueStatement
+    | 'return' ( expression )? ';' # ReturnStatement
     | 'while' expression 'do' statement # WhileStatement
     ;
 

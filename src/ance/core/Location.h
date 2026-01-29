@@ -68,6 +68,12 @@ namespace ance::core
         /// \param location The location to extend to.
         void extend(Location const& location);
 
+        /// Get a location describing the first position of this location.
+        [[nodiscard]] Location first() const;
+
+        /// Get a location describing the last position of this location.
+        [[nodiscard]] Location last() const;
+
         /// Get the first location of two locations.
         /// If any of the locations is global, the other location is returned.
         /// If the locations are in different files, the first argument is returned.

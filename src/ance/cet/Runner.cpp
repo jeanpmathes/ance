@@ -718,10 +718,11 @@ struct ance::cet::Runner::Implementation
         }
 
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
-        if (reporter_.isFailed()) return std::nullopt;
 
         context_.print<Printer>(*unit, "cet", file);
         context_.graph<Grapher>(*unit, "cet", file);
+
+        if (reporter_.isFailed()) return std::nullopt;
 
         return unit;
     }

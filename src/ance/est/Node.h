@@ -146,6 +146,16 @@ namespace ance::est
         explicit Continue(core::Location const& source_location);
     };
 
+    /// Returns from the current runnable, optionally with a value.
+    struct Return final
+        : Statement
+        , utility::ConcreteNode<Return, Visitor>
+    {
+        Return(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
+
+        utility::Optional<utility::Owned<Expression>> value;
+    };
+
     /// Introduce a temporary variable, which works similar to any other local variable but does not have a name it is bound to.
     struct Temporary final
         : Statement
@@ -340,6 +350,7 @@ namespace ance::est
         virtual void visit(Loop const& loop)                      = 0;
         virtual void visit(Break const& break_statement)          = 0;
         virtual void visit(Continue const& continue_statement)    = 0;
+        virtual void visit(Return const& return_statement)        = 0;
         virtual void visit(Temporary const& temporary)            = 0;
         virtual void visit(WriteTemporary const& write_temporary) = 0;
 

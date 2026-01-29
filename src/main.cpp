@@ -76,11 +76,11 @@ namespace ance
 
         return exit_code;
 
-        // todo: add lambda syntax (no or only basic capture, e.g. global vars or copy only), should work in cmp in source code
-        // \[](args...) : type => expr
-        // \[](args...) : type { statements... }
-        // \(args...) : type => expr
-        // \(args...) : type { statements... }
+        // todo: unshelve - add lambda syntax (no capture, global vars only), add FunctionConstructor with todo to make it an actual constructor of function types
+
+        // todo: check if unreachable code detection works or needs to be added (with return in lambda)
+
+        // todo: remove entity from grammar, put IDENTIFIER directly in access and make call more operator-like (but not fully operator yet)
 
         // todo: add function declarations (for now cmp only, must be in syntax)
 
@@ -120,6 +120,9 @@ namespace ance
 
         // todo: when adding serialization of trees for cmp libraries, also serialize the trees of the core language functions and of the types
         // todo: this means on first run the compiler has to build the core language functions and types, serialize them, and later it just loads them (add a command line flag to force rebuild)
+
+        // todo: the compiler should also serialize each file it compiles on EST or BBT level, so that recompilation can be avoided if the file did not change
+        // todo: determine which tree is the best for this, so that no other factors like compiler paramters need to be considered
     }
 }
 

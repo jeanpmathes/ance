@@ -33,7 +33,7 @@ ance::bbt::BasicBlock::BasicBlock(size_t const                             numbe
 
 ance::bbt::ErrorLink::ErrorLink(core::Location const& source_location) : Node(source_location), Link() {}
 
-ance::bbt::Return::Return(core::Location const& source_location) : Node(source_location), Link() {}
+ance::bbt::Return::Return(Temporary const* temporary, core::Location const& source_location) : Node(source_location), Link(), return_value(temporary) {}
 
 ance::bbt::Branch::Branch(Temporary const& temporary, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location)
     : Node(source_location)

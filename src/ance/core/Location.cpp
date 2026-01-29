@@ -80,7 +80,10 @@ void ance::core::Location::extend(Location const& location)
         return;
     }
 
-    if (location.isGlobal()) { return; }
+    if (location.isGlobal())
+    {
+        return;
+    }
 
     assert(location.fileIndex() == fileIndex());
 
@@ -95,6 +98,20 @@ void ance::core::Location::extend(Location const& location)
 
     end_line_   = std::max(end_line_, location.end_line_);
     end_column_ = std::max(end_column_, location.end_column_);
+}
+
+ance::core::Location ance::core::Location::first() const
+{
+    if (isGlobal() || isFile()) return *this;
+
+    return Location(start_line_, start_column_, start_line_, start_column_, file_index_);
+}
+
+ance::core::Location ance::core::Location::last() const
+{
+    if (isGlobal() || isFile()) return *this;
+
+    return Location(end_line_, end_column_, end_line_, end_column_, file_index_);
 }
 
 ance::core::Location ance::core::Location::getFirst(Location a, Location b)
@@ -113,8 +130,14 @@ ance::core::Location ance::core::Location::getFirst(Location a, Location b)
 
 std::ostream& ance::core::operator<<(std::ostream& os, Location const& location)
 {
-    if (!location.isGlobal() && !location.isFile()) { os << "(" << location.start_line_ << ":" << location.start_column_ << ")"; }
-    else { os << "()"; }
+    if (!location.isGlobal() && !location.isFile())
+    {
+        os << "(" << location.start_line_ << ":" << location.start_column_ << ")";
+    }
+    else
+    {
+        os << "()";
+    }
 
     return os;
 }

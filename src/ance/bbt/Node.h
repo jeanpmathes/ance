@@ -54,6 +54,7 @@ namespace ance::bbt
     };
 
     struct Statement;
+    struct Temporary;
     struct Link;
 
     /// A basic block is a sequence of statements that are executed without interruption.
@@ -89,10 +90,10 @@ namespace ance::bbt
         : Link
         , utility::ConcreteNode<Return, Visitor>
     {
-        explicit Return(core::Location const& source_location);
-    };
+        Return(Temporary const* temporary, core::Location const& source_location);
 
-    struct Temporary;
+        Temporary const* return_value;
+    };
 
     /// Chooses between two branches based on a condition.
     struct Branch final

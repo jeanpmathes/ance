@@ -457,6 +457,15 @@ namespace ance::ast
             return statement;
         }
 
+        std::any visitReturnStatement(anceParser::ReturnStatementContext* context) override
+        {
+            utility::Optional<utility::Owned<Expression>> value = {};
+            if (context->expression() != nullptr) value = expectExpression(context->expression());
+
+            Statement* statement = new Return(std::move(value), location(context));
+            return statement;
+        }
+
         std::any visitWhileStatement(anceParser::WhileStatementContext* context) override
         {
             utility::Owned<Expression> condition = expectExpression(context->expression());
@@ -631,9 +640,9 @@ struct ance::ast::Parser::Implementation
             reporter_.error("Failed to read file", core::Location::file(source_file.index()));
         }
 
-        if (reporter_.isFailed()) return std::nullopt;
-
         context_.print<Printer>(**file, "ast", source_file.getRelativePath());
+
+        if (reporter_.isFailed()) return std::nullopt;
 
         return file;
     }
@@ -673,9 +682,9 @@ struct ance::ast::Parser::Implementation
             reporter_.error("Failed to read file", core::Location::file(source_file.index()));
         }
 
-        if (reporter_.isFailed()) return std::nullopt;
-
         context_.print<Printer>(**statement, "ast", source_file.getRelativePath());
+
+        if (reporter_.isFailed()) return std::nullopt;
 
         return statement;
     }

@@ -143,6 +143,17 @@ struct ance::est::Printer::Implementation
             print("continue;");
         }
 
+        void visit(Return const& return_statement) override
+        {
+            print("return");
+            if (return_statement.value.hasValue())
+            {
+                print(" ");
+                visit(**return_statement.value);
+            }
+            print(";");
+        }
+
         void visit(Temporary const& temporary) override
         {
             print("let temporary ");

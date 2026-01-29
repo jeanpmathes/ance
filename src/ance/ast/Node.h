@@ -1,11 +1,11 @@
 #ifndef ANCE_AST_NODE_H
 #define ANCE_AST_NODE_H
 
+#include "ance/core/AccessModifier.h"
+#include "ance/core/Assigner.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
-#include "ance/core/AccessModifier.h"
-#include "ance/core/Assigner.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -41,7 +41,9 @@ namespace ance::ast
     };
 
     /// Declarations are nodes that introduce named entities and are used in unordered scopes.
-    struct Declaration : virtual Node, virtual utility::AbstractNode<Visitor>
+    struct Declaration
+        : virtual Node
+        , virtual utility::AbstractNode<Visitor>
     {
     };
 
@@ -68,12 +70,12 @@ namespace ance::ast
         : Declaration
         , utility::ConcreteNode<VariableDeclaration, Visitor>
     {
-        VariableDeclaration(core::AccessModifier access,
-                        core::Identifier const&                        name,
-                        utility::Owned<Expression>                     t,
-                        core::Assigner assignment,
-                        utility::Optional<utility::Owned<Expression>>  definition,
-                        core::Location const&                          source_location);
+        VariableDeclaration(core::AccessModifier                          access,
+                            core::Identifier const&                       name,
+                            utility::Owned<Expression>                    t,
+                            core::Assigner                                assignment,
+                            utility::Optional<utility::Owned<Expression>> definition,
+                            core::Location const&                         source_location);
 
         core::AccessModifier                          access_modifier;
         core::Identifier                              identifier;
@@ -129,13 +131,13 @@ namespace ance::ast
         , utility::ConcreteNode<Let, Visitor>
     {
         Let(core::Identifier const&                       name,
-        utility::Owned<Expression> t,
-        core::Assigner assignment,
+            utility::Owned<Expression>                    t,
+            core::Assigner                                assignment,
             utility::Optional<utility::Owned<Expression>> definition,
             core::Location const&                         source_location);
 
         core::Identifier                              identifier;
-        utility::Owned<Expression> type;
+        utility::Owned<Expression>                    type;
         core::Assigner                                assigner;
         utility::Optional<utility::Owned<Expression>> value;
     };
@@ -145,13 +147,10 @@ namespace ance::ast
         : Statement
         , utility::ConcreteNode<Assignment, Visitor>
     {
-        Assignment(core::Identifier const&                        assigned,
-                    core::Assigner assignment,
-                    utility::Owned<Expression>                    expression,
-                    core::Location const&                         source_location);
+        Assignment(core::Identifier const& assigned, core::Assigner assignment, utility::Owned<Expression> expression, core::Location const& source_location);
 
-        core::Identifier         identifier;
-        core::Assigner           assigner;
+        core::Identifier           identifier;
+        core::Assigner             assigner;
         utility::Owned<Expression> value;
     };
 
@@ -161,14 +160,14 @@ namespace ance::ast
         : Statement
         , utility::ConcreteNode<If, Visitor>
     {
-        If(utility::Owned<Expression> expression,
-           utility::Owned<Statement>      then_part,
-           utility::Optional<utility::Owned<Statement>>      else_part,
-           core::Location const&      source_location);
+        If(utility::Owned<Expression>                   expression,
+           utility::Owned<Statement>                    then_part,
+           utility::Optional<utility::Owned<Statement>> else_part,
+           core::Location const&                        source_location);
 
-        utility::Owned<Expression> condition;
-        utility::Owned<Statement>      true_part;
-        utility::Optional<utility::Owned<Statement>>      false_part;
+        utility::Owned<Expression>                   condition;
+        utility::Owned<Statement>                    true_part;
+        utility::Optional<utility::Owned<Statement>> false_part;
     };
 
     /// Unconditionally repeats a statement.
@@ -176,8 +175,7 @@ namespace ance::ast
         : Statement
         , utility::ConcreteNode<Loop, Visitor>
     {
-        Loop(utility::Owned<Statement>  statement,
-             core::Location const&      source_location);
+        Loop(utility::Owned<Statement> statement, core::Location const& source_location);
 
         utility::Owned<Statement> body;
     };
@@ -198,14 +196,22 @@ namespace ance::ast
         explicit Continue(core::Location const& source_location);
     };
 
+    /// Returns from the current runnable, optionally with a value.
+    struct Return final
+        : Statement
+        , utility::ConcreteNode<Return, Visitor>
+    {
+        Return(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location);
+
+        utility::Optional<utility::Owned<Expression>> value;
+    };
+
     /// Loops as long as the condition is true.
     struct While final
         : Statement
         , utility::ConcreteNode<While, Visitor>
     {
-        While(utility::Owned<Expression> expression,
-              utility::Owned<Statement>  statement,
-              core::Location const&      source_location);
+        While(utility::Owned<Expression> expression, utility::Owned<Statement> statement, core::Location const& source_location);
 
         utility::Owned<Expression> condition;
         utility::Owned<Statement>  body;
@@ -234,7 +240,7 @@ namespace ance::ast
     {
         Call(core::Identifier const& callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
-        core::Identifier identifier;
+        core::Identifier                          identifier;
         utility::List<utility::Owned<Expression>> arguments;
     };
 
@@ -301,7 +307,7 @@ namespace ance::ast
     {
         UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location);
 
-        core::UnaryOperator op;
+        core::UnaryOperator        op;
         utility::Owned<Expression> operand;
     };
 
@@ -314,29 +320,30 @@ namespace ance::ast
 
         virtual void visit(File const& file) = 0;
 
-        virtual void visit(ErrorDeclaration const& error) = 0;
+        virtual void visit(ErrorDeclaration const& error)       = 0;
         virtual void visit(RunnableDeclaration const& runnable) = 0;
-        virtual void visit(VariableDeclaration const& global) = 0;
+        virtual void visit(VariableDeclaration const& global)   = 0;
 
-        virtual void visit(ErrorStatement const& error)    = 0;
-        virtual void visit(Block const& block)             = 0;
-        virtual void visit(Independent const& independent) = 0;
-        virtual void visit(Let const& let)                 = 0;
-        virtual void visit(Assignment const& assignment)   = 0;
-        virtual void visit(If const& if_statement)         = 0;
-        virtual void visit(Loop const& loop)               = 0;
-        virtual void visit(Break const& break_statement)   = 0;
+        virtual void visit(ErrorStatement const& error)        = 0;
+        virtual void visit(Block const& block)                 = 0;
+        virtual void visit(Independent const& independent)     = 0;
+        virtual void visit(Let const& let)                     = 0;
+        virtual void visit(Assignment const& assignment)       = 0;
+        virtual void visit(If const& if_statement)             = 0;
+        virtual void visit(Loop const& loop)                   = 0;
+        virtual void visit(Break const& break_statement)       = 0;
         virtual void visit(Continue const& continue_statement) = 0;
-        virtual void visit(While const& while_statement)   = 0;
+        virtual void visit(Return const& return_statement)     = 0;
+        virtual void visit(While const& while_statement)       = 0;
 
-        virtual void visit(ErrorExpression const& error) = 0;
-        virtual void visit(Call const& call)             = 0;
-        virtual void visit(Access const& access)         = 0;
-        virtual void visit(UnitLiteral const& unit_literal) = 0;
-        virtual void visit(SizeLiteral const& size_literal) = 0;
-        virtual void visit(StringLiteral const& string_literal) = 0;
-        virtual void visit(BoolLiteral const& bool_literal) = 0;
-        virtual void visit(Here const& here)             = 0;
+        virtual void visit(ErrorExpression const& error)          = 0;
+        virtual void visit(Call const& call)                      = 0;
+        virtual void visit(Access const& access)                  = 0;
+        virtual void visit(UnitLiteral const& unit_literal)       = 0;
+        virtual void visit(SizeLiteral const& size_literal)       = 0;
+        virtual void visit(StringLiteral const& string_literal)   = 0;
+        virtual void visit(BoolLiteral const& bool_literal)       = 0;
+        virtual void visit(Here const& here)                      = 0;
         virtual void visit(UnaryOperation const& unary_operation) = 0;
     };
 }

@@ -8,10 +8,7 @@ ance::ast::File::File(utility::List<utility::Owned<Declaration>> declaration_lis
     , declarations(std::move(declaration_list))
 {}
 
-ance::ast::ErrorDeclaration::ErrorDeclaration(core::Location const& source_location) : Node(source_location), Declaration()
-{
-
-}
+ance::ast::ErrorDeclaration::ErrorDeclaration(core::Location const& source_location) : Node(source_location), Declaration() {}
 
 ance::ast::RunnableDeclaration::RunnableDeclaration(utility::Owned<Statement> statement, core::Location const& source_location)
     : Node(source_location)
@@ -102,6 +99,12 @@ ance::ast::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::ast::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::ast::Return::Return(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , value(std::move(expression))
+{}
+
 ance::ast::While::While(utility::Owned<Expression> expression, utility::Owned<Statement> statement, core::Location const& source_location)
     : Node(source_location)
     , Statement()
@@ -123,22 +126,14 @@ ance::ast::Access::Access(core::Identifier const& accessed, core::Location const
 
 ance::ast::UnitLiteral::UnitLiteral(core::Location const& source_location) : Node(source_location), Expression() {}
 
-ance::ast::SizeLiteral::SizeLiteral(std::string text, core::Location const& source_location)
-    : Node(source_location)
-    , Expression()
-    , value(std::move(text))
-{}
+ance::ast::SizeLiteral::SizeLiteral(std::string text, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(text)) {}
 
 ance::ast::StringLiteral::StringLiteral(std::string text, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(text))
 {}
 
-ance::ast::BoolLiteral::BoolLiteral(bool const v, core::Location const& source_location) : Node(source_location), Expression(), value(v)
-{}
+ance::ast::BoolLiteral::BoolLiteral(bool const v, core::Location const& source_location) : Node(source_location), Expression(), value(v) {}
 
-ance::ast::Here::Here(core::Location const& source_location)
-    : Node(source_location)
-    , Expression()
-{}
+ance::ast::Here::Here(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::ast::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
