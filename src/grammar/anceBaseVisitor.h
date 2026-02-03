@@ -88,6 +88,11 @@ class anceBaseVisitor : public anceVisitor
         return visitChildren(ctx);
     }
 
+    virtual std::any visitLambdaExpression(anceParser::LambdaExpressionContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
     virtual std::any visitAccessExpression(anceParser::AccessExpressionContext* ctx) override
     {
         return visitChildren(ctx);
@@ -144,6 +149,11 @@ class anceBaseVisitor : public anceVisitor
     }
 
     virtual std::any visitEntity(anceParser::EntityContext* ctx) override
+    {
+        return visitChildren(ctx);
+    }
+
+    virtual std::any visitParameter(anceParser::ParameterContext* ctx) override
     {
         return visitChildren(ctx);
     }

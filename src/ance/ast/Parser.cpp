@@ -258,7 +258,7 @@ namespace ance::ast
             size_t const end_line   = start_line;
             size_t const end_column = start_column + getUtf32Length(text) - 1;
 
-            return core::Identifier::like(text, {start_line, start_column, end_line, end_column, file_index_});
+            return core::Identifier::make(text, {start_line, start_column, end_line, end_column, file_index_});
         }
 
       public:
@@ -301,6 +301,15 @@ namespace ance::ast
             return utility::makeOwned<ErrorExpression>(location(ctx));
         }
 
+        Parameter expectParameter(anceParser::ParameterContext* ctx)
+        {
+            core::Identifier const     name     = identifier(ctx->IDENTIFIER());
+            utility::Owned<Expression> type     = expectExpression(ctx->expression());
+            core::Location const       location = this->location(ctx);
+
+            return {name, std::move(type), location};
+        }
+
         core::Assigner expectAssigner(anceParser::AssignerContext* ctx)
         {
             if (ctx == nullptr) return core::Assigner::UNSPECIFIED;
@@ -320,73 +329,66 @@ namespace ance::ast
         }
 
       protected:
-        std::any visitUnorderedScopeFile(anceParser::UnorderedScopeFileContext* context) override
+        std::any visitUnorderedScopeFile(anceParser::UnorderedScopeFileContext* ctx) override
         {
             utility::List<utility::Owned<Declaration>> declarations;
 
-            for (anceParser::DeclarationContext* declaration : context->declaration())
+            for (anceParser::DeclarationContext* declaration : ctx->declaration())
             {
                 declarations.push_back(expectDeclaration(declaration));
             }
 
-            File* file = new File(std::move(declarations), location(context));
+            File* file = new File(std::move(declarations), location(ctx));
             return file;
         }
 
-        std::any visitOrderedScopeFile(anceParser::OrderedScopeFileContext* context) override
+        std::any visitOrderedScopeFile(anceParser::OrderedScopeFileContext* ctx) override
         {
-            return visit(context->statement());
+            return visit(ctx->statement());
         }
 
-        std::any visitRunnableDeclaration(anceParser::RunnableDeclarationContext* context) override
+        std::any visitRunnableDeclaration(anceParser::RunnableDeclarationContext* ctx) override
         {
-            utility::Owned<Statement> body = expectStatement(context->statement());
+            utility::Owned<Statement> body = expectStatement(ctx->statement());
 
-            Declaration* declaration = new RunnableDeclaration(std::move(body), location(context));
+            Declaration* declaration = new RunnableDeclaration(std::move(body), location(ctx));
             return declaration;
         }
 
-        std::any visitVariableDeclaration(anceParser::VariableDeclarationContext* context) override
+        std::any visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx) override
         {
-            core::AccessModifier const access_modifier = expectAccessModifier(context->accessModifier());
-            core::Identifier const     name            = identifier(context->IDENTIFIER());
-            utility::Owned<Expression> type            = expectExpression(context->varType);
+            core::AccessModifier const access_modifier = expectAccessModifier(ctx->accessModifier());
+            core::Identifier const     name            = identifier(ctx->IDENTIFIER());
+            utility::Owned<Expression> type            = expectExpression(ctx->varType);
 
             core::Assigner                                assigner = core::Assigner::UNSPECIFIED;
             utility::Optional<utility::Owned<Expression>> expression;
-            if (context->assigned != nullptr)
+            if (ctx->assigned != nullptr)
             {
-                assigner   = expectAssigner(context->assigner());
-                expression = expectExpression(context->assigned);
+                assigner   = expectAssigner(ctx->assigner());
+                expression = expectExpression(ctx->assigned);
 
                 if (!assigner.isFinal())
                 {
-                    reporter_.error("Unordered scope variable declarations must be final", location(context->assigner()));
+                    reporter_.error("Unordered scope variable declarations must be final", location(ctx->assigner()));
                 }
             }
 
-            Declaration* declaration = new VariableDeclaration(access_modifier, name, std::move(type), assigner, std::move(expression), location(context));
+            Declaration* declaration = new VariableDeclaration(access_modifier, name, std::move(type), assigner, std::move(expression), location(ctx));
             return declaration;
         }
 
-        std::any visitBlockStatement(anceParser::BlockStatementContext* context) override
+        std::any visitBlockStatement(anceParser::BlockStatementContext* ctx) override
         {
-            utility::List<utility::Owned<Statement>> statements;
-
-            for (anceParser::StatementContext* statement : context->statement())
-            {
-                statements.push_back(expectStatement(statement));
-            }
-
-            Statement* statement = new Block(std::move(statements), location(context));
+            Statement* statement = createBlockStatement(ctx->statement(), location(ctx));
             return statement;
         }
 
-        std::any visitExpressionStatement(anceParser::ExpressionStatementContext* context) override
+        std::any visitExpressionStatement(anceParser::ExpressionStatementContext* ctx) override
         {
-            utility::Owned<Expression> expression = expectExpression(context->expression());
+            utility::Owned<Expression> expression = expectExpression(ctx->expression());
 
-            Statement* statement = new Independent(std::move(expression), location(context));
+            Statement* statement = new Independent(std::move(expression), location(ctx));
             return statement;
         }
 
@@ -437,55 +439,78 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitLoopStatement(anceParser::LoopStatementContext* context) override
+        std::any visitLoopStatement(anceParser::LoopStatementContext* ctx) override
         {
-            utility::Owned<Statement> body = expectStatement(context->statement());
+            utility::Owned<Statement> body = expectStatement(ctx->statement());
 
-            Statement* statement = new Loop(std::move(body), location(context));
+            Statement* statement = new Loop(std::move(body), location(ctx));
             return statement;
         }
 
-        std::any visitBreakStatement(anceParser::BreakStatementContext* context) override
+        std::any visitBreakStatement(anceParser::BreakStatementContext* ctx) override
         {
-            Statement* statement = new Break(location(context));
+            Statement* statement = new Break(location(ctx));
             return statement;
         }
 
-        std::any visitContinueStatement(anceParser::ContinueStatementContext* context) override
+        std::any visitContinueStatement(anceParser::ContinueStatementContext* ctx) override
         {
-            Statement* statement = new Continue(location(context));
+            Statement* statement = new Continue(location(ctx));
             return statement;
         }
 
-        std::any visitReturnStatement(anceParser::ReturnStatementContext* context) override
+        std::any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override
         {
             utility::Optional<utility::Owned<Expression>> value = {};
-            if (context->expression() != nullptr) value = expectExpression(context->expression());
+            if (ctx->expression() != nullptr) value = expectExpression(ctx->expression());
 
-            Statement* statement = new Return(std::move(value), location(context));
+            Statement* statement = new Return(std::move(value), location(ctx));
             return statement;
         }
 
-        std::any visitWhileStatement(anceParser::WhileStatementContext* context) override
+        std::any visitWhileStatement(anceParser::WhileStatementContext* ctx) override
         {
-            utility::Owned<Expression> condition = expectExpression(context->expression());
-            utility::Owned<Statement>  body      = expectStatement(context->statement());
+            utility::Owned<Expression> condition = expectExpression(ctx->expression());
+            utility::Owned<Statement>  body      = expectStatement(ctx->statement());
 
-            Statement* statement = new While(std::move(condition), std::move(body), location(context));
+            Statement* statement = new While(std::move(condition), std::move(body), location(ctx));
             return statement;
         }
 
-        std::any visitCallExpression(anceParser::CallExpressionContext* context) override
+        std::any visitCallExpression(anceParser::CallExpressionContext* ctx) override
         {
-            core::Identifier const callable = identifier(context->entity()->IDENTIFIER());
+            core::Identifier const callable = identifier(ctx->entity()->IDENTIFIER());
 
             utility::List<utility::Owned<Expression>> arguments;
-            for (anceParser::ExpressionContext* expression : context->expression())
+            for (anceParser::ExpressionContext* expression : ctx->expression())
             {
                 arguments.push_back(expectExpression(expression));
             }
 
-            Expression* expression = new Call(callable, std::move(arguments), location(context));
+            Expression* expression = new Call(callable, std::move(arguments), location(ctx));
+            return expression;
+        }
+
+        std::any visitLambdaExpression(anceParser::LambdaExpressionContext* ctx) override
+        {
+            utility::List<Parameter> parameters;
+            for (anceParser::ParameterContext* parameter_ctx : ctx->parameter()) parameters.push_back(expectParameter(parameter_ctx));
+
+            utility::Owned<Expression> return_type = expectExpression(ctx->type);
+
+            utility::Optional<utility::Owned<Expression>> expression_body;
+            utility::Optional<utility::Owned<Statement>>  statement_body;
+            if (ctx->body != nullptr)
+            {
+                expression_body = expectExpression(ctx->body);
+            }
+            else if (!ctx->statement().empty())
+            {
+                statement_body = utility::wrap<Statement>(createBlockStatement(ctx->statement(), location(ctx)));
+            }
+
+            Expression* expression =
+                new Lambda(std::move(parameters), std::move(return_type), std::move(expression_body), std::move(statement_body), location(ctx));
             return expression;
         }
 
@@ -497,18 +522,18 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitHereExpression(anceParser::HereExpressionContext* context) override
+        std::any visitHereExpression(anceParser::HereExpressionContext* ctx) override
         {
-            Expression* expression = new Here(location(context));
+            Expression* expression = new Here(location(ctx));
             return expression;
         }
 
-        std::any visitUnaryOperationExpression(anceParser::UnaryOperationExpressionContext* context) override
+        std::any visitUnaryOperationExpression(anceParser::UnaryOperationExpressionContext* ctx) override
         {
-            core::UnaryOperator const  op      = std::any_cast<core::UnaryOperator>(visit(context->unary()));
-            utility::Owned<Expression> operand = expectExpression(context->expression());
+            core::UnaryOperator const  op      = std::any_cast<core::UnaryOperator>(visit(ctx->unary()));
+            utility::Owned<Expression> operand = expectExpression(ctx->expression());
 
-            Expression* expression = new UnaryOperation(op, std::move(operand), location(context));
+            Expression* expression = new UnaryOperation(op, std::move(operand), location(ctx));
             return expression;
         }
 
@@ -517,39 +542,39 @@ namespace ance::ast
             return core::UnaryOperator::NOT;
         }
 
-        std::any visitTrue(anceParser::TrueContext* context) override
+        std::any visitTrue(anceParser::TrueContext* ctx) override
         {
-            Expression* expression = new BoolLiteral(true, location(context));
+            Expression* expression = new BoolLiteral(true, location(ctx));
             return expression;
         }
 
-        std::any visitFalse(anceParser::FalseContext* context) override
+        std::any visitFalse(anceParser::FalseContext* ctx) override
         {
-            Expression* expression = new BoolLiteral(false, location(context));
+            Expression* expression = new BoolLiteral(false, location(ctx));
             return expression;
         }
 
-        std::any visitSizeLiteral(anceParser::SizeLiteralContext* context) override
+        std::any visitSizeLiteral(anceParser::SizeLiteralContext* ctx) override
         {
             // todo: use llvm::APInt instead of size_t
             // todo: do all the validation of integer literals and stuff like whether they actually fit into their type
 
-            Expression* expression = new SizeLiteral(context->getText(), location(context));
+            Expression* expression = new SizeLiteral(ctx->getText(), location(ctx));
             return expression;
         }
 
-        std::any visitUnitLiteral(anceParser::UnitLiteralContext* context) override
+        std::any visitUnitLiteral(anceParser::UnitLiteralContext* ctx) override
         {
-            Expression* expression = new UnitLiteral(location(context));
+            Expression* expression = new UnitLiteral(location(ctx));
             return expression;
         }
 
-        std::any visitStringLiteral(anceParser::StringLiteralContext* context) override
+        std::any visitStringLiteral(anceParser::StringLiteralContext* ctx) override
         {
-            std::string text = context->getText();
+            std::string text = ctx->getText();
             text             = text.substr(1, text.size() - 2);// Remove quotes.
 
-            Expression* expression = new StringLiteral(text, location(context));
+            Expression* expression = new StringLiteral(text, location(ctx));
             return expression;
         }
 
@@ -583,12 +608,23 @@ namespace ance::ast
             return access_modifier;
         }
 
-      protected:
         std::any visitTerminal(antlr4::tree::TerminalNode*) override
         {
             assert(false);// Indicates a missing implementation of a node.
 
             return {};
+        }
+
+        Block* createBlockStatement(std::vector<anceParser::StatementContext*> const& statement_contexts, core::Location const& source_location)
+        {
+            utility::List<utility::Owned<Statement>> statements;
+
+            for (anceParser::StatementContext* statement : statement_contexts)
+            {
+                statements.push_back(expectStatement(statement));
+            }
+
+            return new Block(std::move(statements), source_location);
         }
 
       private:
@@ -599,10 +635,10 @@ namespace ance::ast
 
 struct ance::ast::Parser::Implementation
 {
-    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& ctx)
         : source_tree_(source_tree)
         , reporter_(reporter)
-        , context_(context)
+        , ctx_(ctx)
     {}
 
     utility::Optional<utility::Owned<File>> parseUnorderedFile(std::filesystem::path const& file_path)// todo: reduce duplication with below (templates)
@@ -629,18 +665,18 @@ struct ance::ast::Parser::Implementation
             parser->addErrorListener(error_handler->parserErrorListener());
             parser->setErrorHandler(error_handler->parserErrorStrategy());
 
-            anceParser::UnorderedScopeFileContext* unordered_scope_file_context = parser->unorderedScopeFile();
+            anceParser::UnorderedScopeFileContext* unordered_scope_file_ctx = parser->unorderedScopeFile();
 
             SourceVisitor visitor {source_file.index(), reporter_};
 
-            file = visitor.expectFile(unordered_scope_file_context);
+            file = visitor.expectFile(unordered_scope_file_ctx);
         }
         else
         {
             reporter_.error("Failed to read file", core::Location::file(source_file.index()));
         }
 
-        context_.print<Printer>(**file, "ast", source_file.getRelativePath());
+        ctx_.print<Printer>(**file, "ast", source_file.getRelativePath());
 
         if (reporter_.isFailed()) return std::nullopt;
 
@@ -671,18 +707,18 @@ struct ance::ast::Parser::Implementation
             parser->addErrorListener(error_handler->parserErrorListener());
             parser->setErrorHandler(error_handler->parserErrorStrategy());
 
-            anceParser::OrderedScopeFileContext* unordered_scope_file_context = parser->orderedScopeFile();
+            anceParser::OrderedScopeFileContext* unordered_scope_file_ctx = parser->orderedScopeFile();
 
             SourceVisitor visitor {source_file.index(), reporter_};
 
-            statement = visitor.expectStatement(unordered_scope_file_context);
+            statement = visitor.expectStatement(unordered_scope_file_ctx);
         }
         else
         {
             reporter_.error("Failed to read file", core::Location::file(source_file.index()));
         }
 
-        context_.print<Printer>(**statement, "ast", source_file.getRelativePath());
+        ctx_.print<Printer>(**statement, "ast", source_file.getRelativePath());
 
         if (reporter_.isFailed()) return std::nullopt;
 
@@ -692,11 +728,11 @@ struct ance::ast::Parser::Implementation
   private:
     sources::SourceTree& source_tree_;
     core::Reporter&      reporter_;
-    core::Context&       context_;
+    core::Context&       ctx_;
 };
 
-ance::ast::Parser::Parser(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
-    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
+ance::ast::Parser::Parser(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& ctx)
+    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, ctx))
 {}
 
 ance::ast::Parser::~Parser() = default;

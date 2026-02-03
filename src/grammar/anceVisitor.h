@@ -46,6 +46,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
 
     virtual std::any visitCallExpression(anceParser::CallExpressionContext* context) = 0;
 
+    virtual std::any visitLambdaExpression(anceParser::LambdaExpressionContext* context) = 0;
+
     virtual std::any visitAccessExpression(anceParser::AccessExpressionContext* context) = 0;
 
     virtual std::any visitLiteralExpression(anceParser::LiteralExpressionContext* context) = 0;
@@ -69,6 +71,8 @@ class anceVisitor : public antlr4::tree::AbstractParseTreeVisitor
     virtual std::any visitFalse(anceParser::FalseContext* context) = 0;
 
     virtual std::any visitEntity(anceParser::EntityContext* context) = 0;
+
+    virtual std::any visitParameter(anceParser::ParameterContext* context) = 0;
 
     virtual std::any visitCopyAssigner(anceParser::CopyAssignerContext* context) = 0;
 

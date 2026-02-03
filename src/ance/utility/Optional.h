@@ -1,8 +1,8 @@
 #ifndef ANCE_SRC_LANG_UTILITY_OPTIONAL_H
 #define ANCE_SRC_LANG_UTILITY_OPTIONAL_H
 
-#include <optional>
 #include <array>
+#include <optional>
 
 #include "Concepts.h"
 
@@ -26,23 +26,21 @@ namespace ance::utility
         explicit(false) Optional(T&& value)
             requires(!ConstCopyable<T> and !Copyable<T>);
 
-        Optional<T>& operator=(T value);
-
         template<typename OtherT>
-        requires ConstCopyConvertible<T, OtherT>
+            requires ConstCopyConvertible<T, OtherT>
         explicit(false) Optional(OtherT const& value);
         template<typename OtherT>
-        requires(!ConstCopyConvertible<T, OtherT> and CopyConvertible<T, OtherT>)
+            requires(!ConstCopyConvertible<T, OtherT> and CopyConvertible<T, OtherT>)
         explicit(false) Optional(OtherT& value);
         template<typename OtherT>
-        requires MoveConvertible<T, OtherT>
+            requires MoveConvertible<T, OtherT>
         explicit(false) Optional(OtherT&& value);
 
-        Optional(Optional<T> const& optional)
+        Optional(Optional const& optional)
             requires ConstCopyable<T>;
-        Optional(Optional<T>& optional)
+        Optional(Optional& optional)
             requires(!ConstCopyable<T> and Copyable<T>);
-        Optional(Optional<T>&& optional) noexcept;
+        Optional(Optional&& optional) noexcept;
 
         template<typename OtherT>
             requires ConstCopyConvertible<T, OtherT>
@@ -60,16 +58,16 @@ namespace ance::utility
             requires MoveConvertible<T, OtherT>
         explicit(false) Optional(Optional<OtherT> optional);
 
-        Optional<T>& operator=(Optional<T> optional)
+        Optional& operator=(Optional optional)
             requires Copyable<T>;
-        Optional<T>& operator=(Optional<T>&& optional) noexcept
+        Optional& operator=(Optional&& optional) noexcept
             requires(!Copyable<T>);
         template<typename OtherT>
             requires MoveConvertible<T, OtherT>
-        Optional<T>& operator=(Optional<OtherT>&& optional);
+        Optional& operator=(Optional<OtherT>&& optional);
         template<typename OtherT>
             requires CopyConvertible<T, OtherT>
-        Optional<T>& operator=(Optional<OtherT>& optional);
+        Optional& operator=(Optional<OtherT>& optional);
 
         ~Optional();
 

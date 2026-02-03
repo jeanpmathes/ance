@@ -19,7 +19,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& value = builder.pushVariableAccess(core::Identifier::like("value"));
+        bbt::Temporary const& value = builder.pushVariableAccess(core::Identifier::make("value"));
 
         bbt::Temporary const& str_value = builder.pushTemporary("str_value");
         {
@@ -40,15 +40,15 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         (void) result;
     }
     provider.emplace_back(utility::makeShared<bbt::Function>(
-        bbt::Signature::like("print1b", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getBool())),
+        bbt::Signature::make("print1b", bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getBool())),
         runner.types().getUnit(),
         builder.build("main"),
         runner.types()));
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::like("value"));
-        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::like("location"));
+        bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::make("value"));
+        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::make("location"));
 
         bbt::Temporary const& str_value = builder.pushTemporary("str_value");
         {
@@ -67,16 +67,16 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         (void) result;
     }
     provider.emplace_back(
-        utility::makeShared<bbt::Function>(bbt::Signature::like("print2b",
-                                                                bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getBool()),
-                                                                bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
+        utility::makeShared<bbt::Function>(bbt::Signature::make("print2b",
+                                                                bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getBool()),
+                                                                bbt::Signature::Parameter(core::Identifier::make("location"), runner.types().getLocation())),
                                            runner.types().getUnit(),
                                            builder.build("main"),
                                            runner.types()));
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& value = builder.pushVariableAccess(core::Identifier::like("value"));
+        bbt::Temporary const& value = builder.pushVariableAccess(core::Identifier::make("value"));
 
         bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
 
@@ -90,15 +90,15 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         (void) result;
     }
     provider.emplace_back(utility::makeShared<bbt::Function>(
-        bbt::Signature::like("print1s", bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString())),
+        bbt::Signature::make("print1s", bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getString())),
         runner.types().getUnit(),
         builder.build("main"),
         runner.types()));
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::like("value"));
-        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::like("location"));
+        bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::make("value"));
+        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::make("location"));
 
         bbt::Temporary const& result = builder.pushTemporary("result");
         {
@@ -110,17 +110,17 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         (void) result;
     }
     provider.emplace_back(
-        utility::makeShared<bbt::Function>(bbt::Signature::like("print2s",
-                                                                bbt::Signature::Parameter(core::Identifier::like("value"), runner.types().getString()),
-                                                                bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
+        utility::makeShared<bbt::Function>(bbt::Signature::make("print2s",
+                                                                bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getString()),
+                                                                bbt::Signature::Parameter(core::Identifier::make("location"), runner.types().getLocation())),
                                            runner.types().getUnit(),
                                            builder.build("main"),
                                            runner.types()));
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {
-        bbt::Temporary const& file     = builder.pushVariableAccess(core::Identifier::like("file"));
-        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::like("location"));
+        bbt::Temporary const& file     = builder.pushVariableAccess(core::Identifier::make("file"));
+        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::make("location"));
 
         bbt::Temporary const& result = builder.pushTemporary("result");
         {
@@ -132,9 +132,9 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         (void) result;
     }
     provider.emplace_back(
-        utility::makeShared<bbt::Function>(bbt::Signature::like("include",
-                                                                bbt::Signature::Parameter(core::Identifier::like("file"), runner.types().getString()),
-                                                                bbt::Signature::Parameter(core::Identifier::like("location"), runner.types().getLocation())),
+        utility::makeShared<bbt::Function>(bbt::Signature::make("include",
+                                                                bbt::Signature::Parameter(core::Identifier::make("file"), runner.types().getString()),
+                                                                bbt::Signature::Parameter(core::Identifier::make("location"), runner.types().getLocation())),
                                            runner.types().getUnit(),
                                            builder.build("main"),
                                            runner.types()));

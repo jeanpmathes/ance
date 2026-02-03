@@ -217,6 +217,23 @@ namespace ance::est
         utility::List<utility::Owned<Expression>> arguments;
     };
 
+    struct Parameter;
+
+    /// Creates a function.
+    struct AnonymousFunctionConstructor final// todo: make this an actual constructor of function types
+        : Expression
+        , utility::ConcreteNode<AnonymousFunctionConstructor, Visitor>
+    {
+        AnonymousFunctionConstructor(utility::List<Parameter>   params,
+                                     utility::Owned<Expression> type,
+                                     utility::Owned<Statement>  statement,
+                                     core::Location const&      source_location);
+
+        utility::List<Parameter>   parameters;
+        utility::Owned<Expression> return_type;
+        utility::Owned<Statement>  body;
+    };
+
     /// Reads the value of a variable.
     struct Read final
         : Expression
@@ -332,6 +349,16 @@ namespace ance::est
         core::Identifier identifier;
     };
 
+    /// A parameter for a callable, e.g. a function or lambda.
+    struct Parameter final
+    {
+        Parameter(core::Identifier const& name, utility::Owned<Expression> t, core::Location const& source_location);
+
+        core::Identifier           identifier;
+        utility::Owned<Expression> type;
+        core::Location             location;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -357,6 +384,7 @@ namespace ance::est
         virtual void visit(ErrorExpression const& error)                = 0;
         virtual void visit(Intrinsic const& intrinsic)                  = 0;
         virtual void visit(Call const& call)                            = 0;
+        virtual void visit(AnonymousFunctionConstructor const& ctor)    = 0;
         virtual void visit(Read const& access)                          = 0;
         virtual void visit(UnitLiteral const& unit_literal)             = 0;
         virtual void visit(SizeLiteral const& size_literal)             = 0;

@@ -60,6 +60,19 @@ struct ance::bbt::Segmenter::Implementation
             return !statements_.empty();
         }
 
+        [[nodiscard]] bool isRelevantForReachability() const
+        {
+            for (auto const& statement : statements_)
+            {
+                if (statement->isRelevantForReachability())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         [[nodiscard]] core::Location location() const
         {
             core::Location location = core::Location::global();
@@ -132,7 +145,7 @@ struct ance::bbt::Segmenter::Implementation
 
         virtual void swap(std::reference_wrapper<BaseBB> original, std::reference_wrapper<BaseBB> replacement) = 0;
 
-      public:// todo: undo
+      private:
         std::set<BaseBB*>                        incoming_;
         utility::List<utility::Owned<Statement>> statements_;
 
@@ -162,7 +175,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             if (next_ == nullptr)
             {
-                return utility::makeOwned<Return>(nullptr, core::Location::global());// todo: should not be here but in the correct block maybe?
+                return utility::makeOwned<Return>(core::Location::global());// todo: should not be here but in the correct block maybe?
             }
 
             return utility::makeOwned<Jump>(*blocks[next_->index()], core::Location::global());
@@ -247,11 +260,11 @@ struct ance::bbt::Segmenter::Implementation
         ReturnBB()           = delete;
         ~ReturnBB() override = default;
 
-        ReturnBB(Temporary const* return_value, core::Location const& source_location) : return_value_(return_value), source_location_(source_location) {}
+        explicit ReturnBB(core::Location const& source_location) : source_location_(source_location) {}
 
         [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const&) override
         {
-            return utility::makeOwned<Return>(return_value_, core::Location::global());
+            return utility::makeOwned<Return>(core::Location::global());
         }
 
         [[nodiscard]] std::set<BaseBB*> next() const override
@@ -265,8 +278,6 @@ struct ance::bbt::Segmenter::Implementation
         }
 
       private:
-        Temporary const* return_value_;
-
         core::Location source_location_;
     };
 
@@ -404,7 +415,8 @@ struct ance::bbt::Segmenter::Implementation
 
         utility::Owned<Flow> apply(est::Statement const& statement, bool is_function, std::string id)
         {
-            state_ = {};
+            FlowState previous_state = std::move(state_);
+            state_                   = {};
 
             utility::Owned<SimpleBB> entry_block = utility::makeOwned<SimpleBB>();
             std::reference_wrapper   entry       = *entry_block;
@@ -463,6 +475,8 @@ struct ance::bbt::Segmenter::Implementation
             size_t&     counter = flow_name_counters_[id];
             std::string flow_id = std::format("{}'{}", id, counter++);
 
+            state_ = std::move(previous_state);
+
             utility::Owned<Flow> flow = utility::makeOwned<Flow>(std::move(basic_blocks), first_block, std::move(flow_id), statement.location);
 
             return flow;
@@ -510,17 +524,8 @@ struct ance::bbt::Segmenter::Implementation
 
             for (auto& block : state_.bbs)
             {
-                if (block.get()->hasCode() && !simplified.contains(block.get()))
+                if (block.get()->isRelevantForReachability() && !simplified.contains(block.get()))
                 {
-                    SimpleBB*  UnreachableBlock     = dynamic_cast<SimpleBB*>(block.get());
-                    Statement* UnreachableStatement = UnreachableBlock->statements_.front().get();
-                    if (UnreachableStatement->location.line() == 1)
-                    {
-                        std::string x = typeid(*UnreachableStatement).name();
-                        (void) x;
-                        continue;
-                    }
-
                     has_unreachable_code       = true;
                     first_unreachable_location = core::Location::getFirst(first_unreachable_location, block.get()->location());
                 }
@@ -778,22 +783,20 @@ struct ance::bbt::Segmenter::Implementation
 
             Builder builder(*this);
 
-            for (size_t i = state_.scopes.size(); i > 0; i--)
-            {
-                builder.addStatement<OrderedScopeExit>(*state_.scopes[i - 1], return_statement.location);
-            }
-
             if (return_statement.value.hasValue())
             {
                 auto& return_value = builder.addTemporary("Return_Value", return_statement.value->get()->location);
                 builder.addSegmented(**return_statement.value, return_value);
 
-                builder.addSpecialBlock<ReturnBB>(&return_value, return_statement.location);
+                builder.addStatement<SetReturnValue>(return_value, return_statement.location);
             }
-            else
+
+            for (size_t i = state_.scopes.size(); i > 0; i--)
             {
-                builder.addSpecialBlock<ReturnBB>(nullptr, return_statement.location);
+                builder.addStatement<OrderedScopeExit>(*state_.scopes[i - 1], return_statement.location);
             }
+
+            builder.addSpecialBlock<ReturnBB>(return_statement.location);
 
             setResult(builder.take());
         }
@@ -867,6 +870,28 @@ struct ance::bbt::Segmenter::Implementation
             }
 
             builder.addStatement<Call>(callee, std::move(arguments), destination(), call.location);
+
+            setResult(builder.take());
+        }
+
+        void visit(est::AnonymousFunctionConstructor const& ctor) override
+        {
+            Builder builder(*this);
+
+            utility::List<Parameter> parameters;
+            for (auto const& parameter : ctor.parameters)
+            {
+                auto& parameter_type = builder.addTemporary("AnonymousFunction_ParameterType", parameter.type->location);
+                builder.addSegmented(*parameter.type, parameter_type);
+                parameters.emplace_back(parameter.identifier, parameter_type, parameter.location);
+            }
+
+            auto& return_type = builder.addTemporary("AnonymousFunction_ReturnType", ctor.return_type->location);
+            builder.addSegmented(*ctor.return_type, return_type);
+
+            utility::Owned<Flow> flow = apply(*ctor.body, true, "AnonymousFunction");
+
+            builder.addStatement<AnonymousFunctionConstructor>(std::move(parameters), return_type, std::move(flow), destination(), ctor.location);
 
             setResult(builder.take());
         }

@@ -233,7 +233,6 @@ namespace ance::ast
     };
 
     /// A call is an expression that performs the call-operator on a callable entity.
-
     struct Call final
         : Expression
         , utility::ConcreteNode<Call, Visitor>
@@ -242,6 +241,25 @@ namespace ance::ast
 
         core::Identifier                          identifier;
         utility::List<utility::Owned<Expression>> arguments;
+    };
+
+    struct Parameter;
+
+    /// A lambda expression creates an anonymous function.
+    struct Lambda final
+        : Expression
+        , utility::ConcreteNode<Lambda, Visitor>
+    {
+        Lambda(utility::List<Parameter>                      params,
+               utility::Owned<Expression>                    type,
+               utility::Optional<utility::Owned<Expression>> expression,
+               utility::Optional<utility::Owned<Statement>>  statement,
+               core::Location const&                         source_location);
+
+        utility::List<Parameter>                      parameters;
+        utility::Owned<Expression>                    return_type;
+        utility::Optional<utility::Owned<Expression>> expression_body;
+        utility::Optional<utility::Owned<Statement>>  statement_body;
     };
 
     /// Access is an expression that reads the value of a named entity.
@@ -311,6 +329,16 @@ namespace ance::ast
         utility::Owned<Expression> operand;
     };
 
+    /// A parameter for a callable, e.g. a function or lambda.
+    struct Parameter final
+    {
+        Parameter(core::Identifier const& name, utility::Owned<Expression> t, core::Location const& source_location);
+
+        core::Identifier           identifier;
+        utility::Owned<Expression> type;
+        core::Location             location;
+    };
+
     class Visitor : public utility::AbstractVisitor<Visitor>
     {
       public:
@@ -338,6 +366,7 @@ namespace ance::ast
 
         virtual void visit(ErrorExpression const& error)          = 0;
         virtual void visit(Call const& call)                      = 0;
+        virtual void visit(Lambda const& lambda)                  = 0;
         virtual void visit(Access const& access)                  = 0;
         virtual void visit(UnitLiteral const& unit_literal)       = 0;
         virtual void visit(SizeLiteral const& size_literal)       = 0;

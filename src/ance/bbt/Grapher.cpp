@@ -91,6 +91,8 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(Call const&) override {}
 
+        void visit(AnonymousFunctionConstructor const&) override {}
+
         void visit(Constant const&) override {}
 
         void visit(Default const&) override {}
@@ -104,6 +106,8 @@ struct ance::bbt::Grapher::Implementation
         void visit(OrderedScopeEnter const&) override {}
 
         void visit(OrderedScopeExit const&) override {}
+
+        void visit(SetReturnValue const&) override {}
 
       private:
         void graphFlow(Flow const& flow, std::string const& label)

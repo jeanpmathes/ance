@@ -110,6 +110,7 @@ ance::cet::GlobalScope::GlobalScope(utility::List<utility::Owned<Provider>>& pro
     add_type_variable(type_context.getIdentifier());
     add_type_variable(type_context.getType());
     add_type_variable(type_context.getLocation());
+    add_type_variable(type_context.getFunction());
 }
 
 bool ance::cet::GlobalScope::canDeclare(core::Identifier const&) const

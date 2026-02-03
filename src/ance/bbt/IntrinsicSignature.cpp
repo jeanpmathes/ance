@@ -17,7 +17,7 @@ namespace ance::bbt
             {
                 /// This intrinsic does not take any parameters and returns the unit type.
 
-                signature   = Signature::like(intrinsic.identifier());
+                signature   = Signature::make(intrinsic.identifier());
                 return_type = type_context.getUnit();
 
                 break;
@@ -31,11 +31,11 @@ namespace ance::bbt
                 /// - The type of the variable to declare.
                 /// It returns a reference to the declared variable.
 
-                signature   = Signature::likeUnnamed(intrinsic.identifier(),
-                                                   type_context.getScopeRef(),
-                                                   type_context.getIdentifier(),
-                                                   type_context.getBool(),
-                                                   type_context.getType());
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(),
+                                                             type_context.getScopeRef(),
+                                                             type_context.getIdentifier(),
+                                                             type_context.getBool(),
+                                                             type_context.getType());
                 return_type = type_context.getVariableRef();
 
                 break;
@@ -47,7 +47,7 @@ namespace ance::bbt
                 /// - The identifier of the variable to resolve.
                 /// It returns a reference to the resolved variable.
 
-                signature   = Signature::likeUnnamed(intrinsic.identifier(), type_context.getScopeRef(), type_context.getIdentifier());
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getScopeRef(), type_context.getIdentifier());
                 return_type = type_context.getVariableRef();
 
                 break;
@@ -58,7 +58,7 @@ namespace ance::bbt
                 /// - The scope to get the parent of.
                 /// It returns the parent scope.
 
-                signature   = Signature::likeUnnamed(intrinsic.identifier(), type_context.getScopeRef());
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getScopeRef());
                 return_type = type_context.getScopeRef();
 
                 break;
@@ -70,7 +70,7 @@ namespace ance::bbt
                 /// - The location to log the message at.
                 /// It returns the unit type.
 
-                signature   = Signature::likeUnnamed(intrinsic.identifier(), type_context.getString(), type_context.getLocation());
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getString(), type_context.getLocation());
                 return_type = type_context.getUnit();
 
                 break;
@@ -81,7 +81,7 @@ namespace ance::bbt
                 /// - The boolean to convert.
                 /// It returns the string representation of the boolean.
 
-                signature   = Signature::likeUnnamed(intrinsic.identifier(), type_context.getBool());
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getBool());
                 return_type = type_context.getString();
 
                 break;
@@ -93,9 +93,9 @@ namespace ance::bbt
                 /// - The location of a file to use as base to resolve a relative path.
                 /// It returns the unit type.
 
-                signature   = Signature::likeUnnamed(intrinsic.identifier(),
-                                                   type_context.getString(),// todo: path type
-                                                   type_context.getLocation());
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(),
+                                                             type_context.getString(),// todo: path type
+                                                             type_context.getLocation());
                 return_type = type_context.getUnit();
 
                 break;

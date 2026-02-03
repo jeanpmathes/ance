@@ -37,17 +37,6 @@ ance::utility::Optional<T>::Optional(T&& value)
 }
 
 template<ance::utility::Moveable T>
-ance::utility::Optional<T>& ance::utility::Optional<T>::operator=(T value)
-{
-    if (has_value_) std::destroy_at(std::launder(reinterpret_cast<T*>(storage_.data())));
-
-    new (storage_.data()) T(std::move(value));
-    has_value_ = true;
-
-    return *this;
-}
-
-template<ance::utility::Moveable T>
 template<typename OtherT>
     requires ance::utility::ConstCopyConvertible<T, OtherT>
 ance::utility::Optional<T>::Optional(OtherT const& value) : has_value_(true)

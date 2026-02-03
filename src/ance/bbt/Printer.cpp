@@ -174,6 +174,28 @@ struct ance::bbt::Printer::Implementation
             print(");");
         }
 
+        void visit(AnonymousFunctionConstructor const& function_constructor) override
+        {
+            print(function_constructor.destination.id());
+            print(" ");
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" Function::ctor ( Signature::ctor (");
+            for (size_t i = 0; i < function_constructor.parameters.size(); ++i)
+            {
+                print("(");
+                print(function_constructor.parameters[i].type.id());
+                print(", ");
+                print(function_constructor.parameters[i].identifier);
+                print(")");
+                if (i + 1 < function_constructor.parameters.size()) print(", ");
+            }
+            print("), ");
+            print(function_constructor.return_type.id());
+            print("), flow ");
+            print(function_constructor.body->id());
+            print(";");
+        }
+
         void visit(Constant const& constant) override
         {
             print(constant.destination.id());
@@ -232,6 +254,15 @@ struct ance::bbt::Printer::Implementation
         void visit(OrderedScopeExit const&) override
         {
             print("// exit scope");
+        }
+
+        void visit(SetReturnValue const& set_return_value) override
+        {
+            print("return ");
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" ");
+            print(set_return_value.value.id());
+            print(";");
         }
     };
 

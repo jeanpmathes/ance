@@ -9,7 +9,7 @@ ance::core::Intrinsic::Value ance::core::Intrinsic::value() const
 
 ance::core::Identifier ance::core::Intrinsic::identifier() const
 {
-    return Identifier::like(toString());
+    return Identifier::make(toString());
 }
 
 std::string ance::core::Intrinsic::toString() const

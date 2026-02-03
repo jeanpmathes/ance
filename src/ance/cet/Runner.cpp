@@ -60,8 +60,51 @@ struct ance::cet::Runner::Implementation
             Scope*                               scope           = nullptr;
             utility::Optional<PendingResolution> blocker         = std::nullopt;
 
-            std::list<RunPoint>                            stack        = {};
             utility::Optional<utility::Shared<bbt::Value>> return_value = std::nullopt;
+
+            RunPoint& getExecutableRunPoint()
+            {
+                if (stack().empty())
+                {
+                    return *this;
+                }
+
+                return stack().back();
+            }
+
+            bool isTopLevel() const
+            {
+                return stack().empty();
+            }
+
+            void popLevel(utility::Shared<bbt::Value> lower_return_value)
+            {
+                stack().pop_back();
+
+                auto next = this;
+
+                if (!stack().empty())
+                {
+                    next = &stack().back();
+                }
+
+                next->return_value = lower_return_value;
+            }
+
+            void pushLevel(bbt::BasicBlock const& start, Scope& initial_scope)
+            {
+                RunPoint& lower_level     = stack().emplace_back(start, &initial_scope);
+                lower_level.target_stack_ = &stack_;
+            }
+
+          private:
+            std::list<RunPoint>& stack() const
+            {
+                return *target_stack_;
+            }
+
+            std::list<RunPoint>  stack_;
+            std::list<RunPoint>* target_stack_ = &stack_;
         };
 
         BBT(sources::SourceTree&                                                                                source_tree,
@@ -117,15 +160,8 @@ struct ance::cet::Runner::Implementation
 
         std::tuple<ExecutionResult, utility::Shared<bbt::Value>> execute(RunPoint* run_point)
         {
-            State const previous_state = state_;
-
-            state_ = State {
-                .current_run_point       = run_point,
-                .current_statement_index = run_point->statement_index,
-                .next                    = run_point->block,
-                .execution_result        = std::nullopt,
-                .current_scope           = run_point->scope,
-            };
+            State previous_state = std::move(state_);
+            state_               = State(run_point->scope, run_point, run_point->statement_index, run_point->block);
 
             run_point->clearBlocker();
 
@@ -139,38 +175,22 @@ struct ance::cet::Runner::Implementation
             run_point->block           = state_.next;
             run_point->statement_index = state_.current_statement_index;
 
-            ExecutionResult const result = state_.execution_result.valueOr(ExecutionResult::Completed);
+            ExecutionResult const       result       = state_.execution_result.valueOr(ExecutionResult::Completed);
+            utility::Shared<bbt::Value> return_value = state_.return_value.valueOr(bbt::Unit::make(type_context_));
 
-            state_ = previous_state;
+            state_ = std::move(previous_state);
 
-            return {result, bbt::Unit::make(type_context_)};
+            return {result, return_value};
         }
 
         ExecutionResult execute(RunPoint& run_point)
         {
-            RunPoint* targeted_run_point = &run_point;
-            bool      is_top_level       = true;
+            auto [result, return_value] = execute(&run_point.getExecutableRunPoint());
 
-            if (!run_point.stack.empty())
+            if (!run_point.isTopLevel() && result == ExecutionResult::Completed)
             {
-                targeted_run_point = &run_point.stack.back();
-                is_top_level       = false;
-            }
-
-            auto [result, return_value] = execute(targeted_run_point);
-
-            if (!is_top_level && result == ExecutionResult::Completed)
-            {
-                run_point.stack.pop_back();
                 result = ExecutionResult::Yield;
-
-                RunPoint* next = &run_point;
-                if (!run_point.stack.empty())
-                {
-                    next = &run_point.stack.back();
-                }
-
-                next->return_value = return_value;
+                run_point.popLevel(return_value);
             }
 
             return result;
@@ -316,6 +336,11 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Return const&) override
         {
+            if (!state_.return_value.hasValue())
+            {
+                state_.return_value = bbt::Unit::make(type_context_);
+            }
+
             state_.next = nullptr;
         }
 
@@ -406,10 +431,10 @@ struct ance::cet::Runner::Implementation
             scope().createTemporary(temporary);
         }
 
-        void visit(bbt::CopyTemporary const& write_temporary) override
+        void visit(bbt::CopyTemporary const& copy_temporary) override
         {
-            utility::Shared<bbt::Value> value = scope().getTemporary(write_temporary.source).read();
-            scope().getTemporary(write_temporary.destination).write(deLReference(value));
+            utility::Shared<bbt::Value> value = scope().getTemporary(copy_temporary.source).read();
+            scope().getTemporary(copy_temporary.destination).write(deLReference(value));
         }
 
         void visit(bbt::Intrinsic const& intrinsic) override
@@ -463,6 +488,7 @@ struct ance::cet::Runner::Implementation
             if (run_point.return_value.hasValue())
             {
                 scope().getTemporary(call.destination).write(deLReference(run_point.return_value.value()));
+
                 run_point.return_value = std::nullopt;
 
                 return;
@@ -520,9 +546,38 @@ struct ance::cet::Runner::Implementation
                 (*variable)->as<VariableRef>().value().write(deLReference(argument));
             }
 
-            run_point.stack.emplace_back(function->body().entry, &function_scope);
+            run_point.pushLevel(function->body().entry, function_scope);
 
             yield();
+        }
+
+        void visit(bbt::AnonymousFunctionConstructor const& function_constructor) override
+        {
+            utility::List<bbt::Signature::Parameter> parameters = {};
+            for (auto const& param : function_constructor.parameters)
+            {
+                utility::Shared<bbt::Value> type_value = scope().getTemporary(param.type).read();
+                if (!expectType(*type_context_.getType(), *type_value->type(), param.type.location))
+                {
+                    abort();
+                    return;
+                }
+                parameters.emplace_back(param.identifier, type_value.cast<bbt::Type>());
+            }
+
+            bbt::Signature const signature = bbt::Signature(core::Identifier::make(function_constructor.body->identifier), std::move(parameters));
+
+            utility::Shared<bbt::Value> return_type = scope().getTemporary(function_constructor.return_type).read();
+            if (!expectType(*type_context_.getType(), *return_type->type(), function_constructor.return_type.location))
+            {
+                abort();
+                return;
+            }
+
+            utility::Shared<bbt::Function> function =
+                utility::makeShared<bbt::Function>(signature, return_type.cast<bbt::Type>(), *function_constructor.body, type_context_);
+
+            scope().getTemporary(function_constructor.destination).write(function);
         }
 
         void visit(bbt::Constant const& constant) override
@@ -605,6 +660,13 @@ struct ance::cet::Runner::Implementation
             // todo: destructors and stuff, clean up value storage
         }
 
+        void visit(bbt::SetReturnValue const& set_return_value) override
+        {
+            assert(!state_.return_value.hasValue());
+
+            state_.return_value = deLReference(scope().getTemporary(set_return_value.value).read());
+        }
+
       private:
         sources::SourceTree&                                                                                source_tree_;
         core::Reporter&                                                                                     reporter_;
@@ -647,10 +709,21 @@ struct ance::cet::Runner::Implementation
         {
             RunPoint* current_run_point       = nullptr;
             size_t    current_statement_index = 0;
+            Scope*    current_scope           = nullptr;
 
-            bbt::BasicBlock const*             next             = nullptr;
-            utility::Optional<ExecutionResult> execution_result = std::nullopt;
-            Scope*                             current_scope    = nullptr;
+            bbt::BasicBlock const* next = nullptr;
+
+            utility::Optional<utility::Shared<bbt::Value>> return_value     = std::nullopt;
+            utility::Optional<ExecutionResult>             execution_result = std::nullopt;
+
+            State() = default;
+
+            State(Scope* scope, RunPoint* run_point, size_t const statement_index, bbt::BasicBlock const* next_block)
+                : current_run_point(run_point)
+                , current_statement_index(statement_index)
+                , current_scope(scope)
+                , next(next_block)
+            {}
         };
 
         State state_;
@@ -659,7 +732,6 @@ struct ance::cet::Runner::Implementation
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
         : source_tree_(source_tree)
         , reporter_(reporter)
-        , type_context_()
         , segmenter_(source_tree, reporter, context, type_context_)
         , context_(context)
     {}
@@ -699,6 +771,9 @@ struct ance::cet::Runner::Implementation
                 if (result == BBT::ExecutionResult::Yield)
                 {
                     progress = true;
+
+                    // It is intentional that we do not advance the iterator here, as the run point should be re-entered immediately.
+                    // A yield generally indicates that a function is being called, which means that progress is being made.
 
                     continue;
                 }

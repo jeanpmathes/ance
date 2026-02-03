@@ -24,6 +24,7 @@ statement
 
 expression
     : entity '(' (expression (',' expression)* )? ')' # CallExpression // todo: should become an operator
+    | '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ':' type=expression ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
     | entity # AccessExpression
     | literal # LiteralExpression
     | unary expression # UnaryOperationExpression
@@ -50,6 +51,10 @@ entity
     : IDENTIFIER
     ;
 
+parameter
+    : IDENTIFIER ':' expression
+    ;
+
 assigner
     : '<:' # CopyAssigner
     | ':=' # FinalCopyAssigner
@@ -67,6 +72,7 @@ IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{G
 INTEGER : [0-9]+ ;
 STRING : '"' .*? '"' ; // todo: handle escape sequences (see old grammar) - needs code changes to preserve printing and do correct escaping
 
+LAMBDA : '\\' ;
 SEMICOLON : ';' ;
 
 WHITESPACE : [\p{White_Space}] -> skip ;

@@ -120,6 +120,18 @@ ance::ast::Call::Call(core::Identifier const& callable, utility::List<utility::O
     , identifier(callable)
     , arguments(std::move(expressions))
 {}
+ance::ast::Lambda::Lambda(utility::List<Parameter>                      params,
+                          utility::Owned<Expression>                    type,
+                          utility::Optional<utility::Owned<Expression>> expression,
+                          utility::Optional<utility::Owned<Statement>>  statement,
+                          core::Location const&                         source_location)
+    : Node(source_location)
+    , Expression()
+    , parameters(std::move(params))
+    , return_type(std::move(type))
+    , expression_body(std::move(expression))
+    , statement_body(std::move(statement))
+{}
 
 ance::ast::Access::Access(core::Identifier const& accessed, core::Location const& source_location) : Node(source_location), Expression(), identifier(accessed)
 {}
@@ -140,4 +152,10 @@ ance::ast::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , Expression()
     , op(kind)
     , operand(std::move(expression))
+{}
+
+ance::ast::Parameter::Parameter(core::Identifier const& name, utility::Owned<Expression> t, core::Location const& source_location)
+    : identifier(name)
+    , type(std::move(t))
+    , location(source_location)
 {}

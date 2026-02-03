@@ -32,22 +32,24 @@ class anceParser : public antlr4::Parser
         T__19                = 20,
         T__20                = 21,
         T__21                = 22,
-        IDENTIFIER           = 23,
-        INTEGER              = 24,
-        STRING               = 25,
-        SEMICOLON            = 26,
-        WHITESPACE           = 27,
-        BLOCK_COMMENT        = 28,
-        LINE_COMMENT         = 29,
-        BRACKET_OPEN         = 30,
-        BRACKET_CLOSE        = 31,
-        CURLY_BRACKET_OPEN   = 32,
-        CURLY_BRACKET_CLOSE  = 33,
-        SQUARE_BRACKET_OPEN  = 34,
-        SQUARE_BRACKET_CLOSE = 35,
-        POINTY_BRACKET_OPEN  = 36,
-        POINTY_BRACKET_CLOSE = 37,
-        ERROR_CHAR           = 38
+        T__22                = 23,
+        IDENTIFIER           = 24,
+        INTEGER              = 25,
+        STRING               = 26,
+        LAMBDA               = 27,
+        SEMICOLON            = 28,
+        WHITESPACE           = 29,
+        BLOCK_COMMENT        = 30,
+        LINE_COMMENT         = 31,
+        BRACKET_OPEN         = 32,
+        BRACKET_CLOSE        = 33,
+        CURLY_BRACKET_OPEN   = 34,
+        CURLY_BRACKET_CLOSE  = 35,
+        SQUARE_BRACKET_OPEN  = 36,
+        SQUARE_BRACKET_CLOSE = 37,
+        POINTY_BRACKET_OPEN  = 38,
+        POINTY_BRACKET_CLOSE = 39,
+        ERROR_CHAR           = 40
     };
 
     enum
@@ -61,8 +63,9 @@ class anceParser : public antlr4::Parser
         RuleLiteral            = 6,
         RuleBoolean            = 7,
         RuleEntity             = 8,
-        RuleAssigner           = 9,
-        RuleAccessModifier     = 10
+        RuleParameter          = 9,
+        RuleAssigner           = 10,
+        RuleAccessModifier     = 11
     };
 
     explicit anceParser(antlr4::TokenStream* input);
@@ -90,6 +93,7 @@ class anceParser : public antlr4::Parser
     class LiteralContext;
     class BooleanContext;
     class EntityContext;
+    class ParameterContext;
     class AssignerContext;
     class AccessModifierContext;
 
@@ -351,6 +355,30 @@ class anceParser : public antlr4::Parser
         virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
     };
 
+    class LambdaExpressionContext : public ExpressionContext
+    {
+      public:
+        LambdaExpressionContext(ExpressionContext* ctx);
+
+        anceParser::ExpressionContext*  type = nullptr;
+        anceParser::ExpressionContext*  body = nullptr;
+        antlr4::tree::TerminalNode*     LAMBDA();
+        antlr4::tree::TerminalNode*     BRACKET_OPEN();
+        antlr4::tree::TerminalNode*     BRACKET_CLOSE();
+        std::vector<ExpressionContext*> expression();
+        ExpressionContext*              expression(size_t i);
+        antlr4::tree::TerminalNode*     SQUARE_BRACKET_OPEN();
+        antlr4::tree::TerminalNode*     SQUARE_BRACKET_CLOSE();
+        std::vector<ParameterContext*>  parameter();
+        ParameterContext*               parameter(size_t i);
+        antlr4::tree::TerminalNode*     CURLY_BRACKET_OPEN();
+        antlr4::tree::TerminalNode*     CURLY_BRACKET_CLOSE();
+        std::vector<StatementContext*>  statement();
+        StatementContext*               statement(size_t i);
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
     class HereExpressionContext : public ExpressionContext
     {
       public:
@@ -479,6 +507,19 @@ class anceParser : public antlr4::Parser
     };
 
     EntityContext* entity();
+
+    class ParameterContext : public antlr4::ParserRuleContext
+    {
+      public:
+        ParameterContext(antlr4::ParserRuleContext* parent, size_t invokingState);
+        virtual size_t              getRuleIndex() const override;
+        antlr4::tree::TerminalNode* IDENTIFIER();
+        ExpressionContext*          expression();
+
+        virtual std::any accept(antlr4::tree::ParseTreeVisitor* visitor) override;
+    };
+
+    ParameterContext* parameter();
 
     class AssignerContext : public antlr4::ParserRuleContext
     {

@@ -220,12 +220,43 @@ struct ance::ast::Printer::Implementation
         {
             print(call.identifier);
             print("(");
-            for (size_t i = 0; i < call.arguments.size(); ++i)
+            for (size_t index = 0; index < call.arguments.size(); ++index)
             {
-                visit(*call.arguments[i]);
-                if (i + 1 < call.arguments.size()) print(", ");
+                visit(*call.arguments[index]);
+                if (index + 1 < call.arguments.size()) print(", ");
             }
             print(")");
+        }
+
+        void visit(Lambda const& lambda) override
+        {
+            print("\\[](");
+            for (size_t index = 0; index < lambda.parameters.size(); ++index)
+            {
+                print(lambda.parameters[index].identifier);
+                print(": ");
+                visit(*lambda.parameters[index].type);
+                if (index + 1 < lambda.parameters.size()) print(", ");
+            }
+            print(") : ");
+            visit(*lambda.return_type);
+            if (lambda.expression_body.hasValue())
+            {
+                print(" => ");
+                visit(**lambda.expression_body);
+            }
+            else if (lambda.statement_body.hasValue())
+            {
+                if ((*lambda.statement_body)->isCompound())
+                {
+                    line();
+                    visit(**lambda.statement_body);
+                }
+                else
+                {
+                    visit(**lambda.statement_body);
+                }
+            }
         }
 
         void visit(Access const& access) override

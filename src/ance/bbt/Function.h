@@ -20,6 +20,7 @@ namespace ance::bbt
     class Function final : public Value
     {
       public:
+        Function(Signature signature, utility::Shared<Type> return_type, Flow const& body, TypeContext& type_context);
         Function(Signature signature, utility::Shared<Type> return_type, utility::Shared<Flow> body, TypeContext& type_context);
         Function(Signature signature, utility::Shared<Type> return_type, utility::Owned<Flow> body, TypeContext& type_context);
         ~Function() override = default;
@@ -37,7 +38,9 @@ namespace ance::bbt
       private:
         Signature             signature_;
         utility::Shared<Type> return_type_;
-        utility::Shared<Flow> body_;
+
+        Flow const&                              body_;
+        utility::Optional<utility::Shared<Flow>> owned_body_;
     };
 }
 

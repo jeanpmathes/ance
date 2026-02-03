@@ -208,6 +208,25 @@ struct ance::est::Printer::Implementation
             print(")");
         }
 
+        void visit(AnonymousFunctionConstructor const& ctor) override
+        {
+            print("Function(Signature(");
+            for (size_t i = 0; i < ctor.parameters.size(); ++i)
+            {
+                if (i > 0) print(", ");
+                print("(");
+                visit(*ctor.parameters[i].type);
+                print(", ");
+                print(ctor.parameters[i].identifier);
+                print(")");
+            }
+            print("), ");
+            visit(*ctor.return_type);
+            print(", ");
+            visit(*ctor.body);
+            print(")");
+        }
+
         void visit(Read const& access) override
         {
             print("(read ");

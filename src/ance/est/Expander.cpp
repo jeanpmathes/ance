@@ -29,6 +29,12 @@ struct ance::est::Expander::Implementation
         Statements                 after;
     };
 
+    struct ParameterExpansion
+    {
+        Expansion        expansion;
+        core::Identifier identifier;
+    };
+
     class Result
     {
       public:
@@ -59,6 +65,12 @@ struct ance::est::Expander::Implementation
             setResult(std::move(statements));
         }
 
+        void setStatements(Statements statements, utility::Owned<Statement> final_statement)
+        {
+            statements.emplace_back(std::move(final_statement));
+            setResult(std::move(statements));
+        }
+
         void setExpression(Expansion expansion)
         {
             setResult(std::move(expansion));
@@ -68,6 +80,11 @@ struct ance::est::Expander::Implementation
         {
             Expansion expansion = {.before = {}, .center = std::move(expression), .after = {}};
             setResult(std::move(expansion));
+        }
+
+        void setParameter(ParameterExpansion parameter_expansion)
+        {
+            setResult(std::move(parameter_expansion));
         }
 
         template<typename T>
@@ -82,7 +99,7 @@ struct ance::est::Expander::Implementation
         }
 
       private:
-        using ResultVariant = std::variant<utility::Owned<File>, DeclarationStatement, Statements, Expansion>;
+        using ResultVariant = std::variant<utility::Owned<File>, DeclarationStatement, Statements, Expansion, ParameterExpansion>;
 
         template<typename T>
         void setResult(T value)
@@ -177,6 +194,16 @@ struct ance::est::Expander::Implementation
                 after_.emplace_back(std::move(expansion.after));
 
                 return std::move(expansion.center);
+            }
+
+            [[nodiscard]] Parameter pushParameterExpansion(ast::Parameter const& parameter)
+            {
+                Expansion expansion = ast_.expand(*parameter.type);
+
+                append(before_, std::move(expansion.before));
+                after_.emplace_back(std::move(expansion.after));
+
+                return Parameter(parameter.identifier, std::move(expansion.center), parameter.location);
             }
 
             Expansion take(utility::Owned<Expression> expression)
@@ -471,17 +498,25 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
+            utility::Optional<utility::Owned<Expression>> return_value_expression = std::nullopt;
+
             if (return_statement.value.hasValue())
             {
                 utility::Owned<Expression> value = builder.pushExpansion(**return_statement.value);
-                builder.pushStatement(utility::makeOwned<Return>(std::move(value), return_statement.location));
+
+                Temporary const& return_value = builder.pushTemporary(std::move(value), "Return_Value", return_statement.location);
+                return_value_expression       = utility::makeOwned<ReadTemporary>(return_value, return_statement.location);
             }
             else
             {
-                builder.pushStatement(utility::makeOwned<Return>(std::nullopt, return_statement.location));
+                return_value_expression = std::nullopt;
             }
 
-            result_.setStatements(builder.take());
+            // The expansion of the return value may have added statements that would be put behind the return statement.
+            // Therefore, we explicitly put the return statement at the end.
+
+            utility::Owned<Statement> final_statement = utility::makeOwned<Return>(std::move(return_value_expression), return_statement.location);
+            result_.setStatements(builder.take(), std::move(final_statement));
         }
 
         void visit(ast::While const& while_statement) override
@@ -532,6 +567,36 @@ struct ance::est::Expander::Implementation
 
             result_.setExpression(builder.take(
                 utility::makeOwned<Call>(utility::makeOwned<Read>(std::move(resolved), call.identifier.location()), std::move(arguments), call.location)));
+        }
+
+        void visit(ast::Lambda const& lambda) override
+        {
+            EBuilder builder(*this);
+
+            utility::List<Parameter> parameters;
+            for (auto& parameter : lambda.parameters)
+            {
+                parameters.emplace_back(builder.pushParameterExpansion(parameter));
+            }
+
+            utility::Owned<Expression> return_type = builder.pushExpansion(*lambda.return_type);
+
+            SBuilder body_builder(*this);
+
+            if (lambda.expression_body.hasValue())
+            {
+                utility::Owned<Expression> expression = builder.pushExpansion(**lambda.expression_body);
+                body_builder.pushStatement(utility::makeOwned<Return>(std::move(expression), lambda.location));
+            }
+            else
+            {
+                body_builder.pushExpansion(**lambda.statement_body);
+            }
+
+            utility::Owned<Statement> body = wrap(body_builder.take());
+
+            result_.setExpression(builder.take(
+                utility::makeOwned<AnonymousFunctionConstructor>(std::move(parameters), std::move(return_type), std::move(body), lambda.location)));
         }
 
         void visit(ast::Access const& access) override

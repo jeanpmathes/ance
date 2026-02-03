@@ -105,6 +105,16 @@ ance::est::Call::Call(utility::Owned<Expression> callable, utility::List<utility
     , called(std::move(callable))
     , arguments(std::move(expressions))
 {}
+ance::est::AnonymousFunctionConstructor::AnonymousFunctionConstructor(utility::List<Parameter>   params,
+                                                                      utility::Owned<Expression> type,
+                                                                      utility::Owned<Statement>  statement,
+                                                                      core::Location const&      source_location)
+    : Node(source_location)
+    , Expression()
+    , parameters(std::move(params))
+    , return_type(std::move(type))
+    , body(std::move(statement))
+{}
 
 ance::est::Read::Read(utility::Owned<Expression> accessed, core::Location const& source_location)
     : Node(source_location)
@@ -125,6 +135,8 @@ ance::est::Default::Default(utility::Owned<Expression> t, core::Location const& 
 
 ance::est::Here::Here(core::Location const& source_location) : Node(source_location), Expression() {}
 
+ance::est::CurrentScope::CurrentScope(core::Location const& source_location) : Node(source_location), Expression() {}
+
 ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
     , Expression()
@@ -144,4 +156,8 @@ ance::est::IdentifierCapture::IdentifierCapture(core::Identifier const& ident, c
     , identifier(ident)
 {}
 
-ance::est::CurrentScope::CurrentScope(core::Location const& source_location) : Node(source_location), Expression() {}
+ance::est::Parameter::Parameter(core::Identifier const& name, utility::Owned<Expression> t, core::Location const& source_location)
+    : identifier(name)
+    , type(std::move(t))
+    , location(source_location)
+{}

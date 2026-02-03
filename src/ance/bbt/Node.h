@@ -86,13 +86,12 @@ namespace ance::bbt
     };
 
     /// The return link ends the current function, not linking to any other basic block.
+    /// The link cannot set a return value, for this the SetReturnValue statement is used.
     struct Return final
         : Link
         , utility::ConcreteNode<Return, Visitor>
     {
-        Return(Temporary const* temporary, core::Location const& source_location);
-
-        Temporary const* return_value;
+        explicit Return(core::Location const& source_location);
     };
 
     /// Chooses between two branches based on a condition.
@@ -122,6 +121,8 @@ namespace ance::bbt
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
     {
+        /// Whether this statement is relevant for reachability analysis.
+        [[nodiscard]] virtual bool isRelevantForReachability() const;
     };
 
     /// Error statement, mostly as pass-through from the AST.
@@ -163,6 +164,7 @@ namespace ance::bbt
     };
 
     /// Introduce a temporary variable, which works similar to any other local variable but does not have a name it is bound to.
+    /// Temporaries live within the local scope they are defined in.
     struct Temporary final
         : Statement
         , utility::ConcreteNode<Temporary, Visitor>
@@ -213,6 +215,25 @@ namespace ance::bbt
         Temporary const&                                       called;
         utility::List<std::reference_wrapper<Temporary const>> arguments;
         Temporary const&                                       destination;
+    };
+
+    struct Parameter;
+
+    /// Creates a function.
+    struct AnonymousFunctionConstructor final// todo: remove when actual function constructors exist
+        : Statement
+        , utility::ConcreteNode<AnonymousFunctionConstructor, Visitor>
+    {
+        AnonymousFunctionConstructor(utility::List<Parameter> params,
+                                     Temporary const&         type,
+                                     utility::Owned<Flow>     flow,
+                                     Temporary const&         result,
+                                     core::Location const&    source_location);
+
+        utility::List<Parameter> parameters;
+        Temporary const&         return_type;
+        utility::Owned<Flow>     body;
+        Temporary const&         destination;
     };
 
     /// A constant value.
@@ -277,6 +298,8 @@ namespace ance::bbt
         , utility::ConcreteNode<OrderedScopeEnter, Visitor>
     {
         explicit OrderedScopeEnter(core::Location const& source_location);
+
+        [[nodiscard]] bool isRelevantForReachability() const override;
     };
 
     /// Exits an ordered scope, which is used to manage variable lifetimes and visibility.
@@ -286,7 +309,31 @@ namespace ance::bbt
     {
         OrderedScopeExit(OrderedScopeEnter const& entry, core::Location const& source_location);
 
+        [[nodiscard]] bool isRelevantForReachability() const override;
+
         OrderedScopeEnter const& enter;
+    };
+
+    /// Set the return value of the current function.
+    /// This may only be called at most once per function execution.
+    /// The statement is necessary to allow persisting the return value even after all scopes and their temporaries have been destroyed.
+    struct SetReturnValue final
+        : Statement
+        , utility::ConcreteNode<SetReturnValue, Visitor>
+    {
+        SetReturnValue(Temporary const& return_value, core::Location const& source_location);
+
+        Temporary const& value;
+    };
+
+    /// A parameter for a callable, e.g. a function or lambda.
+    struct Parameter final
+    {
+        Parameter(core::Identifier const& name, Temporary const& t, core::Location const& source_location);
+
+        core::Identifier identifier;
+        Temporary const& type;
+        core::Location   location;
     };
 
     class Visitor : public utility::AbstractVisitor<Visitor>
@@ -312,15 +359,17 @@ namespace ance::bbt
         virtual void visit(Temporary const& temporary)            = 0;
         virtual void visit(CopyTemporary const& write_temporary)  = 0;
 
-        virtual void visit(Intrinsic const& intrinsic)            = 0;
-        virtual void visit(Call const& call)                      = 0;
-        virtual void visit(Constant const& constant)              = 0;
-        virtual void visit(Default const& default_value)          = 0;
-        virtual void visit(CurrentScope const& current_scope)     = 0;
-        virtual void visit(UnaryOperation const& unary_operation) = 0;
-        virtual void visit(TypeOf const& type_of)                 = 0;
-        virtual void visit(OrderedScopeEnter const& scope_enter)  = 0;
-        virtual void visit(OrderedScopeExit const& scope_exit)    = 0;
+        virtual void visit(Intrinsic const& intrinsic)                               = 0;
+        virtual void visit(Call const& call)                                         = 0;
+        virtual void visit(AnonymousFunctionConstructor const& function_constructor) = 0;
+        virtual void visit(Constant const& constant)                                 = 0;
+        virtual void visit(Default const& default_value)                             = 0;
+        virtual void visit(CurrentScope const& current_scope)                        = 0;
+        virtual void visit(UnaryOperation const& unary_operation)                    = 0;
+        virtual void visit(TypeOf const& type_of)                                    = 0;
+        virtual void visit(OrderedScopeEnter const& scope_enter)                     = 0;
+        virtual void visit(OrderedScopeExit const& scope_exit)                       = 0;
+        virtual void visit(SetReturnValue const& set_return_value)                   = 0;
 
         ~Visitor() override = default;
     };

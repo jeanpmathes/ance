@@ -28,7 +28,7 @@ namespace ance::core
         /// \param string The text of the identifier.
         /// \param location The location of the identifier.
         /// \return The identifier.
-        static Identifier like(std::string const& string, Location location = Location::global());
+        static Identifier make(std::string const& string, Location location = Location::global());
 
         /// Create an empty identifier.
         /// \return The empty identifier.
@@ -42,7 +42,7 @@ namespace ance::core
 
       private:
         std::string_view string_;
-        Location   location_;
+        Location         location_;
     };
 }
 

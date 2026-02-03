@@ -33,7 +33,7 @@ ance::bbt::BasicBlock::BasicBlock(size_t const                             numbe
 
 ance::bbt::ErrorLink::ErrorLink(core::Location const& source_location) : Node(source_location), Link() {}
 
-ance::bbt::Return::Return(Temporary const* temporary, core::Location const& source_location) : Node(source_location), Link(), return_value(temporary) {}
+ance::bbt::Return::Return(core::Location const& source_location) : Node(source_location), Link() {}
 
 ance::bbt::Branch::Branch(Temporary const& temporary, BasicBlock const& true_link, BasicBlock const& false_link, core::Location const& source_location)
     : Node(source_location)
@@ -44,6 +44,11 @@ ance::bbt::Branch::Branch(Temporary const& temporary, BasicBlock const& true_lin
 {}
 
 ance::bbt::Jump::Jump(BasicBlock const& link, core::Location const& source_location) : Node(source_location), Link(), target(link) {}
+
+bool ance::bbt::Statement::isRelevantForReachability() const
+{
+    return true;
+}
 
 ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location) : Node(source_location), Statement() {}
 
@@ -99,6 +104,19 @@ ance::bbt::Call::Call(Temporary const&                                       fun
     , destination(result)
 {}
 
+ance::bbt::AnonymousFunctionConstructor::AnonymousFunctionConstructor(utility::List<Parameter> params,
+                                                                      Temporary const&         type,
+                                                                      utility::Owned<Flow>     flow,
+                                                                      Temporary const&         result,
+                                                                      core::Location const&    source_location)
+    : Node(source_location)
+    , Statement()
+    , parameters(std::move(params))
+    , return_type(type)
+    , body(std::move(flow))
+    , destination(result)
+{}
+
 ance::bbt::Constant::Constant(utility::Shared<Value> constant, Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()
@@ -136,8 +154,30 @@ ance::bbt::TypeOf::TypeOf(Temporary const& expr, Temporary const& result, core::
 
 ance::bbt::OrderedScopeEnter::OrderedScopeEnter(core::Location const& source_location) : Node(source_location), Statement() {}
 
+bool ance::bbt::OrderedScopeEnter::isRelevantForReachability() const
+{
+    return false;
+}
+
 ance::bbt::OrderedScopeExit::OrderedScopeExit(OrderedScopeEnter const& entry, core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , enter(entry)
+{}
+
+bool ance::bbt::OrderedScopeExit::isRelevantForReachability() const
+{
+    return false;
+}
+
+ance::bbt::SetReturnValue::SetReturnValue(Temporary const& return_value, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , value(return_value)
+{}
+
+ance::bbt::Parameter::Parameter(core::Identifier const& name, Temporary const& t, core::Location const& source_location)
+    : identifier(name)
+    , type(t)
+    , location(source_location)
 {}

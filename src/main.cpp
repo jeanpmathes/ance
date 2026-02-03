@@ -76,7 +76,17 @@ namespace ance
 
         return exit_code;
 
-        // todo: unshelve - add lambda syntax (no capture, global vars only), add FunctionConstructor with todo to make it an actual constructor of function types
+        // todo: add lambda syntax (no capture, global vars only), add FunctionConstructor with todo to make it an actual constructor of function types
+        // todo: check printing of function ctor in EST, also think how to handle capture later and prepare something in printer
+        // todo: check in what scope lambdas live, check if they can access variables from outside
+
+        // todo: change the reporter so that it prints immediately instead of storing messages
+
+        // todo: adapt lambda syntax so that return type is optional, if omitted it is Unit
+
+        // todo: make sure that flows passed to function ctors are also printed and graphed
+        // todo: in printer, put those flows into list that is printed when all other flows are printed
+        // todo: in grapher, do the same, needs that all statements are visited
 
         // todo: check if unreachable code detection works or needs to be added (with return in lambda)
 
@@ -87,9 +97,12 @@ namespace ance
         // todo: add a way to call intrinsics from source code with the intrinsic expression intrinsic "name" (args...)
         // todo: but also add a core function intrinsic("name", args...) that does the same thing but is a normal function call
 
+        // todo: spend some time improving Optional, Shared and Owned
+
         // todo: define the core language functions using code instead of hardcoding the trees - code would be a string in C++ file, would need an entire chain to parse and transform into flows
         // todo: this requires that the type context is shared between all runers, so create a global type context instead of one per runner
         // todo: the intrinsic function can currently probably not be created in source code because of the varargs, so add a TODO there, or maybe add some more stuff
+        // todo: probably delete the flow builder
 
         // todo: add all cmp statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef
