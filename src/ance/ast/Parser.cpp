@@ -60,7 +60,7 @@ namespace ance::ast
                              std::string const&  msg,
                              std::exception_ptr const) override
             {
-                auto* parser = dynamic_cast<anceParser*>(recognizer);
+                auto* parser = dynamic_cast<grammar::anceParser*>(recognizer);
                 if (!parser) return;
 
                 char_position += 1;
@@ -84,13 +84,13 @@ namespace ance::ast
                     }
                 }
 
-                if (offending_symbol->getType() == anceLexer::ERROR_CHAR)
+                if (offending_symbol->getType() == grammar::anceLexer::ERROR_CHAR)
                 {
                     parent_.reporter_.error("Unexpected character", core::Location::simple(line, char_position, parent_.source_file_.index()));
                     return;
                 }
 
-                if (offending_symbol->getType() == anceLexer::EOF)
+                if (offending_symbol->getType() == grammar::anceLexer::EOF)
                 {
                     parent_.reporter_.error("Unexpected end of file", core::Location::simple(line, char_position, parent_.source_file_.index()));
                     return;
@@ -98,24 +98,24 @@ namespace ance::ast
 
                 auto const expected_tokens = parser->getExpectedTokens();
 
-                if (static_cast<size_t>(expected_tokens.getSingleElement()) == anceLexer::EOF)
+                if (static_cast<size_t>(expected_tokens.getSingleElement()) == grammar::anceLexer::EOF)
                 {
                     parent_.reporter_.error("At most one top-level statement per file allowed",
                                             core::Location::simple(line, char_position, parent_.source_file_.index()));
                     return;
                 }
 
-                if (static_cast<size_t>(expected_tokens.getSingleElement()) == anceLexer::SEMICOLON)
+                if (static_cast<size_t>(expected_tokens.getSingleElement()) == grammar::anceLexer::SEMICOLON)
                 {
                     parent_.reporter_.error("Missing semicolon",
                                             core::Location::simple(previous_line, previous_char_position + 1, parent_.source_file_.index()));
                     return;
                 }
 
-                if (expected_tokens.contains(static_cast<size_t>(anceLexer::BRACKET_CLOSE))
-                    || expected_tokens.contains(static_cast<size_t>(anceLexer::CURLY_BRACKET_CLOSE))
-                    || expected_tokens.contains(static_cast<size_t>(anceLexer::SQUARE_BRACKET_CLOSE))
-                    || expected_tokens.contains(static_cast<size_t>(anceLexer::POINTY_BRACKET_CLOSE)))
+                if (expected_tokens.contains(static_cast<size_t> (grammar::anceLexer::BRACKET_CLOSE))
+                    || expected_tokens.contains(static_cast<size_t> (grammar::anceLexer::CURLY_BRACKET_CLOSE))
+                    || expected_tokens.contains(static_cast<size_t> (grammar::anceLexer::SQUARE_BRACKET_CLOSE))
+                    || expected_tokens.contains(static_cast<size_t> (grammar::anceLexer::POINTY_BRACKET_CLOSE)))
                 {
                     parent_.reporter_.error("Potential missing or mismatched closing bracket",
                                             core::Location::simple(line, char_position, parent_.source_file_.index()));
@@ -166,8 +166,8 @@ namespace ance::ast
 
                     if (type == antlr4::Token::EOF) break;
 
-                    if (depth == 0 && type == anceLexer::SEMICOLON) break;
-                    if (depth == 0 && type == anceLexer::CURLY_BRACKET_CLOSE) break;
+                    if (depth == 0 && type == grammar::anceLexer::SEMICOLON) break;
+                    if (depth == 0 && type == grammar::anceLexer::CURLY_BRACKET_CLOSE) break;
 
                     if (isOpen(type)) depth += 1;
                     else if (isClose(type) && depth > 0) depth -= 1;
@@ -189,14 +189,14 @@ namespace ance::ast
           private:
             static bool isOpen(size_t const type)
             {
-                return type == anceLexer::BRACKET_OPEN || type == anceLexer::SQUARE_BRACKET_OPEN || type == anceLexer::CURLY_BRACKET_OPEN
-                    || type == anceLexer::POINTY_BRACKET_OPEN;
+                return type == grammar::anceLexer::BRACKET_OPEN || type == grammar::anceLexer::SQUARE_BRACKET_OPEN || type == grammar::anceLexer::CURLY_BRACKET_OPEN
+                    || type == grammar::anceLexer::POINTY_BRACKET_OPEN;
             }
 
             static bool isClose(size_t const type)
             {
-                return type == anceLexer::BRACKET_CLOSE || type == anceLexer::SQUARE_BRACKET_CLOSE || type == anceLexer::CURLY_BRACKET_CLOSE
-                    || type == anceLexer::POINTY_BRACKET_CLOSE;
+                return type == grammar::anceLexer::BRACKET_CLOSE || type == grammar::anceLexer::SQUARE_BRACKET_CLOSE || type == grammar::anceLexer::CURLY_BRACKET_CLOSE
+                    || type == grammar::anceLexer::POINTY_BRACKET_CLOSE;
             }
         };
 
@@ -226,7 +226,7 @@ namespace ance::ast
         sources::SourceFile const& source_file_;
     };
 
-    class SourceVisitor final : public anceBaseVisitor
+    class SourceVisitor final : public grammar::anceBaseVisitor
     {
       public:
         SourceVisitor(size_t const file_index, core::Reporter& reporter) : file_index_(file_index), reporter_(reporter) {}
@@ -262,7 +262,7 @@ namespace ance::ast
         }
 
       public:
-        utility::Owned<File> expectFile(anceParser::UnorderedScopeFileContext* ctx)
+        utility::Owned<File> expectFile(grammar::anceParser::UnorderedScopeFileContext* ctx)
         {
             if (ctx == nullptr) return utility::makeOwned<File>(utility::List<utility::Owned<Declaration>> {}, core::Location::file(file_index_));
 
@@ -301,7 +301,7 @@ namespace ance::ast
             return utility::makeOwned<ErrorExpression>(location(ctx));
         }
 
-        Parameter expectParameter(anceParser::ParameterContext* ctx)
+        Parameter expectParameter(grammar::anceParser::ParameterContext* ctx)
         {
             core::Identifier const     name     = identifier(ctx->IDENTIFIER());
             utility::Owned<Expression> type     = expectExpression(ctx->expression());
@@ -310,7 +310,7 @@ namespace ance::ast
             return {name, std::move(type), location};
         }
 
-        core::Assigner expectAssigner(anceParser::AssignerContext* ctx)
+        core::Assigner expectAssigner(grammar::anceParser::AssignerContext* ctx)
         {
             if (ctx == nullptr) return core::Assigner::UNSPECIFIED;
 
@@ -319,7 +319,7 @@ namespace ance::ast
             return core::Assigner::UNSPECIFIED;
         }
 
-        core::AccessModifier expectAccessModifier(anceParser::AccessModifierContext* ctx)
+        core::AccessModifier expectAccessModifier(grammar::anceParser::AccessModifierContext* ctx)
         {
             if (ctx == nullptr) return core::AccessModifier::PRIVATE_ACCESS;
 
@@ -329,11 +329,11 @@ namespace ance::ast
         }
 
       protected:
-        std::any visitUnorderedScopeFile(anceParser::UnorderedScopeFileContext* ctx) override
+        std::any visitUnorderedScopeFile(grammar::anceParser::UnorderedScopeFileContext* ctx) override
         {
             utility::List<utility::Owned<Declaration>> declarations;
 
-            for (anceParser::DeclarationContext* declaration : ctx->declaration())
+            for (grammar::anceParser::DeclarationContext* declaration : ctx->declaration())
             {
                 declarations.push_back(expectDeclaration(declaration));
             }
@@ -342,12 +342,12 @@ namespace ance::ast
             return file;
         }
 
-        std::any visitOrderedScopeFile(anceParser::OrderedScopeFileContext* ctx) override
+        std::any visitOrderedScopeFile(grammar::anceParser::OrderedScopeFileContext* ctx) override
         {
             return visit(ctx->statement());
         }
 
-        std::any visitRunnableDeclaration(anceParser::RunnableDeclarationContext* ctx) override
+        std::any visitRunnableDeclaration(grammar::anceParser::RunnableDeclarationContext* ctx) override
         {
             utility::Owned<Statement> body = expectStatement(ctx->statement());
 
@@ -355,7 +355,7 @@ namespace ance::ast
             return declaration;
         }
 
-        std::any visitVariableDeclaration(anceParser::VariableDeclarationContext* ctx) override
+        std::any visitVariableDeclaration(grammar::anceParser::VariableDeclarationContext* ctx) override
         {
             core::AccessModifier const access_modifier = expectAccessModifier(ctx->accessModifier());
             core::Identifier const     name            = identifier(ctx->IDENTIFIER());
@@ -378,13 +378,13 @@ namespace ance::ast
             return declaration;
         }
 
-        std::any visitBlockStatement(anceParser::BlockStatementContext* ctx) override
+        std::any visitBlockStatement(grammar::anceParser::BlockStatementContext* ctx) override
         {
             Statement* statement = createBlockStatement(ctx->statement(), location(ctx));
             return statement;
         }
 
-        std::any visitExpressionStatement(anceParser::ExpressionStatementContext* ctx) override
+        std::any visitExpressionStatement(grammar::anceParser::ExpressionStatementContext* ctx) override
         {
             utility::Owned<Expression> expression = expectExpression(ctx->expression());
 
@@ -392,7 +392,7 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitLetStatement(anceParser::LetStatementContext* ctx) override
+        std::any visitLetStatement(grammar::anceParser::LetStatementContext* ctx) override
         {
             core::Identifier const     name = identifier(ctx->IDENTIFIER());
             utility::Owned<Expression> type = expectExpression(ctx->varType);
@@ -409,7 +409,7 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitAssignmentStatement(anceParser::AssignmentStatementContext* ctx) override
+        std::any visitAssignmentStatement(grammar::anceParser::AssignmentStatementContext* ctx) override
         {
             core::Identifier const     assigned = identifier(ctx->entity()->IDENTIFIER());
             core::Assigner const       assigner = expectAssigner(ctx->assigner());
@@ -424,7 +424,7 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitIfStatement(anceParser::IfStatementContext* ctx) override
+        std::any visitIfStatement(grammar::anceParser::IfStatementContext* ctx) override
         {
             utility::Owned<Expression> condition = expectExpression(ctx->expression());
             utility::Owned<Statement>  true_part = expectStatement(ctx->trueBlock);
@@ -439,7 +439,7 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitLoopStatement(anceParser::LoopStatementContext* ctx) override
+        std::any visitLoopStatement(grammar::anceParser::LoopStatementContext* ctx) override
         {
             utility::Owned<Statement> body = expectStatement(ctx->statement());
 
@@ -447,19 +447,19 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitBreakStatement(anceParser::BreakStatementContext* ctx) override
+        std::any visitBreakStatement(grammar::anceParser::BreakStatementContext* ctx) override
         {
             Statement* statement = new Break(location(ctx));
             return statement;
         }
 
-        std::any visitContinueStatement(anceParser::ContinueStatementContext* ctx) override
+        std::any visitContinueStatement(grammar::anceParser::ContinueStatementContext* ctx) override
         {
             Statement* statement = new Continue(location(ctx));
             return statement;
         }
 
-        std::any visitReturnStatement(anceParser::ReturnStatementContext* ctx) override
+        std::any visitReturnStatement(grammar::anceParser::ReturnStatementContext* ctx) override
         {
             utility::Optional<utility::Owned<Expression>> value = {};
             if (ctx->expression() != nullptr) value = expectExpression(ctx->expression());
@@ -468,7 +468,7 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitWhileStatement(anceParser::WhileStatementContext* ctx) override
+        std::any visitWhileStatement(grammar::anceParser::WhileStatementContext* ctx) override
         {
             utility::Owned<Expression> condition = expectExpression(ctx->expression());
             utility::Owned<Statement>  body      = expectStatement(ctx->statement());
@@ -477,12 +477,12 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitCallExpression(anceParser::CallExpressionContext* ctx) override
+        std::any visitCallExpression(grammar::anceParser::CallExpressionContext* ctx) override
         {
             core::Identifier const callable = identifier(ctx->entity()->IDENTIFIER());
 
             utility::List<utility::Owned<Expression>> arguments;
-            for (anceParser::ExpressionContext* expression : ctx->expression())
+            for (grammar::anceParser::ExpressionContext* expression : ctx->expression())
             {
                 arguments.push_back(expectExpression(expression));
             }
@@ -491,10 +491,10 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitLambdaExpression(anceParser::LambdaExpressionContext* ctx) override
+        std::any visitLambdaExpression(grammar::anceParser::LambdaExpressionContext* ctx) override
         {
             utility::List<Parameter> parameters;
-            for (anceParser::ParameterContext* parameter_ctx : ctx->parameter()) parameters.push_back(expectParameter(parameter_ctx));
+            for (grammar::anceParser::ParameterContext* parameter_ctx : ctx->parameter()) parameters.push_back(expectParameter(parameter_ctx));
 
             utility::Owned<Expression> return_type = expectExpression(ctx->type);
 
@@ -514,7 +514,7 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitAccessExpression(anceParser::AccessExpressionContext* ctx) override
+        std::any visitAccessExpression(grammar::anceParser::AccessExpressionContext* ctx) override
         {
             core::Identifier const accessed = identifier(ctx->entity()->IDENTIFIER());
 
@@ -522,13 +522,13 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitHereExpression(anceParser::HereExpressionContext* ctx) override
+        std::any visitHereExpression(grammar::anceParser::HereExpressionContext* ctx) override
         {
             Expression* expression = new Here(location(ctx));
             return expression;
         }
 
-        std::any visitUnaryOperationExpression(anceParser::UnaryOperationExpressionContext* ctx) override
+        std::any visitUnaryOperationExpression(grammar::anceParser::UnaryOperationExpressionContext* ctx) override
         {
             core::UnaryOperator const  op      = std::any_cast<core::UnaryOperator>(visit(ctx->unary()));
             utility::Owned<Expression> operand = expectExpression(ctx->expression());
@@ -537,24 +537,24 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitUnaryNot(anceParser::UnaryNotContext*) override
+        std::any visitUnaryNot(grammar::anceParser::UnaryNotContext*) override
         {
             return core::UnaryOperator::NOT;
         }
 
-        std::any visitTrue(anceParser::TrueContext* ctx) override
+        std::any visitTrue(grammar::anceParser::TrueContext* ctx) override
         {
             Expression* expression = new BoolLiteral(true, location(ctx));
             return expression;
         }
 
-        std::any visitFalse(anceParser::FalseContext* ctx) override
+        std::any visitFalse(grammar::anceParser::FalseContext* ctx) override
         {
             Expression* expression = new BoolLiteral(false, location(ctx));
             return expression;
         }
 
-        std::any visitSizeLiteral(anceParser::SizeLiteralContext* ctx) override
+        std::any visitSizeLiteral(grammar::anceParser::SizeLiteralContext* ctx) override
         {
             // todo: use llvm::APInt instead of size_t
             // todo: do all the validation of integer literals and stuff like whether they actually fit into their type
@@ -563,13 +563,13 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitUnitLiteral(anceParser::UnitLiteralContext* ctx) override
+        std::any visitUnitLiteral(grammar::anceParser::UnitLiteralContext* ctx) override
         {
             Expression* expression = new UnitLiteral(location(ctx));
             return expression;
         }
 
-        std::any visitStringLiteral(anceParser::StringLiteralContext* ctx) override
+        std::any visitStringLiteral(grammar::anceParser::StringLiteralContext* ctx) override
         {
             std::string text = ctx->getText();
             text             = text.substr(1, text.size() - 2);// Remove quotes.
@@ -578,31 +578,31 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitCopyAssigner(anceParser::CopyAssignerContext*) override
+        std::any visitCopyAssigner(grammar::anceParser::CopyAssignerContext*) override
         {
             core::Assigner assigner = core::Assigner::COPY_ASSIGNMENT;
             return assigner;
         }
 
-        std::any visitFinalCopyAssigner(anceParser::FinalCopyAssignerContext*) override
+        std::any visitFinalCopyAssigner(grammar::anceParser::FinalCopyAssignerContext*) override
         {
             core::Assigner assigner = core::Assigner::FINAL_COPY_ASSIGNMENT;
             return assigner;
         }
 
-        std::any visitPublic(anceParser::PublicContext*) override
+        std::any visitPublic(grammar::anceParser::PublicContext*) override
         {
             core::AccessModifier access_modifier = core::AccessModifier::PUBLIC_ACCESS;
             return access_modifier;
         }
 
-        std::any visitPrivate(anceParser::PrivateContext*) override
+        std::any visitPrivate(grammar::anceParser::PrivateContext*) override
         {
             core::AccessModifier access_modifier = core::AccessModifier::PRIVATE_ACCESS;
             return access_modifier;
         }
 
-        std::any visitExtern(anceParser::ExternContext*) override
+        std::any visitExtern(grammar::anceParser::ExternContext*) override
         {
             core::AccessModifier access_modifier = core::AccessModifier::EXTERN_ACCESS;
             return access_modifier;
@@ -615,11 +615,11 @@ namespace ance::ast
             return {};
         }
 
-        Block* createBlockStatement(std::vector<anceParser::StatementContext*> const& statement_contexts, core::Location const& source_location)
+        Block* createBlockStatement(std::vector<grammar::anceParser::StatementContext*> const& statement_contexts, core::Location const& source_location)
         {
             utility::List<utility::Owned<Statement>> statements;
 
-            for (anceParser::StatementContext* statement : statement_contexts)
+            for (grammar::anceParser::StatementContext* statement : statement_contexts)
             {
                 statements.push_back(expectStatement(statement));
             }
@@ -655,17 +655,17 @@ struct ance::ast::Parser::Implementation
             utility::Owned<ErrorHandler> error_handler = utility::makeOwned<ErrorHandler>(reporter_, source_file);
 
             utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(code);
-            utility::Owned<anceLexer>                lexer = utility::makeOwned<anceLexer>(input.get());
+            utility::Owned<grammar::anceLexer>                lexer = utility::makeOwned<grammar::anceLexer>(input.get());
             lexer->removeErrorListeners();
             lexer->addErrorListener(error_handler->lexerErrorListener());
 
             utility::Owned<antlr4::CommonTokenStream> tokens = utility::makeOwned<antlr4::CommonTokenStream>(lexer.get());
-            utility::Owned<anceParser>                parser = utility::makeOwned<anceParser>(tokens.get());
+            utility::Owned<grammar::anceParser>                parser = utility::makeOwned<grammar::anceParser>(tokens.get());
             parser->removeErrorListeners();
             parser->addErrorListener(error_handler->parserErrorListener());
             parser->setErrorHandler(error_handler->parserErrorStrategy());
 
-            anceParser::UnorderedScopeFileContext* unordered_scope_file_ctx = parser->unorderedScopeFile();
+            grammar::anceParser::UnorderedScopeFileContext* unordered_scope_file_ctx = parser->unorderedScopeFile();
 
             SourceVisitor visitor {source_file.index(), reporter_};
 
@@ -697,17 +697,17 @@ struct ance::ast::Parser::Implementation
             utility::Owned<ErrorHandler> error_handler = utility::makeOwned<ErrorHandler>(reporter_, source_file);
 
             utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(code);
-            utility::Owned<anceLexer>                lexer = utility::makeOwned<anceLexer>(input.get());
+            utility::Owned<grammar::anceLexer>                lexer = utility::makeOwned<grammar::anceLexer>(input.get());
             lexer->removeErrorListeners();
             lexer->addErrorListener(error_handler->lexerErrorListener());
 
             utility::Owned<antlr4::CommonTokenStream> tokens = utility::makeOwned<antlr4::CommonTokenStream>(lexer.get());
-            utility::Owned<anceParser>                parser = utility::makeOwned<anceParser>(tokens.get());
+            utility::Owned<grammar::anceParser>                parser = utility::makeOwned<grammar::anceParser>(tokens.get());
             parser->removeErrorListeners();
             parser->addErrorListener(error_handler->parserErrorListener());
             parser->setErrorHandler(error_handler->parserErrorStrategy());
 
-            anceParser::OrderedScopeFileContext* unordered_scope_file_ctx = parser->orderedScopeFile();
+            grammar::anceParser::OrderedScopeFileContext* unordered_scope_file_ctx = parser->orderedScopeFile();
 
             SourceVisitor visitor {source_file.index(), reporter_};
 

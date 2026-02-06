@@ -6,12 +6,10 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-include(C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake)
-
 set(VCPKG_TARGET_TRIPLET x64-windows)
-set(CMAKE_TOOLCHAIN_FILE C:/dev/vcpkg/scripts/buildsystems/vcpkg.cmake)
 
-find_path(ANTLR4_INCLUDE_DIR antlr4-runtime.h HINTS C:/dev/vcpkg/installed/x64-windows/include/antlr4-runtime/)
+find_package(antlr4-generator CONFIG REQUIRED)
+find_package(antlr4-runtime CONFIG REQUIRED)
 message(STATUS "Found antlr4 includes at: ${ANTLR4_INCLUDE_DIR}")
 find_library(ANTLR4_LIB antlr4-runtime)
 message(STATUS "Found antlr4 lib at: ${ANTLR4_LIB}")
