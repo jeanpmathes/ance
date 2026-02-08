@@ -23,7 +23,7 @@ statement
     ;
 
 expression
-    : entity '(' (expression (',' expression)* )? ')' # CallExpression // todo: should become an operator
+    : callee=expression '(' (expression (',' expression)* )? ')' # CallExpression // todo: should become an operator
     | '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ':' type=expression ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
     | entity # AccessExpression
     | literal # LiteralExpression

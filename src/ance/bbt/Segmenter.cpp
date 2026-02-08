@@ -857,8 +857,8 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& callee = builder.addTemporary("Call_Callee", call.called->location);
-            builder.addSegmented(*call.called, callee);
+            auto& callee = builder.addTemporary("Call_Callee", call.callee->location);
+            builder.addSegmented(*call.callee, callee);
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (size_t index = 0; index < call.arguments.size(); index++)

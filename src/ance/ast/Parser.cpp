@@ -479,15 +479,17 @@ namespace ance::ast
 
         std::any visitCallExpression(grammar::anceParser::CallExpressionContext* ctx) override
         {
-            core::Identifier const callable = identifier(ctx->entity()->IDENTIFIER());
+            utility::Owned<Expression> callee = expectExpression(ctx->callee);
 
             utility::List<utility::Owned<Expression>> arguments;
             for (grammar::anceParser::ExpressionContext* expression : ctx->expression())
             {
+                if (expression == ctx->callee) continue;
+
                 arguments.push_back(expectExpression(expression));
             }
 
-            Expression* expression = new Call(callable, std::move(arguments), location(ctx));
+            Expression* expression = new Call(std::move(callee), std::move(arguments), location(ctx));
             return expression;
         }
 

@@ -198,7 +198,7 @@ struct ance::est::Printer::Implementation
 
         void visit(Call const& call) override
         {
-            visit(*call.called);
+            visit(*call.callee);
             print("(");
             for (size_t i = 0; i < call.arguments.size(); ++i)
             {
@@ -222,7 +222,8 @@ struct ance::est::Printer::Implementation
             }
             print("), ");
             visit(*ctor.return_type);
-            print(", ");
+            print(", Capture()"); // todo: Capture could take a list of entries, each entry is name + type + (either value or reference)
+            print(", code ");
             visit(*ctor.body);
             print(")");
         }

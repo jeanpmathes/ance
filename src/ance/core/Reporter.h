@@ -18,7 +18,7 @@ namespace ance::core
     class Reporter
     {
       public:
-        Reporter();
+        Reporter(sources::SourceTree& source_tree, std::ostream& out);
         ~Reporter();
 
         /// Report an informational message.
@@ -36,18 +36,11 @@ namespace ance::core
         /// \param location The location in the source code where the error occurred.
         void error(std::string const& message, Location const& location);
 
-        /// Emit all reported messages.
-        /// \param source_tree The source tree to use for source locations.
-        /// \param out The stream to emit the messages to.
-        void emit(sources::SourceTree& source_tree, std::ostream& out) const;
+        /// Clear the state of the reporter.
+        void clear(); // todo: check if this is ever used
 
-        /// Clear all reported messages.
-        void clear();
-
-        /// Report all messages, a summary and clear the messages.
-        /// \param source_tree The source tree to use for source locations.
-        /// \param out The stream to emit the messages to.
-        void report(sources::SourceTree& source_tree, std::ostream& out);
+        /// Report a summary and clear the state.
+        void report();
 
         /// Check whether compilation should fail.
         [[nodiscard]] bool isFailed() const;

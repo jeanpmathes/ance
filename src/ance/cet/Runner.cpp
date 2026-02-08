@@ -50,19 +50,23 @@ struct ance::cet::Runner::Implementation
         {
             RunPoint(bbt::BasicBlock const& start, Scope* initial_scope) : block(&start), scope(initial_scope) {}
 
-            void clearBlocker()
-            {
-                blocker = std::nullopt;
-            }
-
             bbt::BasicBlock const*               block           = nullptr;
             size_t                               statement_index = 0;
             Scope*                               scope           = nullptr;
-            utility::Optional<PendingResolution> blocker         = std::nullopt;
 
             utility::Optional<utility::Shared<bbt::Value>> return_value = std::nullopt;
 
             RunPoint& getExecutableRunPoint()
+            {
+                if (stack().empty())
+                {
+                    return *this;
+                }
+
+                return stack().back();
+            }
+
+            RunPoint const& getExecutableRunPoint() const
             {
                 if (stack().empty())
                 {
@@ -97,6 +101,21 @@ struct ance::cet::Runner::Implementation
                 lower_level.target_stack_ = &stack_;
             }
 
+            utility::Optional<PendingResolution> const& getBlocker() const
+            {
+                return getExecutableRunPoint().blocker_;
+            }
+
+            void clearBlocker()
+            {
+                blocker_ = std::nullopt;
+            }
+
+            void setBlocker(PendingResolution const& blocker)
+            {
+                blocker_ = blocker;
+            }
+
           private:
             std::list<RunPoint>& stack() const
             {
@@ -105,6 +124,8 @@ struct ance::cet::Runner::Implementation
 
             std::list<RunPoint>  stack_;
             std::list<RunPoint>* target_stack_ = &stack_;
+
+            utility::Optional<PendingResolution> blocker_ = std::nullopt;
         };
 
         BBT(sources::SourceTree&                                                                                source_tree,
@@ -150,9 +171,11 @@ struct ance::cet::Runner::Implementation
         {
             for (auto const& run_point : run_points_)
             {
-                if (run_point.blocker.hasValue())
+                auto const& blocker = run_point.getBlocker();
+
+                if (blocker.hasValue())
                 {
-                    auto const& [identifier] = run_point.blocker.value();
+                    auto const& [identifier] = blocker.value();
                     reporter_.error("Cannot resolve name '" + identifier + "'", identifier.location());
                 }
             }
@@ -278,7 +301,7 @@ struct ance::cet::Runner::Implementation
         {
             state_.execution_result = ExecutionResult::Pending;
 
-            state_.current_run_point->blocker = blocker;
+            state_.current_run_point->setBlocker(blocker);
         }
 
         void yield()
@@ -736,26 +759,20 @@ struct ance::cet::Runner::Implementation
         , context_(context)
     {}
 
-    utility::Optional<utility::Owned<Unit>> runOrderedFile(std::filesystem::path const& file)
+    bool run(BBT& bbt)
     {
-        utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentOrderedFile(file);
-        if (!flow.hasValue()) return std::nullopt;
-
-        utility::Owned<BBT> bbt =
-            utility::makeOwned<BBT>(source_tree_, reporter_, type_context_, [&](std::filesystem::path const& f) { return readUnorderedScope(f); }, providers_);
-        bbt->schedule(**flow, nullptr);
-
-        while (bbt->hasRunPoints())
+        while (bbt.hasRunPoints())
         {
             bool progress = false;
 
-            for (auto iterator = bbt->getRunPointBegin(); iterator != bbt->getRunPointEnd();)
+            for (auto iterator = bbt.getRunPointBegin(); iterator != bbt.getRunPointEnd();)
             {
-                BBT::ExecutionResult const result = bbt->execute(*iterator);
+                BBT::RunPoint& run_point = *iterator;
+                BBT::ExecutionResult const result = bbt.execute(run_point);
 
                 if (result == BBT::ExecutionResult::Completed)
                 {
-                    iterator = bbt->removeRunPoint(iterator);
+                    iterator = bbt.removeRunPoint(iterator);
                     progress = true;
 
                     continue;
@@ -780,24 +797,42 @@ struct ance::cet::Runner::Implementation
 
                 if (result == BBT::ExecutionResult::Error)
                 {
-                    return std::nullopt;
+                    return false;
                 }
             }
 
-            if (!progress && bbt->hasRunPoints())
+            if (!progress && bbt.hasRunPoints())
             {
-                bbt->reportBlockers();
+                bbt.reportBlockers();
 
-                return std::nullopt;
+                return false;
             }
         }
+
+        return true;
+    }
+
+    utility::Optional<utility::Owned<Unit>> runOrderedFile(std::filesystem::path const& file)
+    {
+        utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentOrderedFile(file);
+        if (!flow.hasValue()) return std::nullopt;
+
+        utility::Owned<BBT> bbt =
+            utility::makeOwned<BBT>(source_tree_, reporter_, type_context_, [&](std::filesystem::path const& f) { return readUnorderedScope(f); }, providers_);
+        bbt->schedule(**flow, nullptr);
+
+        bool const ok = run(*bbt);
+
+        if (!ok)
+            return std::nullopt;
 
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
 
         context_.print<Printer>(*unit, "cet", file);
         context_.graph<Grapher>(*unit, "cet", file);
 
-        if (reporter_.isFailed()) return std::nullopt;
+        if (reporter_.isFailed())
+            return std::nullopt;
 
         return unit;
     }

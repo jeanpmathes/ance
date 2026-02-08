@@ -213,7 +213,7 @@ namespace ance::est
     {
         Call(utility::Owned<Expression> callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
-        utility::Owned<Expression>                called;
+        utility::Owned<Expression>                callee;
         utility::List<utility::Owned<Expression>> arguments;
     };
 

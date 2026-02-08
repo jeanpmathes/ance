@@ -55,7 +55,7 @@ namespace ance
         create_directories(debug_path);
 
         sources::SourceTree source_tree {base_path};
-        core::Reporter      reporter;
+        core::Reporter      reporter {source_tree, out};
         core::Context       context {debug_path};
 
         cet::Runner     runner {source_tree, reporter, context};
@@ -72,15 +72,9 @@ namespace ance
             if (compiler.compile(**unit)) { exit_code = EXIT_SUCCESS; }
         }
 
-        reporter.report(source_tree, out);
+        reporter.report();
 
         return exit_code;
-
-        // todo: add lambda syntax (no capture, global vars only), add FunctionConstructor with todo to make it an actual constructor of function types
-        // todo: check printing of function ctor in EST, also think how to handle capture later and prepare something in printer
-        // todo: check in what scope lambdas live, check if they can access variables from outside
-
-        // todo: change the reporter so that it prints immediately instead of storing messages
 
         // todo: adapt lambda syntax so that return type is optional, if omitted it is Unit
 
@@ -90,7 +84,7 @@ namespace ance
 
         // todo: check if unreachable code detection works or needs to be added (with return in lambda)
 
-        // todo: remove entity from grammar, put IDENTIFIER directly in access and make call more operator-like (but not fully operator yet)
+        // todo: remove entity from grammar, put IDENTIFIER directly in access, assignment should require expression on left side (so only one resolve in Expander)
 
         // todo: add function declarations (for now cmp only, must be in syntax)
 

@@ -554,19 +554,15 @@ struct ance::est::Expander::Implementation
         {
             EBuilder builder(*this);
 
+            utility::Owned<Expression> callee = builder.pushExpansion(*call.callee);
+
             utility::List<utility::Owned<Expression>> arguments;
             for (auto& argument : call.arguments)
             {
                 arguments.emplace_back(builder.pushExpansion(*argument));
             }
 
-            utility::Owned<Expression> resolved = intrinsic(core::Intrinsic::RESOLVE,
-                                                            call.location,
-                                                            utility::makeOwned<CurrentScope>(call.location),
-                                                            utility::makeOwned<IdentifierCapture>(call.identifier, call.location));
-
-            result_.setExpression(builder.take(
-                utility::makeOwned<Call>(utility::makeOwned<Read>(std::move(resolved), call.identifier.location()), std::move(arguments), call.location)));
+            result_.setExpression(builder.take(utility::makeOwned<Call>(std::move(callee), std::move(arguments), call.location)));
         }
 
         void visit(ast::Lambda const& lambda) override

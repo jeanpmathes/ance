@@ -90,57 +90,52 @@ struct ance::core::Reporter::Implementation
         Entry(Level const level, std::string message, Location const& location) : level_(level), location_(location), message_(std::move(message)) {}
     };
 
+    Implementation(sources::SourceTree& source_tree, std::ostream& out) : source_tree_(source_tree), out_(out) {}
+
     void report(Level level, std::string const& message, Location location)
     {
         if (level == Level::ERROR) error_count_++;
         if (level == Level::WARNING) warning_count_++;
 
-        entries_.emplace_back(level, message, location);
-    }
+        size_t start = 0;
 
-    void emit(sources::SourceTree& source_tree, std::ostream& out) const
-    {
-        for (auto& entry : entries_)
-        {
-            size_t start = 0;
+            out_ << "ance: ";
 
-            out << "ance: ";
-
-            switch (entry.level_)
+            switch (level)
             {
                 case Level::ERROR:
-                    out << ansi::ColorRed << "error" << ansi::ColorReset << ": ";
+                    out_ << ansi::ColorRed << "error" << ansi::ColorReset << ": ";
                     break;
                 case Level::WARNING:
-                    out << ansi::ColorYellow << "warning" << ansi::ColorReset << ": ";
+                    out_ << ansi::ColorYellow << "warning" << ansi::ColorReset << ": ";
                     break;
                 case Level::INFO:
-                    out << ansi::ColorBlue << "info" << ansi::ColorReset << ": ";
+                    out_ << ansi::ColorBlue << "info" << ansi::ColorReset << ": ";
                     break;
             }
 
-            if (entry.location_.isGlobal())
+            if (location.isGlobal())
             {
-                out << entry.message_ << std::endl;
-                continue;
+                out_ << message << std::endl;
+                return;
             }
 
-            sources::SourceFile const& source_file = source_tree.getFile(entry.location_.fileIndex());
+            sources::SourceFile const& source_file = source_tree_.getFile(location.fileIndex());
 
-            out << source_file.getRelativePath().generic_string() << " ";
-            out << entry.location_ << " " << entry.message_ << std::endl;
+            out_ << source_file.getRelativePath().generic_string() << " ";
+            out_ << location << " " << message << std::endl;
 
-            if (entry.location_.isFile()) continue;
+            if (location.isFile()) return;
 
-            out << std::endl;
+            out_ << std::endl;
 
-            std::u32string_view const line_view = text::trim(source_file.getLine(entry.location_.line()), start);
-            out << '\t' << boost::locale::conv::utf_to_utf<char>(std::u32string(line_view)) << std::endl;
+            std::u32string_view const line_view = text::trim(source_file.getLine(location.line()), start);
+            out_ << '\t' << boost::locale::conv::utf_to_utf<char>(std::u32string(line_view)) << std::endl;
 
-            if (entry.location_.isSingleLine())
+            if (location.isSingleLine())
             {
-                size_t const length_to_mark = entry.location_.column() - start - 1;
-                size_t const length_of_mark = entry.location_.columnEnd() - entry.location_.column() + 1;
+                size_t const length_to_mark = location.column() - start - 1;
+                size_t const length_of_mark = location.columnEnd() - location.column() + 1;
 
                 std::u32string_view const text_to_mark   = line_view.substr(0, length_to_mark);
                 std::u32string_view const text_with_mark = length_to_mark >= line_view.size() ? U"" : line_view.substr(length_to_mark, length_of_mark);
@@ -151,36 +146,32 @@ struct ance::core::Reporter::Implementation
                 size_t const marker_start  = std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 0uz);
                 size_t const marker_length = std::max(text::estimateWidth(text_with_mark) + missing_with_mark, 1uz);
 
-                out << '\t' << std::string(marker_start, ' ') << std::string(marker_length, '~') << std::endl;
-                out << std::endl;
+                out_ << '\t' << std::string(marker_start, ' ') << std::string(marker_length, '~') << std::endl;
+                out_ << std::endl;
             }
-        }
     }
 
     void clear()
     {
-        entries_.clear();
         error_count_   = 0;
         warning_count_ = 0;
     }
 
-    void report(sources::SourceTree& source_tree, std::ostream& out)
+    void report()
     {
         bool const warnings_as_errors = false;// todo: allow setting
 
-        emit(source_tree, out);
-
         if (errorCount() > 0 || (warnings_as_errors && warningCount() > 0))
         {
-            out << "ance: " << errorCount() << " errors, " << warningCount() << " warnings" << std::endl;
-            out << "ance: Failed";
+            out_ << "ance: " << errorCount() << " errors, " << warningCount() << " warnings" << std::endl;
+            out_ << "ance: Failed";
 
-            if (errorCount() == 0) out << " (by warning)";
+            if (errorCount() == 0) out_ << " (by warning)";
         }
         else
         {
-            out << "ance: " << warningCount() << " warnings" << std::endl;
-            out << "ance: Success";
+            out_ << "ance: " << warningCount() << " warnings" << std::endl;
+            out_ << "ance: Success";
         }
 
         clear();
@@ -197,19 +188,21 @@ struct ance::core::Reporter::Implementation
     {
         return error_count_;
     }
+
     [[nodiscard]] size_t warningCount() const
     {
         return warning_count_;
     }
 
   private:
-    std::vector<Entry> entries_;
-
     size_t error_count_   = 0;
     size_t warning_count_ = 0;
+
+    sources::SourceTree& source_tree_;
+    std::ostream&        out_;
 };
 
-ance::core::Reporter::Reporter() : implementation_(utility::makeOwned<Implementation>()) {}
+ance::core::Reporter::Reporter(sources::SourceTree& source_tree, std::ostream& out) : implementation_(utility::makeOwned<Implementation>(source_tree, out)) {}
 
 ance::core::Reporter::~Reporter() = default;
 
@@ -228,19 +221,14 @@ void ance::core::Reporter::error(std::string const& message, Location const& loc
     implementation_->report(Implementation::Level::ERROR, message, location);
 }
 
-void ance::core::Reporter::emit(sources::SourceTree& source_tree, std::ostream& out) const
-{
-    implementation_->emit(source_tree, out);
-}
-
 void ance::core::Reporter::clear()
 {
     implementation_->clear();
 }
 
-void ance::core::Reporter::report(sources::SourceTree& source_tree, std::ostream& out)
+void ance::core::Reporter::report()
 {
-    implementation_->report(source_tree, out);
+    implementation_->report();
 }
 
 bool ance::core::Reporter::isFailed() const

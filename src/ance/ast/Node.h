@@ -237,9 +237,9 @@ namespace ance::ast
         : Expression
         , utility::ConcreteNode<Call, Visitor>
     {
-        Call(core::Identifier const& callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
+        Call(utility::Owned<Expression> called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
-        core::Identifier                          identifier;
+        utility::Owned<Expression> callee;
         utility::List<utility::Owned<Expression>> arguments;
     };
 
