@@ -105,6 +105,7 @@ ance::est::Call::Call(utility::Owned<Expression> callable, utility::List<utility
     , callee(std::move(callable))
     , arguments(std::move(expressions))
 {}
+
 ance::est::AnonymousFunctionConstructor::AnonymousFunctionConstructor(utility::List<Parameter>   params,
                                                                       utility::Owned<Expression> type,
                                                                       utility::Owned<Statement>  statement,

@@ -122,7 +122,7 @@ ance::ast::Call::Call(utility::Owned<Expression> called, utility::List<utility::
 {}
 
 ance::ast::Lambda::Lambda(utility::List<Parameter>                      params,
-                          utility::Owned<Expression>                    type,
+                          utility::Optional<utility::Owned<Expression>> type,
                           utility::Optional<utility::Owned<Expression>> expression,
                           utility::Optional<utility::Owned<Statement>>  statement,
                           core::Location const&                         source_location)

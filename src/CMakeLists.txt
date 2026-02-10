@@ -1,4 +1,5 @@
-add_executable(ance)
+add_executable(ance
+        ance/core/Constants.h)
 
 add_subdirectory(ance)
 add_subdirectory(grammar)

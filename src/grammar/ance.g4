@@ -24,7 +24,7 @@ statement
 
 expression
     : callee=expression '(' (expression (',' expression)* )? ')' # CallExpression // todo: should become an operator
-    | '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ':' type=expression ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
+    | '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
     | entity # AccessExpression
     | literal # LiteralExpression
     | unary expression # UnaryOperationExpression

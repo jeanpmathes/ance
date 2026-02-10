@@ -8,7 +8,6 @@
 #include "ance/ast/Node.h"
 #include "ance/ast/Parser.h"
 
-#include "ance/bbt/Function.h"
 #include "ance/bbt/Type.h"
 
 #include "ance/cet/Node.h"
@@ -75,10 +74,6 @@ namespace ance
         reporter.report();
 
         return exit_code;
-
-        // todo: test lambdas in lambdas, all should return values (do a negation chain so that value changes)
-
-        // todo: adapt lambda syntax so that return type is optional, if omitted it is Unit
 
         // todo: make sure that flows passed to function ctors are also printed and graphed
         // todo: in printer, put those flows into list that is printed when all other flows are printed

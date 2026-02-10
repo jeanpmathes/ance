@@ -4,6 +4,7 @@
 #include <variant>
 
 #include "ance/core/Intrinsic.h"
+#include "ance/core/Constants.h"
 
 #include "ance/ast/Node.h"
 #include "ance/ast/Parser.h"
@@ -575,7 +576,17 @@ struct ance::est::Expander::Implementation
                 parameters.emplace_back(builder.pushParameterExpansion(parameter));
             }
 
-            utility::Owned<Expression> return_type = builder.pushExpansion(*lambda.return_type);
+            utility::Optional<utility::Owned<Expression>> return_type;
+            if (lambda.return_type.hasValue())
+            {
+                return_type = builder.pushExpansion(**lambda.return_type);
+            }
+            else
+            {
+                // todo: as soon as we have our own types, we would need this access here to be in the global scope, e.g. a global:: prefix
+                // todo: or as long as that is not done, just a new type of expression that contains an enum of important types
+                return_type = builder.pushExpansion(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME), lambda.location));
+            }
 
             SBuilder body_builder(*this);
 
@@ -592,7 +603,7 @@ struct ance::est::Expander::Implementation
             utility::Owned<Statement> body = wrap(body_builder.take());
 
             result_.setExpression(builder.take(
-                utility::makeOwned<AnonymousFunctionConstructor>(std::move(parameters), std::move(return_type), std::move(body), lambda.location)));
+                utility::makeOwned<AnonymousFunctionConstructor>(std::move(parameters), std::move(return_type.value()), std::move(body), lambda.location)));
         }
 
         void visit(ast::Access const& access) override

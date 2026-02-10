@@ -238,8 +238,12 @@ struct ance::ast::Printer::Implementation
                 visit(*lambda.parameters[index].type);
                 if (index + 1 < lambda.parameters.size()) print(", ");
             }
-            print(") : ");
-            visit(*lambda.return_type);
+            print(")");
+            if (lambda.return_type.hasValue())
+            {
+                print(" : ");
+                visit(**lambda.return_type);
+            }
             if (lambda.expression_body.hasValue())
             {
                 print(" => ");

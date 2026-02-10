@@ -508,7 +508,11 @@ namespace ance::ast
             utility::List<Parameter> parameters;
             for (grammar::anceParser::ParameterContext* parameter_ctx : ctx->parameter()) parameters.push_back(expectParameter(parameter_ctx));
 
-            utility::Owned<Expression> return_type = expectExpression(ctx->type);
+            utility::Optional<utility::Owned<Expression>> return_type;
+            if (ctx->type != nullptr)
+            {
+                return_type = expectExpression(ctx->type);
+            }
 
             utility::Optional<utility::Owned<Expression>> expression_body;
             utility::Optional<utility::Owned<Statement>>  statement_body;

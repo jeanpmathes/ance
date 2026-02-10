@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include "ance/core/Constants.h"
+
 #include "ance/utility/Empty.h"
 
 namespace ance::bbt
@@ -160,7 +162,7 @@ namespace ance::bbt
 
     utility::Shared<Type> TypeContext::getUnit()
     {
-        return Implementation::getOrCreate(implementation_->unit_type, [&] { return utility::makeShared<Type>(core::Identifier::make("Unit"), *this); });
+        return Implementation::getOrCreate(implementation_->unit_type, [&] { return utility::makeShared<Type>(core::Identifier::make(core::UNIT_TYPE_NAME), *this); });
     }
 
     utility::Shared<Type> TypeContext::getSize()

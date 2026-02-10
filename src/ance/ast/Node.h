@@ -251,13 +251,13 @@ namespace ance::ast
         , utility::ConcreteNode<Lambda, Visitor>
     {
         Lambda(utility::List<Parameter>                      params,
-               utility::Owned<Expression>                    type,
+               utility::Optional<utility::Owned<Expression>> type,
                utility::Optional<utility::Owned<Expression>> expression,
                utility::Optional<utility::Owned<Statement>>  statement,
                core::Location const&                         source_location);
 
         utility::List<Parameter>                      parameters;
-        utility::Owned<Expression>                    return_type;
+        utility::Optional<utility::Owned<Expression>> return_type;
         utility::Optional<utility::Owned<Expression>> expression_body;
         utility::Optional<utility::Owned<Statement>>  statement_body;
     };
