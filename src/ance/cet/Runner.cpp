@@ -665,6 +665,10 @@ struct ance::cet::Runner::Implementation
 
             switch (unary_operation.op)
             {
+                case core::UnaryOperator::UNSPECIFIED:
+                    abort();
+                    break;
+
                 case core::UnaryOperator::NOT:
                     scope().getTemporary(unary_operation.destination).write(bbt::Bool::make(!deLReference<bbt::Bool>(value).value(), type_context_));
                     break;

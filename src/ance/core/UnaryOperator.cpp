@@ -11,6 +11,9 @@ std::string ance::core::UnaryOperator::toString() const
 {
     switch (value_)
     {
+        case UNSPECIFIED:
+            return "/* unspecified */";
+
         case NOT:
             return "not";
     }

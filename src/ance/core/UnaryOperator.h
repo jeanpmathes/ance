@@ -11,6 +11,9 @@ namespace ance::core
     public:
         enum Value
         {
+            /// Any unspecified operator, used as a default value for error handling and such.
+            UNSPECIFIED,
+
             /// The logical not operator.
             NOT,
         };

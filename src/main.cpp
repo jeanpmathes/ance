@@ -76,9 +76,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: individual files should not have their own unordered scope, instead the global scope should be an unordered scope
-        // todo: as an effect, the lambda in included.nc will be able to access the a, b and c variables
-
         // todo: test lambdas in lambdas, all should return values (do a negation chain so that value changes)
 
         // todo: adapt lambda syntax so that return type is optional, if omitted it is Unit

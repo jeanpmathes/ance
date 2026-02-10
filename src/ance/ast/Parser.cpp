@@ -310,6 +310,16 @@ namespace ance::ast
             return {name, std::move(type), location};
         }
 
+        core::UnaryOperator expectUnaryOperator(grammar::anceParser::UnaryContext* ctx)
+        {
+            if (ctx == nullptr) return core::UnaryOperator::UNSPECIFIED;
+
+            if (std::any const result = visit(ctx); result.has_value())
+                return std::any_cast<core::UnaryOperator>(result);
+
+            return core::UnaryOperator::UNSPECIFIED;
+        }
+
         core::Assigner expectAssigner(grammar::anceParser::AssignerContext* ctx)
         {
             if (ctx == nullptr) return core::Assigner::UNSPECIFIED;
@@ -532,7 +542,7 @@ namespace ance::ast
 
         std::any visitUnaryOperationExpression(grammar::anceParser::UnaryOperationExpressionContext* ctx) override
         {
-            core::UnaryOperator const  op      = std::any_cast<core::UnaryOperator>(visit(ctx->unary()));
+            core::UnaryOperator const  op      = expectUnaryOperator(ctx->unary());
             utility::Owned<Expression> operand = expectExpression(ctx->expression());
 
             Expression* expression = new UnaryOperation(op, std::move(operand), location(ctx));
@@ -541,7 +551,8 @@ namespace ance::ast
 
         std::any visitUnaryNot(grammar::anceParser::UnaryNotContext*) override
         {
-            return core::UnaryOperator::NOT;
+            core::UnaryOperator op = core::UnaryOperator::NOT;
+            return op;
         }
 
         std::any visitTrue(grammar::anceParser::TrueContext* ctx) override

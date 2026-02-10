@@ -31,10 +31,6 @@ expression
     | 'here' # HereExpression
     ;
 
-unary
-    : 'not' # UnaryNot
-    ;
-
 literal
     : boolean # BooleanLiteral
     | INTEGER # SizeLiteral
@@ -53,6 +49,10 @@ entity
 
 parameter
     : IDENTIFIER ':' expression
+    ;
+
+unary
+    : 'not' # UnaryNot
     ;
 
 assigner
