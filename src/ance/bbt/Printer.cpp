@@ -17,6 +17,22 @@ struct ance::bbt::Printer::Implementation
         explicit BBT(std::ostream& out) : Printer(out) {}
         ~BBT() override = default;
 
+        void visit(Flows const& flows) override
+        {
+            for (auto const& flow : flows.flows)
+            {
+                print("flow ");
+                print(flow->id());
+                print(":");
+                line();
+                enter();
+
+                visit(*flow);
+
+                exit();
+            }
+        }
+
         void visit(UnorderedScope const& scope) override
         {
             for (auto const& flow : scope.flows)
@@ -281,9 +297,9 @@ struct ance::bbt::Printer::Implementation
 ance::bbt::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
 ance::bbt::Printer::~Printer() = default;
 
-void ance::bbt::Printer::print(UnorderedScope const& scope) const
+void ance::bbt::Printer::print(Flows const& flows) const
 {
-    implementation_->print(scope);
+    implementation_->print(flows);
 }
 
 void ance::bbt::Printer::print(Flow const& flow) const

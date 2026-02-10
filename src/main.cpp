@@ -76,6 +76,11 @@ namespace ance
 
         return exit_code;
 
+        // todo: individual files should not have their own unordered scope, instead the global scope should be an unordered scope
+        // todo: as an effect, the lambda in included.nc will be able to access the a, b and c variables
+
+        // todo: test lambdas in lambdas, all should return values (do a negation chain so that value changes)
+
         // todo: adapt lambda syntax so that return type is optional, if omitted it is Unit
 
         // todo: make sure that flows passed to function ctors are also printed and graphed
@@ -117,6 +122,7 @@ namespace ance
 
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
+        // todo: do not forget destructors of global variables - should have reversed order of creation
 
         // todo: add the # and @ operators to the grammar, # takes an identifier and returns an identifier value, and @ resolves an entity and gives a reference to the entity
 

@@ -4,6 +4,11 @@
 
 ance::bbt::Node::Node(core::Location const& source_location) : location(source_location) {}
 
+ance::bbt::Flows::Flows(utility::List<utility::Owned<Flow>> flow_list, core::Location const& source_location)
+    : Node(source_location)
+    , flows(std::move(flow_list))
+{}
+
 ance::bbt::UnorderedScope::UnorderedScope(utility::List<utility::Owned<Flow>> flow_list, core::Location const& source_location)
     : Node(source_location)
     , flows(std::move(flow_list))

@@ -50,9 +50,9 @@ struct ance::cet::Runner::Implementation
         {
             RunPoint(bbt::BasicBlock const& start, Scope* initial_scope) : block(&start), scope(initial_scope) {}
 
-            bbt::BasicBlock const*               block           = nullptr;
-            size_t                               statement_index = 0;
-            Scope*                               scope           = nullptr;
+            bbt::BasicBlock const* block           = nullptr;
+            size_t                 statement_index = 0;
+            Scope*                 scope           = nullptr;
 
             utility::Optional<utility::Shared<bbt::Value>> return_value = std::nullopt;
 
@@ -131,20 +131,21 @@ struct ance::cet::Runner::Implementation
         BBT(sources::SourceTree&                                                                                source_tree,
             core::Reporter&                                                                                     reporter,
             bbt::TypeContext&                                                                                   type_context,
-            std::function<utility::Optional<utility::Owned<bbt::UnorderedScope>>(std::filesystem::path const&)> get_unordered_scope,
+            std::function<utility::Optional<utility::Owned<bbt::Flows>>(std::filesystem::path const&)> get_flows,
             utility::List<utility::Owned<Provider>>&                                                            providers)
             : source_tree_(source_tree)
             , reporter_(reporter)
             , type_context_(type_context)
-            , read_unordered_scope_(std::move(get_unordered_scope))
-            , global_scope_(utility::makeOwned<GlobalScope>(providers, type_context))
+            , read_flows_(std::move(get_flows))
+            , global_language_scope_(utility::makeOwned<GlobalScope>(providers, type_context))
+            , project_scope_(global_language_scope_->addChildScope(utility::makeOwned<UnorderedScope>(*global_language_scope_, type_context)))
         {}
 
         ~BBT() override = default;
 
         void schedule(bbt::Flow const& flow, Scope* scope)
         {
-            run_points_.emplace_back(flow.entry, scope != nullptr ? scope : global_scope_.get());
+            run_points_.emplace_back(flow.entry, scope != nullptr ? scope : &project_scope_);
         }
 
         [[nodiscard]] bool hasRunPoints() const
@@ -318,12 +319,20 @@ struct ance::cet::Runner::Implementation
                 return *state_.current_scope;
             }
 
-            return *global_scope_;
+            return project_scope_;
+        }
+
+        void visit(bbt::Flows const& flows) override
+        {
+            scheduleFlows(flows);
         }
 
         void visit(bbt::UnorderedScope const& scope) override
         {
-            scheduleUnorderedScope(scope);
+            // todo: this is kinda wrong because it does not know in which flow to place the unordered flow
+            assert(false); // todo: that is why we need to change this before we use it
+
+            scheduleUnorderedScope(scope, project_scope_);
         }
 
         void visit(bbt::Flow const&) override
@@ -550,7 +559,7 @@ struct ance::cet::Runner::Implementation
                 arguments.emplace_back(scope().getTemporary(argument.get()).read());
             }
 
-            Scope& function_scope = global_scope_->addChildScope(utility::makeOwned<OrderedScope>(*global_scope_, type_context_));
+            Scope& function_scope = project_scope_.addChildScope(utility::makeOwned<OrderedScope>(project_scope_, type_context_));
 
             for (size_t index = 0; index < signature.arity(); ++index)
             {
@@ -694,11 +703,19 @@ struct ance::cet::Runner::Implementation
         sources::SourceTree&                                                                                source_tree_;
         core::Reporter&                                                                                     reporter_;
         bbt::TypeContext&                                                                                   type_context_;
-        std::function<utility::Optional<utility::Owned<bbt::UnorderedScope>>(std::filesystem::path const&)> read_unordered_scope_;
+        std::function<utility::Optional<utility::Owned<bbt::Flows>>(std::filesystem::path const&)> read_flows_;
 
-        void scheduleUnorderedScope(bbt::UnorderedScope const& scope)
+        void scheduleFlows(bbt::Flows const& flows)
         {
-            Scope& unordered_scope = global_scope_->addChildScope(utility::makeOwned<UnorderedScope>(*global_scope_, type_context_));
+            for (auto const& flow : flows.flows)
+            {
+                schedule(*flow, &project_scope_);
+            }
+        }
+
+        void scheduleUnorderedScope(bbt::UnorderedScope const& scope, Scope& parent_scope)
+        {
+            Scope& unordered_scope = parent_scope.addChildScope(utility::makeOwned<UnorderedScope>(parent_scope, type_context_));
 
             for (auto const& flow : scope.flows)
             {
@@ -707,26 +724,28 @@ struct ance::cet::Runner::Implementation
         }
 
         std::function<void(std::filesystem::path const&)> include_ = [this](std::filesystem::path const& path) {
-            utility::Optional<utility::Owned<bbt::UnorderedScope>> scope = read_unordered_scope_(path);
+            utility::Optional<utility::Owned<bbt::Flows>> flows = read_flows_(path);
 
-            if (!scope.hasValue())
+            if (!flows.hasValue())
             {
                 abort();
                 return;
             }
 
-            bbt::UnorderedScope const& scope_ref = **scope;
+            bbt::Flows const& flows_ref = **flows;
 
-            roots_.emplace_back(std::move(*scope));
+            included_flows_.emplace_back(std::move(*flows));
 
-            scheduleUnorderedScope(scope_ref);
+            scheduleFlows(flows_ref);
         };
 
         IntrinsicsRunner intrinsics_ {source_tree_, reporter_, type_context_, include_};
 
         std::list<RunPoint>                                run_points_ = {};
-        utility::List<utility::Owned<bbt::UnorderedScope>> roots_;
-        utility::Owned<GlobalScope>                        global_scope_;
+        utility::List<utility::Owned<bbt::Flows>>          included_flows_ = {};
+
+        utility::Owned<GlobalScope> global_language_scope_;
+        Scope&                      project_scope_;
 
         struct State
         {
@@ -767,8 +786,8 @@ struct ance::cet::Runner::Implementation
 
             for (auto iterator = bbt.getRunPointBegin(); iterator != bbt.getRunPointEnd();)
             {
-                BBT::RunPoint& run_point = *iterator;
-                BBT::ExecutionResult const result = bbt.execute(run_point);
+                BBT::RunPoint&             run_point = *iterator;
+                BBT::ExecutionResult const result    = bbt.execute(run_point);
 
                 if (result == BBT::ExecutionResult::Completed)
                 {
@@ -818,26 +837,24 @@ struct ance::cet::Runner::Implementation
         if (!flow.hasValue()) return std::nullopt;
 
         utility::Owned<BBT> bbt =
-            utility::makeOwned<BBT>(source_tree_, reporter_, type_context_, [&](std::filesystem::path const& f) { return readUnorderedScope(f); }, providers_);
+            utility::makeOwned<BBT>(source_tree_, reporter_, type_context_, [&](std::filesystem::path const& f) { return readUnorderedFile(f); }, providers_);
         bbt->schedule(**flow, nullptr);
 
         bool const ok = run(*bbt);
 
-        if (!ok)
-            return std::nullopt;
+        if (!ok) return std::nullopt;
 
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
 
         context_.print<Printer>(*unit, "cet", file);
         context_.graph<Grapher>(*unit, "cet", file);
 
-        if (reporter_.isFailed())
-            return std::nullopt;
+        if (reporter_.isFailed()) return std::nullopt;
 
         return unit;
     }
 
-    utility::Optional<utility::Owned<bbt::UnorderedScope>> readUnorderedScope(std::filesystem::path const& file)
+    utility::Optional<utility::Owned<bbt::Flows>> readUnorderedFile(std::filesystem::path const& file)
     {
         return segmenter_.segmentUnorderedFile(file);
     }

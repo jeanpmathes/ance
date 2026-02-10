@@ -26,8 +26,18 @@ namespace ance::bbt
 
     struct Flow;
 
+    /// A set of flows, e.g. all flows of a file.
+    struct Flows final
+        : Node
+        , utility::ConcreteNode<Flows, Visitor>
+    {
+        Flows(utility::List<utility::Owned<Flow>> flow_list, core::Location const& source_location);
+
+        utility::List<utility::Owned<Flow>> flows = {};
+    };
+
     /// An unordered scope contains a set of parts which are evaluated in an unspecified order.
-    /// An example of an unordered scope is the top-level of any file except for the primary file.
+    /// An example of an unordered scope is the scope in which the flows of all files are placed, which is the project scope.
     struct UnorderedScope final
         : Node
         , utility::ConcreteNode<UnorderedScope, Visitor>
@@ -341,6 +351,7 @@ namespace ance::bbt
       public:
         using AbstractVisitor::visit;
 
+        virtual void visit(Flows const& flows) = 0;
         virtual void visit(UnorderedScope const& unordered_scope) = 0;
 
         virtual void visit(Flow const& flow) = 0;

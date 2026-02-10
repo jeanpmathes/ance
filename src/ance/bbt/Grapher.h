@@ -7,7 +7,7 @@
 
 namespace ance::bbt
 {
-    struct UnorderedScope;
+    struct Flows;
     struct Flow;
 
     /// Graphs the BBT to a stream.
@@ -17,7 +17,7 @@ namespace ance::bbt
         explicit Grapher(std::ostream& out);
         ~Grapher();
 
-        void graph(UnorderedScope const& scope) const;
+        void graph(Flows const& flows) const;
         void graph(Flow const& flow) const;
 
     private:

@@ -401,7 +401,7 @@ struct ance::bbt::Segmenter::Implementation
             utility::Optional<std::reference_wrapper<SimpleBB>> exit_  = {};
         };
 
-        utility::Owned<UnorderedScope> apply(est::File const& file)
+        utility::Owned<Flows> apply(est::File const& file)
         {
             utility::List<utility::Owned<Flow>> flows;
 
@@ -410,7 +410,7 @@ struct ance::bbt::Segmenter::Implementation
                 flows.emplace_back(apply(*declaration.statement, false, declaration.name));
             }
 
-            return utility::makeOwned<UnorderedScope>(std::move(flows), file.location);
+            return utility::makeOwned<Flows>(std::move(flows), file.location);
         }
 
         utility::Owned<Flow> apply(est::Statement const& statement, bool is_function, std::string id)
@@ -1082,21 +1082,21 @@ struct ance::bbt::Segmenter::Implementation
         return flow;
     }
 
-    utility::Optional<utility::Owned<UnorderedScope>> segmentUnorderedFile(std::filesystem::path const& file)
+    utility::Optional<utility::Owned<Flows>> segmentUnorderedFile(std::filesystem::path const& file)
     {
         utility::Optional<utility::Owned<est::File>> expanded = expander_.expandUnorderedFile(file);
         if (!expanded.hasValue()) return std::nullopt;
 
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
 
-        utility::Owned<UnorderedScope> scope = ret->apply(**expanded);
+        utility::Owned<Flows> flows = ret->apply(**expanded);
 
-        context_.print<Printer>(*scope, "bbt", file);
-        context_.graph<Grapher>(*scope, "bbt", file);
+        context_.print<Printer>(*flows, "bbt", file);
+        context_.graph<Grapher>(*flows, "bbt", file);
 
         if (reporter_.isFailed()) return std::nullopt;
 
-        return scope;
+        return flows;
     }
 
   private:
@@ -1118,7 +1118,7 @@ ance::utility::Optional<ance::utility::Owned<ance::bbt::Flow>> ance::bbt::Segmen
     return implementation_->segmentOrderedFile(file);
 }
 
-ance::utility::Optional<ance::utility::Owned<ance::bbt::UnorderedScope>> ance::bbt::Segmenter::segmentUnorderedFile(std::filesystem::path const& file)
+ance::utility::Optional<ance::utility::Owned<ance::bbt::Flows>> ance::bbt::Segmenter::segmentUnorderedFile(std::filesystem::path const& file)
 {
     return implementation_->segmentUnorderedFile(file);
 }

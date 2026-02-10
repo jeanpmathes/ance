@@ -16,8 +16,8 @@ namespace ance::sources
 
 namespace ance::bbt
 {
-    struct UnorderedScope;
     struct Flow;
+    struct Flows;
 
     /// Segments RETs into BBTs.
     class Segmenter
@@ -31,10 +31,10 @@ namespace ance::bbt
         /// \return The control flow built from the file.
         utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file);
 
-        /// Segment an unordered file into an unordered scope.
+        /// Segment an unordered file into the set of flows it contains.
         /// \param file The path to the file to segment.
         /// \return The unordered scope built from the file.
-        utility::Optional<utility::Owned<UnorderedScope>> segmentUnorderedFile(std::filesystem::path const& file);
+        utility::Optional<utility::Owned<Flows>> segmentUnorderedFile(std::filesystem::path const& file);
 
       private:
         struct Implementation;

@@ -64,6 +64,8 @@ namespace ance::cet
         std::list<utility::Owned<Scope>>                           child_scopes_ = {};
     };
 
+    /// The global scope, which is the root of all scopes.
+    /// Note that it is even higher than the scope of the compiled unit, as it contains providers and dependencies as well.
     class GlobalScope final : public Scope
     {
       public:
