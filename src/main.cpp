@@ -74,11 +74,7 @@ namespace ance
         reporter.report();
 
         return exit_code;
-
-        // todo: make sure that flows passed to function ctors are also printed and graphed
-        // todo: in printer, put those flows into list that is printed when all other flows are printed
-        // todo: in grapher, do the same, needs that all statements are visited
-
+        
         // todo: check if unreachable code detection works or needs to be added (with return in lambda)
 
         // todo: remove entity from grammar, put IDENTIFIER directly in access, assignment should require expression on left side (so only one resolve in Expander)

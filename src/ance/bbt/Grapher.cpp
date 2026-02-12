@@ -2,6 +2,8 @@
 
 #include <sstream>
 #include <string>
+#include <unordered_set>
+#include <queue>
 
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Printer.h"
@@ -21,14 +23,10 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(Flows const& flows) override
         {
-            beginGraph();
-
             for (auto const& flow : flows.flows)
             {
-                graphFlow(*flow, flow->id());
+                visit(*flow);
             }
-
-            endGraph();
         }
 
         void visit(UnorderedScope const& scope) override
@@ -37,19 +35,39 @@ struct ance::bbt::Grapher::Implementation
 
             for (auto const& flow : scope.flows)
             {
-                graphFlow(*flow, flow->id());
+                visit(*flow);
             }
-
-            endGraph();
         }
 
         void visit(Flow const& flow) override
         {
-            beginGraph();
+            auto [_, inserted] = graphed_flows_.insert(&flow);
+            if (!inserted) return;
 
-            graphFlow(flow, "flow");
+            bool const is_top_level_flow = flow_depth_ == 0;
+            flow_depth_++;
 
-            endGraph();
+            beginGroup(flow.id());
+
+            for (auto& block : flow.blocks)
+            {
+                visit(*block);
+            }
+
+            endGroup();
+
+            if (is_top_level_flow)
+            {
+                while (!nested_flows_to_graph_.empty())
+                {
+                    visit(*nested_flows_to_graph_.front());
+                    nested_flows_to_graph_.pop();
+                }
+
+                graphed_flows_.clear();
+            }
+
+            flow_depth_--;
         }
 
         void visit(BasicBlock const& block) override
@@ -63,6 +81,11 @@ struct ance::bbt::Grapher::Implementation
             addNode(code.str(), block.id, Style::CODE);
 
             current_id_ = block.id;
+
+            for (auto& statement : block.statements)
+            {
+                visit(*statement);
+            }
 
             visit(*block.link);
         }
@@ -103,7 +126,10 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(Call const&) override {}
 
-        void visit(AnonymousFunctionConstructor const&) override {}
+        void visit(AnonymousFunctionConstructor const& function_constructor) override
+        {
+            nested_flows_to_graph_.push(function_constructor.body.get());
+        }
 
         void visit(Constant const&) override {}
 
@@ -121,20 +147,22 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(SetReturnValue const&) override {}
 
-      private:
-        void graphFlow(Flow const& flow, std::string const& label)
+        void begin()
         {
-            beginGroup(label);
-
-            for (auto& block : flow.blocks)
-            {
-                visit(*block);
-            }
-
-            endGroup();
+            beginGraph();
         }
 
+        void end()
+        {
+            endGraph();
+        }
+
+      private:
         size_t current_id_ = 0;
+
+        size_t flow_depth_ = 0;
+        std::queue<Flow const*> nested_flows_to_graph_;
+        std::unordered_set<Flow const*> graphed_flows_;
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}
@@ -142,7 +170,9 @@ struct ance::bbt::Grapher::Implementation
     void graph(Node const& node) const
     {
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(out_);
+        bbt->begin();
         bbt->visit(node);
+        bbt->end();
     }
 
   private:

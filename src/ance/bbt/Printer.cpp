@@ -1,5 +1,8 @@
 #include "Printer.h"
 
+#include <unordered_set>
+#include <queue>
+
 #include "ance/core/Printer.h"
 
 #include "Value.h"
@@ -21,15 +24,7 @@ struct ance::bbt::Printer::Implementation
         {
             for (auto const& flow : flows.flows)
             {
-                print("flow ");
-                print(flow->id());
-                print(":");
-                line();
-                enter();
-
                 visit(*flow);
-
-                exit();
             }
         }
 
@@ -37,25 +32,44 @@ struct ance::bbt::Printer::Implementation
         {
             for (auto const& flow : scope.flows)
             {
-                print("flow ");
-                print(flow->id());
-                print(":");
-                line();
-                enter();
-
                 visit(*flow);
-
-                exit();
             }
         }
 
         void visit(Flow const& flow) override
         {
+            auto [_, inserted] = printed_flows_.insert(&flow);
+            if (!inserted) return;
+
+            bool const is_top_level_flow = flow_depth_ == 0;
+            flow_depth_++;
+
+            print("flow ");
+            print(flow.id());
+            print(":");
+            line();
+            enter();
+
             for (auto& block : flow.blocks)
             {
                 visit(*block);
                 line();
             }
+
+            exit();
+
+            if (is_top_level_flow)
+            {
+                while (!nested_flows_to_print_.empty())
+                {
+                    visit(*nested_flows_to_print_.front());
+                    nested_flows_to_print_.pop();
+                }
+
+                printed_flows_.clear();
+            }
+
+            flow_depth_--;
         }
 
         void visit(BasicBlock const& block) override
@@ -195,7 +209,7 @@ struct ance::bbt::Printer::Implementation
             print(function_constructor.destination.id());
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
-            print(" Function::ctor ( Signature::ctor (");
+            print(" Function::ctor(Signature::ctor(");
             for (size_t i = 0; i < function_constructor.parameters.size(); ++i)
             {
                 print("(");
@@ -210,6 +224,8 @@ struct ance::bbt::Printer::Implementation
             print("), flow ");
             print(function_constructor.body->id());
             print(";");
+
+            nested_flows_to_print_.push(function_constructor.body.get());
         }
 
         void visit(Constant const& constant) override
@@ -280,6 +296,11 @@ struct ance::bbt::Printer::Implementation
             print(set_return_value.value.id());
             print(";");
         }
+
+      private:
+        size_t flow_depth_ = 0;
+        std::queue<Flow const*> nested_flows_to_print_;
+        std::unordered_set<Flow const*> printed_flows_;
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}
