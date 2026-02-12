@@ -93,11 +93,17 @@ void ance::core::Location::extend(Location const& location)
         return;
     }
 
-    start_line_   = std::min(start_line_, location.start_line_);
-    start_column_ = std::min(start_column_, location.start_column_);
+    if (location.start_line_ < start_line_ || (location.start_line_ == start_line_ && location.start_column_ < start_column_))
+    {
+        start_line_   = location.start_line_;
+        start_column_ = location.start_column_;
+    }
 
-    end_line_   = std::max(end_line_, location.end_line_);
-    end_column_ = std::max(end_column_, location.end_column_);
+    if (location.end_line_ > end_line_ || (location.end_line_ == end_line_ && location.end_column_ > end_column_))
+    {
+        end_line_   = location.end_line_;
+        end_column_ = location.end_column_;
+    }
 }
 
 ance::core::Location ance::core::Location::first() const
