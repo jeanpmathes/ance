@@ -39,7 +39,9 @@ struct ance::build::Compiler::Implementation
         (void) context_;    // todo: use or remove
         (void) source_tree_;// todo: use or remove
 
-        return reporter_.isFailed();
+        bool const ok = !reporter_.isFailed();
+
+        return ok;
     }
 
   private:

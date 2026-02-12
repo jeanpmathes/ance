@@ -142,14 +142,14 @@ namespace ance::ast
         utility::Optional<utility::Owned<Expression>> value;
     };
 
-    /// An assignment statement assigns a value to a variable.
+    /// An assignment statement assigns a value to an assignable.
     struct Assignment final
         : Statement
         , utility::ConcreteNode<Assignment, Visitor>
     {
-        Assignment(core::Identifier const& assigned, core::Assigner assignment, utility::Owned<Expression> expression, core::Location const& source_location);
+        Assignment(utility::Owned<Expression> left, core::Assigner assignment, utility::Owned<Expression> right, core::Location const& source_location);
 
-        core::Identifier           identifier;
+        utility::Owned<Expression> assignee;
         core::Assigner             assigner;
         utility::Owned<Expression> value;
     };

@@ -68,14 +68,15 @@ namespace ance
 
         if (unit.hasValue())
         {
-            if (compiler.compile(**unit)) { exit_code = EXIT_SUCCESS; }
+            if (compiler.compile(**unit))
+            {
+                exit_code = EXIT_SUCCESS;
+            }
         }
 
         reporter.report();
 
         return exit_code;
-
-        // todo: remove entity from grammar, put IDENTIFIER directly in access, assignment should require expression on left side (so only one resolve in Expander)
 
         // todo: add function declarations (for now cmp only, must be in syntax)
 
@@ -111,6 +112,8 @@ namespace ance
         // todo: do not forget destructors of global variables - should have reversed order of creation
 
         // todo: add the # and @ operators to the grammar, # takes an identifier and returns an identifier value, and @ resolves an entity and gives a reference to the entity
+
+        // todo: check what happens when an expression that does not make sense as a statement is used as a statement, e.g. unary op, think about what to do
 
         // todo: when adding erase, check where it is used in expansion, instead use scoping
         // todo: correctly call copy and move functions for all linearized temporary using nodes in BBT and CET

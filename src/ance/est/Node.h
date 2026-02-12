@@ -94,7 +94,7 @@ namespace ance::est
         utility::Owned<Expression> expression;
     };
 
-    /// A write statement writes a value to a variable.
+    /// A write statement writes a value to an assignable.
     struct Write final
         : Statement
         , utility::ConcreteNode<Write, Visitor>

@@ -13,7 +13,7 @@ statement
     : '{' ( statement )* '}' # BlockStatement
     | expression ';' # ExpressionStatement
     | 'let' IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # LetStatement // todo: type inference - maybe before doing real type inference just do expansion to typeof(expression) if no type is set
-    | entity assigner expression ';' # AssignmentStatement
+    | assignee=expression assigner assgined=expression ';' # AssignmentStatement
     | 'if' expression 'then' trueBlock=statement ( 'else' falseBlock=statement )? # IfStatement
     | 'loop' statement # LoopStatement
     | 'break' ';' # BreakStatement
@@ -23,13 +23,26 @@ statement
     ;
 
 expression
-    : callee=expression '(' (expression (',' expression)* )? ')' # CallExpression // todo: should become an operator
-    | '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
-    | entity # AccessExpression
+    : unaryExpression
+    ;
+
+unaryExpression
+    : unary target=unaryExpression # UnaryOperationExpression
+    | postfixExpression # PostfixExpressionExpression
+    ;
+
+postfixExpression
+    : callee=postfixExpression '(' (expression (',' expression)* )? ')' # CallExpression // todo: should become an operator
+    | primaryExpression # PrimaryExpressionExpression
+    ;
+
+primaryExpression
+    : '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
+    | IDENTIFIER # AccessExpression
     | literal # LiteralExpression
-    | unary expression # UnaryOperationExpression
     | 'here' # HereExpression
     ;
+
 
 literal
     : boolean # BooleanLiteral
@@ -41,10 +54,6 @@ literal
 boolean
     : 'true' # True
     | 'false' # False
-    ;
-
-entity
-    : IDENTIFIER
     ;
 
 parameter

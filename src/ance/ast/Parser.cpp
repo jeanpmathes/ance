@@ -421,16 +421,16 @@ namespace ance::ast
 
         std::any visitAssignmentStatement(grammar::anceParser::AssignmentStatementContext* ctx) override
         {
-            core::Identifier const     assigned = identifier(ctx->entity()->IDENTIFIER());
+            utility::Owned<Expression> assignee = expectExpression(ctx->assignee);
             core::Assigner const       assigner = expectAssigner(ctx->assigner());
-            utility::Owned<Expression> value    = expectExpression(ctx->expression());
+            utility::Owned<Expression> assigned = expectExpression(ctx->assgined);
 
             if (assigner.isFinal())
             {
                 reporter_.error("Assignment to existing variable cannot be final", location(ctx->assigner()));
             }
 
-            Statement* statement = new Assignment(assigned, assigner, std::move(value), location(ctx));
+            Statement* statement = new Assignment(std::move(assignee), assigner, std::move(assigned), location(ctx));
             return statement;
         }
 
@@ -487,17 +487,22 @@ namespace ance::ast
             return statement;
         }
 
+        std::any visitUnaryOperationExpression(grammar::anceParser::UnaryOperationExpressionContext* ctx) override
+        {
+            core::UnaryOperator const  op      = expectUnaryOperator(ctx->unary());
+            utility::Owned<Expression> operand = expectExpression(ctx->target);
+
+            Expression* expression = new UnaryOperation(op, std::move(operand), location(ctx));
+            return expression;
+        }
+
         std::any visitCallExpression(grammar::anceParser::CallExpressionContext* ctx) override
         {
             utility::Owned<Expression> callee = expectExpression(ctx->callee);
 
             utility::List<utility::Owned<Expression>> arguments;
             for (grammar::anceParser::ExpressionContext* expression : ctx->expression())
-            {
-                if (expression == ctx->callee) continue;
-
                 arguments.push_back(expectExpression(expression));
-            }
 
             Expression* expression = new Call(std::move(callee), std::move(arguments), location(ctx));
             return expression;
@@ -532,7 +537,7 @@ namespace ance::ast
 
         std::any visitAccessExpression(grammar::anceParser::AccessExpressionContext* ctx) override
         {
-            core::Identifier const accessed = identifier(ctx->entity()->IDENTIFIER());
+            core::Identifier const accessed = identifier(ctx->IDENTIFIER());
 
             Expression* expression = new Access(accessed, location(ctx));
             return expression;
@@ -541,15 +546,6 @@ namespace ance::ast
         std::any visitHereExpression(grammar::anceParser::HereExpressionContext* ctx) override
         {
             Expression* expression = new Here(location(ctx));
-            return expression;
-        }
-
-        std::any visitUnaryOperationExpression(grammar::anceParser::UnaryOperationExpressionContext* ctx) override
-        {
-            core::UnaryOperator const  op      = expectUnaryOperator(ctx->unary());
-            utility::Owned<Expression> operand = expectExpression(ctx->expression());
-
-            Expression* expression = new UnaryOperation(op, std::move(operand), location(ctx));
             return expression;
         }
 

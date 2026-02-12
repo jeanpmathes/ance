@@ -11,8 +11,6 @@
 #include <utility>
 #include <vector>
 
-#include "ance/core/Intrinsic.h"
-
 #include "ance/bbt/Function.h"
 #include "ance/bbt/IntrinsicSignature.h"
 #include "ance/bbt/Node.h"

@@ -118,7 +118,7 @@ struct ance::ast::Printer::Implementation
 
         void visit(Assignment const& assignment) override
         {
-            print(assignment.identifier);
+            visit(*assignment.assignee);
             print(" ");
             print(assignment.assigner);
             print(" ");

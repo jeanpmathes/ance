@@ -67,15 +67,15 @@ ance::ast::Let::Let(core::Identifier const&                       name,
     , value(std::move(definition))
 {}
 
-ance::ast::Assignment::Assignment(core::Identifier const&    assigned,
+ance::ast::Assignment::Assignment(utility::Owned<Expression>    left,
                                   core::Assigner             assignment,
-                                  utility::Owned<Expression> expression,
+                                  utility::Owned<Expression> right,
                                   core::Location const&      source_location)
     : Node(source_location)
     , Statement()
-    , identifier(assigned)
+    , assignee(std::move(left))
     , assigner(assignment)
-    , value(std::move(expression))
+    , value(std::move(right))
 {}
 
 ance::ast::If::If(utility::Owned<Expression>                   expression,

@@ -372,7 +372,7 @@ struct ance::est::Expander::Implementation
             Temporary const& declared =
                 builder.pushTemporary(std::move(declared_expression), "VariableDeclaration_DefaultValue", variable_declaration.location);
 
-            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(declared, variable_declaration.location),
+            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<Read>(utility::makeOwned<ReadTemporary>(declared, variable_declaration.location), variable_declaration.location),
                                                             utility::makeOwned<ReadTemporary>(*initial_value, variable_declaration.location),
                                                             variable_declaration.location));
 
@@ -439,7 +439,7 @@ struct ance::est::Expander::Implementation
 
             Temporary const& declared = builder.pushTemporary(std::move(declared_expression), "Let_Declared", let.location);
 
-            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(declared, let.location),
+            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<Read>(utility::makeOwned<ReadTemporary>(declared, let.location), let.location),
                                                             utility::makeOwned<ReadTemporary>(*initial_value, let.location),
                                                             let.location));
 
@@ -450,17 +450,10 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
+            utility::Owned<Expression> assignee = builder.pushExpansion(*assignment.assignee);
             utility::Owned<Expression> value = builder.pushExpansion(*assignment.value);
 
-            utility::Owned<Expression> resolved_expression = intrinsic(core::Intrinsic::RESOLVE,
-                                                                       assignment.location,
-                                                                       utility::makeOwned<CurrentScope>(assignment.location),
-                                                                       utility::makeOwned<IdentifierCapture>(assignment.identifier, assignment.location));
-
-            Temporary const& resolved = builder.pushTemporary(std::move(resolved_expression), "Assignment_Resolved", assignment.location);
-
-            builder.pushStatement(
-                utility::makeOwned<Write>(utility::makeOwned<ReadTemporary>(resolved, assignment.location), std::move(value), assignment.location));
+            builder.pushStatement(utility::makeOwned<Write>(std::move(assignee), std::move(value), assignment.location));
 
             result_.setStatements(builder.take());
         }

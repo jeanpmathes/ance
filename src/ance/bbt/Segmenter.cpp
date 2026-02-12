@@ -673,11 +673,7 @@ struct ance::bbt::Segmenter::Implementation
             auto& value = builder.addTemporary("Write_Value", assignment.value->location);
             builder.addSegmented(*assignment.value, value);
 
-            // We also need an access and a temporary to store the result of that.
-
-            auto& accessed = builder.addTemporary("Write_Accessed", assignment.value->location);
-            builder.addStatement<Access>(target, accessed, assignment.location);
-            builder.addStatement<Store>(accessed, value, assignment.location);
+            builder.addStatement<Store>(target, value, assignment.location);
 
             setResult(builder.take());
         }
