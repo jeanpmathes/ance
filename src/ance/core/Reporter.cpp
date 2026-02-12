@@ -15,6 +15,7 @@ namespace ansi
     inline auto ColorRed    = "\x1B[31m";
     inline auto ColorYellow = "\x1B[33m";
     inline auto ColorBlue   = "\x1B[34m";
+    inline auto ColorDim    = "\x1B[90m";
 
     inline auto ColorReset = "\x1B[0m";
 }
@@ -92,6 +93,18 @@ struct ance::core::Reporter::Implementation
 
     Implementation(sources::SourceTree& source_tree, std::ostream& out) : source_tree_(source_tree), out_(out) {}
 
+    static char const* colorForLevel(Level level)
+    {
+        switch (level)
+        {
+            case Level::ERROR: return ansi::ColorRed;
+            case Level::WARNING: return ansi::ColorYellow;
+            case Level::INFO: return ansi::ColorBlue;
+        }
+
+        return ansi::ColorReset;
+    }
+
     void report(Level level, std::string const& message, Location location)
     {
         if (level == Level::ERROR) error_count_++;
@@ -146,9 +159,15 @@ struct ance::core::Reporter::Implementation
                 size_t const marker_start  = std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 0uz);
                 size_t const marker_length = std::max(text::estimateWidth(text_with_mark) + missing_with_mark, 1uz);
 
-                out_ << '\t' << std::string(marker_start, ' ') << std::string(marker_length, '~') << std::endl;
-                out_ << std::endl;
+                out_ << '\t' << std::string(marker_start, ' ') << colorForLevel(level) << std::string(marker_length, '~') << ansi::ColorReset << std::endl;
             }
+            else
+            {
+                size_t const extra_lines = location.lineEnd() - location.line();
+                out_ << '\t' << ansi::ColorDim << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")" << ansi::ColorReset << std::endl;
+            }
+
+            out_ << std::endl;
     }
 
     void clear()

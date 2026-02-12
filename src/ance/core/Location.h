@@ -42,6 +42,10 @@ namespace ance::core
         /// \return The column number.
         [[nodiscard]] size_t column() const;
 
+        /// Get the last line of this location.
+        /// \return The last line number. Can be equal to line for single line locations.
+        [[nodiscard]] size_t lineEnd() const;
+
         /// Get the last column of this location.
         /// \return The last column number. Can be equal to column for single character locations.
         [[nodiscard]] size_t columnEnd() const;
@@ -83,11 +87,11 @@ namespace ance::core
         friend std::ostream& operator<<(std::ostream& os, Location const& location);
 
       private:
-        size_t                  start_line_;
-        size_t                  start_column_;
-        [[maybe_unused]] size_t end_line_;
-        [[maybe_unused]] size_t end_column_;
-        size_t                  file_index_;
+        size_t start_line_;
+        size_t start_column_;
+        size_t end_line_;
+        size_t end_column_;
+        size_t file_index_;
     };
 }
 

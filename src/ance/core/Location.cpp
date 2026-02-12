@@ -47,6 +47,11 @@ size_t ance::core::Location::column() const
     return start_column_;
 }
 
+size_t ance::core::Location::lineEnd() const
+{
+    return end_line_;
+}
+
 size_t ance::core::Location::columnEnd() const
 {
     return end_column_;

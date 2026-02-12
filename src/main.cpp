@@ -74,8 +74,6 @@ namespace ance
         reporter.report();
 
         return exit_code;
-        
-        // todo: check if unreachable code detection works or needs to be added (with return in lambda)
 
         // todo: remove entity from grammar, put IDENTIFIER directly in access, assignment should require expression on left side (so only one resolve in Expander)
 
