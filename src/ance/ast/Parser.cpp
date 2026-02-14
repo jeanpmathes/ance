@@ -388,6 +388,27 @@ namespace ance::ast
             return declaration;
         }
 
+        std::any visitFunctionDeclaration(grammar::anceParser::FunctionDeclarationContext* ctx) override
+        {
+            core::AccessModifier const access_modifier = expectAccessModifier(ctx->accessModifier());
+            core::Identifier const     name            = identifier(ctx->IDENTIFIER());
+
+            utility::List<Parameter> parameters;
+            for (grammar::anceParser::ParameterContext* parameter_ctx : ctx->parameter()) parameters.push_back(expectParameter(parameter_ctx));
+
+            utility::Optional<utility::Owned<Expression>> return_type;
+            if (ctx->type != nullptr)
+            {
+                return_type = expectExpression(ctx->type);
+            }
+
+            utility::Owned<Statement> body = utility::Owned<Statement>(*createBlockStatement(ctx->statement(), location(ctx)));
+
+            Declaration* declaration =
+                new FunctionDeclaration(access_modifier, name, std::move(parameters), std::move(return_type), std::move(body), location(ctx));
+            return declaration;
+        }
+
         std::any visitBlockStatement(grammar::anceParser::BlockStatementContext* ctx) override
         {
             Statement* statement = createBlockStatement(ctx->statement(), location(ctx));

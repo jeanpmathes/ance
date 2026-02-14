@@ -27,6 +27,7 @@ namespace ance::ast
     struct Declaration;
     struct Statement;
     struct Expression;
+    struct Parameter;
 
     /// Represents a source file creating an unordered scope.
     /// Note that actual source files may contain a top-level ordered scope,
@@ -82,6 +83,25 @@ namespace ance::ast
         utility::Owned<Expression>                    type;
         core::Assigner                                assigner;
         utility::Optional<utility::Owned<Expression>> value;
+    };
+
+    /// A function declaration in an unordered scope.
+    struct FunctionDeclaration final
+        : Declaration
+        , utility::ConcreteNode<FunctionDeclaration, Visitor>
+    {
+        FunctionDeclaration(core::AccessModifier                          access,
+                            core::Identifier const&                       name,
+                            utility::List<Parameter>                      params,
+                            utility::Optional<utility::Owned<Expression>> type,
+                            utility::Owned<Statement>                     function_body,
+                            core::Location const&                         source_location);
+
+        core::AccessModifier                          access_modifier;
+        core::Identifier                              identifier;
+        utility::List<Parameter>                      parameters;
+        utility::Optional<utility::Owned<Expression>> return_type;
+        utility::Owned<Statement>                     body;
     };
 
     /// A statement is an independent part of code.
@@ -348,9 +368,10 @@ namespace ance::ast
 
         virtual void visit(File const& file) = 0;
 
-        virtual void visit(ErrorDeclaration const& error)       = 0;
-        virtual void visit(RunnableDeclaration const& runnable) = 0;
-        virtual void visit(VariableDeclaration const& global)   = 0;
+        virtual void visit(ErrorDeclaration const& error)          = 0;
+        virtual void visit(RunnableDeclaration const& runnable)  = 0;
+        virtual void visit(VariableDeclaration const& global)    = 0;
+        virtual void visit(FunctionDeclaration const& function)  = 0;
 
         virtual void visit(ErrorStatement const& error)        = 0;
         virtual void visit(Block const& block)                 = 0;

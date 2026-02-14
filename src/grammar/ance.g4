@@ -7,6 +7,7 @@ orderedScopeFile : statement EOF ;
 declaration
     : 'do' statement # RunnableDeclaration
     | accessModifier 'cmp' IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # VariableDeclaration
+    | accessModifier 'cmp' IDENTIFIER '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? '{' ( statement )* '}' # FunctionDeclaration
     ;
 
 statement

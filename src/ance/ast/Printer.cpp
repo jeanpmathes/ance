@@ -65,6 +65,29 @@ struct ance::ast::Printer::Implementation
             print(";");
         }
 
+        void visit(FunctionDeclaration const& function_declaration) override
+        {
+            print(function_declaration.access_modifier);
+            print(" cmp ");
+            print(function_declaration.identifier);
+            print(" (");
+            for (size_t index = 0; index < function_declaration.parameters.size(); ++index)
+            {
+                print(function_declaration.parameters[index].identifier);
+                print(": ");
+                visit(*function_declaration.parameters[index].type);
+                if (index + 1 < function_declaration.parameters.size()) print(", ");
+            }
+            print(")");
+            if (function_declaration.return_type.hasValue())
+            {
+                print(" : ");
+                visit(**function_declaration.return_type);
+            }
+            line();
+            visit(*function_declaration.body);
+        }
+
         void visit(ErrorStatement const&) override
         {
             print("// error");

@@ -140,9 +140,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: try claude feature-dev for this
-        // todo: add function declarations (for now cmp only, must be in syntax)
-
         // todo: modernize the cmake, e.g. target variants of commands if that is better
 
         // todo: add a way to call intrinsics from source code with the intrinsic expression intrinsic "name" (args...)
@@ -161,6 +158,8 @@ namespace ance
         // todo: WHEN WORKING ON TYPES: TYPES SHOULD DEFINE THEIR OPS USING SOURCE CODE (HARDCODED IN C++), just like the core functions, using intrinsics
 
         // todo: reduce duplication between temporary and variable
+
+        // todo: go through all TODOs in the other code, check if completable now or soon or maybe already completed, potentially move them here
 
         // todo: rework SourceFile class to read into single string buffer, then use string views instead of line-by-line reading
 

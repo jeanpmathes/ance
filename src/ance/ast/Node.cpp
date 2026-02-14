@@ -30,6 +30,21 @@ ance::ast::VariableDeclaration::VariableDeclaration(core::AccessModifier        
     , value(std::move(definition))
 {}
 
+ance::ast::FunctionDeclaration::FunctionDeclaration(core::AccessModifier                          access,
+                                                    core::Identifier const&                       name,
+                                                    utility::List<Parameter>                      params,
+                                                    utility::Optional<utility::Owned<Expression>> type,
+                                                    utility::Owned<Statement>                     function_body,
+                                                    core::Location const&                         source_location)
+    : Node(source_location)
+    , Declaration()
+    , access_modifier(access)
+    , identifier(name)
+    , parameters(std::move(params))
+    , return_type(std::move(type))
+    , body(std::move(function_body))
+{}
+
 bool ance::ast::Statement::isCompound() const
 {
     return false;

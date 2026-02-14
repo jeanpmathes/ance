@@ -382,6 +382,58 @@ struct ance::est::Expander::Implementation
             });
         }
 
+        void visit(ast::FunctionDeclaration const& function_declaration) override
+        {
+            SBuilder builder(*this);
+
+            utility::Owned<Expression> type = builder.pushExpansion(ast::Access(core::Identifier::make(core::FUNCTION_TYPE_NAME), function_declaration.location));
+
+            utility::Owned<Expression> parent_scope =
+                intrinsic(core::Intrinsic::GET_PARENT, function_declaration.location, utility::makeOwned<CurrentScope>(function_declaration.location));
+
+            Temporary const& tmp_type = builder.pushTemporary(std::move(type), "FunctionDeclaration_Type", function_declaration.location);
+
+            utility::List<Parameter> parameters;
+            for (auto const& parameter : function_declaration.parameters)
+            {
+                utility::Owned<Expression> param_type = builder.pushExpansion(*parameter.type);
+                parameters.emplace_back(parameter.identifier, std::move(param_type), parameter.location);
+            }
+
+            utility::Owned<Expression> return_type_expression = function_declaration.return_type.hasValue()
+                ? builder.pushExpansion(**function_declaration.return_type)
+                : builder.pushExpansion(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME), function_declaration.location));
+
+            SBuilder body_builder(*this);
+            body_builder.pushExpansion(*function_declaration.body);
+            utility::Owned<Statement> body = wrap(body_builder.take());
+
+            Temporary const& initial_value = builder.pushTemporary(
+                utility::makeOwned<AnonymousFunctionConstructor>(std::move(parameters), std::move(return_type_expression), std::move(body), function_declaration.location),
+                "FunctionDeclaration_InitialValue",
+                function_declaration.location);
+
+            utility::Owned<Expression> declared_expression =
+                intrinsic(core::Intrinsic::DECLARE,
+                          function_declaration.location,
+                          std::move(parent_scope),
+                          utility::makeOwned<IdentifierCapture>(function_declaration.identifier, function_declaration.location),
+                          utility::makeOwned<BoolLiteral>(true, function_declaration.location),
+                          utility::makeOwned<ReadTemporary>(tmp_type, function_declaration.location));
+
+            Temporary const& declared =
+                builder.pushTemporary(std::move(declared_expression), "FunctionDeclaration_Declared", function_declaration.location);
+
+            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<Read>(utility::makeOwned<ReadTemporary>(declared, function_declaration.location), function_declaration.location),
+                                                            utility::makeOwned<ReadTemporary>(initial_value, function_declaration.location),
+                                                            function_declaration.location));
+
+            result_.setDeclaration({
+                .statement = wrap(builder.take()),
+                .name      = std::format("FunctionDeclaration({})", function_declaration.identifier.text()),
+            });
+        }
+
         void visit(ast::ErrorStatement const& error_statement) override
         {
             result_.setStatements(utility::makeOwned<ErrorStatement>(error_statement.location));
@@ -576,8 +628,9 @@ struct ance::est::Expander::Implementation
             }
             else
             {
-                // todo: as soon as we have our own types, we would need this access here to be in the global scope, e.g. a global:: prefix
+                // todo: as soon as we have custom types, we would need this access here to be in the global scope, e.g. a global:: prefix
                 // todo: or as long as that is not done, just a new type of expression that contains an enum of important types
+                // todo: and the same for the Function type above in function declaration - remove that constants file to find all places
                 return_type = builder.pushExpansion(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME), lambda.location));
             }
 
