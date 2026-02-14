@@ -24,6 +24,9 @@ namespace ance::cet
         /// Write a value to the addressed location.
         void                                      write(utility::Shared<bbt::Value> value) const;
 
+        /// Check whether the addressed location is defined, i.e. has a value.
+        [[nodiscard]] bool                        isDefined() const;
+
     private:
         std::reference_wrapper<Memory> memory_;
         std::vector<size_t>            indices_;

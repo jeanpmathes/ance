@@ -38,12 +38,6 @@ std::weak_ordering ance::core::Identifier::operator<=>(Identifier const& other) 
     return string_ <=> other.string_;
 }
 
-std::ostream& operator<<(std::ostream& os, ance::core::Identifier const& identifier)
-{
-    os << identifier.text();
-    return os;
-}
-
 std::string operator+(std::string const& str, ance::core::Identifier const& identifier)
 {
     return str + std::string(identifier.text());
@@ -62,4 +56,9 @@ std::string operator+(char const* str, ance::core::Identifier const& identifier)
 std::string operator+(ance::core::Identifier const& identifier, char const* str)
 {
     return std::string(identifier.text()) + str;
+}
+
+std::ostream& ance::core::operator<<(std::ostream& os, Identifier const& identifier)
+{
+    return os << identifier.text();
 }

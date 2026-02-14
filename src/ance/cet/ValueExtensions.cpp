@@ -54,6 +54,9 @@ namespace ance::cet
 
     std::string LReference::toString() const
     {
+        if (!address().isDefined())
+            return "<undefined l-ref>";
+
         return address().read()->toString();
     }
 

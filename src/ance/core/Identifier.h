@@ -40,13 +40,13 @@ namespace ance::core
 
         std::weak_ordering operator<=>(Identifier const& other) const;
 
+        friend std::ostream& operator<<(std::ostream& os, Identifier const& identifier);
+
       private:
         std::string_view string_;
         Location         location_;
     };
 }
-
-std::ostream& operator<<(std::ostream& os, ance::core::Identifier const& identifier);
 
 std::string operator+(std::string const& str, ance::core::Identifier const& identifier);
 std::string operator+(ance::core::Identifier const& identifier, std::string const& str);

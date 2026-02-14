@@ -32,4 +32,9 @@ namespace ance::cet
     {
         memory_.get().write(std::move(value), indices_);
     }
+
+    bool Address::isDefined() const
+    {
+        return memory_.get().isDefined();
+    }
 }

@@ -29,19 +29,26 @@ namespace ance
         // Optional arguments:
 
         bool print_version = false;
+        bool trace_enabled = false;
     };
 
     static utility::Optional<Arguments> parseArguments(std::ostream& out, int const argc, char** argv)
     {
         Arguments arguments;
 
+        // todo: actual command line parsing library
+
         for (int index = 1; index < argc; index++)
         {
             std::string_view const arg(argv[index]);
 
-            if (arg == "--version" || arg == "-v")
+            if (arg == "--version")
             {
                 arguments.print_version = true;
+            }
+            else if (arg == "--trace")
+            {
+                arguments.trace_enabled = true;
             }
             else if (arg.starts_with("-"))
             {
@@ -76,9 +83,7 @@ namespace ance
         std::locale::global(loc);
 
         std::ostream& program_out = std::cout;
-        program_out << std::boolalpha;
         std::ostream& compiler_out = std::cerr;
-        compiler_out << std::boolalpha;
 
         utility::Optional<Arguments> const arguments = parseArguments(compiler_out, argc, argv);
 
@@ -111,7 +116,7 @@ namespace ance
         create_directories(debug_path);
 
         sources::SourceTree source_tree {base_path};
-        core::Reporter      reporter {source_tree, compiler_out};
+        core::Reporter      reporter {source_tree, compiler_out, arguments->trace_enabled};
         core::Context       context {debug_path};
 
         cet::Runner     runner {source_tree, reporter, context};
@@ -134,9 +139,7 @@ namespace ance
         reporter.report();
 
         return exit_code;
-
-        // todo: check the codex trace first and use if good
-
+        
         // todo: try claude feature-dev for this
         // todo: add function declarations (for now cmp only, must be in syntax)
 
