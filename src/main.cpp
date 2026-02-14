@@ -139,7 +139,7 @@ namespace ance
         reporter.report();
 
         return exit_code;
-        
+
         // todo: try claude feature-dev for this
         // todo: add function declarations (for now cmp only, must be in syntax)
 

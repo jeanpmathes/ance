@@ -40,7 +40,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         (void) result;
     }
     provider.emplace_back(utility::makeShared<bbt::Function>(
-        bbt::Signature::make("print1b", bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getBool())),
+        bbt::Signature::make("log1b", bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getBool())),
         runner.types().getUnit(),
         builder.build("main"),
         runner.types()));
@@ -67,7 +67,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         (void) result;
     }
     provider.emplace_back(
-        utility::makeShared<bbt::Function>(bbt::Signature::make("print2b",
+        utility::makeShared<bbt::Function>(bbt::Signature::make("log2b",
                                                                 bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getBool()),
                                                                 bbt::Signature::Parameter(core::Identifier::make("location"), runner.types().getLocation())),
                                            runner.types().getUnit(),
@@ -90,7 +90,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         (void) result;
     }
     provider.emplace_back(utility::makeShared<bbt::Function>(
-        bbt::Signature::make("print1s", bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getString())),
+        bbt::Signature::make("log1s", bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getString())),
         runner.types().getUnit(),
         builder.build("main"),
         runner.types()));
@@ -110,7 +110,7 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
         (void) result;
     }
     provider.emplace_back(
-        utility::makeShared<bbt::Function>(bbt::Signature::make("print2s",
+        utility::makeShared<bbt::Function>(bbt::Signature::make("log2s",
                                                                 bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getString()),
                                                                 bbt::Signature::Parameter(core::Identifier::make("location"), runner.types().getLocation())),
                                            runner.types().getUnit(),
