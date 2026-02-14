@@ -64,7 +64,7 @@ struct ance::cet::Runner::Implementation
                 return stack().back();
             }
 
-            RunPoint const& getExecutableRunPoint() const
+            [[nodiscard]] RunPoint const& getExecutableRunPoint() const
             {
                 if (stack().empty())
                 {
@@ -74,7 +74,7 @@ struct ance::cet::Runner::Implementation
                 return stack().back();
             }
 
-            bool isTopLevel() const
+            [[nodiscard]] bool isTopLevel() const
             {
                 return stack().empty();
             }

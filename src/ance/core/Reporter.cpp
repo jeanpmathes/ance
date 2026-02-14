@@ -12,10 +12,11 @@
 
 namespace ansi
 {
-    inline auto ColorRed    = "\x1B[31m";
-    inline auto ColorYellow = "\x1B[33m";
-    inline auto ColorBlue   = "\x1B[34m";
-    inline auto ColorDim    = "\x1B[90m";
+    inline auto ColorSuccess = "\x1B[32m";
+    inline auto ColorError    = "\x1B[31m";
+    inline auto ColorWarning = "\x1B[33m";
+    inline auto ColorInfo   = "\x1B[34m";
+    inline auto ColorMeta    = "\x1B[90m";
 
     inline auto ColorReset = "\x1B[0m";
 }
@@ -97,9 +98,9 @@ struct ance::core::Reporter::Implementation
     {
         switch (level)
         {
-            case Level::ERROR: return ansi::ColorRed;
-            case Level::WARNING: return ansi::ColorYellow;
-            case Level::INFO: return ansi::ColorBlue;
+            case Level::ERROR: return ansi::ColorError;
+            case Level::WARNING: return ansi::ColorWarning;
+            case Level::INFO: return ansi::ColorInfo;
         }
 
         return ansi::ColorReset;
@@ -117,13 +118,13 @@ struct ance::core::Reporter::Implementation
             switch (level)
             {
                 case Level::ERROR:
-                    out_ << ansi::ColorRed << "error" << ansi::ColorReset << ": ";
+                    out_ << ansi::ColorError << "error" << ansi::ColorReset << ": ";
                     break;
                 case Level::WARNING:
-                    out_ << ansi::ColorYellow << "warning" << ansi::ColorReset << ": ";
+                    out_ << ansi::ColorWarning << "warning" << ansi::ColorReset << ": ";
                     break;
                 case Level::INFO:
-                    out_ << ansi::ColorBlue << "info" << ansi::ColorReset << ": ";
+                    out_ << ansi::ColorInfo << "info" << ansi::ColorReset << ": ";
                     break;
             }
 
@@ -164,7 +165,7 @@ struct ance::core::Reporter::Implementation
             else
             {
                 size_t const extra_lines = location.lineEnd() - location.line();
-                out_ << '\t' << ansi::ColorDim << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")" << ansi::ColorReset << std::endl;
+                out_ << '\t' << ansi::ColorMeta << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")" << ansi::ColorReset << std::endl;
             }
 
             out_ << std::endl;
@@ -182,15 +183,44 @@ struct ance::core::Reporter::Implementation
 
         if (errorCount() > 0 || (warnings_as_errors && warningCount() > 0))
         {
-            out_ << "ance: " << errorCount() << " errors, " << warningCount() << " warnings" << std::endl;
-            out_ << "ance: Failed";
+            out_ << "ance: ";
+
+            if (errorCount() > 0)
+            {
+                out_ << ansi::ColorError << errorCount() << " error" << (errorCount() > 1 ? "s" : "") << ansi::ColorReset;
+            }
+            else
+            {
+                out_ << "0 errors";
+            }
+
+            out_ << ", ";
+
+            if (warningCount() > 0)
+            {
+                out_ << ansi::ColorWarning << warningCount() << " warning" << (warningCount() > 1 ? "s" : "") << ansi::ColorReset;
+            }
+            else
+            {
+                out_ << "0 warnings";
+            }
+
+            out_ << std::endl;
+
+            out_ << "ance: " << ansi::ColorError << "Failed" << ansi::ColorReset;
 
             if (errorCount() == 0) out_ << " (by warning)";
+
+            out_ << std::endl;
         }
         else
         {
-            out_ << "ance: " << warningCount() << " warnings" << std::endl;
-            out_ << "ance: Success";
+            if (warningCount() > 0)
+            {
+                out_ << "ance: " << ansi::ColorWarning << warningCount() << " warning" << (warningCount() > 1 ? "s" : "") << ansi::ColorReset << std::endl;
+            }
+
+            out_ << "ance: " << ansi::ColorSuccess << "Success" << ansi::ColorReset << std::endl;
         }
 
         clear();

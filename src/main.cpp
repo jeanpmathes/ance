@@ -20,29 +20,86 @@
 
 namespace ance
 {
-    static int program(int const argc, char** argv)
+    struct Arguments
     {
-        core::Reporter::print(std::cout, "Copyright (c) 2026 Jean Patrick Mathes");
+        // Required arguments:
 
-        if (argc != 2)
+        utility::Optional<std::filesystem::path> input_file;
+
+        // Optional arguments:
+
+        bool print_version = false;
+    };
+
+    static utility::Optional<Arguments> parseArguments(std::ostream& out, int const argc, char** argv)
+    {
+        Arguments arguments;
+
+        for (int index = 1; index < argc; index++)
         {
-            core::Reporter::print(std::cout, "command", "Requires exactly one argument");
-            return EXIT_FAILURE;
+            std::string_view const arg(argv[index]);
+
+            if (arg == "--version" || arg == "-v")
+            {
+                arguments.print_version = true;
+            }
+            else if (arg.starts_with("-"))
+            {
+                core::Reporter::print(out, "command", "Unknown command line argument: " + std::string(arg));
+            }
+            else
+            {
+                if (arguments.input_file.hasValue())
+                {
+                    core::Reporter::print(out, "command", "Multiple input files provided");
+                }
+                else
+                {
+                    arguments.input_file = std::filesystem::path(arg);
+                }
+            }
         }
 
+        if (!arguments.input_file.hasValue())
+        {
+            core::Reporter::print(out, "command", "No input file provided");
+            return std::nullopt;
+        }
+
+        return arguments;
+    }
+
+    static int program(int const argc, char** argv)
+    {
         boost::locale::generator const gen;
         std::locale const              loc = gen("");
         std::locale::global(loc);
 
-        std::filesystem::path file_path(argv[1]);
-        if (file_path.is_relative()) file_path = absolute(file_path);
-        if (!exists(file_path))
+        std::ostream& program_out = std::cout;
+        program_out << std::boolalpha;
+        std::ostream& compiler_out = std::cerr;
+        compiler_out << std::boolalpha;
+
+        utility::Optional<Arguments> const arguments = parseArguments(compiler_out, argc, argv);
+
+        if (!arguments.hasValue())
         {
-            core::Reporter::print(std::cout, "input", "File does not exist");
             return EXIT_FAILURE;
         }
 
-        std::ostream& out = std::cout;
+        if (arguments->print_version)
+        {
+            program_out << "ance compiler version 0.1.0" << std::endl;
+            program_out << "Copyright (c) 2026 Jean Patrick Mathes" << std::endl;
+            program_out << std::endl;
+        }
+
+        std::filesystem::path file_path = arguments->input_file.value();
+        if (!exists(file_path))
+        {
+            core::Reporter::print(compiler_out, "input", "File does not exist");
+            return EXIT_FAILURE;
+        }
 
         std::filesystem::path const base_path = file_path.parent_path();
         std::filesystem::path const file_name = file_path.filename();
@@ -54,7 +111,7 @@ namespace ance
         create_directories(debug_path);
 
         sources::SourceTree source_tree {base_path};
-        core::Reporter      reporter {source_tree, out};
+        core::Reporter      reporter {source_tree, compiler_out};
         core::Context       context {debug_path};
 
         cet::Runner     runner {source_tree, reporter, context};
@@ -78,6 +135,9 @@ namespace ance
 
         return exit_code;
 
+        // todo: check the codex trace first and use if good
+
+        // todo: try claude feature-dev for this
         // todo: add function declarations (for now cmp only, must be in syntax)
 
         // todo: modernize the cmake, e.g. target variants of commands if that is better
@@ -127,6 +187,8 @@ namespace ance
 
         // todo: the compiler should also serialize each file it compiles on EST or BBT level, so that recompilation can be avoided if the file did not change
         // todo: determine which tree is the best for this, so that no other factors like compiler paramters need to be considered
+
+        // todo: the compile time code needs a print function that actually prints to std::cout
     }
 }
 
