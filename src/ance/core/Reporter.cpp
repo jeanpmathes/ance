@@ -14,9 +14,9 @@
 namespace ansi
 {
     inline auto ColorSuccess = "\x1B[32m";
-    inline auto ColorError    = "\x1B[31m";
+    inline auto ColorError   = "\x1B[31m";
     inline auto ColorWarning = "\x1B[33m";
-    inline auto ColorInfo   = "\x1B[34m";
+    inline auto ColorInfo    = "\x1B[34m";
     inline auto ColorTrace   = "\x1B[36m";
     inline auto ColorMeta    = "\x1B[90m";
 
@@ -85,16 +85,25 @@ struct ance::core::Reporter::Implementation
         ERROR
     };
 
-    Implementation(Reporter* reporter, sources::SourceTree& source_tree, std::ostream& out, bool trace_enable) : reporter_(reporter), source_tree_(source_tree), out_(out), trace_enabled_(trace_enable) {}
+    Implementation(Reporter* reporter, sources::SourceTree& source_tree, std::ostream& out, bool trace_enable)
+        : reporter_(reporter)
+        , source_tree_(source_tree)
+        , out_(out)
+        , trace_enabled_(trace_enable)
+    {}
 
     static char const* colorForLevel(Level level)
     {
         switch (level)
         {
-            case Level::ERROR: return ansi::ColorError;
-            case Level::WARNING: return ansi::ColorWarning;
-            case Level::INFO: return ansi::ColorInfo;
-            case Level::TRACE: return ansi::ColorTrace;
+            case Level::ERROR:
+                return ansi::ColorError;
+            case Level::WARNING:
+                return ansi::ColorWarning;
+            case Level::INFO:
+                return ansi::ColorInfo;
+            case Level::TRACE:
+                return ansi::ColorTrace;
         }
 
         return ansi::ColorReset;
@@ -109,76 +118,81 @@ struct ance::core::Reporter::Implementation
 
         size_t start = 0;
 
-            out_ << "ance: ";
+        out_ << "ance: ";
 
-            switch (level)
-            {
-                case Level::ERROR:
-                    out_ << ansi::ColorError << "error" << ansi::ColorReset << ": ";
-                    break;
-                case Level::WARNING:
-                    out_ << ansi::ColorWarning << "warning" << ansi::ColorReset << ": ";
-                    break;
-                case Level::INFO:
-                    out_ << ansi::ColorInfo << "info" << ansi::ColorReset << ": ";
-                    break;
-                case Level::TRACE:
-                    out_ << ansi::ColorTrace << "trace" << ansi::ColorReset << ": ";
-                    break;
-            }
+        switch (level)
+        {
+            case Level::ERROR:
+                out_ << ansi::ColorError << "error" << ansi::ColorReset << ": ";
+                break;
+            case Level::WARNING:
+                out_ << ansi::ColorWarning << "warning" << ansi::ColorReset << ": ";
+                break;
+            case Level::INFO:
+                out_ << ansi::ColorInfo << "info" << ansi::ColorReset << ": ";
+                break;
+            case Level::TRACE:
+                out_ << ansi::ColorTrace << "trace" << ansi::ColorReset << ": ";
+                break;
+        }
 
-            if (!compiler_location.empty())
-            {
-                out_ << "[" << compiler_location << "] ";
-            }
+        if (!compiler_location.empty())
+        {
+            out_ << "[" << compiler_location << "] ";
+        }
 
-            if (location.isGlobal())
-            {
-                out_ << message << std::endl;
-                return;
-            }
+        if (location.isGlobal())
+        {
+            out_ << message << std::endl;
+            return;
+        }
 
-            if (location.isCore())
-            {
-                out_ << location << " " << message << std::endl;
-                return;
-            }
-
-            sources::SourceFile const& source_file = source_tree_.getFile(location.fileIndex());
-
-            out_ << source_file.getRelativePath().generic_string() << " ";
+        if (location.isCore())
+        {
             out_ << location << " " << message << std::endl;
 
-            if (location.isFile()) return;
+            if (level == Level::ERROR || level == Level::WARNING)
+                out_ << ansi::ColorError << "Warnings and errors in core code indicate a critical language or compiler issue!" << ansi::ColorReset << std::endl
+                     << std::endl;
 
-            out_ << std::endl;
+            return;
+        }
 
-            std::u32string_view const line_view = text::trim(source_file.getLine(location.line()), start);
-            out_ << '\t' << boost::locale::conv::utf_to_utf<char>(std::u32string(line_view)) << std::endl;
+        sources::SourceFile const& source_file = source_tree_.getFile(location.fileIndex());
 
-            if (location.isSingleLine())
-            {
-                size_t const length_to_mark = location.column() - start - 1;
-                size_t const length_of_mark = location.columnEnd() - location.column() + 1;
+        out_ << source_file.getRelativePath().generic_string() << " ";
+        out_ << location << " " << message << std::endl;
 
-                std::u32string_view const text_to_mark   = line_view.substr(0, length_to_mark);
-                std::u32string_view const text_with_mark = length_to_mark >= line_view.size() ? U"" : line_view.substr(length_to_mark, length_of_mark);
+        if (location.isFile()) return;
 
-                size_t const missing_to_mark   = length_to_mark - text_to_mark.size();
-                size_t const missing_with_mark = length_of_mark - text_with_mark.size();
+        out_ << std::endl;
 
-                size_t const marker_start  = std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 0uz);
-                size_t const marker_length = std::max(text::estimateWidth(text_with_mark) + missing_with_mark, 1uz);
+        std::u32string_view const line_view = text::trim(source_file.getLine(location.line()), start);
+        out_ << '\t' << boost::locale::conv::utf_to_utf<char>(std::u32string(line_view)) << std::endl;
 
-                out_ << '\t' << std::string(marker_start, ' ') << colorForLevel(level) << std::string(marker_length, '~') << ansi::ColorReset << std::endl;
-            }
-            else
-            {
-                size_t const extra_lines = location.lineEnd() - location.line();
-                out_ << '\t' << ansi::ColorMeta << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")" << ansi::ColorReset << std::endl;
-            }
+        if (location.isSingleLine())
+        {
+            size_t const length_to_mark = location.column() - start - 1;
+            size_t const length_of_mark = location.columnEnd() - location.column() + 1;
 
-            out_ << std::endl;
+            std::u32string_view const text_to_mark   = line_view.substr(0, length_to_mark);
+            std::u32string_view const text_with_mark = length_to_mark >= line_view.size() ? U"" : line_view.substr(length_to_mark, length_of_mark);
+
+            size_t const missing_to_mark   = length_to_mark - text_to_mark.size();
+            size_t const missing_with_mark = length_of_mark - text_with_mark.size();
+
+            size_t const marker_start  = std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 0uz);
+            size_t const marker_length = std::max(text::estimateWidth(text_with_mark) + missing_with_mark, 1uz);
+
+            out_ << '\t' << std::string(marker_start, ' ') << colorForLevel(level) << std::string(marker_length, '~') << ansi::ColorReset << std::endl;
+        }
+        else
+        {
+            size_t const extra_lines = location.lineEnd() - location.line();
+            out_ << '\t' << ansi::ColorMeta << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")" << ansi::ColorReset << std::endl;
+        }
+
+        out_ << std::endl;
     }
 
     void clear()
@@ -238,7 +252,7 @@ struct ance::core::Reporter::Implementation
 
     MessageBuilder beginReport(Level const level, std::string const& compiler_location, Location const& location)
     {
-        return {*reporter_, compiler_location, location, level != Level::TRACE || isTraceEnabled() };
+        return {*reporter_, compiler_location, location, level != Level::TRACE || isTraceEnabled()};
     }
 
     [[nodiscard]] bool isFailed() const
@@ -267,13 +281,14 @@ struct ance::core::Reporter::Implementation
     size_t error_count_   = 0;
     size_t warning_count_ = 0;
 
-    Reporter*       reporter_;
+    Reporter*            reporter_;
     sources::SourceTree& source_tree_;
     std::ostream&        out_;
-    bool trace_enabled_;
+    bool                 trace_enabled_;
 };
 
-ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter& reporter, std::string compiler_location, Location const& location, bool const enabled) : reporter_(&reporter)
+ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter& reporter, std::string compiler_location, Location const& location, bool const enabled)
+    : reporter_(&reporter)
     , compiler_location_(std::move(compiler_location))
     , location_(location)
 {
@@ -283,7 +298,8 @@ ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter& reporter, std::st
     }
 }
 
-ance::core::Reporter::MessageBuilder::MessageBuilder(MessageBuilder&& other) noexcept : reporter_(other.reporter_)
+ance::core::Reporter::MessageBuilder::MessageBuilder(MessageBuilder&& other) noexcept
+    : reporter_(other.reporter_)
     , compiler_location_(std::move(other.compiler_location_))
     , location_(other.location_)
     , stream_(std::move(other.stream_))
@@ -295,10 +311,10 @@ ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::oper
 {
     if (this == &other) return *this;
 
-    reporter_ = other.reporter_;
+    reporter_          = other.reporter_;
     compiler_location_ = std::move(other.compiler_location_);
-    location_ = other.location_;
-    stream_   = std::move(other.stream_);
+    location_          = other.location_;
+    stream_            = std::move(other.stream_);
 
     other.reporter_ = nullptr;
 
@@ -313,7 +329,9 @@ ance::core::Reporter::MessageBuilder::~MessageBuilder()
     }
 }
 
-ance::core::Reporter::Reporter(sources::SourceTree& source_tree, std::ostream& out, bool trace_enabled) : implementation_(utility::makeOwned<Implementation>(this, source_tree, out, trace_enabled)) {}
+ance::core::Reporter::Reporter(sources::SourceTree& source_tree, std::ostream& out, bool trace_enabled)
+    : implementation_(utility::makeOwned<Implementation>(this, source_tree, out, trace_enabled))
+{}
 
 ance::core::Reporter::~Reporter() = default;
 
