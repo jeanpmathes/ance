@@ -140,14 +140,10 @@ namespace ance
 
         return exit_code;
 
-        // todo: add a way to call intrinsics from source code with the intrinsic expression intrinsic "name" (args...)
-        // todo: but also add a core function intrinsic("name", args...) that does the same thing but is a normal function call
-
         // todo: spend some time improving Optional, Shared and Owned
 
         // todo: define the core language functions using code instead of hardcoding the trees - code would be a string in C++ file, would need an entire chain to parse and transform into flows
         // todo: this requires that the type context is shared between all runers, so create a global type context instead of one per runner
-        // todo: the intrinsic function can currently probably not be created in source code because of the varargs, so add a TODO there, or maybe add some more stuff
         // todo: probably delete the flow builder
 
         // todo: add all cmp statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file

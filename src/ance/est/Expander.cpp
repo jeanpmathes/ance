@@ -652,6 +652,23 @@ struct ance::est::Expander::Implementation
                 utility::makeOwned<AnonymousFunctionConstructor>(std::move(parameters), std::move(return_type.value()), std::move(body), lambda.location)));
         }
 
+        void visit(ast::Intrinsic const& intrinsic_expression) override
+        {
+            EBuilder builder(*this);
+
+            utility::Owned<Expression> name = builder.pushExpansion(*intrinsic_expression.name);
+
+            utility::List<utility::Owned<Expression>> arguments;
+            arguments.emplace_back(std::move(name));
+            for (auto& argument : intrinsic_expression.arguments)
+            {
+                arguments.emplace_back(builder.pushExpansion(*argument));
+            }
+
+            result_.setExpression(builder.take(
+                utility::makeOwned<Intrinsic>(core::Intrinsic::CALL_INTRINSIC, std::move(arguments), intrinsic_expression.location)));
+        }
+
         void visit(ast::Access const& access) override
         {
             utility::Owned<Expression> resolved = intrinsic(core::Intrinsic::RESOLVE,

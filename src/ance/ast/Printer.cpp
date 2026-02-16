@@ -71,7 +71,7 @@ struct ance::ast::Printer::Implementation
             print(" cmp ");
             print(function_declaration.identifier);
             print(" (");
-            for (size_t index = 0; index < function_declaration.parameters.size(); ++index)
+            for (size_t index = 0; index < function_declaration.parameters.size(); index++)
             {
                 print(function_declaration.parameters[index].identifier);
                 print(": ");
@@ -243,7 +243,7 @@ struct ance::ast::Printer::Implementation
         {
             visit(*call.callee);
             print("(");
-            for (size_t index = 0; index < call.arguments.size(); ++index)
+            for (size_t index = 0; index < call.arguments.size(); index++)
             {
                 visit(*call.arguments[index]);
                 if (index + 1 < call.arguments.size()) print(", ");
@@ -254,7 +254,7 @@ struct ance::ast::Printer::Implementation
         void visit(Lambda const& lambda) override
         {
             print("\\[](");
-            for (size_t index = 0; index < lambda.parameters.size(); ++index)
+            for (size_t index = 0; index < lambda.parameters.size(); index++)
             {
                 print(lambda.parameters[index].identifier);
                 print(": ");
@@ -284,6 +284,19 @@ struct ance::ast::Printer::Implementation
                     visit(**lambda.statement_body);
                 }
             }
+        }
+
+        void visit(Intrinsic const& intrinsic_expression) override
+        {
+            print("intrinsic ");
+            visit(*intrinsic_expression.name);
+            print(" (");
+            for (size_t index = 0; index < intrinsic_expression.arguments.size(); index++)
+            {
+                visit(*intrinsic_expression.arguments[index]);
+                if (index + 1 < intrinsic_expression.arguments.size()) print(", ");
+            }
+            print(")");
         }
 
         void visit(Access const& access) override

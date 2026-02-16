@@ -11,8 +11,8 @@ namespace ance::bbt
         , type(std::move(parameter_type))
     {}
 
-    Signature::Signature(core::Identifier const& name, utility::List<Parameter> parameters)
-        : name_(name), parameters_(std::move(parameters))
+    Signature::Signature(core::Identifier const& name, utility::List<Parameter> parameters, bool const variadic)
+        : name_(name), parameters_(std::move(parameters)), variadic_(variadic)
     {}
 
     core::Identifier const& Signature::name() const
@@ -40,5 +40,10 @@ namespace ance::bbt
     utility::List<Signature::Parameter> const& Signature::parameters() const
     {
         return parameters_;
+    }
+
+    bool Signature::isVariadic() const
+    {
+        return variadic_;
     }
 }

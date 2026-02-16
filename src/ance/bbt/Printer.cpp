@@ -178,8 +178,9 @@ struct ance::bbt::Printer::Implementation
             print(intrinsic.destination.id());
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
-            print(" intrinsic (");
+            print(" intrinsic ");
             print(intrinsic.intrinsic);
+            print(" (");
             for (auto const argument : intrinsic.arguments)
             {
                 print(", ");
@@ -196,10 +197,10 @@ struct ance::bbt::Printer::Implementation
             print(" call ");
             print(call.called.id());
             print(" (");
-            for (size_t i = 0; i < call.arguments.size(); ++i)
+            for (size_t index = 0; index < call.arguments.size(); index++)
             {
-                print(call.arguments[i].get().id());
-                if (i + 1 < call.arguments.size()) print(", ");
+                print(call.arguments[index].get().id());
+                if (index + 1 < call.arguments.size()) print(", ");
             }
             print(");");
         }
@@ -210,14 +211,14 @@ struct ance::bbt::Printer::Implementation
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
             print(" Function::ctor(Signature::ctor(");
-            for (size_t i = 0; i < function_constructor.parameters.size(); ++i)
+            for (size_t index = 0; index < function_constructor.parameters.size(); index++)
             {
                 print("(");
-                print(function_constructor.parameters[i].type.id());
+                print(function_constructor.parameters[index].type.id());
                 print(", ");
-                print(function_constructor.parameters[i].identifier);
+                print(function_constructor.parameters[index].identifier);
                 print(")");
-                if (i + 1 < function_constructor.parameters.size()) print(", ");
+                if (index + 1 < function_constructor.parameters.size()) print(", ");
             }
             print("), ");
             print(function_constructor.return_type.id());

@@ -82,7 +82,7 @@ ance::ast::Let::Let(core::Identifier const&                       name,
     , value(std::move(definition))
 {}
 
-ance::ast::Assignment::Assignment(utility::Owned<Expression>    left,
+ance::ast::Assignment::Assignment(utility::Owned<Expression> left,
                                   core::Assigner             assignment,
                                   utility::Owned<Expression> right,
                                   core::Location const&      source_location)
@@ -134,6 +134,15 @@ ance::ast::Call::Call(utility::Owned<Expression> called, utility::List<utility::
     , Expression()
     , callee(std::move(called))
     , arguments(std::move(expressions))
+{}
+
+ance::ast::Intrinsic::Intrinsic(utility::Owned<Expression>                intrinsic_name,
+                                                    utility::List<utility::Owned<Expression>> args,
+                                                    core::Location const&                     source_location)
+    : Node(source_location)
+    , Expression()
+    , name(std::move(intrinsic_name))
+    , arguments(std::move(args))
 {}
 
 ance::ast::Lambda::Lambda(utility::List<Parameter>                      params,

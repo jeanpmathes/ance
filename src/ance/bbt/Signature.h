@@ -23,7 +23,7 @@ namespace ance::bbt
             Parameter(core::Identifier const& parameter_name, utility::Shared<Type> parameter_type);
         };
 
-        Signature(core::Identifier const& name, utility::List<Parameter> parameters);
+        Signature(core::Identifier const& name, utility::List<Parameter> parameters, bool variadic = false);
 
         /// Get the name of the signature.
         [[nodiscard]] core::Identifier const& name() const;
@@ -39,6 +39,10 @@ namespace ance::bbt
 
         /// Get the parameters of the signature.
         [[nodiscard]] utility::List<Parameter> const& parameters() const;
+
+        /// Whether this signature accepts variadic untyped arguments after the typed parameters.
+        /// todo: remove variadic support, instead use a list type for the additional arguments
+        [[nodiscard]] bool isVariadic() const;
 
         template<typename... Args>
         static Signature make(std::string const& name, Args&&... args)
@@ -77,6 +81,7 @@ namespace ance::bbt
       private:
         core::Identifier         name_;
         utility::List<Parameter> parameters_;
+        bool                     variadic_ = false;
     };
 }
 

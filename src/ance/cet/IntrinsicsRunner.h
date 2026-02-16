@@ -52,6 +52,7 @@ namespace ance::cet
         void runLog();
         void runB2Str();
         void runInclude();
+        void runCallIntrinsic();
 
         void setResult(utility::Shared<bbt::Value> value);
         void setPending(core::Identifier const& identifier);

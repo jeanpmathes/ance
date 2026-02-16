@@ -186,12 +186,13 @@ struct ance::est::Printer::Implementation
 
         void visit(Intrinsic const& intrinsic) override
         {
-            print("intrinsic(");
+            print("intrinsic ");
             print(intrinsic.intrinsic);
-            for (size_t i = 0; i < intrinsic.arguments.size(); ++i)
+            print(" (");
+            for (size_t index = 0; index < intrinsic.arguments.size(); index++)
             {
                 print(", ");
-                visit(*intrinsic.arguments[i]);
+                visit(*intrinsic.arguments[index]);
             }
             print(")");
         }
@@ -200,10 +201,10 @@ struct ance::est::Printer::Implementation
         {
             visit(*call.callee);
             print("(");
-            for (size_t i = 0; i < call.arguments.size(); ++i)
+            for (size_t index = 0; index < call.arguments.size(); index++)
             {
-                if (i > 0) print(", ");
-                visit(*call.arguments[i]);
+                if (index > 0) print(", ");
+                visit(*call.arguments[index]);
             }
             print(")");
         }
@@ -211,13 +212,13 @@ struct ance::est::Printer::Implementation
         void visit(AnonymousFunctionConstructor const& ctor) override
         {
             print("Function(Signature(");
-            for (size_t i = 0; i < ctor.parameters.size(); ++i)
+            for (size_t index = 0; index < ctor.parameters.size(); index++)
             {
-                if (i > 0) print(", ");
+                if (index > 0) print(", ");
                 print("(");
-                visit(*ctor.parameters[i].type);
+                visit(*ctor.parameters[index].type);
                 print(", ");
-                print(ctor.parameters[i].identifier);
+                print(ctor.parameters[index].identifier);
                 print(")");
             }
             print("), ");

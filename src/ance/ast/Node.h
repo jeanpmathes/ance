@@ -259,7 +259,7 @@ namespace ance::ast
     {
         Call(utility::Owned<Expression> called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
 
-        utility::Owned<Expression> callee;
+        utility::Owned<Expression>                callee;
         utility::List<utility::Owned<Expression>> arguments;
     };
 
@@ -330,6 +330,17 @@ namespace ance::ast
         bool value;
     };
 
+    /// An expression that calls an intrinsic by name.
+    struct Intrinsic final
+        : Expression
+        , utility::ConcreteNode<Intrinsic, Visitor>
+    {
+        Intrinsic(utility::Owned<Expression> intrinsic_name, utility::List<utility::Owned<Expression>> args, core::Location const& source_location);
+
+        utility::Owned<Expression>                name;
+        utility::List<utility::Owned<Expression>> arguments;
+    };
+
     /// An expression that resolves to its own source location.
     struct Here final
         : Expression
@@ -368,10 +379,10 @@ namespace ance::ast
 
         virtual void visit(File const& file) = 0;
 
-        virtual void visit(ErrorDeclaration const& error)          = 0;
-        virtual void visit(RunnableDeclaration const& runnable)  = 0;
-        virtual void visit(VariableDeclaration const& global)    = 0;
-        virtual void visit(FunctionDeclaration const& function)  = 0;
+        virtual void visit(ErrorDeclaration const& error)       = 0;
+        virtual void visit(RunnableDeclaration const& runnable) = 0;
+        virtual void visit(VariableDeclaration const& global)   = 0;
+        virtual void visit(FunctionDeclaration const& function) = 0;
 
         virtual void visit(ErrorStatement const& error)        = 0;
         virtual void visit(Block const& block)                 = 0;
@@ -385,16 +396,17 @@ namespace ance::ast
         virtual void visit(Return const& return_statement)     = 0;
         virtual void visit(While const& while_statement)       = 0;
 
-        virtual void visit(ErrorExpression const& error)          = 0;
-        virtual void visit(Call const& call)                      = 0;
-        virtual void visit(Lambda const& lambda)                  = 0;
-        virtual void visit(Access const& access)                  = 0;
-        virtual void visit(UnitLiteral const& unit_literal)       = 0;
-        virtual void visit(SizeLiteral const& size_literal)       = 0;
-        virtual void visit(StringLiteral const& string_literal)   = 0;
-        virtual void visit(BoolLiteral const& bool_literal)       = 0;
-        virtual void visit(Here const& here)                      = 0;
-        virtual void visit(UnaryOperation const& unary_operation) = 0;
+        virtual void visit(ErrorExpression const& error)                    = 0;
+        virtual void visit(Call const& call)                                = 0;
+        virtual void visit(Intrinsic const& intrinsic_expression) = 0;
+        virtual void visit(Lambda const& lambda)                            = 0;
+        virtual void visit(Access const& access)                            = 0;
+        virtual void visit(UnitLiteral const& unit_literal)                 = 0;
+        virtual void visit(SizeLiteral const& size_literal)                 = 0;
+        virtual void visit(StringLiteral const& string_literal)             = 0;
+        virtual void visit(BoolLiteral const& bool_literal)                 = 0;
+        virtual void visit(Here const& here)                                = 0;
+        virtual void visit(UnaryOperation const& unary_operation)           = 0;
     };
 }
 

@@ -556,6 +556,22 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitIntrinsicExpression(grammar::anceParser::IntrinsicExpressionContext* ctx) override
+        {
+            utility::Owned<Expression> name = expectExpression(ctx->name);
+
+            utility::List<utility::Owned<Expression>> arguments;
+            for (grammar::anceParser::ExpressionContext* expression : ctx->expression())
+            {
+                if (expression == ctx->name) continue;
+
+                arguments.push_back(expectExpression(expression));
+            }
+
+            Expression* expression = new Intrinsic(std::move(name), std::move(arguments), location(ctx));
+            return expression;
+        }
+
         std::any visitAccessExpression(grammar::anceParser::AccessExpressionContext* ctx) override
         {
             core::Identifier const accessed = identifier(ctx->IDENTIFIER());

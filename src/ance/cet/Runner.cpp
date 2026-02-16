@@ -282,21 +282,41 @@ struct ance::cet::Runner::Implementation
             size_t const arity          = signature.arity();
             size_t const argument_count = argument_types.size();
 
-            if (arity != argument_count)
+            if (signature.isVariadic())
             {
-                reporter_.error(location) << "Call to " << signature.annotated() << " with wrong number of arguments: expected " << arity << " but got " << argument_count;
-                ok = false;
+                if (argument_count < arity)
+                {
+                    reporter_.error(location) << "Call to " << signature.annotated() << " with too few arguments: expected at least " << arity << " but got " << argument_count;
+                    return false;
+                }
+
+                for (size_t index = 0; index < arity; index++)
+                {
+                    bbt::Type const&      parameter_type    = *signature.parameters()[index].type;
+                    bbt::Type const&      argument_type     = argument_types[index].get();
+                    core::Location const& argument_location = argument_locations[index];
+
+                    ok &= expectType(parameter_type, argument_type, argument_location);
+                }
             }
-
-            if (!ok) return false;
-
-            for (size_t i = 0; i < argument_count; ++i)
+            else
             {
-                bbt::Type const&      parameter_type    = *signature.parameters()[i].type;
-                bbt::Type const&      argument_type     = argument_types[i].get();
-                core::Location const& argument_location = argument_locations[i];
+                if (arity != argument_count)
+                {
+                    reporter_.error(location) << "Call to " << signature.annotated() << " with wrong number of arguments: expected " << arity << " but got " << argument_count;
+                    ok = false;
+                }
 
-                ok &= expectType(parameter_type, argument_type, argument_location);
+                if (!ok) return false;
+
+                for (size_t index = 0; index < argument_count; index++)
+                {
+                    bbt::Type const&      parameter_type    = *signature.parameters()[index].type;
+                    bbt::Type const&      argument_type     = argument_types[index].get();
+                    core::Location const& argument_location = argument_locations[index];
+
+                    ok &= expectType(parameter_type, argument_type, argument_location);
+                }
             }
 
             return ok;
@@ -688,7 +708,7 @@ struct ance::cet::Runner::Implementation
 
             Scope& function_scope = project_scope_.addChildScope(utility::makeOwned<OrderedScope>(project_scope_, type_context_));
 
-            for (size_t index = 0; index < signature.arity(); ++index)
+            for (size_t index = 0; index < signature.arity(); index++)
             {
                 bbt::Signature::Parameter&  parameter = signature[index];
                 utility::Shared<bbt::Value> argument  = arguments[index];

@@ -47,8 +47,16 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
                     .return_value_        = std::nullopt,
                     .pending_resolution   = std::nullopt};
 
-    assert(arguments.size() == signature.parameters().size());
-    for (size_t i = 0; i < arguments.size(); ++i) assert(*arguments[i]->type() == *signature.parameters()[i].type);
+    if (signature.isVariadic())
+    {
+        assert(arguments.size() >= signature.parameters().size());
+        for (size_t index = 0; index < signature.parameters().size(); index++) assert(*arguments[index]->type() == *signature.parameters()[index].type);
+    }
+    else
+    {
+        assert(arguments.size() == signature.parameters().size());
+        for (size_t index = 0; index < arguments.size(); index++) assert(*arguments[index]->type() == *signature.parameters()[index].type);
+    }
 
     switch (intrinsic.value())
     {
@@ -72,6 +80,9 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
             break;
         case core::Intrinsic::INCLUDE:
             runInclude();
+            break;
+        case core::Intrinsic::CALL_INTRINSIC:
+            runCallIntrinsic();
             break;
     }
 
@@ -164,6 +175,41 @@ void ance::cet::IntrinsicsRunner::runInclude()
     include_(path);
 
     setResult(bbt::Unit::make(type_context_));
+}
+
+void ance::cet::IntrinsicsRunner::runCallIntrinsic()
+{
+    std::string const& name = state_.arguments->at(0)->as<bbt::String>().value();
+
+    std::optional<core::Intrinsic> target = core::Intrinsic::fromString(name);
+    if (!target.has_value())
+    {
+        reporter_.error(state_.location) << "Unknown intrinsic: '" << name << "'";
+        abort();
+        return;
+    }
+
+    utility::List<utility::Shared<bbt::Value>> arguments;
+    for (size_t index = 1; index < state_.arguments->size(); index++)
+        arguments.emplace_back(state_.arguments->at(index));
+
+    State outer_state = std::move(state_);
+    Result inner_result = run(target.value(), arguments, outer_state.location);
+    state_ = std::move(outer_state);
+
+    if (inner_result.isFailed())
+    {
+        abort();
+    }
+    else if (inner_result.isPending())
+    {
+        setPending(inner_result.getPending().identifier);
+    }
+    else
+    {
+        // todo: currently we cannot handle the any result type safely, which is why we do not use setResult here
+        state_.return_value_ = inner_result.getResult();
+    }
 }
 
 void ance::cet::IntrinsicsRunner::setResult(utility::Shared<bbt::Value> value)

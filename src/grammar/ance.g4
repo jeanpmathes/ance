@@ -39,6 +39,7 @@ postfixExpression
 
 primaryExpression
     : '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
+    | 'intrinsic' name=expression '(' (expression (',' expression)* )? ')' # IntrinsicExpression
     | IDENTIFIER # AccessExpression
     | literal # LiteralExpression
     | 'here' # HereExpression
