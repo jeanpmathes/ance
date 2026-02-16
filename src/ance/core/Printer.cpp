@@ -23,7 +23,9 @@ void ance::core::Printer::print(char const* text)
 void ance::core::Printer::print(Identifier const& identifier)
 {
     indent();
-    out_ << identifier;
+
+    // By default, identifier adds quotes to the text which we do not want here.
+    out_ << identifier.text();
 }
 
 void ance::core::Printer::print(AccessModifier const access_modifier)

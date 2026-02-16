@@ -22,7 +22,7 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
 {
     if (!canDeclare(identifier))
     {
-        reporter.error("Declaring '" + identifier + "' in this scope would block previous access to it outside of the scope", location);
+        reporter.error(location) << "Declaring " << identifier << " in this scope would block previous access to it outside of the scope";
         return std::nullopt;
     }
 

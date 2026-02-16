@@ -20,6 +20,11 @@ namespace ance::bbt
         return name_;
     }
 
+    std::string Signature::annotated() const
+    {
+        return std::format("'{}'", name_.text());
+    }
+
     size_t Signature::arity() const
     {
         return parameters_.size();

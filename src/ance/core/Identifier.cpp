@@ -60,5 +60,5 @@ std::string operator+(ance::core::Identifier const& identifier, char const* str)
 
 std::ostream& ance::core::operator<<(std::ostream& os, Identifier const& identifier)
 {
-    return os << identifier.text();
+    return os << "'" << identifier.text() << "'";
 }

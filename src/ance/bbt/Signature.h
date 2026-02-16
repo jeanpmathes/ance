@@ -28,6 +28,9 @@ namespace ance::bbt
         /// Get the name of the signature.
         [[nodiscard]] core::Identifier const& name() const;
 
+        /// Get the annotated name of the signature, for compiler messages.
+        [[nodiscard]] std::string annotated() const;
+
         /// Get the arity of the signature, meaning the number of arguments.
         [[nodiscard]] size_t arity() const;
 

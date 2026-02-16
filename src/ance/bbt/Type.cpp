@@ -79,6 +79,11 @@ namespace ance::bbt
         return identifier_;
     }
 
+    std::string Type::annotated() const
+    {
+        return std::format("'{}'", identifier_.text());
+    }
+
     bool Type::operator==(Type const& other) const
     {
         return &other == this;
@@ -214,9 +219,4 @@ namespace ance::bbt
         return Implementation::getOrCreate(implementation_->location_type,
                                            [&] { return utility::makeShared<Type>(core::Identifier::make("Location"), *this); });
     }
-}
-
-std::ostream& operator<<(std::ostream& out, ance::bbt::Type const& type)
-{
-    return out << type.name();
 }

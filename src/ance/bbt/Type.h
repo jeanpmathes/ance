@@ -36,6 +36,9 @@ namespace ance::bbt
         /// Gets the name of this type.
         [[nodiscard]] core::Identifier const& name() const;
 
+        /// Gets the annotated name of this type, for compiler messages.
+        [[nodiscard]] std::string annotated() const;
+
         bool operator==(Type const& other) const;
         bool operator!=(Type const& other) const;
 
@@ -120,7 +123,5 @@ namespace ance::bbt
         utility::Owned<Implementation> implementation_;
     };
 }
-
-std::ostream& operator<<(std::ostream& out, ance::bbt::Type const& type);
 
 #endif

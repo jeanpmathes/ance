@@ -533,7 +533,7 @@ struct ance::bbt::Segmenter::Implementation
 
             if (has_unreachable_code)
             {
-                reporter_.warning("Unreachable code", first_unreachable_location);
+                reporter_.warning(first_unreachable_location) << "Unreachable code";
             }
 
             return current_entry;
@@ -722,7 +722,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             if (state_.loops.empty())
             {
-                reporter_.error("Break statement outside of loop", break_statement.location);
+                reporter_.error(break_statement.location) << "Break statement outside of loop";
 
                 setEmptyResult();
 
@@ -748,7 +748,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             if (state_.loops.empty())
             {
-                reporter_.error("Continue statement outside of loop", continue_statement.location);
+                reporter_.error(continue_statement.location) << "Continue statement outside of loop";
 
                 setEmptyResult();
 
@@ -774,7 +774,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             if (!state_.is_function)
             {
-                reporter_.error("Return statement outside of function", return_statement.location);
+                reporter_.error(return_statement.location) << "Return statement outside of function";
             }
 
             Builder builder(*this);

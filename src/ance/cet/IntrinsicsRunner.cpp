@@ -129,7 +129,7 @@ void ance::cet::IntrinsicsRunner::runGetParent()
 
     if (scope.parent() == nullptr)
     {
-        reporter_.error("Scope has no parent", state_.location);
+        reporter_.error(state_.location) << "Scope has no parent";
         abort();
         return;
     }

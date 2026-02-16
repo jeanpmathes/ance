@@ -86,13 +86,13 @@ namespace ance::ast
 
                 if (offending_symbol->getType() == grammar::anceLexer::ERROR_CHAR)
                 {
-                    parent_.reporter_.error("Unexpected character", core::Location::simple(line, char_position, parent_.source_file_.index()));
+                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index())) << "Unexpected character";
                     return;
                 }
 
                 if (offending_symbol->getType() == grammar::anceLexer::EOF)
                 {
-                    parent_.reporter_.error("Unexpected end of file", core::Location::simple(line, char_position, parent_.source_file_.index()));
+                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index())) << "Unexpected end of file";
                     return;
                 }
 
@@ -100,15 +100,15 @@ namespace ance::ast
 
                 if (static_cast<size_t>(expected_tokens.getSingleElement()) == grammar::anceLexer::EOF)
                 {
-                    parent_.reporter_.error("At most one top-level statement per file allowed",
-                                            core::Location::simple(line, char_position, parent_.source_file_.index()));
+                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index()))
+                        << "At most one top-level statement per file allowed";
                     return;
                 }
 
                 if (static_cast<size_t>(expected_tokens.getSingleElement()) == grammar::anceLexer::SEMICOLON)
                 {
-                    parent_.reporter_.error("Missing semicolon",
-                                            core::Location::simple(previous_line, previous_char_position + 1, parent_.source_file_.index()));
+                    parent_.reporter_.error(core::Location::simple(previous_line, previous_char_position + 1, parent_.source_file_.index()))
+                        << "Missing semicolon";
                     return;
                 }
 
@@ -117,8 +117,8 @@ namespace ance::ast
                     || expected_tokens.contains(static_cast<size_t> (grammar::anceLexer::SQUARE_BRACKET_CLOSE))
                     || expected_tokens.contains(static_cast<size_t> (grammar::anceLexer::POINTY_BRACKET_CLOSE)))
                 {
-                    parent_.reporter_.error("Potential missing or mismatched closing bracket",
-                                            core::Location::simple(line, char_position, parent_.source_file_.index()));
+                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index()))
+                        << "Potential missing or mismatched closing bracket";
                     return;
                 }
 
@@ -131,15 +131,15 @@ namespace ance::ast
                         expected_text = parser->getVocabulary().getSymbolicName(static_cast<size_t>(expected_tokens.getSingleElement()));
                     }
 
-                    parent_.reporter_.error("Expected " + expected_text + " somewhere around here",
-                                            core::Location::simple(line, char_position, parent_.source_file_.index()));
+                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index()))
+                        << "Expected " << expected_text << " somewhere around here";
                     return;
                 }
 
                 if (!expected_tokens.isEmpty())
                 {
-                    parent_.reporter_.error("Unexpected token '" + offending_symbol->getText() + "', check it and previous tokens for errors",
-                                            core::Location::simple(line, char_position, parent_.source_file_.index()));
+                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index()))
+                        << "Unexpected token '" << offending_symbol->getText() << "', check it and previous tokens for errors";
 
                     return;
                 }
@@ -380,7 +380,7 @@ namespace ance::ast
 
                 if (!assigner.isFinal())
                 {
-                    reporter_.error("Unordered scope variable declarations must be final", location(ctx->assigner()));
+                    reporter_.error(location(ctx->assigner())) << "Unordered scope variable declarations must be final";
                 }
             }
 
@@ -448,7 +448,7 @@ namespace ance::ast
 
             if (assigner.isFinal())
             {
-                reporter_.error("Assignment to existing variable cannot be final", location(ctx->assigner()));
+                reporter_.error(location(ctx->assigner())) << "Assignment to existing variable cannot be final";
             }
 
             Statement* statement = new Assignment(std::move(assignee), assigner, std::move(assigned), location(ctx));
@@ -707,7 +707,7 @@ struct ance::ast::Parser::Implementation
         }
         else
         {
-            reporter_.error("Failed to read file", core::Location::file(source_file.index()));
+            reporter_.error(core::Location::file(source_file.index())) << "Failed to read file";
         }
 
         ctx_.print<Printer>(**file, "ast", source_file.getRelativePath());
@@ -749,7 +749,7 @@ struct ance::ast::Parser::Implementation
         }
         else
         {
-            reporter_.error("Failed to read file", core::Location::file(source_file.index()));
+            reporter_.error(core::Location::file(source_file.index())) << "Failed to read file";
         }
 
         ctx_.print<Printer>(**statement, "ast", source_file.getRelativePath());

@@ -202,7 +202,7 @@ struct ance::cet::Runner::Implementation
                 if (blocker.hasValue())
                 {
                     auto const& [identifier] = blocker.value();
-                    reporter_.error("Cannot resolve name '" + identifier + "'", identifier.location());
+                    reporter_.error(identifier.location()) << "Cannot resolve name " << identifier;
                 }
             }
         }
@@ -265,8 +265,38 @@ struct ance::cet::Runner::Implementation
 
             if (*actual_ptr != expected)
             {
-                reporter_.error("Expected type '" + expected.name() + "' but got '" + actual_ptr->name() + "'", location);
+                reporter_.error(location) << "Expected type " << expected.annotated() << " but got " << actual_ptr->annotated();
                 ok = false;
+            }
+
+            return ok;
+        }
+
+        [[nodiscard]] bool expectSignature(bbt::Signature const&                                         signature,
+                                           utility::List<std::reference_wrapper<bbt::Type const>> const& argument_types,
+                                           utility::List<core::Location> const&                          argument_locations,
+                                           core::Location const&                                         location)
+        {
+            bool ok = true;
+
+            size_t const arity          = signature.arity();
+            size_t const argument_count = argument_types.size();
+
+            if (arity != argument_count)
+            {
+                reporter_.error(location) << "Call to " << signature.annotated() << " with wrong number of arguments: expected " << arity << " but got " << argument_count;
+                ok = false;
+            }
+
+            if (!ok) return false;
+
+            for (size_t i = 0; i < argument_count; ++i)
+            {
+                bbt::Type const&      parameter_type    = *signature.parameters()[i].type;
+                bbt::Type const&      argument_type     = argument_types[i].get();
+                core::Location const& argument_location = argument_locations[i];
+
+                ok &= expectType(parameter_type, argument_type, argument_location);
             }
 
             return ok;
@@ -289,38 +319,6 @@ struct ance::cet::Runner::Implementation
         static T const& deLReference(utility::Shared<bbt::Value> value)
         {
             return deLReference(value)->as<T>();
-        }
-
-        [[nodiscard]] bool expectSignature(bbt::Signature const&                                         signature,
-                                           utility::List<std::reference_wrapper<bbt::Type const>> const& argument_types,
-                                           utility::List<core::Location> const&                          argument_locations,
-                                           core::Location const&                                         location)
-        {
-            bool ok = true;
-
-            size_t const arity          = signature.arity();
-            size_t const argument_count = argument_types.size();
-
-            if (arity != argument_count)
-            {
-                reporter_.error("Call to '" + signature.name() + "' with wrong number of arguments:" + " expected " + std::to_string(arity) + " but got "
-                                    + std::to_string(argument_count),
-                                location);
-                ok = false;
-            }
-
-            if (!ok) return false;
-
-            for (size_t i = 0; i < argument_count; ++i)
-            {
-                bbt::Type const&      parameter_type    = *signature.parameters()[i].type;
-                bbt::Type const&      argument_type     = argument_types[i].get();
-                core::Location const& argument_location = argument_locations[i];
-
-                ok &= expectType(parameter_type, argument_type, argument_location);
-            }
-
-            return ok;
         }
 
         struct TemporaryOutput
@@ -370,7 +368,7 @@ struct ance::cet::Runner::Implementation
         {
             auto const& [identifier] = blocker;
 
-            reporter_.trace(prefix, core::Location::global()) << "block execution pending on '" << identifier << "'";
+            reporter_.trace(prefix, core::Location::global()) << "block execution pending on " << identifier;
 
             state_.execution_result = ExecutionResult::Pending;
 
@@ -437,7 +435,7 @@ struct ance::cet::Runner::Implementation
         {
             trace("ErrorLink", error_link);
 
-            reporter_.error("Cannot execute this link", error_link.location);
+            reporter_.error(error_link.location) << "Cannot execute this link";
 
             abort();
         }
@@ -488,7 +486,7 @@ struct ance::cet::Runner::Implementation
         {
             trace("ErrorStatement", error_statement);
 
-            reporter_.error("Cannot execute this statement", error_statement.location);
+            reporter_.error(error_statement.location) << "Cannot execute this statement";
 
             abort();
         }
@@ -509,7 +507,7 @@ struct ance::cet::Runner::Implementation
 
             if (!target->type()->isLReference())
             {
-                reporter_.error("Cannot store to non-l-value", store.target.location);
+                reporter_.error(store.target.location) << "Cannot store to non-l-value";
                 abort();
                 return;
             }
@@ -789,7 +787,7 @@ struct ance::cet::Runner::Implementation
                 if (type == *type_context_.getLocation()) return bbt::Location::make(core::Location::global(), type_context_);
                 if (type == *type_context_.getString()) return bbt::String::make("", type_context_);
 
-                reporter_.error("Cannot create default value for type '" + type.name() + "'", default_value.type.location);
+                reporter_.error(default_value.type.location) << "Cannot create default value for type " << type.annotated();
 
                 return bbt::Unit::make(type_context_);
             };
