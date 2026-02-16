@@ -15,7 +15,7 @@
 void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 {
     utility::List<utility::Shared<bbt::Function>> provider;// todo: remove / improve the functions
-    bbt::FlowBuilder                              builder(core::Location::global(), runner.types());
+    bbt::FlowBuilder                              builder(core::Location::core(), runner.types());
 
     builder.setActiveBasicBlock(builder.createBasicBlock());
     {

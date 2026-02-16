@@ -22,6 +22,10 @@ namespace ance::core
         /// \return A global location.
         static Location global();
 
+        /// Create a core location. A core location is used for generated language core definitions.
+        /// \return A core location.
+        static Location core();
+
         /// Create a file location. It targets an entire file.
         /// \param file_index The index of the file.
         /// \return The location.
@@ -57,6 +61,10 @@ namespace ance::core
         /// Get whether this location is global, meaning not an actual source location.
         /// \return True if it is global.
         [[nodiscard]] bool isGlobal() const;
+
+        /// Get whether this location is for core code.
+        /// \return True if it is a core location.
+        [[nodiscard]] bool isCore() const;
 
         /// Get whether this location is a file location, meaning it targets an entire file.
         /// \return True if it is a file location.

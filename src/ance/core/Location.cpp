@@ -9,6 +9,7 @@ namespace
     {
         MODE_GLOBAL = 0,
         MODE_FILE   = 1,
+        MODE_CORE   = 2,
     };
 }
 
@@ -28,6 +29,11 @@ ance::core::Location ance::core::Location::global()
 ance::core::Location ance::core::Location::file(size_t file_index)
 {
     return {0, 0, MODE_FILE, 0, file_index};
+}
+
+ance::core::Location ance::core::Location::core()
+{
+    return {0, 0, MODE_CORE, 0, 0};
 }
 
 ance::core::Location ance::core::Location::simple(size_t line, size_t column, size_t file_index)
@@ -67,6 +73,11 @@ bool ance::core::Location::isGlobal() const
     return start_line_ == 0 && end_line_ == MODE_GLOBAL;
 }
 
+bool ance::core::Location::isCore() const
+{
+    return start_line_ == 0 && end_line_ == MODE_CORE;
+}
+
 bool ance::core::Location::isFile() const
 {
     return start_line_ == 0 && end_line_ == MODE_FILE;
@@ -74,18 +85,18 @@ bool ance::core::Location::isFile() const
 
 bool ance::core::Location::isSingleLine() const
 {
-    return start_line_ == end_line_ && !isGlobal() && !isFile();
+    return start_line_ == end_line_ && !isGlobal() && !isCore() && !isFile();
 }
 
 void ance::core::Location::extend(Location const& location)
 {
-    if (this->isGlobal() || this->isFile())
+    if (this->isGlobal() || this->isCore() || this->isFile())
     {
         *this = location;
         return;
     }
 
-    if (location.isGlobal())
+    if (location.isGlobal() || location.isCore())
     {
         return;
     }
@@ -113,22 +124,22 @@ void ance::core::Location::extend(Location const& location)
 
 ance::core::Location ance::core::Location::first() const
 {
-    if (isGlobal() || isFile()) return *this;
+    if (isGlobal() || isCore() || isFile()) return *this;
 
     return Location(start_line_, start_column_, start_line_, start_column_, file_index_);
 }
 
 ance::core::Location ance::core::Location::last() const
 {
-    if (isGlobal() || isFile()) return *this;
+    if (isGlobal() || isCore() || isFile()) return *this;
 
     return Location(end_line_, end_column_, end_line_, end_column_, file_index_);
 }
 
 ance::core::Location ance::core::Location::getFirst(Location a, Location b)
 {
-    if (b.isGlobal()) return a;
-    if (a.isGlobal()) return b;
+    if (b.isGlobal() || b.isCore()) return a;
+    if (a.isGlobal() || a.isCore()) return b;
 
     if (a.fileIndex() != b.fileIndex()) return a;
 
@@ -141,7 +152,11 @@ ance::core::Location ance::core::Location::getFirst(Location a, Location b)
 
 std::ostream& ance::core::operator<<(std::ostream& os, Location const& location)
 {
-    if (!location.isGlobal() && !location.isFile())
+    if (location.isCore())
+    {
+        os << "(core)";
+    }
+    else if (!location.isGlobal() && !location.isFile())
     {
         os << "(" << location.start_line_ << ":" << location.start_column_ << ")";
     }

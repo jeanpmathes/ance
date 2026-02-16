@@ -138,6 +138,12 @@ struct ance::core::Reporter::Implementation
                 return;
             }
 
+            if (location.isCore())
+            {
+                out_ << location << " " << message << std::endl;
+                return;
+            }
+
             sources::SourceFile const& source_file = source_tree_.getFile(location.fileIndex());
 
             out_ << source_file.getRelativePath().generic_string() << " ";
