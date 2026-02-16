@@ -1,16 +1,16 @@
 #include "CoreDefinitions.h"
 
-#include "ance/utility/Containers.h"
-#include "ance/utility/Owners.h"
+#include "utility/Containers.h"
+#include "utility/Owners.h"
 
-#include "ance/core/Intrinsic.h"
+#include "core/Intrinsic.h"
 
-#include "ance/bbt/FlowBuilder.h"
-#include "ance/bbt/Function.h"
-#include "ance/bbt/Type.h"
+#include "bbt/FlowBuilder.h"
+#include "bbt/Function.h"
+#include "bbt/Type.h"
 
-#include "ance/cet/Provider.h"
-#include "ance/cet/Runner.h"
+#include "cet/Provider.h"
+#include "cet/Runner.h"
 
 void ance::defineCoreLanguageFunctions(cet::Runner& runner)
 {

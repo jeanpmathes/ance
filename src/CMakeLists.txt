@@ -1,10 +1,15 @@
-add_executable(ance
-        ance/core/Constants.h)
+add_executable(ance)
 
 add_subdirectory(ance)
 add_subdirectory(grammar)
 
-target_sources(ance PRIVATE main.cpp CoreDefinitions.cpp)
+target_sources(ance PRIVATE main.cpp)
+
+configure_file(
+        "${PROJECT_SOURCE_DIR}/src/ance/Version.h.in"
+        "${PROJECT_BINARY_DIR}/src/ance/Version.h"
+)
+include_directories(${PROJECT_BINARY_DIR}/src)
 
 target_compile_features(ance PRIVATE cxx_std_23)
 set_target_properties(ance PROPERTIES

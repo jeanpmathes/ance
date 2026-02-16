@@ -1,8 +1,8 @@
 #ifndef ANCE_UTILITY_OWNERS_H
 #define ANCE_UTILITY_OWNERS_H
 
-#include <memory>
 #include <any>
+#include <memory>
 
 #include "Optional.h"
 
@@ -79,20 +79,6 @@ namespace ance::utility
     }
 
     template<typename T>
-    T* getPtr(Optional<Owned<T>>& value)
-    {
-        if (value.hasValue()) return value->get();
-        return nullptr;
-    }
-
-    template<typename T>
-    T const* getPtr(Optional<Owned<T>> const& value)
-    {
-        if (value.hasValue()) return value->get();
-        return nullptr;
-    }
-
-    template<typename T>
     T* unwrap(Owned<T>&& value)
     {
         return Owned<T>::release(std::move(value));
@@ -134,7 +120,6 @@ namespace ance::utility
         Shared& operator=(Shared<OtherT>& value) noexcept;
 
         bool operator==(Shared const& other) const noexcept;
-        bool operator!=(Shared const& other) const noexcept;
 
       private:
         explicit Shared(std::shared_ptr<T>&& value);

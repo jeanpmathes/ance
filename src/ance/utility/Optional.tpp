@@ -79,10 +79,13 @@ ance::utility::Optional<T>::Optional(Optional<T>& optional)
 template<ance::utility::Moveable T>
 ance::utility::Optional<T>::Optional(Optional<T>&& optional) noexcept : has_value_(optional.has_value_)
 {
-    if (has_value_) new (storage_.data()) T(std::move(*optional));
+    if (has_value_)
+    {
+        new (storage_.data()) T(std::move(*optional));
+        std::destroy_at(std::launder(reinterpret_cast<T*>(optional.storage_.data())));
+    }
 
     optional.has_value_ = false;
-    optional.storage_   = {};
 }
 
 template<ance::utility::Moveable T>
@@ -106,21 +109,13 @@ template<typename OtherT>
     requires ance::utility::MoveConvertible<T, OtherT>
 ance::utility::Optional<T>::Optional(Optional<OtherT>&& optional) : has_value_(optional.has_value_)
 {
-    if (has_value_) new (storage_.data()) T(std::move(*optional));
+    if (has_value_)
+    {
+        new (storage_.data()) T(std::move(*optional));
+        std::destroy_at(std::launder(reinterpret_cast<OtherT*>(optional.storage_.data())));
+    }
 
     optional.has_value_ = false;
-    optional.storage_   = {};
-}
-
-template<ance::utility::Moveable T>
-template<typename OtherT>
-    requires ance::utility::MoveConvertible<T, OtherT>
-ance::utility::Optional<T>::Optional(Optional<OtherT> optional) : has_value_(optional.has_value_)
-{
-    if (has_value_) new (storage_.data()) T(std::move(*optional));
-
-    optional.has_value_ = false;
-    optional.storage_   = {};
 }
 
 template<ance::utility::Moveable T>
@@ -177,9 +172,6 @@ template<ance::utility::Moveable T>
 ance::utility::Optional<T>::~Optional<T>()
 {
     if (has_value_) std::destroy_at(std::launder(reinterpret_cast<T*>(storage_.data())));
-
-    has_value_ = false;
-    storage_   = {};
 }
 
 template<ance::utility::Moveable T>

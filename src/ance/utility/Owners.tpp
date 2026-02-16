@@ -139,12 +139,6 @@ bool ance::utility::Shared<T>::operator==(Shared<T> const& other) const noexcept
 }
 
 template<typename T>
-bool ance::utility::Shared<T>::operator!=(Shared<T> const& other) const noexcept
-{
-    return value_ != other.value_;
-}
-
-template<typename T>
 T* ance::utility::Shared<T>::get()
 {
     return value_.get();

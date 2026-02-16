@@ -16,7 +16,8 @@
 
 #include "ance/build/Compiler.h"
 
-#include "CoreDefinitions.h"
+#include "ance/Version.h"
+#include "ance/CoreDefinitions.h"
 
 namespace ance
 {
@@ -94,7 +95,7 @@ namespace ance
 
         if (arguments->print_version)
         {
-            program_out << "ance compiler version 0.1.0" << std::endl;
+            program_out << "ance compiler version " << VERSION << std::endl;
             program_out << "Copyright (c) 2026 Jean Patrick Mathes" << std::endl;
             program_out << std::endl;
         }
@@ -140,7 +141,7 @@ namespace ance
 
         return exit_code;
 
-        // todo: spend some time improving Optional, Shared and Owned
+        // todo: check dumpbin warning, fix it
 
         // todo: define the core language functions using code instead of hardcoding the trees - code would be a string in C++ file, would need an entire chain to parse and transform into flows
         // todo: this requires that the type context is shared between all runers, so create a global type context instead of one per runner

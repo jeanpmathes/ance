@@ -54,10 +54,6 @@ namespace ance::utility
             requires MoveConvertible<T, OtherT>
         explicit(false) Optional(Optional<OtherT>&& optional);
 
-        template<typename OtherT>
-            requires MoveConvertible<T, OtherT>
-        explicit(false) Optional(Optional<OtherT> optional);
-
         Optional& operator=(Optional optional)
             requires Copyable<T>;
         Optional& operator=(Optional&& optional) noexcept

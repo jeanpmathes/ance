@@ -1,0 +1,12 @@
+#ifndef ANCE_VERSION_H
+#define ANCE_VERSION_H
+
+namespace ance
+{
+    /**
+     * The version of ANCE.
+     */
+    static constexpr const char* VERSION = "@PROJECT_VERSION@";
+}
+
+#endif

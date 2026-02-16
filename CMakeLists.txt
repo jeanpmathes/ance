@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.30)
-project(ance LANGUAGES CXX)
+project(ance
+        VERSION 0.1.0
+        DESCRIPTION "A compiler for the ance programming language"
+        LANGUAGES CXX)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
