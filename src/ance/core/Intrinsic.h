@@ -16,31 +16,49 @@ namespace ance::core
         enum Value
         {
             /**
-             * This intrinsic does nothing.
+             * This intrinsic does not take any parameters and returns the unit type.
              */
             NO_OPERATION,
             /**
-             * This intrinsic declares a variable in a scope.
+             * This intrinsic takes the following parameters:
+             * - The scope to declare the variable in.
+             * - The identifier of the variable to declare.
+             * - Whether the declaration is final.
+             * - The type of the variable to declare.
+             * It returns a reference to the declared variable.
              */
             DECLARE,// todo: make method on scope class
             /**
-             * This intrinsic resolves a variable in a scope.
+             * This intrinsic takes the following parameters:
+             * - The scope to resolve the variable in.
+             * - The identifier of the variable to resolve.
+             * It returns a reference to the resolved variable.
              */
             RESOLVE,// todo: make method on scope class
             /**
-             * This intrinsic gets the parent scope of a scope.
+             * This intrinsic takes the following parameters:
+             * - The scope to get the parent of.
+             * It returns the parent scope.
              */
             GET_PARENT,// todo: make method on scope class
             /**
-             * This intrinsic converts a boolean to a string.
+             * This intrinsic takes the following parameters:
+             * - The boolean to convert.
+             * It returns the string representation of the boolean.
              */
             B_2_STR,// todo: implement as core function
             /**
-             * This intrinsic logs a string to the compiler log.
+             * This intrinsic takes the following parameters:
+             * - The string message to log.
+             * - The location to log the message at.
+             * It returns the unit type.
              */
             LOG,
             /**
-             * This intrinsic includes another source file.
+             * This intrinsic takes the following parameters:
+             * - The path of the file to include.
+             * - The location of a file to use as base to resolve a relative path.
+             * It returns the unit type.
              */
             INCLUDE
         };
