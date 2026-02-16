@@ -1,8 +1,13 @@
 import os.path
 import subprocess
 
+
+def executable_name(name: str) -> str:
+    return f"{name}.exe" if os.name == "nt" else name
+
+
 working_directory: str = os.path.abspath('../..')
-compiler_path: str = os.path.abspath('../../cmake-build-debug/src/ance.exe')
+compiler_path: str = os.path.abspath(os.path.join('../../cmake-build-debug/src', executable_name('ance')))
 
 
 def compile_project(project_dir_path: str) -> (int, str):
@@ -12,7 +17,7 @@ def compile_project(project_dir_path: str) -> (int, str):
 
 
 def run_project(project_path: str, target_triple: str, project_name: str) -> (int, str):
-    path: str = os.path.join(project_path, 'bld', target_triple, 'bin', f'{project_name}.exe')
+    path: str = os.path.join(project_path, 'bld', target_triple, 'bin', executable_name(project_name))
     project = subprocess.run([path], capture_output=True, encoding='utf-8')
 
     result: int = project.returncode
