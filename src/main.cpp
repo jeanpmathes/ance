@@ -140,8 +140,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: modernize the cmake, e.g. target variants of commands if that is better
-
         // todo: add a way to call intrinsics from source code with the intrinsic expression intrinsic "name" (args...)
         // todo: but also add a core function intrinsic("name", args...) that does the same thing but is a normal function call
 

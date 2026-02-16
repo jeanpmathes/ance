@@ -6,7 +6,10 @@ add_subdirectory(grammar)
 
 target_sources(ance PRIVATE main.cpp CoreDefinitions.cpp)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-reserved-macro-identifier -Wno-unused-macros")
+target_compile_features(ance PRIVATE cxx_std_23)
+set_target_properties(ance PROPERTIES
+        CXX_STANDARD_REQUIRED ON
+        CXX_EXTENSIONS OFF)
 
 set(ERROR_OPTIONS
     -Werror -Weverything
@@ -21,7 +24,11 @@ set(ERROR_OPTIONS
     -Wno-switch-enum
     -Wno-padded)
 
-target_compile_options(ance PRIVATE /EHsc -MDd ${ERROR_OPTIONS})
+target_compile_options(ance PRIVATE
+        /EHsc
+        -Wno-reserved-macro-identifier
+        -Wno-unused-macros
+        ${ERROR_OPTIONS})
 
 foreach(file IN LISTS ANCE_ANTLR_GENERATED_FILES)
     if(file MATCHES "\\.cpp$")
@@ -32,13 +39,19 @@ foreach(file IN LISTS ANCE_ANTLR_GENERATED_FILES)
     endif()
 endforeach()
 
-target_include_directories(ance PUBLIC .)
+target_include_directories(ance PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(ance SYSTEM PRIVATE
+        ${ANTLR4_INCLUDE_DIR}
+        ${LLVM_INCLUDE_DIRS}
+        ${LLD_INCLUDE_DIRS})
+
+target_compile_definitions(ance PRIVATE ${LLVM_DEFINITIONS})
 
 set(LLD_AVAILABLE_LIBS lldCommon lldCOFF lldELF lldMachO lldMinGW lldWasm)
 
-add_dependencies(ance antlr4_shared)
-target_link_libraries(ance PRIVATE antlr4_shared)
-
-target_link_libraries(ance PRIVATE ${LLVM_AVAILABLE_LIBS} ${LLD_AVAILABLE_LIBS})
-target_link_libraries(ance PRIVATE Boost::boost Boost::locale Boost::regex)
-target_link_libraries(ance PRIVATE ICU ICU::data ICU::i18n ICU::io ICU::tu ICU::uc)
+target_link_libraries(ance PRIVATE
+        antlr4_shared
+        ${LLVM_AVAILABLE_LIBS}
+        ${LLD_AVAILABLE_LIBS}
+        Boost::boost Boost::locale Boost::regex
+        ICU ICU::data ICU::i18n ICU::io ICU::tu ICU::uc)
