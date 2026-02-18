@@ -1,18 +1,18 @@
-#include "CoreDefinitions.h"
+#include "LanguageCore.h"
 
-#include "utility/Containers.h"
-#include "utility/Owners.h"
+#include "ance/utility/Containers.h"
+#include "ance/utility/Owners.h"
 
-#include "core/Intrinsic.h"
+#include "ance/core/Intrinsic.h"
 
-#include "bbt/FlowBuilder.h"
-#include "bbt/Function.h"
-#include "bbt/Type.h"
+#include "ance/bbt/FlowBuilder.h"
+#include "ance/bbt/Function.h"
+#include "ance/bbt/Type.h"
 
-#include "cet/Provider.h"
-#include "cet/Runner.h"
+#include "Provider.h"
+#include "Runner.h"
 
-void ance::defineCoreLanguageFunctions(cet::Runner& runner)
+void ance::cet::defineLanguageCore(Runner& runner)
 {
     utility::List<utility::Shared<bbt::Function>> provider;// todo: remove / improve the functions
     bbt::FlowBuilder                              builder(core::Location::core(), runner.types());
@@ -139,5 +139,5 @@ void ance::defineCoreLanguageFunctions(cet::Runner& runner)
                                            builder.build("main"),
                                            runner.types()));
 
-    runner.add(cet::Provider::fromList(std::move(provider)));
+    runner.add(Provider::fromList(std::move(provider)));
 }

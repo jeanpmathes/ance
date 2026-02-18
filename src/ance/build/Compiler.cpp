@@ -1,8 +1,8 @@
 #include "Compiler.h"
 
-#include "ance/core/Intrinsic.h"
-
 #include "ance/cet/Node.h"
+#include "ance/cet/Runner.h"
+#include "ance/cet/LanguageCore.h"
 
 struct ance::build::Compiler::Implementation
 {
@@ -28,13 +28,20 @@ struct ance::build::Compiler::Implementation
         : source_tree_(source_tree)
         , reporter_(reporter)
         , context_(context)
-    {}
-
-    bool compile(cet::Unit const& unit)
+        , runner_(source_tree, reporter, context)
     {
+        cet::defineLanguageCore(runner_);
+    }
+
+    bool compile(std::filesystem::path const& file)
+    {
+        utility::Optional<utility::Owned<cet::Unit>> unit = runner_.runOrderedFile(file);
+
+        if (!unit.hasValue()) return false;
+
         utility::Owned<CET> cet = utility::makeOwned<CET>(reporter_);
 
-        cet->visit(unit);
+        cet->visit(**unit);
 
         (void) context_;    // todo: use or remove
         (void) source_tree_;// todo: use or remove
@@ -48,6 +55,8 @@ struct ance::build::Compiler::Implementation
     sources::SourceTree& source_tree_;
     core::Reporter&      reporter_;
     core::Context&       context_;
+
+    cet::Runner runner_;
 };
 
 ance::build::Compiler::Compiler(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
@@ -56,7 +65,7 @@ ance::build::Compiler::Compiler(sources::SourceTree& source_tree, core::Reporter
 
 ance::build::Compiler::~Compiler() = default;
 
-bool ance::build::Compiler::compile(cet::Unit const& unit)
+bool ance::build::Compiler::compile(std::filesystem::path const& file)
 {
-    return implementation_->compile(unit);
+    return implementation_->compile(file);
 }

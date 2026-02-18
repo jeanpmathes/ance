@@ -12,16 +12,17 @@ namespace ance::cet
 
 namespace ance::build
 {
-    /// Compiles CETs into binaries.
+    /// Compiles projects into binaries.
     class Compiler
     {
       public:
         Compiler(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
         ~Compiler();
 
-        /// Compile a CET unit.
-        /// \param unit The unit to compile.
-        bool compile(cet::Unit const& unit);
+        /// Compile a project.
+        /// \param file The path to the project file to compile.
+        /// \return Whether the compilation was successful.
+        bool compile(std::filesystem::path const& file);
 
       private:
         struct Implementation;

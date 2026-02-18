@@ -7,5 +7,3 @@ add_subdirectory(est)
 add_subdirectory(bbt)
 add_subdirectory(cet)
 add_subdirectory(build)
-
-target_sources(ance PRIVATE CoreDefinitions.cpp)

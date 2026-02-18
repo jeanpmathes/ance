@@ -5,19 +5,9 @@
 
 #include "ance/sources/SourceTree.h"
 
-#include "ance/ast/Node.h"
-#include "ance/ast/Parser.h"
-
-#include "ance/bbt/Type.h"
-
-#include "ance/cet/Node.h"
-#include "ance/cet/Provider.h"
-#include "ance/cet/Runner.h"
-
 #include "ance/build/Compiler.h"
 
 #include "ance/Version.h"
-#include "ance/CoreDefinitions.h"
 
 namespace ance
 {
@@ -36,8 +26,6 @@ namespace ance
     static utility::Optional<Arguments> parseArguments(std::ostream& out, int const argc, char** argv)
     {
         Arguments arguments;
-
-        // todo: actual command line parsing library
 
         for (int index = 1; index < argc; index++)
         {
@@ -120,34 +108,28 @@ namespace ance
         core::Reporter      reporter {source_tree, compiler_out, arguments->trace_enabled};
         core::Context       context {debug_path};
 
-        cet::Runner     runner {source_tree, reporter, context};
-        build::Compiler compiler {source_tree, reporter, context};// todo: consider using the runner internally
-
-        defineCoreLanguageFunctions(runner);
+        build::Compiler compiler {source_tree, reporter, context};
 
         int exit_code = EXIT_FAILURE;
 
-        utility::Optional<utility::Owned<cet::Unit>> unit = runner.runOrderedFile(file_name);
-
-        if (unit.hasValue())
-        {
-            if (compiler.compile(**unit))
-            {
-                exit_code = EXIT_SUCCESS;
-            }
-        }
+        if (compiler.compile(file_name))
+            exit_code = EXIT_SUCCESS;
 
         reporter.report();
 
         return exit_code;
 
-        // todo: check dumpbin warning, fix it
-
         // todo: define the core language functions using code instead of hardcoding the trees - code would be a string in C++ file, would need an entire chain to parse and transform into flows
         // todo: this requires that the type context is shared between all runers, so create a global type context instead of one per runner
         // todo: probably delete the flow builder
 
-        // todo: add all cmp statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
+        // todo: check dumpbin warning, fix it
+
+        // todo: instead of marking code as cmp, it should be unmarked by default (unmarked code can run at compile and run time)
+        // todo: remove all mentions of cmp, instead add the compiletime and runtime keywords
+        // todo: go through the existing compiler and check all places that need to be adapted, should not be too much yet
+
+        // todo: add all compiletime statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef
         // todo: do it step by step, as e.g. the array things require more changes so that array ops have support on types that the temporary and variable classes can use
         // todo: WHEN WORKING ON TYPES: TYPES SHOULD DEFINE THEIR OPS USING SOURCE CODE (HARDCODED IN C++), just like the core functions, using intrinsics
@@ -158,11 +140,15 @@ namespace ance
 
         // todo: rework SourceFile class to read into single string buffer, then use string views instead of line-by-line reading
 
-        // todo: add first non-cmp code and do actual compilation, maybe have a Lowerer visitor that works in tandem with the runner
+        // todo: add first runtime code and do actual compilation, maybe have a Lowerer visitor that works in tandem with the runner
         // todo: build a very minimal CET that heavily relies and uses intrinsics, should be close to LLVM IR in capability and nodes
         // todo: might need its own value type (defined in CET namespace), do not use the one from BBT or LLVM
         // todo: this is the point where the tests should be brought back in, maybe deactivate those that certainly won't work yet and maybe prioritize them, add TODOs to bring them back
         // todo: also add loads of tests for all the new things, e.g. lambdas, better cmp, different types, etc.
+
+        // todo: fully support the compiletime and runtime keywords
+        // todo: some statements are only allowed in functions marked as compiletime and some only in runtime
+        // todo: THINK MORE ABOUT THIS: non-marked can be called from all, runtime only from runtime, compiletime only from compiletime and runtime
 
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
