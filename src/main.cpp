@@ -119,8 +119,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: delete the flow builder
-
         // todo: rework anonymous function constructor into function constructor, should take an identifier for the function name but that should be optional
         // todo: for lambdas it remains AnonymousFunction'N, for actual functions it is the function name
 

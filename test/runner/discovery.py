@@ -65,7 +65,7 @@ def create_test(project: Project) -> Optional[Test]:
     if not os.path.exists(code_path):
         return None
 
-    is_valid: bool
+    is_valid: Optional[bool] = None
     expected_result: Optional[str] = None
 
     with open(code_path, "r") as code_file:
@@ -86,5 +86,8 @@ def create_test(project: Project) -> Optional[Test]:
                 break
 
             idx += 1
+
+        if is_valid is None:
+            return None
 
         return Test(project.directory_name, project.directory_path, is_valid, expected_result)
