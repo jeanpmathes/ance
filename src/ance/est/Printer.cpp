@@ -176,7 +176,7 @@ struct ance::est::Printer::Implementation
             print(core::Assigner::COPY_ASSIGNMENT);
             print(" temporary ");
             visit(*write_temporary.value);
-            print(");");
+            print(";");
         }
 
         void visit(ErrorExpression const&) override
@@ -191,7 +191,7 @@ struct ance::est::Printer::Implementation
             print(" (");
             for (size_t index = 0; index < intrinsic.arguments.size(); index++)
             {
-                print(", ");
+                if (index > 0) print(", ");
                 visit(*intrinsic.arguments[index]);
             }
             print(")");

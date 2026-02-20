@@ -181,10 +181,10 @@ struct ance::bbt::Printer::Implementation
             print(" intrinsic ");
             print(intrinsic.intrinsic);
             print(" (");
-            for (auto const argument : intrinsic.arguments)
+            for (size_t index = 0; index < intrinsic.arguments.size(); index++)
             {
-                print(", ");
-                print(argument.get().id());
+                if (index > 0) print(", ");
+                print(intrinsic.arguments[index].get().id());
             }
             print(");");
         }
