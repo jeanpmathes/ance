@@ -8,6 +8,7 @@
 namespace ance::ast
 {
     struct File;
+    struct Declaration;
     struct Statement;
 
     /// Prints the AST to a stream.
@@ -18,6 +19,7 @@ namespace ance::ast
         ~Printer();
 
         void print(File const& file) const;
+        void print(Declaration const& declaration) const;
         void print(Statement const& statement) const;
 
       private:

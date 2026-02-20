@@ -3,7 +3,6 @@
 #include "ance/bbt/Function.h"
 #include "ance/bbt/Type.h"
 
-#include "ance/cet/Provider.h"
 #include "ance/cet/Temporary.h"
 #include "ance/cet/ValueExtensions.h"
 
@@ -95,55 +94,28 @@ ance::bbt::TypeContext& ance::cet::Scope::types()
     return type_context_;
 }
 
-ance::cet::GlobalScope::GlobalScope(utility::List<utility::Owned<Provider>>& providers, bbt::TypeContext& type_context)
-    : Scope(nullptr, type_context)
-    , providers_(providers)
+ance::cet::CoreScope::CoreScope(bbt::TypeContext& type_context) : Scope(nullptr, type_context)
 {
-    auto add_type_variable = [&](utility::Shared<bbt::Type> type) {
-        variables_.emplace(type->name(), Variable::createConstant(type->name(), type, type_context));
-    };
 
-    add_type_variable(type_context.getBool());
-    add_type_variable(type_context.getUnit());
-    add_type_variable(type_context.getSize());
-    add_type_variable(type_context.getString());
-    add_type_variable(type_context.getIdentifier());
-    add_type_variable(type_context.getType());
-    add_type_variable(type_context.getLocation());
-    add_type_variable(type_context.getFunction());
 }
 
-bool ance::cet::GlobalScope::canDeclare(core::Identifier const&) const
+bool ance::cet::CoreScope::canDeclare(core::Identifier const& identifier) const
 {
-    return false;
+    return !variables_.contains(identifier);
 }
 
-void ance::cet::GlobalScope::onDeclare(utility::Owned<Variable>)
+void ance::cet::CoreScope::onDeclare(utility::Owned<Variable> variable)
 {
-    assert(false);
+    variables_.emplace(variable->name(), std::move(variable));
 }
 
-ance::cet::Variable* ance::cet::GlobalScope::onFind(core::Identifier const& identifier)
+ance::cet::Variable* ance::cet::CoreScope::onFind(core::Identifier const& identifier)
 {
     auto iterator = variables_.find(identifier);
     if (iterator != variables_.end())
     {
         auto& [_, variable] = *iterator;
         return variable.get();
-    }
-
-    for (auto& provider : this->providers_)
-    {
-        utility::Optional<utility::Shared<bbt::Function>> provided = provider->provide(identifier);
-        if (provided.hasValue())
-        {
-            auto variable = utility::makeShared<Variable>(identifier, types().getFunction(), true, core::Location::global(), types());
-            variables_.emplace(identifier, variable);
-
-            variable->write(*provided);
-
-            return variable.get();
-        }
     }
 
     return nullptr;

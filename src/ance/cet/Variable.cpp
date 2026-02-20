@@ -85,11 +85,4 @@ namespace ance::cet
     {
         return value_.hasValue();
     }
-
-    utility::Shared<Variable> Variable::createConstant(core::Identifier const& name, utility::Shared<bbt::Value> value, bbt::TypeContext& type_context)
-    {
-        utility::Shared<Variable> constant = utility::makeShared<Variable>(name, value->type(), true, core::Location::global(), type_context);
-        constant->write(std::move(value), {});
-        return constant;
-    }
 }

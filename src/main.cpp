@@ -119,9 +119,16 @@ namespace ance
 
         return exit_code;
 
-        // todo: define the core language functions using code instead of hardcoding the trees - code would be a string in C++ file, would need an entire chain to parse and transform into flows
-        // todo: this requires that the type context is shared between all runers, so create a global type context instead of one per runner
-        // todo: probably delete the flow builder
+        // todo: delete the flow builder
+
+        // todo: rework anonymous function constructor into function constructor, should take an identifier for the function name but that should be optional
+        // todo: for lambdas it remains AnonymousFunction'N, for actual functions it is the function name
+
+        // todo: canDeclare should return an enum why declaration is not allowed
+
+        // todo: rename global location to project location, also add a nowhere location for things that do not have a location
+        // todo: disallow creating identifier without location (and use core where appropriate)
+        // todo: use nowhere in LanguageCore.cpp for the variable
 
         // todo: check dumpbin warning, fix it
 
@@ -175,7 +182,7 @@ namespace ance
     }
 }
 
-//#define ANCE_HANDLE_ERRORS
+#define ANCE_HANDLE_ERRORS
 
 int main(int const argc, char** argv)
 {

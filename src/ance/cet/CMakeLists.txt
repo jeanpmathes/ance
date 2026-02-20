@@ -1,1 +1,1 @@
-target_sources(ance PRIVATE Runner.cpp Node.cpp Printer.cpp Grapher.cpp Provider.cpp Variable.cpp Scope.cpp LanguageCore.cpp IntrinsicsRunner.cpp Memory.cpp ValueExtensions.cpp Temporary.cpp Address.cpp)
+target_sources(ance PRIVATE Runner.cpp Node.cpp Printer.cpp Grapher.cpp Variable.cpp Scope.cpp LanguageCore.cpp IntrinsicsRunner.cpp Memory.cpp ValueExtensions.cpp Temporary.cpp Address.cpp)

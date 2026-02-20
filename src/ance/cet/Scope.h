@@ -20,7 +20,6 @@
 namespace ance::cet
 {
     class Temporary;
-    class Provider;
 }
 
 namespace ance::cet
@@ -64,14 +63,14 @@ namespace ance::cet
         std::list<utility::Owned<Scope>>                           child_scopes_ = {};
     };
 
-    /// The global scope, which is the root of all scopes.
-    /// Note that it is even higher than the scope of the compiled unit, as it contains providers and dependencies as well.
-    class GlobalScope final : public Scope
+    /// The core scope, which is the root of all scopes.
+    /// Note that it is even higher than the scope of the compiled unit, as it contains core language features and dependencies as well.
+    class CoreScope final : public Scope
     {
       public:
-        explicit GlobalScope(utility::List<utility::Owned<Provider>>& providers, bbt::TypeContext& type_context);
+        explicit CoreScope(bbt::TypeContext& type_context);
 
-        ~GlobalScope() override = default;
+        ~CoreScope() override = default;
 
       protected:
         [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override;
@@ -80,9 +79,7 @@ namespace ance::cet
         [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;
 
       private:
-        utility::List<utility::Owned<Provider>>& providers_;
-
-        std::map<core::Identifier, utility::Shared<Variable>> variables_ = {};
+        std::map<core::Identifier, utility::Owned<Variable>> variables_ = {};
     };
 
     class OrderedScope final : public Scope

@@ -77,14 +77,6 @@ namespace text
 
 struct ance::core::Reporter::Implementation
 {
-    enum class Level
-    {
-        TRACE,
-        INFO,
-        WARNING,
-        ERROR
-    };
-
     Implementation(Reporter* reporter, sources::SourceTree& source_tree, std::ostream& out, bool trace_enable)
         : reporter_(reporter)
         , source_tree_(source_tree)
@@ -252,7 +244,7 @@ struct ance::core::Reporter::Implementation
 
     MessageBuilder beginReport(Level const level, std::string const& compiler_location, Location const& location)
     {
-        return {*reporter_, compiler_location, location, level != Level::TRACE || isTraceEnabled()};
+        return {*reporter_, level, compiler_location, location, level != Level::TRACE || isTraceEnabled()};
     }
 
     [[nodiscard]] bool isFailed() const
@@ -287,8 +279,9 @@ struct ance::core::Reporter::Implementation
     bool                 trace_enabled_;
 };
 
-ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter& reporter, std::string compiler_location, Location const& location, bool const enabled)
+ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter& reporter, Level level, std::string compiler_location, Location const& location, bool const enabled)
     : reporter_(&reporter)
+    , level_(level)
     , compiler_location_(std::move(compiler_location))
     , location_(location)
 {
@@ -300,6 +293,7 @@ ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter& reporter, std::st
 
 ance::core::Reporter::MessageBuilder::MessageBuilder(MessageBuilder&& other) noexcept
     : reporter_(other.reporter_)
+    , level_(other.level_)
     , compiler_location_(std::move(other.compiler_location_))
     , location_(other.location_)
     , stream_(std::move(other.stream_))
@@ -312,6 +306,7 @@ ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::oper
     if (this == &other) return *this;
 
     reporter_          = other.reporter_;
+    level_             = other.level_;
     compiler_location_ = std::move(other.compiler_location_);
     location_          = other.location_;
     stream_            = std::move(other.stream_);
@@ -325,7 +320,7 @@ ance::core::Reporter::MessageBuilder::~MessageBuilder()
 {
     if (reporter_ != nullptr && stream_.hasValue())
     {
-        reporter_->implementation_->report(Implementation::Level::TRACE, stream_.value().str(), compiler_location_, location_);
+        reporter_->implementation_->report(level_, stream_.value().str(), compiler_location_, location_);
     }
 }
 
@@ -337,50 +332,50 @@ ance::core::Reporter::~Reporter() = default;
 
 void ance::core::Reporter::trace(std::string const& message, std::string const& compiler_location, Location const& location)
 {
-    implementation_->report(Implementation::Level::TRACE, message, compiler_location, location);
+    implementation_->report(Level::TRACE, message, compiler_location, location);
 }
 
 void ance::core::Reporter::trace(std::function<std::string()> const& message_builder, std::string const& compiler_location, Location const& location)
 {
     if (implementation_->isTraceEnabled())
     {
-        implementation_->report(Implementation::Level::TRACE, message_builder(), compiler_location, location);
+        implementation_->report(Level::TRACE, message_builder(), compiler_location, location);
     }
 }
 
 ance::core::Reporter::MessageBuilder ance::core::Reporter::trace(std::string const& compiler_location, Location const& location)
 {
-    return implementation_->beginReport(Implementation::Level::TRACE, compiler_location, location);
+    return implementation_->beginReport(Level::TRACE, compiler_location, location);
 }
 
 void ance::core::Reporter::info(std::string const& message, Location const& location)
 {
-    implementation_->report(Implementation::Level::INFO, message, "", location);
+    implementation_->report(Level::INFO, message, "", location);
 }
 
 ance::core::Reporter::MessageBuilder ance::core::Reporter::info(Location const& location)
 {
-    return implementation_->beginReport(Implementation::Level::INFO, "", location);
+    return implementation_->beginReport(Level::INFO, "", location);
 }
 
 void ance::core::Reporter::warning(std::string const& message, Location const& location)
 {
-    implementation_->report(Implementation::Level::WARNING, message, "", location);
+    implementation_->report(Level::WARNING, message, "", location);
 }
 
 ance::core::Reporter::MessageBuilder ance::core::Reporter::warning(Location const& location)
 {
-    return implementation_->beginReport(Implementation::Level::WARNING, "", location);
+    return implementation_->beginReport(Level::WARNING, "", location);
 }
 
 void ance::core::Reporter::error(std::string const& message, Location const& location)
 {
-    implementation_->report(Implementation::Level::ERROR, message, "", location);
+    implementation_->report(Level::ERROR, message, "", location);
 }
 
 ance::core::Reporter::MessageBuilder ance::core::Reporter::error(Location const& location)
 {
-    return implementation_->beginReport(Implementation::Level::ERROR, "", location);
+    return implementation_->beginReport(Level::ERROR, "", location);
 }
 
 void ance::core::Reporter::clear()

@@ -358,6 +358,11 @@ void ance::ast::Printer::print(File const& file) const
     implementation_->print(file);
 }
 
+void ance::ast::Printer::print(Declaration const& declaration) const
+{
+    implementation_->print(declaration);
+}
+
 void ance::ast::Printer::print(Statement const& statement) const
 {
     implementation_->print(statement);

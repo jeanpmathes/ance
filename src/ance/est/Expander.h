@@ -34,6 +34,12 @@ namespace ance::est
         /// \return The expanded file.
         utility::Optional<utility::Owned<File>> expandUnorderedFile(std::filesystem::path const& file);
 
+        /// Expand a piece of core code containing a single declaration, removing syntactic sugar.
+        /// \param code The code to expand.
+        /// \param id An identifier of the declaration.
+        /// \return The expanded statement.
+        utility::Optional<utility::Owned<Statement>> expandDeclaration(std::string const& code, std::string const& id);
+
       private:
         struct Implementation;
         utility::Owned<Implementation> implementation_;

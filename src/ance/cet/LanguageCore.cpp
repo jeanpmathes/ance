@@ -1,143 +1,86 @@
 #include "LanguageCore.h"
 
-#include "ance/utility/Containers.h"
 #include "ance/utility/Owners.h"
 
-#include "ance/core/Intrinsic.h"
+#include "ance/core/Identifier.h"
 
 #include "ance/bbt/FlowBuilder.h"
 #include "ance/bbt/Function.h"
 #include "ance/bbt/Type.h"
+#include "ance/bbt/Value.h"
 
-#include "Provider.h"
-#include "Runner.h"
+#include "ance/cet/Runner.h"
+
+namespace
+{
+    void defineLanguageCoreTypes(ance::cet::Runner& runner)
+    {
+        auto declare_type = [&](ance::utility::Shared<ance::bbt::Type> type) { runner.declareCoreVariable(type->name(), type); };
+
+        declare_type(runner.types().getBool());
+        declare_type(runner.types().getUnit());
+        declare_type(runner.types().getSize());
+        declare_type(runner.types().getString());
+        declare_type(runner.types().getIdentifier());
+        declare_type(runner.types().getType());
+        declare_type(runner.types().getLocation());
+        declare_type(runner.types().getFunction());
+    }
+
+    void defineLanguageCoreValues(ance::cet::Runner& runner)
+    {
+        // todo: maybe remove true and false literals and define them as variables here
+
+        runner.declareCoreVariable(ance::core::Identifier::make("nowhere", ance::core::Location::core()),
+                                   ance::utility::makeShared<ance::bbt::Location>(ance::core::Location::global(), runner.types()));
+    }
+
+    void defineLanguageCoreFunctions(ance::cet::Runner& runner)
+    {
+        // todo: remove / improve the functions
+
+        runner.declareCore(R"CODE(
+public cmp log1b (value: Bool)
+{
+    let string_value: String := intrinsic "b_2_str" (value);
+    intrinsic "log" (string_value, nowhere);
+}
+)CODE", "log1b");
+
+        runner.declareCore(R"CODE(
+public cmp log2b (value: Bool, location: Location)
+{
+    let string_value: String := intrinsic "b_2_str" (value);
+    intrinsic "log" (string_value, location);
+}
+)CODE", "log2b");
+
+        runner.declareCore(R"CODE(
+public cmp log1s (value: String)
+{
+    intrinsic "log" (value, nowhere);
+}
+)CODE", "log1s");
+
+        runner.declareCore(R"CODE(
+public cmp log2s (value: String, location: Location)
+{
+    intrinsic "log" (value, location);
+}
+)CODE","log2s");
+
+        runner.declareCore(R"CODE(
+public cmp include (file: String, location: Location)
+{
+    intrinsic "include" (file, location);
+}
+)CODE", "include");
+    }
+}
 
 void ance::cet::defineLanguageCore(Runner& runner)
 {
-    utility::List<utility::Shared<bbt::Function>> provider;// todo: remove / improve the functions
-    bbt::FlowBuilder                              builder(core::Location::core(), runner.types());
-
-    builder.setActiveBasicBlock(builder.createBasicBlock());
-    {
-        bbt::Temporary const& value = builder.pushVariableAccess(core::Identifier::make("value"));
-
-        bbt::Temporary const& str_value = builder.pushTemporary("str_value");
-        {
-            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-            args.emplace_back(value);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::B_2_STR, std::move(args), str_value, core::Location::global()));
-        }
-
-        bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
-
-        bbt::Temporary const& result = builder.pushTemporary("result");
-        {
-            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-            args.emplace_back(str_value);
-            args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::LOG, std::move(args), result, core::Location::global()));
-        }
-        (void) result;
-    }
-    provider.emplace_back(utility::makeShared<bbt::Function>(
-        bbt::Signature::make("log1b", bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getBool())),
-        runner.types().getUnit(),
-        builder.build("main"),
-        runner.types()));
-
-    builder.setActiveBasicBlock(builder.createBasicBlock());
-    {
-        bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::make("value"));
-        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::make("location"));
-
-        bbt::Temporary const& str_value = builder.pushTemporary("str_value");
-        {
-            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-            args.emplace_back(value);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::B_2_STR, std::move(args), str_value, core::Location::global()));
-        }
-
-        bbt::Temporary const& result = builder.pushTemporary("result");
-        {
-            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-            args.emplace_back(str_value);
-            args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::LOG, std::move(args), result, core::Location::global()));
-        }
-        (void) result;
-    }
-    provider.emplace_back(
-        utility::makeShared<bbt::Function>(bbt::Signature::make("log2b",
-                                                                bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getBool()),
-                                                                bbt::Signature::Parameter(core::Identifier::make("location"), runner.types().getLocation())),
-                                           runner.types().getUnit(),
-                                           builder.build("main"),
-                                           runner.types()));
-
-    builder.setActiveBasicBlock(builder.createBasicBlock());
-    {
-        bbt::Temporary const& value = builder.pushVariableAccess(core::Identifier::make("value"));
-
-        bbt::Temporary const& location = builder.pushConstant(bbt::Location::make(core::Location::global(), runner.types()));
-
-        bbt::Temporary const& result = builder.pushTemporary("result");
-        {
-            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-            args.emplace_back(value);
-            args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::LOG, std::move(args), result, core::Location::global()));
-        }
-        (void) result;
-    }
-    provider.emplace_back(utility::makeShared<bbt::Function>(
-        bbt::Signature::make("log1s", bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getString())),
-        runner.types().getUnit(),
-        builder.build("main"),
-        runner.types()));
-
-    builder.setActiveBasicBlock(builder.createBasicBlock());
-    {
-        bbt::Temporary const& value    = builder.pushVariableAccess(core::Identifier::make("value"));
-        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::make("location"));
-
-        bbt::Temporary const& result = builder.pushTemporary("result");
-        {
-            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-            args.emplace_back(value);
-            args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::LOG, std::move(args), result, core::Location::global()));
-        }
-        (void) result;
-    }
-    provider.emplace_back(
-        utility::makeShared<bbt::Function>(bbt::Signature::make("log2s",
-                                                                bbt::Signature::Parameter(core::Identifier::make("value"), runner.types().getString()),
-                                                                bbt::Signature::Parameter(core::Identifier::make("location"), runner.types().getLocation())),
-                                           runner.types().getUnit(),
-                                           builder.build("main"),
-                                           runner.types()));
-
-    builder.setActiveBasicBlock(builder.createBasicBlock());
-    {
-        bbt::Temporary const& file     = builder.pushVariableAccess(core::Identifier::make("file"));
-        bbt::Temporary const& location = builder.pushVariableAccess(core::Identifier::make("location"));
-
-        bbt::Temporary const& result = builder.pushTemporary("result");
-        {
-            utility::List<std::reference_wrapper<bbt::Temporary const>> args;
-            args.emplace_back(file);
-            args.emplace_back(location);
-            builder.pushStatement(utility::makeOwned<bbt::Intrinsic>(core::Intrinsic::INCLUDE, std::move(args), result, core::Location::global()));
-        }
-        (void) result;
-    }
-    provider.emplace_back(
-        utility::makeShared<bbt::Function>(bbt::Signature::make("include",
-                                                                bbt::Signature::Parameter(core::Identifier::make("file"), runner.types().getString()),
-                                                                bbt::Signature::Parameter(core::Identifier::make("location"), runner.types().getLocation())),
-                                           runner.types().getUnit(),
-                                           builder.build("main"),
-                                           runner.types()));
-
-    runner.add(Provider::fromList(std::move(provider)));
+    defineLanguageCoreTypes(runner);
+    defineLanguageCoreValues(runner);
+    defineLanguageCoreFunctions(runner);
 }

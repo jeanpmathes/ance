@@ -20,12 +20,21 @@ namespace ance::core
     class Reporter
     {
       public:
+        /// The level of a message reported by the reporter.
+        enum class Level
+        {
+            TRACE,
+            INFO,
+            WARNING,
+            ERROR
+        };
+
         class MessageBuilder
         {
         public:
             MessageBuilder() = delete;
 
-            MessageBuilder(Reporter& reporter, std::string  compiler_location, Location const& location, bool enabled);
+            MessageBuilder(Reporter& reporter, Level level, std::string  compiler_location, Location const& location, bool enabled);
             MessageBuilder(MessageBuilder&& other) noexcept;
 
             MessageBuilder(MessageBuilder const&) = delete;
@@ -44,7 +53,8 @@ namespace ance::core
 
         private:
             Reporter*                               reporter_;
-            std::string compiler_location_;
+            Level                                  level_;
+            std::string                    compiler_location_;
             Location                                location_;
 
             utility::Optional<std::ostringstream> stream_   = std::nullopt;

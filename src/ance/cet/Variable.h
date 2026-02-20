@@ -46,11 +46,6 @@ namespace ance::cet
 
         [[nodiscard]] bool isDefined() const override;
 
-        /**
-         * Create a final variable that holds a passed value as constant.
-         */
-        static utility::Shared<Variable> createConstant(core::Identifier const& name, utility::Shared<bbt::Value> value, bbt::TypeContext& type_context);
-
       private:
         core::Identifier           identifier_;
         utility::Shared<bbt::Type> type_;

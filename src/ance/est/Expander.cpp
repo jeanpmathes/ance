@@ -754,6 +754,21 @@ struct ance::est::Expander::Implementation
         return est;
     }
 
+    utility::Optional<utility::Owned<Statement>> expandDeclaration(std::string const& code, std::string const& id)
+    {
+        utility::Optional<utility::Owned<ast::Declaration>> parsed = parser_.parseDeclaration(code, id);
+        if (!parsed.hasValue()) return std::nullopt;
+
+        utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
+        DeclarationStatement declaration_statement = ast->expand(**parsed);
+
+        context_.print<Printer>(*declaration_statement.statement, "est", std::filesystem::path("core") / id);
+
+        if (reporter_.isFailed()) return std::nullopt;
+
+        return std::move(declaration_statement.statement);
+    }
+
   private:
     sources::SourceTree& source_tree_;
     core::Reporter&      reporter_;
@@ -775,4 +790,9 @@ ance::utility::Optional<ance::utility::Owned<ance::est::Statement>> ance::est::E
 ance::utility::Optional<ance::utility::Owned<ance::est::File>> ance::est::Expander::expandUnorderedFile(std::filesystem::path const& file)
 {
     return implementation_->expandUnorderedFile(file);
+}
+
+ance::utility::Optional<ance::utility::Owned<ance::est::Statement>> ance::est::Expander::expandDeclaration(std::string const& code, std::string const& id)
+{
+    return implementation_->expandDeclaration(code, id);
 }

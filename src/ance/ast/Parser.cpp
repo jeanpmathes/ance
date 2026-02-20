@@ -32,7 +32,7 @@ namespace ance::ast
     class ErrorHandler
     {
       public:
-        explicit ErrorHandler(core::Reporter& reporter, sources::SourceFile const& source_file) : reporter_(reporter), source_file_(source_file) {}
+        explicit ErrorHandler(core::Reporter& reporter, sources::SourceFile const* source_file) : reporter_(reporter), source_file_(source_file) {}
 
       private:
         class LexerErrorListener final : public antlr4::BaseErrorListener
@@ -53,6 +53,14 @@ namespace ance::ast
           public:
             explicit ParserErrorListener(ErrorHandler& parent) : parent_(parent) {}
 
+            core::Location location(size_t const line, size_t const char_position) const
+            {
+                if (parent_.source_file_ == nullptr) 
+                    return core::Location::core();
+                
+                return core::Location::simple(line, char_position, parent_.source_file_->index());
+            }
+            
             void syntaxError(antlr4::Recognizer* recognizer,
                              antlr4::Token*      offending_symbol,
                              size_t              line,
@@ -86,13 +94,13 @@ namespace ance::ast
 
                 if (offending_symbol->getType() == grammar::anceLexer::ERROR_CHAR)
                 {
-                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index())) << "Unexpected character";
+                    parent_.reporter_.error(location(line, char_position)) << "Unexpected character";
                     return;
                 }
 
                 if (offending_symbol->getType() == grammar::anceLexer::EOF)
                 {
-                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index())) << "Unexpected end of file";
+                    parent_.reporter_.error(location(line, char_position)) << "Unexpected end of file";
                     return;
                 }
 
@@ -100,14 +108,14 @@ namespace ance::ast
 
                 if (static_cast<size_t>(expected_tokens.getSingleElement()) == grammar::anceLexer::EOF)
                 {
-                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index()))
+                    parent_.reporter_.error(location(line, char_position))
                         << "At most one top-level statement per file allowed";
                     return;
                 }
 
                 if (static_cast<size_t>(expected_tokens.getSingleElement()) == grammar::anceLexer::SEMICOLON)
                 {
-                    parent_.reporter_.error(core::Location::simple(previous_line, previous_char_position + 1, parent_.source_file_.index()))
+                    parent_.reporter_.error(location(previous_line, previous_char_position + 1))
                         << "Missing semicolon";
                     return;
                 }
@@ -117,7 +125,7 @@ namespace ance::ast
                     || expected_tokens.contains(static_cast<size_t> (grammar::anceLexer::SQUARE_BRACKET_CLOSE))
                     || expected_tokens.contains(static_cast<size_t> (grammar::anceLexer::POINTY_BRACKET_CLOSE)))
                 {
-                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index()))
+                    parent_.reporter_.error(location(line, char_position))
                         << "Potential missing or mismatched closing bracket";
                     return;
                 }
@@ -131,14 +139,14 @@ namespace ance::ast
                         expected_text = parser->getVocabulary().getSymbolicName(static_cast<size_t>(expected_tokens.getSingleElement()));
                     }
 
-                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index()))
+                    parent_.reporter_.error(location(line, char_position))
                         << "Expected " << expected_text << " somewhere around here";
                     return;
                 }
 
                 if (!expected_tokens.isEmpty())
                 {
-                    parent_.reporter_.error(core::Location::simple(line, char_position, parent_.source_file_.index()))
+                    parent_.reporter_.error(location(line, char_position))
                         << "Unexpected token '" << offending_symbol->getText() << "', check it and previous tokens for errors";
 
                     return;
@@ -223,17 +231,33 @@ namespace ance::ast
         std::shared_ptr<ParserErrorStrategy> parser_error_strategy_ = std::make_shared<ParserErrorStrategy>();
 
         core::Reporter&            reporter_;
-        sources::SourceFile const& source_file_;
+        sources::SourceFile const* source_file_;
     };
 
     class SourceVisitor final : public grammar::anceBaseVisitor
     {
       public:
-        SourceVisitor(size_t const file_index, core::Reporter& reporter) : file_index_(file_index), reporter_(reporter) {}
+        SourceVisitor(utility::Optional<size_t> file_index, core::Reporter& reporter) : file_index_(file_index), reporter_(reporter) {}
 
         ~SourceVisitor() override = default;
 
       private:
+        [[nodiscard]] core::Location location(size_t const start_line, size_t const start_column, size_t const end_line, size_t const end_column) const
+        {
+            if (!file_index_.hasValue())
+                return core::Location::core();
+
+            return {start_line, start_column, end_line, end_column, file_index_.value()};
+        }
+
+        [[nodiscard]] core::Location location() const
+        {
+            if (!file_index_.hasValue())
+                return core::Location::core();
+
+            return core::Location::file(file_index_.value());
+        }
+
         core::Location location(antlr4::ParserRuleContext const* ctx) const
         {
             size_t const start_line   = ctx->getStart()->getLine();
@@ -243,7 +267,7 @@ namespace ance::ast
             size_t const end_column = ctx->getStop()->getCharPositionInLine() + getUtf32Length(ctx->getStop()->getText());
             // todo: check if -1 is needed for end_column
 
-            return {start_line, start_column, end_line, end_column, file_index_};
+            return location(start_line, start_column, end_line, end_column);
         }
 
         core::Identifier identifier(antlr4::tree::TerminalNode* i) const
@@ -258,13 +282,13 @@ namespace ance::ast
             size_t const end_line   = start_line;
             size_t const end_column = start_column + getUtf32Length(text) - 1;
 
-            return core::Identifier::make(text, {start_line, start_column, end_line, end_column, file_index_});
+            return core::Identifier::make(text, location(start_line, start_column, end_line, end_column));
         }
 
       public:
         utility::Owned<File> expectFile(grammar::anceParser::UnorderedScopeFileContext* ctx)
         {
-            if (ctx == nullptr) return utility::makeOwned<File>(utility::List<utility::Owned<Declaration>> {}, core::Location::file(file_index_));
+            if (ctx == nullptr) return utility::makeOwned<File>(utility::List<utility::Owned<Declaration>> {}, location());
 
             if (std::any const result = visit(ctx); result.has_value()) return utility::wrap<File>(result);
 
@@ -274,7 +298,7 @@ namespace ance::ast
         template<typename T>
         utility::Owned<Declaration> expectDeclaration(T* ctx)
         {
-            if (ctx == nullptr) return utility::makeOwned<ErrorDeclaration>(core::Location::file(file_index_));
+            if (ctx == nullptr) return utility::makeOwned<ErrorDeclaration>(location());
 
             if (std::any const result = visit(ctx); result.has_value()) return utility::wrap<Declaration>(result);
 
@@ -284,7 +308,7 @@ namespace ance::ast
         template<typename T>
         utility::Owned<Statement> expectStatement(T* ctx)
         {
-            if (ctx == nullptr) return utility::makeOwned<ErrorStatement>(core::Location::file(file_index_));
+            if (ctx == nullptr) return utility::makeOwned<ErrorStatement>(location());
 
             if (std::any const result = visit(ctx); result.has_value()) return utility::wrap<Statement>(result);
 
@@ -294,7 +318,7 @@ namespace ance::ast
         template<typename T>
         utility::Owned<Expression> expectExpression(T* ctx)
         {
-            if (ctx == nullptr) return utility::makeOwned<ErrorExpression>(core::Location::file(file_index_));
+            if (ctx == nullptr) return utility::makeOwned<ErrorExpression>(location());
 
             if (std::any const result = visit(ctx); result.has_value()) return utility::wrap<Expression>(result);
 
@@ -678,7 +702,7 @@ namespace ance::ast
         }
 
       private:
-        size_t          file_index_;
+        utility::Optional<size_t>          file_index_;
         core::Reporter& reporter_;
     };
 }
@@ -691,20 +715,18 @@ struct ance::ast::Parser::Implementation
         , ctx_(ctx)
     {}
 
-    utility::Optional<utility::Owned<File>> parseUnorderedFile(std::filesystem::path const& file_path)// todo: reduce duplication with below (templates)
+    template<typename Target, typename Code, typename Reader>
+    utility::Optional<utility::Owned<Target>> parse(sources::SourceFile* source_file, std::string const& id, Code&& code, Reader&& reader)
     {
-        sources::SourceFile& source_file = source_tree_.addFile(file_path);
+        utility::Optional<utility::Owned<Target>> result;
 
-        utility::Optional<utility::Owned<File>> file;
-
-        if (source_file.isOk())
+        if (source_file == nullptr || source_file->isOk())
         {
-            std::fstream code;
-            code.open(source_file.getRelativePath());
-
             utility::Owned<ErrorHandler> error_handler = utility::makeOwned<ErrorHandler>(reporter_, source_file);
 
-            utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(code);
+            auto i_stream = code();
+
+            utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(i_stream);
             utility::Owned<grammar::anceLexer>                lexer = utility::makeOwned<grammar::anceLexer>(input.get());
             lexer->removeErrorListeners();
             lexer->addErrorListener(error_handler->lexerErrorListener());
@@ -715,64 +737,80 @@ struct ance::ast::Parser::Implementation
             parser->addErrorListener(error_handler->parserErrorListener());
             parser->setErrorHandler(error_handler->parserErrorStrategy());
 
-            grammar::anceParser::UnorderedScopeFileContext* unordered_scope_file_ctx = parser->unorderedScopeFile();
+            utility::Optional<size_t> file_index;
+            if (source_file != nullptr)
+                file_index = source_file->index();
 
-            SourceVisitor visitor {source_file.index(), reporter_};
+            SourceVisitor visitor {file_index, reporter_};
 
-            file = visitor.expectFile(unordered_scope_file_ctx);
+            result = reader(parser.get(), visitor);
         }
         else
         {
-            reporter_.error(core::Location::file(source_file.index())) << "Failed to read file";
+            reporter_.error(core::Location::file(source_file->index())) << "Failed to read file";
         }
 
-        ctx_.print<Printer>(**file, "ast", source_file.getRelativePath());
+        std::filesystem::path file_path;
+
+        if (source_file != nullptr)
+            file_path = source_file->getRelativePath();
+        else
+            file_path = std::filesystem::path("core") / id;
+
+        ctx_.print<Printer>(**result, "ast", file_path);
 
         if (reporter_.isFailed()) return std::nullopt;
 
-        return file;
+        return result;
+    }
+
+    utility::Optional<utility::Owned<File>> parseUnorderedFile(std::filesystem::path const& file_path)// todo: reduce duplication with below (templates)
+    {
+        sources::SourceFile& source_file = source_tree_.addFile(file_path);
+
+        return parse<File>(&source_file, "",
+            [&source_file]
+            {
+                std::fstream code; // todo: this appears to be a double read as addFile also reads the file
+                code.open(source_file.getRelativePath());
+
+                return code;
+            },
+            [](grammar::anceParser* parser, SourceVisitor& visitor)
+            {
+                return visitor.expectFile(parser->unorderedScopeFile());
+            });
     }
 
     utility::Optional<utility::Owned<Statement>> parseOrderedFile(std::filesystem::path const& file_path)
     {
         sources::SourceFile& source_file = source_tree_.addFile(file_path);
 
-        utility::Optional<utility::Owned<Statement>> statement;
+        return parse<Statement>(&source_file, "",
+            [&source_file]
+            {
+                std::fstream code; // todo: this appears to be a double read as addFile also reads the file
+                code.open(source_file.getRelativePath());
 
-        if (source_file.isOk())
-        {
-            std::fstream code;
-            code.open(source_file.getRelativePath());
+                return code;
+            },
+            [](grammar::anceParser* parser, SourceVisitor& visitor)
+            {
+                return visitor.expectStatement(parser->orderedScopeFile());
+            });
+    }
 
-            utility::Owned<ErrorHandler> error_handler = utility::makeOwned<ErrorHandler>(reporter_, source_file);
-
-            utility::Owned<antlr4::ANTLRInputStream> input = utility::makeOwned<antlr4::ANTLRInputStream>(code);
-            utility::Owned<grammar::anceLexer>                lexer = utility::makeOwned<grammar::anceLexer>(input.get());
-            lexer->removeErrorListeners();
-            lexer->addErrorListener(error_handler->lexerErrorListener());
-
-            utility::Owned<antlr4::CommonTokenStream> tokens = utility::makeOwned<antlr4::CommonTokenStream>(lexer.get());
-            utility::Owned<grammar::anceParser>                parser = utility::makeOwned<grammar::anceParser>(tokens.get());
-            parser->removeErrorListeners();
-            parser->addErrorListener(error_handler->parserErrorListener());
-            parser->setErrorHandler(error_handler->parserErrorStrategy());
-
-            grammar::anceParser::OrderedScopeFileContext* unordered_scope_file_ctx = parser->orderedScopeFile();
-
-            SourceVisitor visitor {source_file.index(), reporter_};
-
-            statement = visitor.expectStatement(unordered_scope_file_ctx);
-        }
-        else
-        {
-            reporter_.error(core::Location::file(source_file.index())) << "Failed to read file";
-        }
-
-        ctx_.print<Printer>(**statement, "ast", source_file.getRelativePath());
-
-        if (reporter_.isFailed()) return std::nullopt;
-
-        return statement;
+    utility::Optional<utility::Owned<Declaration>> parseDeclaration(std::string const& code, std::string const& id)
+    {
+        return parse<Declaration>(nullptr, id,
+            [&code]
+            {
+                return std::istringstream(code);
+            },
+            [](grammar::anceParser* parser, SourceVisitor& visitor)
+            {
+                return visitor.expectDeclaration(parser->declaration());
+            });
     }
 
   private:
@@ -795,4 +833,9 @@ ance::utility::Optional<ance::utility::Owned<ance::ast::File>> ance::ast::Parser
 ance::utility::Optional<ance::utility::Owned<ance::ast::Statement>> ance::ast::Parser::parseOrderedFile(std::filesystem::path const& file)
 {
     return implementation_->parseOrderedFile(file);
+}
+
+ance::utility::Optional<ance::utility::Owned<ance::ast::Declaration>> ance::ast::Parser::parseDeclaration(std::string const& code, std::string const& id)
+{
+    return implementation_->parseDeclaration(code, id);
 }

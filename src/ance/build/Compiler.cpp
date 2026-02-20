@@ -35,7 +35,7 @@ struct ance::build::Compiler::Implementation
 
     bool compile(std::filesystem::path const& file)
     {
-        utility::Optional<utility::Owned<cet::Unit>> unit = runner_.runOrderedFile(file);
+        utility::Optional<utility::Owned<cet::Unit>> unit = runner_.runProjectFile(file);
 
         if (!unit.hasValue()) return false;
 

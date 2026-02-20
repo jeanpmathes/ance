@@ -1095,6 +1095,24 @@ struct ance::bbt::Segmenter::Implementation
         return flows;
     }
 
+    utility::Optional<utility::Owned<Flow>> segmentDeclaration(std::string const& code, std::string const& id)
+    {
+        utility::Optional<utility::Owned<est::Statement>> expanded = expander_.expandDeclaration(code, id);
+        if (!expanded.hasValue()) return std::nullopt;
+
+        utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
+
+        utility::Owned<Flow> flow = ret->apply(**expanded, false, id);
+
+        std::filesystem::path path = std::filesystem::path("core") / id;
+        context_.print<Printer>(*flow, "bbt", path);
+        context_.graph<Grapher>(*flow, "bbt", path);
+
+        if (reporter_.isFailed()) return std::nullopt;
+
+        return flow;
+    }
+
   private:
     sources::SourceTree& source_tree_;
     core::Reporter&      reporter_;
@@ -1117,4 +1135,9 @@ ance::utility::Optional<ance::utility::Owned<ance::bbt::Flow>> ance::bbt::Segmen
 ance::utility::Optional<ance::utility::Owned<ance::bbt::Flows>> ance::bbt::Segmenter::segmentUnorderedFile(std::filesystem::path const& file)
 {
     return implementation_->segmentUnorderedFile(file);
+}
+
+ance::utility::Optional<ance::utility::Owned<ance::bbt::Flow>> ance::bbt::Segmenter::segmentDeclaration(std::string const& code, std::string const& id)
+{
+    return implementation_->segmentDeclaration(code, id);
 }

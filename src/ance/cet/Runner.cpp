@@ -22,7 +22,6 @@
 #include "ance/cet/IntrinsicsRunner.h"
 #include "ance/cet/Node.h"
 #include "ance/cet/Printer.h"
-#include "ance/cet/Provider.h"
 #include "ance/cet/Scope.h"
 #include "ance/cet/ValueExtensions.h"
 
@@ -156,14 +155,13 @@ struct ance::cet::Runner::Implementation
         BBT(sources::SourceTree&                                                                       source_tree,
             core::Reporter&                                                                            reporter,
             bbt::TypeContext&                                                                          type_context,
-            std::function<utility::Optional<utility::Owned<bbt::Flows>>(std::filesystem::path const&)> get_flows,
-            utility::List<utility::Owned<Provider>>&                                                   providers)
+            std::function<utility::Optional<utility::Owned<bbt::Flows>>(std::filesystem::path const&)> get_flows)
             : source_tree_(source_tree)
             , reporter_(reporter)
             , type_context_(type_context)
             , read_flows_(std::move(get_flows))
-            , global_language_scope_(utility::makeOwned<GlobalScope>(providers, type_context))
-            , project_scope_(global_language_scope_->addChildScope(utility::makeOwned<UnorderedScope>(*global_language_scope_, type_context)))
+            , core_language_scope_(utility::makeOwned<CoreScope>(type_context))
+            , project_scope_(core_language_scope_->addChildScope(utility::makeOwned<UnorderedScope>(*core_language_scope_, type_context)))
         {}
 
         ~BBT() override = default;
@@ -171,6 +169,15 @@ struct ance::cet::Runner::Implementation
         void schedule(bbt::Flow const& flow, Scope* scope)
         {
             run_points_.emplace_back(flow.entry, scope != nullptr ? scope : &project_scope_);
+        }
+
+        void scheduleCore(utility::Owned<bbt::Flow> flow)
+        {
+            bbt::Flow& flow_ref = *flow;
+
+            core_flows_.emplace_back(std::move(flow));
+
+            schedule(flow_ref, core_language_scope_.get());
         }
 
         [[nodiscard]] bool hasRunPoints() const
@@ -883,6 +890,16 @@ struct ance::cet::Runner::Implementation
             state_.return_value = deLReference(scope().getTemporary(set_return_value.value).read());
         }
 
+        void declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value> value)
+        {
+            value = deLReference(std::move(value));
+
+            utility::Optional<utility::Shared<bbt::Value>> declared = core_language_scope_->declare(name, value->type(), true, core::Location::core(), reporter_);
+
+            if (declared.hasValue())
+                (*declared)->as<VariableRef>().value().write(std::move(value));
+        }
+
       private:
         sources::SourceTree&                                                                       source_tree_;
         core::Reporter&                                                                            reporter_;
@@ -926,9 +943,10 @@ struct ance::cet::Runner::Implementation
         IntrinsicsRunner intrinsics_ {source_tree_, reporter_, type_context_, include_};
 
         std::list<RunPoint>                       run_points_     = {};
+        utility::List<utility::Owned<bbt::Flow>> core_flows_     = {};
         utility::List<utility::Owned<bbt::Flows>> included_flows_ = {};
 
-        utility::Owned<GlobalScope> global_language_scope_;
+        utility::Owned<CoreScope> core_language_scope_;
         Scope&                      project_scope_;
 
         struct State
@@ -960,6 +978,7 @@ struct ance::cet::Runner::Implementation
         , reporter_(reporter)
         , segmenter_(source_tree, reporter, context, type_context_)
         , context_(context)
+        , bbt_(utility::makeOwned<BBT>(source_tree_, reporter_, type_context_, [&](std::filesystem::path const& f) { return readUnorderedFile(f); }))
     {}
 
     bool run(BBT& bbt)
@@ -1015,16 +1034,14 @@ struct ance::cet::Runner::Implementation
         return true;
     }
 
-    utility::Optional<utility::Owned<Unit>> runOrderedFile(std::filesystem::path const& file)
+    utility::Optional<utility::Owned<Unit>> runProjectFile(std::filesystem::path const& file)
     {
         utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentOrderedFile(file);
         if (!flow.hasValue()) return std::nullopt;
 
-        utility::Owned<BBT> bbt =
-            utility::makeOwned<BBT>(source_tree_, reporter_, type_context_, [&](std::filesystem::path const& f) { return readUnorderedFile(f); }, providers_);
-        bbt->schedule(**flow, nullptr);
+        bbt_->schedule(**flow, nullptr);
 
-        bool const ok = run(*bbt);
+        bool const ok = run(*bbt_);
 
         if (!ok) return std::nullopt;
 
@@ -1043,9 +1060,24 @@ struct ance::cet::Runner::Implementation
         return segmenter_.segmentUnorderedFile(file);
     }
 
-    void add(utility::Owned<Provider> provider)
+    void declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value> value)
     {
-        providers_.emplace_back(std::move(provider));
+        bbt_->declareCoreVariable(name, value);
+    }
+
+    void declareCore(std::string const& code, std::string const& id)
+    {
+        utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentDeclaration(code, id);
+
+        if (!flow.hasValue())
+            throw std::logic_error("Failed to parse core code");
+
+        bbt_->scheduleCore(std::move(flow.value()));
+
+        bool const ok = run(*bbt_);
+
+        if (!ok)
+            throw std::logic_error("Failed to run core code");
     }
 
     bbt::TypeContext& getTypeContext()
@@ -1056,10 +1088,11 @@ struct ance::cet::Runner::Implementation
   private:
     sources::SourceTree&                    source_tree_;
     core::Reporter&                         reporter_;
-    utility::List<utility::Owned<Provider>> providers_ = {};
     bbt::TypeContext                        type_context_ {};
     bbt::Segmenter                          segmenter_;
     core::Context&                          context_;
+
+    utility::Owned<BBT> bbt_;
 };
 
 ance::cet::Runner::Runner(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
@@ -1068,14 +1101,19 @@ ance::cet::Runner::Runner(sources::SourceTree& source_tree, core::Reporter& repo
 
 ance::cet::Runner::~Runner() = default;
 
-void ance::cet::Runner::add(utility::Owned<Provider> provider)
+void ance::cet::Runner::declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value> value)
 {
-    implementation_->add(std::move(provider));
+    return implementation_->declareCoreVariable(name, std::move(value));
 }
 
-ance::utility::Optional<ance::utility::Owned<ance::cet::Unit>> ance::cet::Runner::runOrderedFile(std::filesystem::path const& file)
+void ance::cet::Runner::declareCore(std::string const& code, std::string const& id)
 {
-    return implementation_->runOrderedFile(file);
+    return implementation_->declareCore(code, id);
+}
+
+ance::utility::Optional<ance::utility::Owned<ance::cet::Unit>> ance::cet::Runner::runProjectFile(std::filesystem::path const& file)
+{
+    return implementation_->runProjectFile(file);
 }
 
 ance::bbt::TypeContext& ance::cet::Runner::types()
