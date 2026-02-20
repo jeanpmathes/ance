@@ -84,7 +84,10 @@ def run_test(test: discovery.Test) -> TestRun:
         return TestRun(test, compile_result, compile_output, run_result == 0, run_output)
 
 
-projects: list = discovery.discover_projects("../ance")
+script_directory: str = os.path.dirname(os.path.abspath(__file__))
+tests_root: str = os.path.normpath(os.path.join(script_directory, "..", "ance"))
+
+projects: list = discovery.discover_projects(tests_root)
 tests: list = discovery.create_tests(projects)
 
 test_runs = []
