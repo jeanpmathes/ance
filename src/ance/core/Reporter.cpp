@@ -19,6 +19,7 @@ namespace ansi
     inline auto ColorInfo    = "\x1B[34m";
     inline auto ColorTrace   = "\x1B[36m";
     inline auto ColorMeta    = "\x1B[90m";
+    inline auto ColorCritical = "\x1B[35m";
 
     inline auto ColorReset = "\x1B[0m";
 }
@@ -144,8 +145,10 @@ struct ance::core::Reporter::Implementation
             out_ << location << " " << message << std::endl;
 
             if (level == Level::ERROR || level == Level::WARNING)
-                out_ << ansi::ColorError << "Warnings and errors in core code indicate a critical language or compiler issue!" << ansi::ColorReset << std::endl
-                     << std::endl;
+            {
+                printCritical(out_, "core", "Warnings and errors in core code indicate a critical language or compiler issue!");
+                out_ << std::endl;
+            }
 
             return;
         }
@@ -416,4 +419,9 @@ void ance::core::Reporter::print(std::ostream& out, std::string const& message)
 void ance::core::Reporter::print(std::ostream& out, std::string const& prefix, std::string const& message)
 {
     out << "ance: " << prefix << ": " << message << std::endl;
+}
+
+void ance::core::Reporter::printCritical(std::ostream& out, std::string const& prefix, std::string const& message)
+{
+    out << "ance: " << ansi::ColorCritical << prefix << ansi::ColorReset << ": " << ansi::ColorCritical << message << ansi::ColorReset << std::endl;
 }

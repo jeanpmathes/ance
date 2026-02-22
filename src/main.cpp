@@ -191,7 +191,7 @@ int main(int const argc, char** argv)
     }
     catch (std::exception const& e)
     {
-        std::cerr << "ance: internal error: " << e.what() << std::endl;
+        ance::core::Reporter::printCritical(std::cerr, "internal error", e.what());
         return EXIT_FAILURE;
     }
 #else
