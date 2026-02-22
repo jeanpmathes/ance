@@ -209,23 +209,25 @@ struct ance::est::Printer::Implementation
             print(")");
         }
 
-        void visit(AnonymousFunctionConstructor const& ctor) override
+        void visit(FunctionConstructor const& function_constructor) override
         {
-            print("Function(Signature(");
-            for (size_t index = 0; index < ctor.parameters.size(); index++)
+            print("Function(Signature(#");
+            print(function_constructor.name);
+            print(", [");
+            for (size_t index = 0; index < function_constructor.parameters.size(); index++)
             {
                 if (index > 0) print(", ");
                 print("(");
-                visit(*ctor.parameters[index].type);
+                visit(*function_constructor.parameters[index].type);
                 print(", ");
-                print(ctor.parameters[index].identifier);
+                print(function_constructor.parameters[index].identifier);
                 print(")");
             }
-            print("), ");
-            visit(*ctor.return_type);
+            print("]), ");
+            visit(*function_constructor.return_type);
             print(", Capture()"); // todo: Capture could take a list of entries, each entry is name + type + (either value or reference)
             print(", code ");
-            visit(*ctor.body);
+            visit(*function_constructor.body);
             print(")");
         }
 

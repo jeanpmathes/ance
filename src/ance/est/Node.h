@@ -220,15 +220,17 @@ namespace ance::est
     struct Parameter;
 
     /// Creates a function.
-    struct AnonymousFunctionConstructor final// todo: make this an actual constructor of function types
+    struct FunctionConstructor final// todo: make this an actual constructor of function types
         : Expression
-        , utility::ConcreteNode<AnonymousFunctionConstructor, Visitor>
+        , utility::ConcreteNode<FunctionConstructor, Visitor>
     {
-        AnonymousFunctionConstructor(utility::List<Parameter>   params,
-                                     utility::Owned<Expression> type,
-                                     utility::Owned<Statement>  statement,
-                                     core::Location const&      source_location);
+        FunctionConstructor(core::Identifier const&    identifier,
+                            utility::List<Parameter>   params,
+                            utility::Owned<Expression> type,
+                            utility::Owned<Statement>  statement,
+                            core::Location const&      source_location);
 
+        core::Identifier           name;
         utility::List<Parameter>   parameters;
         utility::Owned<Expression> return_type;
         utility::Owned<Statement>  body;
@@ -381,22 +383,22 @@ namespace ance::est
         virtual void visit(Temporary const& temporary)            = 0;
         virtual void visit(WriteTemporary const& write_temporary) = 0;
 
-        virtual void visit(ErrorExpression const& error)                = 0;
-        virtual void visit(Intrinsic const& intrinsic)                  = 0;
-        virtual void visit(Call const& call)                            = 0;
-        virtual void visit(AnonymousFunctionConstructor const& ctor)    = 0;
-        virtual void visit(Read const& access)                          = 0;
-        virtual void visit(UnitLiteral const& unit_literal)             = 0;
-        virtual void visit(SizeLiteral const& size_literal)             = 0;
-        virtual void visit(StringLiteral const& string_literal)         = 0;
-        virtual void visit(BoolLiteral const& bool_literal)             = 0;
-        virtual void visit(Default const& default_value)                = 0;
-        virtual void visit(Here const& here)                            = 0;
-        virtual void visit(CurrentScope const& current_scope)           = 0;
-        virtual void visit(UnaryOperation const& unary_operation)       = 0;
-        virtual void visit(ReadTemporary const& read_temporary)         = 0;
-        virtual void visit(TypeOf const& type_of)                       = 0;
-        virtual void visit(IdentifierCapture const& identifier_capture) = 0;
+        virtual void visit(ErrorExpression const& error)                    = 0;
+        virtual void visit(Intrinsic const& intrinsic)                      = 0;
+        virtual void visit(Call const& call)                                = 0;
+        virtual void visit(FunctionConstructor const& function_constructor) = 0;
+        virtual void visit(Read const& access)                              = 0;
+        virtual void visit(UnitLiteral const& unit_literal)                 = 0;
+        virtual void visit(SizeLiteral const& size_literal)                 = 0;
+        virtual void visit(StringLiteral const& string_literal)             = 0;
+        virtual void visit(BoolLiteral const& bool_literal)                 = 0;
+        virtual void visit(Default const& default_value)                    = 0;
+        virtual void visit(Here const& here)                                = 0;
+        virtual void visit(CurrentScope const& current_scope)               = 0;
+        virtual void visit(UnaryOperation const& unary_operation)           = 0;
+        virtual void visit(ReadTemporary const& read_temporary)             = 0;
+        virtual void visit(TypeOf const& type_of)                           = 0;
+        virtual void visit(IdentifierCapture const& identifier_capture)     = 0;
     };
 }
 

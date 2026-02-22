@@ -409,7 +409,7 @@ struct ance::est::Expander::Implementation
             utility::Owned<Statement> body = wrap(body_builder.take());
 
             Temporary const& initial_value = builder.pushTemporary(
-                utility::makeOwned<AnonymousFunctionConstructor>(std::move(parameters), std::move(return_type_expression), std::move(body), function_declaration.location),
+                utility::makeOwned<FunctionConstructor>(function_declaration.identifier, std::move(parameters), std::move(return_type_expression), std::move(body), function_declaration.location),
                 "FunctionDeclaration_InitialValue",
                 function_declaration.location);
 
@@ -648,8 +648,10 @@ struct ance::est::Expander::Implementation
 
             utility::Owned<Statement> body = wrap(body_builder.take());
 
+            std::string const name = std::format("Lambda'{}", anonymous_function_counter_++);
+
             result_.setExpression(builder.take(
-                utility::makeOwned<AnonymousFunctionConstructor>(std::move(parameters), std::move(return_type.value()), std::move(body), lambda.location)));
+                utility::makeOwned<FunctionConstructor>(core::Identifier::make(name), std::move(parameters), std::move(return_type.value()), std::move(body), lambda.location)));
         }
 
         void visit(ast::Intrinsic const& intrinsic_expression) override
@@ -718,6 +720,7 @@ struct ance::est::Expander::Implementation
         Result          result_;
 
         std::map<std::string, size_t> temporary_name_counters_;
+        size_t anonymous_function_counter_ = 0;
     };
 
     utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (template)

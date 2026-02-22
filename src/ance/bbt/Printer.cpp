@@ -205,12 +205,14 @@ struct ance::bbt::Printer::Implementation
             print(");");
         }
 
-        void visit(AnonymousFunctionConstructor const& function_constructor) override
+        void visit(FunctionConstructor const& function_constructor) override
         {
             print(function_constructor.destination.id());
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
-            print(" Function::ctor(Signature::ctor(");
+            print(" Function::ctor(Signature::ctor(#");
+            print(function_constructor.name);
+            print(", [");
             for (size_t index = 0; index < function_constructor.parameters.size(); index++)
             {
                 print("(");
@@ -220,7 +222,7 @@ struct ance::bbt::Printer::Implementation
                 print(")");
                 if (index + 1 < function_constructor.parameters.size()) print(", ");
             }
-            print("), ");
+            print("]), ");
             print(function_constructor.return_type.id());
             print("), flow ");
             print(function_constructor.body->id());

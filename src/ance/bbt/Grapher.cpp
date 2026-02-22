@@ -126,7 +126,7 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(Call const&) override {}
 
-        void visit(AnonymousFunctionConstructor const& function_constructor) override
+        void visit(FunctionConstructor const& function_constructor) override
         {
             nested_flows_to_graph_.push(function_constructor.body.get());
         }

@@ -870,24 +870,24 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
-        void visit(est::AnonymousFunctionConstructor const& ctor) override
+        void visit(est::FunctionConstructor const& ctor) override
         {
             Builder builder(*this);
 
             utility::List<Parameter> parameters;
             for (auto const& parameter : ctor.parameters)
             {
-                auto& parameter_type = builder.addTemporary("AnonymousFunction_ParameterType", parameter.type->location);
+                auto& parameter_type = builder.addTemporary("FunctionConstructor_ParameterType", parameter.type->location);
                 builder.addSegmented(*parameter.type, parameter_type);
                 parameters.emplace_back(parameter.identifier, parameter_type, parameter.location);
             }
 
-            auto& return_type = builder.addTemporary("AnonymousFunction_ReturnType", ctor.return_type->location);
+            auto& return_type = builder.addTemporary("FunctionConstructor_ReturnType", ctor.return_type->location);
             builder.addSegmented(*ctor.return_type, return_type);
 
-            utility::Owned<Flow> flow = apply(*ctor.body, true, "AnonymousFunction");
+            utility::Owned<Flow> flow = apply(*ctor.body, true, "Function");
 
-            builder.addStatement<AnonymousFunctionConstructor>(std::move(parameters), return_type, std::move(flow), destination(), ctor.location);
+            builder.addStatement<FunctionConstructor>(ctor.name, std::move(parameters), return_type, std::move(flow), destination(), ctor.location);
 
             setResult(builder.take());
         }

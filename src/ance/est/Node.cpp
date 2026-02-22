@@ -106,12 +106,14 @@ ance::est::Call::Call(utility::Owned<Expression> callable, utility::List<utility
     , arguments(std::move(expressions))
 {}
 
-ance::est::AnonymousFunctionConstructor::AnonymousFunctionConstructor(utility::List<Parameter>   params,
-                                                                      utility::Owned<Expression> type,
-                                                                      utility::Owned<Statement>  statement,
-                                                                      core::Location const&      source_location)
+ance::est::FunctionConstructor::FunctionConstructor(core::Identifier const&    identifier,
+                                                    utility::List<Parameter>   params,
+                                                    utility::Owned<Expression> type,
+                                                    utility::Owned<Statement>  statement,
+                                                    core::Location const&      source_location)
     : Node(source_location)
     , Expression()
+    , name(identifier)
     , parameters(std::move(params))
     , return_type(std::move(type))
     , body(std::move(statement))

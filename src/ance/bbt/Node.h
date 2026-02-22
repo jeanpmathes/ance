@@ -230,16 +230,18 @@ namespace ance::bbt
     struct Parameter;
 
     /// Creates a function.
-    struct AnonymousFunctionConstructor final// todo: remove when actual function constructors exist
+    struct FunctionConstructor final// todo: remove when actual function constructors exist
         : Statement
-        , utility::ConcreteNode<AnonymousFunctionConstructor, Visitor>
+        , utility::ConcreteNode<FunctionConstructor, Visitor>
     {
-        AnonymousFunctionConstructor(utility::List<Parameter> params,
-                                     Temporary const&         type,
-                                     utility::Owned<Flow>     flow,
-                                     Temporary const&         result,
-                                     core::Location const&    source_location);
+        FunctionConstructor(core::Identifier const&  identifier,
+                            utility::List<Parameter> params,
+                            Temporary const&         returned_type,
+                            utility::Owned<Flow>     flow,
+                            Temporary const&         result,
+                            core::Location const&    source_location);
 
+        core::Identifier const&  name;
         utility::List<Parameter> parameters;
         Temporary const&         return_type;
         utility::Owned<Flow>     body;
@@ -372,7 +374,7 @@ namespace ance::bbt
 
         virtual void visit(Intrinsic const& intrinsic)                               = 0;
         virtual void visit(Call const& call)                                         = 0;
-        virtual void visit(AnonymousFunctionConstructor const& function_constructor) = 0;
+        virtual void visit(FunctionConstructor const& function_constructor) = 0;
         virtual void visit(Constant const& constant)                                 = 0;
         virtual void visit(Default const& default_value)                             = 0;
         virtual void visit(CurrentScope const& current_scope)                        = 0;

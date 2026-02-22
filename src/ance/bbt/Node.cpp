@@ -108,16 +108,17 @@ ance::bbt::Call::Call(Temporary const&                                       fun
     , arguments(std::move(args))
     , destination(result)
 {}
-
-ance::bbt::AnonymousFunctionConstructor::AnonymousFunctionConstructor(utility::List<Parameter> params,
-                                                                      Temporary const&         type,
-                                                                      utility::Owned<Flow>     flow,
-                                                                      Temporary const&         result,
-                                                                      core::Location const&    source_location)
+ance::bbt::FunctionConstructor::FunctionConstructor(core::Identifier const&  identifier,
+                                                    utility::List<Parameter> params,
+                                                    Temporary const&         returned_type,
+                                                    utility::Owned<Flow>     flow,
+                                                    Temporary const&         result,
+                                                    core::Location const&    source_location)
     : Node(source_location)
     , Statement()
+    , name(identifier)
     , parameters(std::move(params))
-    , return_type(type)
+    , return_type(returned_type)
     , body(std::move(flow))
     , destination(result)
 {}

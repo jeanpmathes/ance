@@ -737,12 +737,12 @@ struct ance::cet::Runner::Implementation
             yield();
         }
 
-        void visit(bbt::AnonymousFunctionConstructor const& function_constructor) override
+        void visit(bbt::FunctionConstructor const& function_constructor) override
         {
             if (reporter_.isTraceEnabled())
             {
-                auto tr = trace("AnonymousFunctionConstructor", function_constructor);
-                tr << ", destination=" << function_constructor.destination.id() << ", return_type=" << temp(function_constructor.return_type) << ", parameters={";
+                auto tr = trace("FunctionConstructor", function_constructor);
+                tr << ", name=" << function_constructor.name << ", parameters={";
 
                 bool first = true;
                 for (auto const& param : function_constructor.parameters)
@@ -753,7 +753,7 @@ struct ance::cet::Runner::Implementation
                     tr << param.identifier << ": " << temp(param.type);
                 }
 
-                tr << "}";
+                tr << "}" << ", return_type=" << temp(function_constructor.return_type) << ", destination=" << function_constructor.destination.id();
             }
 
             utility::List<bbt::Signature::Parameter> parameters = {};
@@ -768,7 +768,7 @@ struct ance::cet::Runner::Implementation
                 parameters.emplace_back(param.identifier, type_value.cast<bbt::Type>());
             }
 
-            bbt::Signature const signature = bbt::Signature(core::Identifier::make(function_constructor.body->identifier), std::move(parameters));
+            bbt::Signature const signature = bbt::Signature(function_constructor.name, std::move(parameters));
 
             utility::Shared<bbt::Value> return_type = scope().getTemporary(function_constructor.return_type).read();
             if (!expectType(*type_context_.getType(), *return_type->type(), function_constructor.return_type.location))
