@@ -24,6 +24,13 @@ namespace ance::cet
 
 namespace ance::cet
 {
+    enum class DeclarationCheckResult
+    {
+        OK,
+        BLOCKS_OUTER,
+        ALREADY_DEFINED,
+    };
+
     class Scope
     {
       protected:
@@ -49,7 +56,7 @@ namespace ance::cet
         void   removeChildScope(Scope& scope);
 
       protected:
-        [[nodiscard]] virtual bool      canDeclare(core::Identifier const& identifier) const = 0;
+        [[nodiscard]] virtual DeclarationCheckResult      canDeclare(core::Identifier const& identifier) const = 0;
         virtual void                    onDeclare(utility::Owned<Variable> variable)         = 0;
         [[nodiscard]] virtual Variable* onFind(core::Identifier const& identifier)           = 0;
 
@@ -73,7 +80,7 @@ namespace ance::cet
         ~CoreScope() override = default;
 
       protected:
-        [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override;
+        [[nodiscard]] DeclarationCheckResult canDeclare(core::Identifier const& identifier) const override;
         void               onDeclare(utility::Owned<Variable> variable) override;
 
         [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;
@@ -90,7 +97,7 @@ namespace ance::cet
         ~OrderedScope() override = default;
 
       protected:
-        [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override;
+        [[nodiscard]] DeclarationCheckResult canDeclare(core::Identifier const& identifier) const override;
         void               onDeclare(utility::Owned<Variable> variable) override;
 
         [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;
@@ -109,7 +116,7 @@ namespace ance::cet
         ~UnorderedScope() override = default;
 
       protected:
-        [[nodiscard]] bool canDeclare(core::Identifier const& identifier) const override;
+        [[nodiscard]] DeclarationCheckResult canDeclare(core::Identifier const& identifier) const override;
         void               onDeclare(utility::Owned<Variable> variable) override;
 
         [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;

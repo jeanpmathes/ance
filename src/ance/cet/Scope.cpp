@@ -19,9 +19,17 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
                                                                                            core::Location const&      location,
                                                                                            core::Reporter&            reporter)
 {
-    if (!canDeclare(identifier))
+    DeclarationCheckResult check = canDeclare(identifier);
+
+    if (check == DeclarationCheckResult::BLOCKS_OUTER)
     {
         reporter.error(location) << "Declaring " << identifier << " in this scope would block previous access to it outside of the scope";
+        return std::nullopt;
+    }
+
+    if (check == DeclarationCheckResult::ALREADY_DEFINED)
+    {
+        reporter.error(location) << "Identifier " << identifier << " is already defined in this scope";
         return std::nullopt;
     }
 
@@ -99,9 +107,9 @@ ance::cet::CoreScope::CoreScope(bbt::TypeContext& type_context) : Scope(nullptr,
 
 }
 
-bool ance::cet::CoreScope::canDeclare(core::Identifier const& identifier) const
+ance::cet::DeclarationCheckResult ance::cet::CoreScope::canDeclare(core::Identifier const& identifier) const
 {
-    return !variables_.contains(identifier);
+    return variables_.contains(identifier) ? DeclarationCheckResult::ALREADY_DEFINED : DeclarationCheckResult::OK;
 }
 
 void ance::cet::CoreScope::onDeclare(utility::Owned<Variable> variable)
@@ -123,9 +131,9 @@ ance::cet::Variable* ance::cet::CoreScope::onFind(core::Identifier const& identi
 
 ance::cet::OrderedScope::OrderedScope(Scope& parent, bbt::TypeContext& type_context) : Scope(&parent, type_context) {}
 
-bool ance::cet::OrderedScope::canDeclare(core::Identifier const& identifier) const
+ance::cet::DeclarationCheckResult ance::cet::OrderedScope::canDeclare(core::Identifier const& identifier) const
 {
-    return !outer_identifiers_.contains(identifier);
+    return outer_identifiers_.contains(identifier) ? DeclarationCheckResult::BLOCKS_OUTER : DeclarationCheckResult::OK;
 }
 
 void ance::cet::OrderedScope::onDeclare(utility::Owned<Variable> variable)
@@ -148,9 +156,9 @@ ance::cet::Variable* ance::cet::OrderedScope::onFind(core::Identifier const& ide
 
 ance::cet::UnorderedScope::UnorderedScope(Scope& parent, bbt::TypeContext& type_context) : Scope(&parent, type_context) {}
 
-bool ance::cet::UnorderedScope::canDeclare(core::Identifier const& identifier) const
+ance::cet::DeclarationCheckResult ance::cet::UnorderedScope::canDeclare(core::Identifier const& identifier) const
 {
-    return !variables_.contains(identifier);
+    return variables_.contains(identifier) ? DeclarationCheckResult::ALREADY_DEFINED : DeclarationCheckResult::OK;
 }
 
 void ance::cet::UnorderedScope::onDeclare(utility::Owned<Variable> variable)

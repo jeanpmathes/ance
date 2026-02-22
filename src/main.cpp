@@ -119,11 +119,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: rework anonymous function constructor into function constructor, should take an identifier for the function name but that should be optional
-        // todo: for lambdas it remains AnonymousFunction'N, for actual functions it is the function name
-
-        // todo: canDeclare should return an enum why declaration is not allowed
-
         // todo: rename global location to project location, also add a nowhere location for things that do not have a location
         // todo: disallow creating identifier without location (and use core where appropriate)
         // todo: use nowhere in LanguageCore.cpp for the variable
