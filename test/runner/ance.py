@@ -6,8 +6,10 @@ def executable_name(name: str) -> str:
     return f"{name}.exe" if os.name == "nt" else name
 
 
-working_directory: str = os.path.abspath('../..')
-compiler_path: str = os.path.abspath(os.path.join('../../cmake-build-debug/src', executable_name('ance')))
+script_directory: str = os.path.dirname(os.path.abspath(__file__))
+working_directory: str = os.path.abspath(os.path.join(script_directory, '../..'))
+compiler_path: str = os.path.abspath(
+    os.path.join(script_directory, '../../cmake-build-debug/src', executable_name('ance')))
 
 
 def compile_project(project_dir_path: str) -> (int, str):
