@@ -8,6 +8,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(VCPKG_TARGET_TRIPLET x64-windows)
 
+set(ignored "${CMAKE_TOOLCHAIN_FILE} ${CMAKE_C_COMPILER}")
+
 find_package(antlr4-generator CONFIG REQUIRED)
 find_package(antlr4-runtime CONFIG REQUIRED)
 message(STATUS "Found ANTLR4 (${ANTLR4_INCLUDE_DIR})")

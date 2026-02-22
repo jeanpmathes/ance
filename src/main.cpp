@@ -119,8 +119,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: check dumpbin warning, fix it
-
         // todo: instead of marking code as cmp, it should be unmarked by default (unmarked code can run at compile and run time)
         // todo: remove all mentions of cmp, instead add the compiletime and runtime keywords
         // todo: go through the existing compiler and check all places that need to be adapted, should not be too much yet
