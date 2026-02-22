@@ -40,7 +40,7 @@ struct ance::bbt::Segmenter::Implementation
 
             id_ = id;
 
-            return utility::makeOwned<BasicBlock>(id, std::move(statements_), utility::makeOwned<ErrorLink>(core::Location::global()), location());
+            return utility::makeOwned<BasicBlock>(id, std::move(statements_), utility::makeOwned<ErrorLink>(core::Location::project()), location());
         }
 
         [[nodiscard]] virtual utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) = 0;
@@ -75,7 +75,7 @@ struct ance::bbt::Segmenter::Implementation
 
         [[nodiscard]] core::Location location() const
         {
-            core::Location location = core::Location::global();
+            core::Location location = core::Location::project();
 
             if (!statements_.empty())
             {
@@ -175,10 +175,10 @@ struct ance::bbt::Segmenter::Implementation
         {
             if (next_ == nullptr)
             {
-                return utility::makeOwned<Return>(core::Location::global());// todo: should not be here but in the correct block maybe?
+                return utility::makeOwned<Return>(core::Location::project());// todo: should not be here but in the correct block maybe?
             }
 
-            return utility::makeOwned<Jump>(*blocks[next_->index()], core::Location::global());
+            return utility::makeOwned<Jump>(*blocks[next_->index()], core::Location::project());
         }
 
         [[nodiscard]] std::set<BaseBB*> next() const override
@@ -264,7 +264,7 @@ struct ance::bbt::Segmenter::Implementation
 
         [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const&) override
         {
-            return utility::makeOwned<Return>(core::Location::global());
+            return utility::makeOwned<Return>(core::Location::project());
         }
 
         [[nodiscard]] std::set<BaseBB*> next() const override
@@ -520,7 +520,7 @@ struct ance::bbt::Segmenter::Implementation
             }
 
             bool           has_unreachable_code       = false;
-            core::Location first_unreachable_location = core::Location::global();
+            core::Location first_unreachable_location = core::Location::project();
 
             for (auto& block : state_.bbs)
             {

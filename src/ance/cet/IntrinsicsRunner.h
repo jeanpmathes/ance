@@ -67,7 +67,7 @@ namespace ance::cet
 
         struct State
         {
-            core::Location                                location             = core::Location::global();
+            core::Location                                location             = core::Location::project();
             utility::List<utility::Shared<bbt::Value>>*   arguments            = nullptr;
             utility::Optional<utility::Shared<bbt::Type>> expected_return_type = std::nullopt;
 

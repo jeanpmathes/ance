@@ -30,8 +30,8 @@ namespace
     {
         // todo: maybe remove true and false literals and define them as variables here
 
-        runner.declareCoreVariable(ance::core::Identifier::make("nowhere", ance::core::Location::core()),
-                                   ance::utility::makeShared<ance::bbt::Location>(ance::core::Location::global(), runner.types()));
+        runner.declareCoreVariable(ance::core::Identifier::make("nowhere", ance::core::Location::nowhere()),
+                                   ance::utility::makeShared<ance::bbt::Location>(ance::core::Location::project(), runner.types()));
     }
 
     void defineLanguageCoreFunctions(ance::cet::Runner& runner)

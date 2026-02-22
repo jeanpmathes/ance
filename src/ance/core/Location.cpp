@@ -7,23 +7,28 @@ namespace
 {
     enum MODE : size_t
     {
-        MODE_GLOBAL = 0,
-        MODE_FILE   = 1,
-        MODE_CORE   = 2,
+        MODE_NOWHERE = 0,
+        MODE_PROJECT = 1,
+        MODE_FILE   = 2,
+        MODE_CORE   = 3,
     };
 }
 
-ance::core::Location::Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column, size_t file_index)
+ance::core::Location::Location(size_t const start_line, size_t const start_column, size_t const end_line, size_t const end_column, size_t const file_index)
     : start_line_(start_line)
     , start_column_(start_column)
     , end_line_(end_line)
     , end_column_(end_column)
     , file_index_(file_index)
 {}
-
-ance::core::Location ance::core::Location::global()
+ance::core::Location ance::core::Location::nowhere()
 {
-    return {0, 0, MODE_GLOBAL, 0, 0};
+    return {0, 0, MODE_NOWHERE, 0, 0};
+}
+
+ance::core::Location ance::core::Location::project()
+{
+    return {0, 0, MODE_PROJECT, 0, 0};
 }
 
 ance::core::Location ance::core::Location::file(size_t file_index)
@@ -68,9 +73,14 @@ size_t ance::core::Location::fileIndex() const
     return file_index_;
 }
 
-bool ance::core::Location::isGlobal() const
+bool ance::core::Location::isNowhere() const
 {
-    return start_line_ == 0 && end_line_ == MODE_GLOBAL;
+    return start_line_ == 0 && end_line_ == MODE_NOWHERE;
+}
+
+bool ance::core::Location::isProject() const
+{
+    return start_line_ == 0 && end_line_ == MODE_PROJECT;
 }
 
 bool ance::core::Location::isCore() const
@@ -85,27 +95,22 @@ bool ance::core::Location::isFile() const
 
 bool ance::core::Location::isSingleLine() const
 {
-    return start_line_ == end_line_ && !isGlobal() && !isCore() && !isFile();
+    return start_line_ == end_line_ && !isProject() && !isCore() && !isFile();
 }
 
 void ance::core::Location::extend(Location const& location)
 {
-    if (this->isGlobal() || this->isCore() || this->isFile())
-    {
-        *this = location;
+    if (this->isProject() || this->isCore() || this->isFile())
         return;
-    }
 
-    if (location.isGlobal() || location.isCore())
-    {
+    if (location.isProject() || location.isCore())
         return;
-    }
-
-    assert(location.fileIndex() == fileIndex());
 
     if (location.isFile())
     {
-        *this = location;
+        if (location.fileIndex() == fileIndex())
+            *this = location;
+
         return;
     }
 
@@ -124,22 +129,22 @@ void ance::core::Location::extend(Location const& location)
 
 ance::core::Location ance::core::Location::first() const
 {
-    if (isGlobal() || isCore() || isFile()) return *this;
+    if (isProject() || isCore() || isFile()) return *this;
 
-    return Location(start_line_, start_column_, start_line_, start_column_, file_index_);
+    return {start_line_, start_column_, start_line_, start_column_, file_index_};
 }
 
 ance::core::Location ance::core::Location::last() const
 {
-    if (isGlobal() || isCore() || isFile()) return *this;
+    if (isProject() || isCore() || isFile()) return *this;
 
-    return Location(end_line_, end_column_, end_line_, end_column_, file_index_);
+    return {end_line_, end_column_, end_line_, end_column_, file_index_};
 }
 
-ance::core::Location ance::core::Location::getFirst(Location a, Location b)
+ance::core::Location ance::core::Location::getFirst(Location const& a, Location const& b)
 {
-    if (b.isGlobal() || b.isCore()) return a;
-    if (a.isGlobal() || a.isCore()) return b;
+    if (b.isProject() || b.isCore()) return a;
+    if (a.isProject() || a.isCore()) return b;
 
     if (a.fileIndex() != b.fileIndex()) return a;
 
@@ -156,7 +161,7 @@ std::ostream& ance::core::operator<<(std::ostream& os, Location const& location)
     {
         os << "(core)";
     }
-    else if (!location.isGlobal() && !location.isFile())
+    else if (!location.isNowhere() && !location.isProject() && !location.isFile())
     {
         os << "(" << location.start_line_ << ":" << location.start_column_ << ")";
     }

@@ -119,10 +119,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: rename global location to project location, also add a nowhere location for things that do not have a location
-        // todo: disallow creating identifier without location (and use core where appropriate)
-        // todo: use nowhere in LanguageCore.cpp for the variable
-
         // todo: check dumpbin warning, fix it
 
         // todo: instead of marking code as cmp, it should be unmarked by default (unmarked code can run at compile and run time)

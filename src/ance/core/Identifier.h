@@ -28,7 +28,7 @@ namespace ance::core
         /// \param string The text of the identifier.
         /// \param location The location of the identifier.
         /// \return The identifier.
-        static Identifier make(std::string const& string, Location location = Location::global());
+        static Identifier make(std::string const& string, Location location);
 
         /// Create an empty identifier.
         /// \return The empty identifier.

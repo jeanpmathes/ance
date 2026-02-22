@@ -221,7 +221,7 @@ struct ance::cet::Runner::Implementation
 
             run_point->clearBlocker();
 
-            reporter_.trace(prefix, core::Location::global())
+            reporter_.trace(prefix, core::Location::project())
                 << "execute run point enter {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null")
                 << ", statement_index=" << state_.current_statement_index << "}";
 
@@ -238,7 +238,7 @@ struct ance::cet::Runner::Implementation
             ExecutionResult const       result       = state_.execution_result.valueOr(ExecutionResult::Completed);
             utility::Shared<bbt::Value> return_value = state_.return_value.valueOr(bbt::Unit::make(type_context_));
 
-            reporter_.trace(prefix, core::Location::global()) << "execute run point exit {result=" << result << ", return_value=" << return_value->toString()
+            reporter_.trace(prefix, core::Location::project()) << "execute run point exit {result=" << result << ", return_value=" << return_value->toString()
                                                               << ", return_type=" << return_value->type()->name() << "}";
 
             state_ = std::move(previous_state);
@@ -367,7 +367,7 @@ struct ance::cet::Runner::Implementation
 
         core::Reporter::MessageBuilder trace(std::string_view const link_name, bbt::Link const& link)
         {
-            auto builder = reporter_.trace(prefix, core::Location::global());
+            auto builder = reporter_.trace(prefix, core::Location::project());
             builder << "visit link " << link_name << " " << link.location << " {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null")
                 << "}";
             return builder;
@@ -375,7 +375,7 @@ struct ance::cet::Runner::Implementation
 
         core::Reporter::MessageBuilder trace(std::string_view const statement_name, bbt::Statement const& statement)
         {
-            auto builder = reporter_.trace(prefix, core::Location::global());
+            auto builder = reporter_.trace(prefix, core::Location::project());
             builder << "visit statement " << statement_name << " " << statement.location
                     << " {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null")
                     << ", statement_index=" << state_.current_statement_index << "}";
@@ -384,7 +384,7 @@ struct ance::cet::Runner::Implementation
 
         void abort()
         {
-            reporter_.trace(prefix, core::Location::global()) << "abort execution";
+            reporter_.trace(prefix, core::Location::project()) << "abort execution";
 
             state_.execution_result = ExecutionResult::Error;
 
@@ -395,7 +395,7 @@ struct ance::cet::Runner::Implementation
         {
             auto const& [identifier] = blocker;
 
-            reporter_.trace(prefix, core::Location::global()) << "block execution pending on " << identifier;
+            reporter_.trace(prefix, core::Location::project()) << "block execution pending on " << identifier;
 
             state_.execution_result = ExecutionResult::Pending;
 
@@ -404,7 +404,7 @@ struct ance::cet::Runner::Implementation
 
         void yield()
         {
-            reporter_.trace(prefix, core::Location::global()) << "yield";
+            reporter_.trace(prefix, core::Location::project()) << "yield";
 
             state_.execution_result = ExecutionResult::Yield;
 
@@ -721,7 +721,7 @@ struct ance::cet::Runner::Implementation
                 utility::Shared<bbt::Value> argument  = arguments[index];
 
                 utility::Optional<utility::Shared<bbt::Value>> variable =
-                    function_scope.declare(parameter.name, parameter.type, true, core::Location::global(), reporter_);
+                    function_scope.declare(parameter.name, parameter.type, true, core::Location::project(), reporter_);
 
                 if (!variable.hasValue())
                 {
@@ -811,7 +811,7 @@ struct ance::cet::Runner::Implementation
                 if (type == *type_context_.getBool()) return bbt::Bool::make(false, type_context_);
                 if (type == *type_context_.getUnit()) return bbt::Unit::make(type_context_);
                 if (type == *type_context_.getSize()) return bbt::Size::make(0, type_context_);
-                if (type == *type_context_.getLocation()) return bbt::Location::make(core::Location::global(), type_context_);
+                if (type == *type_context_.getLocation()) return bbt::Location::make(core::Location::project(), type_context_);
                 if (type == *type_context_.getString()) return bbt::String::make("", type_context_);
 
                 reporter_.error(default_value.type.location) << "Cannot create default value for type " << type.annotated();

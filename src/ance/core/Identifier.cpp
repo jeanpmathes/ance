@@ -15,7 +15,7 @@ ance::core::Identifier ance::core::Identifier::make(std::string const& string, L
 
 ance::core::Identifier ance::core::Identifier::empty()
 {
-    return {std::string_view(), Location::global()};
+    return {std::string_view(), Location::project()};
 }
 
 std::string_view ance::core::Identifier::text() const

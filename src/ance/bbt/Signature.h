@@ -45,14 +45,6 @@ namespace ance::bbt
         [[nodiscard]] bool isVariadic() const;
 
         template<typename... Args>
-        static Signature make(std::string const& name, Args&&... args)
-        {
-            utility::List<Parameter> parameters;
-            (parameters.emplace_back(std::forward<Args>(args)), ...);
-            return {core::Identifier::make(name), std::move(parameters)};
-        }
-
-        template<typename... Args>
         static Signature make(core::Identifier const& name, Args&&... args)
         {
             utility::List<Parameter> parameters;
@@ -61,20 +53,11 @@ namespace ance::bbt
         }
 
         template<typename... Args>
-        static Signature makeAndNameParameters(std::string const& name, Args&&... args)
-        {
-            utility::List<Parameter> parameters;
-            size_t                   index = 0;
-            (parameters.emplace_back(Parameter {core::Identifier::make("arg" + std::to_string(index++)), std::forward<Args>(args)}), ...);
-            return {core::Identifier::make(name), std::move(parameters)};
-        }
-
-        template<typename... Args>
         static Signature makeAndNameParameters(core::Identifier const& name, Args&&... args)
         {
             utility::List<Parameter> parameters;
             size_t                   index = 0;
-            (parameters.emplace_back(Parameter {core::Identifier::make("arg" + std::to_string(index++)), std::forward<Args>(args)}), ...);
+            (parameters.emplace_back(Parameter {core::Identifier::make("arg" + std::to_string(index++), name.location()), std::forward<Args>(args)}), ...);
             return {name, std::move(parameters)};
         }
 

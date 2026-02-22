@@ -285,7 +285,7 @@ struct ance::est::Expander::Implementation
         {
             if (statements.empty())
             {
-                return utility::makeOwned<Pass>(core::Location::global());
+                return utility::makeOwned<Pass>(core::Location::project());
             }
 
             if (statements.size() == 1 && statements.front()->isCompound())
@@ -386,7 +386,7 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
-            utility::Owned<Expression> type = builder.pushExpansion(ast::Access(core::Identifier::make(core::FUNCTION_TYPE_NAME), function_declaration.location));
+            utility::Owned<Expression> type = builder.pushExpansion(ast::Access(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), function_declaration.location));
 
             utility::Owned<Expression> parent_scope =
                 intrinsic(core::Intrinsic::GET_PARENT, function_declaration.location, utility::makeOwned<CurrentScope>(function_declaration.location));
@@ -402,7 +402,7 @@ struct ance::est::Expander::Implementation
 
             utility::Owned<Expression> return_type_expression = function_declaration.return_type.hasValue()
                 ? builder.pushExpansion(**function_declaration.return_type)
-                : builder.pushExpansion(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME), function_declaration.location));
+                : builder.pushExpansion(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), function_declaration.location));
 
             SBuilder body_builder(*this);
             body_builder.pushExpansion(*function_declaration.body);
@@ -631,7 +631,7 @@ struct ance::est::Expander::Implementation
                 // todo: as soon as we have custom types, we would need this access here to be in the global scope, e.g. a global:: prefix
                 // todo: or as long as that is not done, just a new type of expression that contains an enum of important types
                 // todo: and the same for the Function type above in function declaration - remove that constants file to find all places
-                return_type = builder.pushExpansion(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME), lambda.location));
+                return_type = builder.pushExpansion(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), lambda.location));
             }
 
             SBuilder body_builder(*this);
@@ -651,7 +651,7 @@ struct ance::est::Expander::Implementation
             std::string const name = std::format("Lambda'{}", anonymous_function_counter_++);
 
             result_.setExpression(builder.take(
-                utility::makeOwned<FunctionConstructor>(core::Identifier::make(name), std::move(parameters), std::move(return_type.value()), std::move(body), lambda.location)));
+                utility::makeOwned<FunctionConstructor>(core::Identifier::make(name, lambda.location), std::move(parameters), std::move(return_type.value()), std::move(body), lambda.location)));
         }
 
         void visit(ast::Intrinsic const& intrinsic_expression) override

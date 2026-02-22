@@ -134,7 +134,7 @@ struct ance::core::Reporter::Implementation
             out_ << "[" << compiler_location << "] ";
         }
 
-        if (location.isGlobal())
+        if (location.isProject())
         {
             out_ << message << std::endl;
             return;

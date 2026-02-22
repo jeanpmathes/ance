@@ -18,9 +18,13 @@ namespace ance::core
         /// \param file_index The index of the file the location is in.
         Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column, size_t file_index);
 
-        /// Create a global location. A global location is used for code that is not in a source file.
-        /// \return A global location.
-        static Location global();
+        /// Create a nowhere location. A nowhere location is used for code that does not have a location.
+        /// \return A nowhere location.
+        static Location nowhere(); // todo: possibly remove with Optional<Location> as soon as language has Optional
+
+        /// Create a project location. A project location is used for code that is associated with a project but not an actual source location.
+        /// \return A project location.
+        static Location project();
 
         /// Create a core location. A core location is used for generated language core definitions.
         /// \return A core location.
@@ -58,9 +62,13 @@ namespace ance::core
         /// \return The file index.
         [[nodiscard]] size_t fileIndex() const;
 
-        /// Get whether this location is global, meaning not an actual source location.
-        /// \return True if it is global.
-        [[nodiscard]] bool isGlobal() const;
+        /// Get whether this location is a nowhere location, meaning it does not have a location.
+        /// \return True if it is a nowhere location.
+        [[nodiscard]] bool isNowhere() const;
+
+        /// Get whether this location is targeting a project.
+        /// \return True if it is a project location.
+        [[nodiscard]] bool isProject() const;
 
         /// Get whether this location is for core code.
         /// \return True if it is a core location.
@@ -76,7 +84,7 @@ namespace ance::core
         [[nodiscard]] bool isSingleLine() const;
 
         /// Extend this location to include another location.
-        /// If this is a global or file location, it will be set to the passed location.
+        /// If the locations are in different files, the location is not extended.
         /// \param location The location to extend to.
         void extend(Location const& location);
 
@@ -87,10 +95,8 @@ namespace ance::core
         [[nodiscard]] Location last() const;
 
         /// Get the first location of two locations.
-        /// If any of the locations is global, the other location is returned.
-        /// If the locations are in different files, the first argument is returned.
         /// \return The first location.
-        static Location getFirst(Location a, Location b);
+        static Location getFirst(Location const& a, Location const& b);
 
         friend std::ostream& operator<<(std::ostream& os, Location const& location);
 

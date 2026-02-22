@@ -72,7 +72,7 @@ namespace ance::bbt
             {
                 // todo: remove variadic parameters, instead take a string and a list of arguments
                 utility::List<Signature::Parameter> parameters;
-                parameters.emplace_back(Signature::Parameter {core::Identifier::make("arg0"), type_context.getString()});
+                parameters.emplace_back(Signature::Parameter {core::Identifier::make("arg0", core::Location::nowhere()), type_context.getString()});
                 signature   = Signature(intrinsic.identifier(), std::move(parameters), true);
                 return_type = type_context.getUnit();// Return type is determined dynamically by the called intrinsic.
 
