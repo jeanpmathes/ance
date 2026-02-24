@@ -119,12 +119,44 @@ namespace ance
 
         return exit_code;
 
-
-
         // todo: add all compiletime statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef
         // todo: do it step by step, as e.g. the array things require more changes so that array ops have support on types that the temporary and variable classes can use
+
+        // todo: erase statement
+        // todo: when adding erase, check where it is used in expansion, instead use scoping
+
+        // todo: and, or expressions with the funny not addition in the middle
+
+        // todo: assert statement
+
+        // todo: match statement
+
+        // todo: if expression
+        // todo: match expression
+
+        // todo: add all four float types
+
         // todo: WHEN WORKING ON TYPES: TYPES SHOULD DEFINE THEIR OPS USING SOURCE CODE (HARDCODED IN C++), just like the core functions, using intrinsics
+
+        // todo: additive and multiplicative ops
+        // todo: unary ops
+        // todo: bitwise binary ops and shifts
+        // todo: relational and equality ops
+
+        // todo: parenthesis expression
+
+        // todo: function overloading / function groups
+
+        // todo: constructors as callable types
+
+        // todo: integer type, integer literals (need type expressions for them, e.g. Int{32}, UInt{64}, etc.)
+        // todo: ops for all integer types
+
+        // todo: array type, array literals
+        // todo: subscript operator
+
+        // todo: vector type, vector literals
 
         // todo: reduce duplication between temporary and variable
 
@@ -132,28 +164,42 @@ namespace ance
 
         // todo: rework SourceFile class to read into single string buffer, then use string views instead of line-by-line reading
 
+        // todo: struct types
+
+        // todo: all variants of char and string types and literals, check that char might need to be called codepoint
+
+        // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
+        // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
+        // todo: do not forget destructors of global variables - should have reversed order of creation
+        // todo: add assertion that when variable or temporary is destroyed in C++, the isDestructed flag is set to true to catch missing destructor calls
+
         // todo: add first runtime code and do actual compilation, maybe have a Lowerer visitor that works in tandem with the runner
         // todo: build a very minimal CET that heavily relies and uses intrinsics, should be close to LLVM IR in capability and nodes
         // todo: might need its own value type (defined in CET namespace), do not use the one from BBT or LLVM
         // todo: this is the point where the tests should be brought back in, maybe deactivate those that certainly won't work yet and maybe prioritize them, add TODOs to bring them back
         // todo: also add loads of tests for all the new things, e.g. lambdas, better cmp, different types, etc.
 
+        // todo: pointer type, pointer type expression, uiptr, ptr and diff type (renamed to Diff, Pointer, UIntPointer)
+        // todo: also adapt Size type to work like Diff and UIntPointer meaning that it is correctly sized depending on platform
+
+        // todo: casting with as
+
+        // todo: allocation and delete expressions
+        // todo: addressof and pointer operations
+
         // todo: fully support the compiletime and runtime keywords
         // todo: some statements are only allowed in functions marked as compiletime and some only in runtime
         // todo: do not forget to also print those markers in later states, currently they are AST only
         // todo: THINK MORE ABOUT THIS: non-marked can be called from all, runtime only from runtime, compiletime only from compiletime and runtime
 
-        // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
-        // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
-        // todo: do not forget destructors of global variables - should have reversed order of creation
+        // todo: add sizeof (type, expression)
 
         // todo: add the # and @ operators to the grammar, # takes an identifier and returns an identifier value, and @ resolves an entity and gives a reference to the entity
 
         // todo: check what happens when an expression that does not make sense as a statement is used as a statement, e.g. unary op, think about what to do
 
-        // todo: when adding erase, check where it is used in expansion, instead use scoping
         // todo: correctly call copy and move functions for all linearized temporary using nodes in BBT and CET
-        // todo: global variables with non-cmp initializers need an ordering determined using topological sort
+        // todo: global variables with runtime initializers need an ordering determined using topological sort
         // todo: think about making the typeof node an intrinsic, would either require an any type or something else for the argument like overloading
 
         // todo: maybe parametrized function types could be a thing now, could also need generics or at least varargs
@@ -165,6 +211,10 @@ namespace ance
         // todo: determine which tree is the best for this, so that no other factors like compiler paramters need to be considered
 
         // todo: the compile time code needs a print function that actually prints to std::cout
+
+        // todo: when compile time is actually typesafe make the compile time execution more machine-like
+        // todo: this would mean that pointer ops and such make sense as actual bytes are stored and manipulated
+        // todo: but then values can no longer story their type, static typing is needed and to keep type safety the compile time needs to actually do typing
     }
 }
 
