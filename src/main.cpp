@@ -119,9 +119,7 @@ namespace ance
 
         return exit_code;
 
-        // todo: instead of marking code as cmp, it should be unmarked by default (unmarked code can run at compile and run time)
-        // todo: remove all mentions of cmp, instead add the compiletime and runtime keywords
-        // todo: go through the existing compiler and check all places that need to be adapted, should not be too much yet
+
 
         // todo: add all compiletime statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
         // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef
@@ -142,6 +140,7 @@ namespace ance
 
         // todo: fully support the compiletime and runtime keywords
         // todo: some statements are only allowed in functions marked as compiletime and some only in runtime
+        // todo: do not forget to also print those markers in later states, currently they are AST only
         // todo: THINK MORE ABOUT THIS: non-marked can be called from all, runtime only from runtime, compiletime only from compiletime and runtime
 
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
@@ -180,7 +179,7 @@ int main(int const argc, char** argv)
     }
     catch (std::exception const& e)
     {
-        ance::core::Reporter::printCritical(std::cerr, "internal error", e.what());
+        ance::core::Reporter::printCritical(std::cerr, e.what());
         return EXIT_FAILURE;
     }
 #else

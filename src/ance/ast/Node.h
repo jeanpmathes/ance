@@ -3,6 +3,7 @@
 
 #include "ance/core/AccessModifier.h"
 #include "ance/core/Assigner.h"
+#include "ance/core/ExecutionModifier.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
@@ -72,6 +73,7 @@ namespace ance::ast
         , utility::ConcreteNode<VariableDeclaration, Visitor>
     {
         VariableDeclaration(core::AccessModifier                          access,
+                            core::ExecutionModifier                       execution,
                             core::Identifier const&                       name,
                             utility::Owned<Expression>                    t,
                             core::Assigner                                assignment,
@@ -79,6 +81,7 @@ namespace ance::ast
                             core::Location const&                         source_location);
 
         core::AccessModifier                          access_modifier;
+        core::ExecutionModifier                       execution_modifier;
         core::Identifier                              identifier;
         utility::Owned<Expression>                    type;
         core::Assigner                                assigner;
@@ -91,6 +94,7 @@ namespace ance::ast
         , utility::ConcreteNode<FunctionDeclaration, Visitor>
     {
         FunctionDeclaration(core::AccessModifier                          access,
+                            core::ExecutionModifier                       execution,
                             core::Identifier const&                       name,
                             utility::List<Parameter>                      params,
                             utility::Optional<utility::Owned<Expression>> type,
@@ -98,6 +102,7 @@ namespace ance::ast
                             core::Location const&                         source_location);
 
         core::AccessModifier                          access_modifier;
+        core::ExecutionModifier                       execution_modifier;
         core::Identifier                              identifier;
         utility::List<Parameter>                      parameters;
         utility::Optional<utility::Owned<Expression>> return_type;

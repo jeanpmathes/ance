@@ -6,8 +6,8 @@ orderedScopeFile : statement EOF ;
 
 declaration
     : 'do' statement # RunnableDeclaration
-    | accessModifier 'cmp' IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # VariableDeclaration
-    | accessModifier 'cmp' IDENTIFIER '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? '{' ( statement )* '}' # FunctionDeclaration
+    | accessModifier ( executionMode )? IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # VariableDeclaration
+    | accessModifier ( executionMode )? IDENTIFIER '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? '{' ( statement )* '}' # FunctionDeclaration
     ;
 
 statement
@@ -75,6 +75,11 @@ accessModifier
     : 'public' # Public
     | 'private' # Private
     | 'extern' # Extern
+    ;
+
+executionMode
+    : 'compiletime' # CompileTime
+    | 'runtime' # Runtime
     ;
 
 IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )

@@ -34,6 +34,12 @@ void ance::core::Printer::print(AccessModifier const access_modifier)
     out_ << access_modifier.toString();// todo: access modifier should provide operator<<
 }
 
+void ance::core::Printer::print(ExecutionModifier execution_modifier)
+{
+    indent();
+    out_ << execution_modifier.toString(); // todo: execution modifier should provide operator<<
+}
+
 void ance::core::Printer::print(UnaryOperator unary_operator)
 {
     indent();

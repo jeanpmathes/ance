@@ -49,7 +49,12 @@ struct ance::ast::Printer::Implementation
         void visit(VariableDeclaration const& variable_declaration) override
         {
             print(variable_declaration.access_modifier);
-            print(" cmp ");
+            print(" ");
+            if (variable_declaration.execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
+            {
+                print(variable_declaration.execution_modifier);
+                print(" ");
+            }
             print(variable_declaration.identifier);
             print(": ");
             visit(*variable_declaration.type);
@@ -68,7 +73,12 @@ struct ance::ast::Printer::Implementation
         void visit(FunctionDeclaration const& function_declaration) override
         {
             print(function_declaration.access_modifier);
-            print(" cmp ");
+            print(" ");
+            if (function_declaration.execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
+            {
+                print(function_declaration.execution_modifier);
+                print(" ");
+            }
             print(function_declaration.identifier);
             print(" (");
             for (size_t index = 0; index < function_declaration.parameters.size(); index++)

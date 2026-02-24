@@ -15,22 +15,26 @@ ance::ast::RunnableDeclaration::RunnableDeclaration(utility::Owned<Statement> st
     , Declaration()
     , body(std::move(statement))
 {}
-ance::ast::VariableDeclaration::VariableDeclaration(core::AccessModifier                          access,
+
+ance::ast::VariableDeclaration::VariableDeclaration(core::AccessModifier const                    access,
+                                                    core::ExecutionModifier const                 execution,
                                                     core::Identifier const&                       name,
                                                     utility::Owned<Expression>                    t,
-                                                    core::Assigner                                assignment,
+                                                    core::Assigner const                          assignment,
                                                     utility::Optional<utility::Owned<Expression>> definition,
                                                     core::Location const&                         source_location)
     : Node(source_location)
     , Declaration()
     , access_modifier(access)
+    , execution_modifier(execution)
     , identifier(name)
     , type(std::move(t))
     , assigner(assignment)
     , value(std::move(definition))
 {}
 
-ance::ast::FunctionDeclaration::FunctionDeclaration(core::AccessModifier                          access,
+ance::ast::FunctionDeclaration::FunctionDeclaration(core::AccessModifier const                    access,
+                                                    core::ExecutionModifier const                 execution,
                                                     core::Identifier const&                       name,
                                                     utility::List<Parameter>                      params,
                                                     utility::Optional<utility::Owned<Expression>> type,
@@ -39,6 +43,7 @@ ance::ast::FunctionDeclaration::FunctionDeclaration(core::AccessModifier        
     : Node(source_location)
     , Declaration()
     , access_modifier(access)
+    , execution_modifier(execution)
     , identifier(name)
     , parameters(std::move(params))
     , return_type(std::move(type))
@@ -137,8 +142,8 @@ ance::ast::Call::Call(utility::Owned<Expression> called, utility::List<utility::
 {}
 
 ance::ast::Intrinsic::Intrinsic(utility::Owned<Expression>                intrinsic_name,
-                                                    utility::List<utility::Owned<Expression>> args,
-                                                    core::Location const&                     source_location)
+                                utility::List<utility::Owned<Expression>> args,
+                                core::Location const&                     source_location)
     : Node(source_location)
     , Expression()
     , name(std::move(intrinsic_name))

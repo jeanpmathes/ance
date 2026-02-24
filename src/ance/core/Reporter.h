@@ -148,9 +148,8 @@ namespace ance::core
         /// Print a critical message to the given output stream with the given prefix.
         /// It uses the formatting of the reporter.
         /// \param out The output stream to print to.
-        /// \param prefix The prefix to use, e.g. "internal", "core".
         /// \param message The message to print.
-        static void printCritical(std::ostream& out, std::string const& prefix, std::string const& message);
+        static void printCritical(std::ostream& out, std::string const& message);
 
       private:
         struct Implementation;

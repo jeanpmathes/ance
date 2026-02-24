@@ -4,6 +4,7 @@
 #include <ostream>
 
 #include "ance/core/AccessModifier.h"
+#include "ance/core/ExecutionModifier.h"
 #include "ance/core/Assigner.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/UnaryOperator.h"
@@ -32,6 +33,9 @@ namespace ance::core
 
         /// Print an access modifier to the output stream.
         void print(AccessModifier access_modifier);
+
+        /// Print an execution modifier to the output stream.
+        void print(ExecutionModifier execution_modifier);
 
         /// Print a unary operator to the output stream.
         void print(UnaryOperator unary_operator);

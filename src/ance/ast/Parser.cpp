@@ -13,6 +13,7 @@
 #include "anceParser.h"
 
 #include "ance/core/Context.h"
+#include "ance/core/ExecutionModifier.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/UnaryOperator.h"
 
@@ -362,6 +363,15 @@ namespace ance::ast
             return core::AccessModifier::PRIVATE_ACCESS;
         }
 
+        core::ExecutionModifier expectExecutionModifier(grammar::anceParser::ExecutionModeContext* ctx)
+        {
+            if (ctx == nullptr) return core::ExecutionModifier::ANY_EXECUTION;
+
+            if (std::any const result = visit(ctx); result.has_value()) return std::any_cast<core::ExecutionModifier>(result);
+
+            return core::ExecutionModifier::ANY_EXECUTION;
+        }
+
       protected:
         std::any visitUnorderedScopeFile(grammar::anceParser::UnorderedScopeFileContext* ctx) override
         {
@@ -391,9 +401,16 @@ namespace ance::ast
 
         std::any visitVariableDeclaration(grammar::anceParser::VariableDeclarationContext* ctx) override
         {
-            core::AccessModifier const access_modifier = expectAccessModifier(ctx->accessModifier());
-            core::Identifier const     name            = identifier(ctx->IDENTIFIER());
-            utility::Owned<Expression> type            = expectExpression(ctx->varType);
+            core::AccessModifier const    access_modifier    = expectAccessModifier(ctx->accessModifier());
+            core::ExecutionModifier execution_modifier = expectExecutionModifier(ctx->executionMode());
+            core::Identifier const        name               = identifier(ctx->IDENTIFIER());
+            utility::Owned<Expression>    type               = expectExpression(ctx->varType);
+
+            if (execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
+            {
+                reporter_.error(location(ctx->executionMode())) << "Execution modifiers are not yet supported";
+                execution_modifier = core::ExecutionModifier::ANY_EXECUTION;
+            }
 
             core::Assigner                                assigner = core::Assigner::UNSPECIFIED;
             utility::Optional<utility::Owned<Expression>> expression;
@@ -408,14 +425,21 @@ namespace ance::ast
                 }
             }
 
-            Declaration* declaration = new VariableDeclaration(access_modifier, name, std::move(type), assigner, std::move(expression), location(ctx));
+            Declaration* declaration = new VariableDeclaration(access_modifier, execution_modifier, name, std::move(type), assigner, std::move(expression), location(ctx));
             return declaration;
         }
 
         std::any visitFunctionDeclaration(grammar::anceParser::FunctionDeclarationContext* ctx) override
         {
-            core::AccessModifier const access_modifier = expectAccessModifier(ctx->accessModifier());
-            core::Identifier const     name            = identifier(ctx->IDENTIFIER());
+            core::AccessModifier const    access_modifier    = expectAccessModifier(ctx->accessModifier());
+            core::ExecutionModifier execution_modifier = expectExecutionModifier(ctx->executionMode());
+            core::Identifier const        name               = identifier(ctx->IDENTIFIER());
+
+            if (execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
+            {
+                reporter_.error(location(ctx->executionMode())) << "Execution modifiers are not yet supported";
+                execution_modifier = core::ExecutionModifier::ANY_EXECUTION;
+            }
 
             utility::List<Parameter> parameters;
             for (grammar::anceParser::ParameterContext* parameter_ctx : ctx->parameter()) parameters.push_back(expectParameter(parameter_ctx));
@@ -429,7 +453,7 @@ namespace ance::ast
             utility::Owned<Statement> body = utility::Owned<Statement>(*createBlockStatement(ctx->statement(), location(ctx)));
 
             Declaration* declaration =
-                new FunctionDeclaration(access_modifier, name, std::move(parameters), std::move(return_type), std::move(body), location(ctx));
+                new FunctionDeclaration(access_modifier, execution_modifier, name, std::move(parameters), std::move(return_type), std::move(body), location(ctx));
             return declaration;
         }
 
@@ -680,6 +704,18 @@ namespace ance::ast
         {
             core::AccessModifier access_modifier = core::AccessModifier::EXTERN_ACCESS;
             return access_modifier;
+        }
+
+        std::any visitCompileTime(grammar::anceParser::CompileTimeContext*) override
+        {
+            core::ExecutionModifier execution_modifier = core::ExecutionModifier::COMPILETIME_EXECUTION;
+            return execution_modifier;
+        }
+
+        std::any visitRuntime(grammar::anceParser::RuntimeContext*) override
+        {
+            core::ExecutionModifier execution_modifier = core::ExecutionModifier::RUNTIME_EXECUTION;
+            return execution_modifier;
         }
 
         std::any visitTerminal(antlr4::tree::TerminalNode*) override

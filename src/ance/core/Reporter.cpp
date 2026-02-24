@@ -146,7 +146,7 @@ struct ance::core::Reporter::Implementation
 
             if (level == Level::ERROR || level == Level::WARNING)
             {
-                printCritical(out_, "core", "Warnings and errors in core code indicate a critical language or compiler issue!");
+                printCritical(out_, "Warnings and errors in core code indicate a critical language or compiler issue!");
                 out_ << std::endl;
             }
 
@@ -421,7 +421,7 @@ void ance::core::Reporter::print(std::ostream& out, std::string const& prefix, s
     out << "ance: " << prefix << ": " << message << std::endl;
 }
 
-void ance::core::Reporter::printCritical(std::ostream& out, std::string const& prefix, std::string const& message)
+void ance::core::Reporter::printCritical(std::ostream& out, std::string const& message)
 {
-    out << "ance: " << ansi::ColorCritical << prefix << ansi::ColorReset << ": " << ansi::ColorCritical << message << ansi::ColorReset << std::endl;
+    out << "ance: " << ansi::ColorCritical << "internal error" << ansi::ColorReset << ": " << ansi::ColorCritical << message << ansi::ColorReset << std::endl;
 }

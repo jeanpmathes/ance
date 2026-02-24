@@ -37,9 +37,10 @@ namespace
     void defineLanguageCoreFunctions(ance::cet::Runner& runner)
     {
         // todo: remove / improve the functions
+        // todo: probably make them all compiletime only
 
         runner.declareCore(R"CODE(
-public cmp log1b (value: Bool)
+public log1b (value: Bool)
 {
     let string_value: String := intrinsic "b_2_str" (value);
     intrinsic "log" (string_value, nowhere);
@@ -47,7 +48,7 @@ public cmp log1b (value: Bool)
 )CODE", "log1b");
 
         runner.declareCore(R"CODE(
-public cmp log2b (value: Bool, location: Location)
+public log2b (value: Bool, location: Location)
 {
     let string_value: String := intrinsic "b_2_str" (value);
     intrinsic "log" (string_value, location);
@@ -55,21 +56,21 @@ public cmp log2b (value: Bool, location: Location)
 )CODE", "log2b");
 
         runner.declareCore(R"CODE(
-public cmp log1s (value: String)
+public log1s (value: String)
 {
     intrinsic "log" (value, nowhere);
 }
 )CODE", "log1s");
 
         runner.declareCore(R"CODE(
-public cmp log2s (value: String, location: Location)
+public log2s (value: String, location: Location)
 {
     intrinsic "log" (value, location);
 }
 )CODE","log2s");
 
         runner.declareCore(R"CODE(
-public cmp include (file: String, location: Location)
+public include (file: String, location: Location)
 {
     intrinsic "include" (file, location);
 }
