@@ -56,7 +56,7 @@ namespace ance
             }
         }
 
-        if (!arguments.input_file.hasValue())
+        if (!arguments.input_file.hasValue() && !arguments.print_version)
         {
             core::Reporter::print(out, "command", "No input file provided");
             return std::nullopt;
@@ -76,10 +76,7 @@ namespace ance
 
         utility::Optional<Arguments> const arguments = parseArguments(compiler_out, argc, argv);
 
-        if (!arguments.hasValue())
-        {
-            return EXIT_FAILURE;
-        }
+        if (!arguments.hasValue()) return EXIT_FAILURE;
 
         if (arguments->print_version)
         {
@@ -87,6 +84,8 @@ namespace ance
             program_out << "Copyright (c) 2026 Jean Patrick Mathes" << std::endl;
             program_out << std::endl;
         }
+
+        if (!arguments->input_file.hasValue()) return EXIT_SUCCESS;
 
         std::filesystem::path file_path = arguments->input_file.value();
         if (!exists(file_path))
