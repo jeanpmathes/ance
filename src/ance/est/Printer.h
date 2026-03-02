@@ -7,6 +7,7 @@
 
 namespace ance::est
 {
+    struct Declaration;
     struct File;
     struct Statement;
 
@@ -18,6 +19,7 @@ namespace ance::est
         ~Printer();
 
         void print(File const& file) const;
+        void print(Declaration const& declaration) const;
         void print(Statement const& statement) const;
 
       private:

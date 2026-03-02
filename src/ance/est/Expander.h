@@ -14,6 +14,7 @@ namespace ance::sources
 
 namespace ance::est
 {
+    struct Declaration;
     struct File;
     struct Statement;
 
@@ -37,8 +38,8 @@ namespace ance::est
         /// Expand a piece of core code containing a single declaration, removing syntactic sugar.
         /// \param code The code to expand.
         /// \param id An identifier of the declaration.
-        /// \return The expanded statement.
-        utility::Optional<utility::Owned<Statement>> expandDeclaration(std::string const& code, std::string const& id);
+        /// \return The expanded declaration.
+        utility::Optional<utility::Owned<Declaration>> expandDeclaration(std::string const& code, std::string const& id);
 
       private:
         struct Implementation;

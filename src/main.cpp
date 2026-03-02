@@ -118,14 +118,9 @@ namespace ance
 
         return exit_code;
 
-        // todo: add all compiletime statements and expressions (see old grammar), if a statement/expression is non-cmp add a TODO in the old grammar file
-        // todo: also check in old code whether they returned indirect values or direct values, mimic that now through LRef
-        // todo: do it step by step, as e.g. the array things require more changes so that array ops have support on types that the temporary and variable classes can use
-
         // todo: erase statement
-        // todo: when adding erase, check where it is used in expansion, instead use scoping
 
-        // todo: and, or expressions with the funny not addition in the middle
+        // todo: and, or expressions with the funny not addition in the middle, have to short-circuit
 
         // todo: assert statement
 
@@ -151,6 +146,10 @@ namespace ance
 
         // todo: integer type, integer literals (need type expressions for them, e.g. Int{32}, UInt{64}, etc.)
         // todo: ops for all integer types
+        // todo: for intrinsics for integers, use a single intrinsic for the operations, e.g. "int_add" and change how intrinsics do type checks
+        // todo: pretend that the intrinsics are generic and take generic parameters, e.g. intrinsic "int_add" {N} (a, b)
+        // todo: to do this, add a GenericIntrinsicSignature class which is used by IntrinsicSignature, getIntrinsicSignature would take the generic parameters
+        // todo: the int types can then simply use string manipulation to put the right N there
 
         // todo: array type, array literals
         // todo: subscript operator
@@ -169,6 +168,7 @@ namespace ance
 
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
         // todo: do not forget that temporaries are also scoped and require destructors to be called, also ensure that temporaries are not usable outside their scope e.g. with invalid expansion code
+        // todo:    for temporaries, they need to be statement scoped, as such the segmenter must add a scope enter and scope exit on every statement (add a is_statement_scope = true for diagnostics)
         // todo: do not forget destructors of global variables - should have reversed order of creation
         // todo: add assertion that when variable or temporary is destroyed in C++, the isDestructed flag is set to true to catch missing destructor calls
 
@@ -188,12 +188,13 @@ namespace ance
 
         // todo: fully support the compiletime and runtime keywords
         // todo: some statements are only allowed in functions marked as compiletime and some only in runtime
+        // todo: think about do-blocks, maybe they should also be markable, or maybe only one of them makes sense for them
         // todo: do not forget to also print those markers in later states, currently they are AST only
         // todo: THINK MORE ABOUT THIS: non-marked can be called from all, runtime only from runtime, compiletime only from compiletime and runtime
 
         // todo: add sizeof (type, expression)
 
-        // todo: add the # and @ operators to the grammar, # takes an identifier and returns an identifier value, and @ resolves an entity and gives a reference to the entity
+        // todo: add the # operator to the grammar, # takes an identifier and returns an identifier value
 
         // todo: check what happens when an expression that does not make sense as a statement is used as a statement, e.g. unary op, think about what to do
 

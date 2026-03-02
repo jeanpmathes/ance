@@ -1,15 +1,46 @@
 #include "Node.h"
 
-#include <iomanip>
-#include <sstream>
 #include <utility>
 
 ance::est::Node::Node(core::Location const& source_location) : location(source_location) {}
 
-ance::est::File::File(utility::List<DeclarationStatement> declaration_statement_list, core::Location const& source_location)
+ance::est::File::File(utility::List<utility::Owned<Declaration>> declaration_list, core::Location const& source_location)
     : Node(source_location)
-    , declaration_statements(std::move(declaration_statement_list))
+    , declarations(std::move(declaration_list))
 {}
+
+ance::est::RunnableDeclaration::RunnableDeclaration(utility::Owned<Statement> body_statement, core::Location const& source_location)
+    : Node(source_location)
+    , Declaration()
+    , body(std::move(body_statement))
+{}
+
+std::string ance::est::RunnableDeclaration::displayName() const
+{
+    return "runnable";
+}
+
+ance::est::VariableDeclaration::VariableDeclaration(core::AccessModifier                          access,
+                                                    core::ExecutionModifier                       execution,
+                                                    core::Identifier const&                       name,
+                                                    utility::Owned<Expression>                    t,
+                                                    core::Assigner                                assignment,
+                                                    utility::Optional<utility::Owned<Expression>> definition,
+                                                    core::Location const&                         source_location)
+    : Node(source_location)
+    , Declaration()
+    , access_modifier(access)
+    , execution_modifier(execution)
+    , identifier(name)
+    , type(std::move(t))
+    , assigner(assignment)
+    , value(std::move(definition))
+{}
+
+std::string ance::est::VariableDeclaration::displayName() const
+{
+    return std::string(identifier.text());
+}
 
 bool ance::est::Statement::isCompound() const
 {
@@ -71,32 +102,28 @@ ance::est::Return::Return(utility::Optional<utility::Owned<Expression>> expressi
     , value(std::move(expression))
 {}
 
-ance::est::Temporary::Temporary(utility::Optional<utility::Owned<Expression>> expression, std::string id, core::Location const& source_location)
+ance::est::Let::Let(core::Identifier const&                       name,
+                    utility::Owned<Expression>                    t,
+                    core::Assigner                                assignment,
+                    utility::Optional<utility::Owned<Expression>> definition,
+                    core::Location const&                         source_location)
     : Node(source_location)
     , Statement()
-    , definition(std::move(expression))
-    , identifier(std::move(id))
-{}
-
-std::string ance::est::Temporary::id() const
-{
-    return std::format("t\"{}\"", identifier);
-}
-
-ance::est::WriteTemporary::WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location)
-    : Node(source_location)
-    , Statement()
-    , temporary(target)
-    , value(std::move(expression))
+    , identifier(name)
+    , type(std::move(t))
+    , assigner(assignment)
+    , value(std::move(definition))
 {}
 
 ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
-ance::est::Intrinsic::Intrinsic(core::Intrinsic called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
+ance::est::Intrinsic::Intrinsic(utility::Owned<Expression>                    intrinsic_name,
+                                utility::List<utility::Owned<Expression>>     argument_list,
+                                core::Location const&                         source_location)
     : Node(source_location)
     , Expression()
-    , intrinsic(called)
-    , arguments(std::move(expressions))
+    , name(std::move(intrinsic_name))
+    , arguments(std::move(argument_list))
 {}
 
 ance::est::Call::Call(utility::Owned<Expression> callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
@@ -125,6 +152,12 @@ ance::est::Read::Read(utility::Owned<Expression> accessed, core::Location const&
     , target(std::move(accessed))
 {}
 
+ance::est::Access::Access(core::Identifier const& ident, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , identifier(ident)
+{}
+
 ance::est::UnitLiteral::UnitLiteral(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::est::SizeLiteral::SizeLiteral(std::string text, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(text)) {}
@@ -138,8 +171,6 @@ ance::est::Default::Default(utility::Owned<Expression> t, core::Location const& 
 
 ance::est::Here::Here(core::Location const& source_location) : Node(source_location), Expression() {}
 
-ance::est::CurrentScope::CurrentScope(core::Location const& source_location) : Node(source_location), Expression() {}
-
 ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utility::Owned<Expression> expression, core::Location const& source_location)
     : Node(source_location)
     , Expression()
@@ -147,16 +178,7 @@ ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , operand(std::move(expression))
 {}
 
-ance::est::ReadTemporary::ReadTemporary(Temporary const& target, core::Location const& source_location) : Node(source_location), Expression(), temporary(target)
-{}
-
 ance::est::TypeOf::TypeOf(utility::Owned<Expression> e, core::Location const& source_location) : Node(source_location), Expression(), expression(std::move(e))
-{}
-
-ance::est::IdentifierCapture::IdentifierCapture(core::Identifier const& ident, core::Location const& source_location)
-    : Node(source_location)
-    , Expression()
-    , identifier(ident)
 {}
 
 ance::est::Parameter::Parameter(core::Identifier const& name, utility::Owned<Expression> t, core::Location const& source_location)

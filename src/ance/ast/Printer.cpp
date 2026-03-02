@@ -22,13 +22,11 @@ struct ance::ast::Printer::Implementation
 
             for (auto const& declaration : file.declarations)
             {
-                if (!first)
-                {
-                    line();
-                }
+                if (!first) line();
                 first = false;
 
                 visit(*declaration);
+                line();
             }
         }
 
@@ -58,7 +56,6 @@ struct ance::ast::Printer::Implementation
             print(variable_declaration.identifier);
             print(": ");
             visit(*variable_declaration.type);
-
             if (variable_declaration.value.hasValue())
             {
                 print(" ");
@@ -66,7 +63,6 @@ struct ance::ast::Printer::Implementation
                 print(" ");
                 visit(**variable_declaration.value);
             }
-
             print(";");
         }
 

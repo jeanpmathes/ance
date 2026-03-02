@@ -1,9 +1,7 @@
 #include "Expander.h"
 
-#include <map>
 #include <variant>
 
-#include "ance/core/Intrinsic.h"
 #include "ance/core/Constants.h"
 
 #include "ance/ast/Node.h"
@@ -49,9 +47,9 @@ struct ance::est::Expander::Implementation
             setResult(std::move(file));
         }
 
-        void setDeclaration(DeclarationStatement declaration_statement)
+        void setDeclaration(utility::Owned<Declaration> declaration)
         {
-            setResult(std::move(declaration_statement));
+            setResult(std::move(declaration));
         }
 
         void setStatements(Statements statements)
@@ -100,7 +98,7 @@ struct ance::est::Expander::Implementation
         }
 
       private:
-        using ResultVariant = std::variant<utility::Owned<File>, DeclarationStatement, Statements, Expansion, ParameterExpansion>;
+        using ResultVariant = std::variant<utility::Owned<File>, utility::Owned<Declaration>, Statements, Expansion, ParameterExpansion>;
 
         template<typename T>
         void setResult(T value)
@@ -146,15 +144,19 @@ struct ance::est::Expander::Implementation
                 statements_.emplace_back(std::move(statement));
             }
 
-            Temporary const& pushTemporary(utility::Optional<utility::Owned<Expression>> definition, std::string id, core::Location const& location)
+            /// Creates an anonymous local variable and returns its identifier.
+            /// When using this, do not forget to wrap the expansion in a block so the variable is cleaned up after use.
+            core::Identifier pushAnonymousLet(utility::Owned<Expression>                    type,
+                                              core::Assigner                                assigner,
+                                              utility::Optional<utility::Owned<Expression>> definition,
+                                              core::Location const&                         location)
             {
-                size_t&     counter      = ast_.temporary_name_counters_[id];
-                std::string temporary_id = std::format("{}'{}", id, counter++);
+                std::string const    id         = std::format("_anonymous'{}", ast_.anonymous_variable_counter_++);
+                core::Identifier     identifier = core::Identifier::make(id, location);
 
-                utility::Owned<Temporary> temporary = utility::makeOwned<Temporary>(std::move(definition), std::move(temporary_id), location);
-                Temporary const&          tmp       = *temporary;
-                statements_.emplace_back(std::move(temporary));
-                return tmp;
+                statements_.emplace_back(utility::makeOwned<Let>(identifier, std::move(type), assigner, std::move(definition), location));
+
+                return identifier;
             }
 
             Statements&& take()
@@ -204,7 +206,7 @@ struct ance::est::Expander::Implementation
                 append(before_, std::move(expansion.before));
                 after_.emplace_back(std::move(expansion.after));
 
-                return Parameter(parameter.identifier, std::move(expansion.center), parameter.location);
+                return {parameter.identifier, std::move(expansion.center), parameter.location};
             }
 
             Expansion take(utility::Owned<Expression> expression)
@@ -241,14 +243,12 @@ struct ance::est::Expander::Implementation
             return result_.take<utility::Owned<File>>();
         }
 
-        DeclarationStatement expand(ast::Declaration const& declaration)
+        utility::Owned<Declaration> expand(ast::Declaration const& declaration)
         {
             result_.reset();
-            temporary_name_counters_.clear();
-
             visit(declaration);
 
-            return result_.take<DeclarationStatement>();
+            return result_.take<utility::Owned<Declaration>>();
         }
 
         Statements expand(ast::Statement const& statement)
@@ -271,14 +271,6 @@ struct ance::est::Expander::Implementation
         static void append(Statements& target, Statements&& source)
         {
             target.insert(target.end(), make_move_iterator(source.begin()), make_move_iterator(source.end()));
-        }
-
-        template<typename... Args>
-        static utility::Owned<Expression> intrinsic(core::Intrinsic const& called, core::Location const& source_location, Args&&... args)
-        {
-            utility::List<utility::Owned<Expression>> arguments;
-            (arguments.emplace_back(std::forward<Args>(args)), ...);
-            return utility::makeOwned<Intrinsic>(called, std::move(arguments), source_location);
         }
 
         static utility::Owned<Statement> wrap(Statements&& statements)
@@ -305,133 +297,80 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::File const& file) override
         {
-            utility::List<DeclarationStatement> declaration_statements;
+            utility::List<utility::Owned<Declaration>> declarations;
 
             for (auto const& declaration : file.declarations)
             {
-                DeclarationStatement expanded = expand(*declaration);
-                declaration_statements.emplace_back(std::move(expanded));
+                declarations.emplace_back(expand(*declaration));
             }
 
-            result_.setFile(utility::makeOwned<File>(std::move(declaration_statements), file.location));
+            result_.setFile(utility::makeOwned<File>(std::move(declarations), file.location));
         }
 
         void visit(ast::ErrorDeclaration const& error) override
         {
-            result_.setDeclaration({
-                .statement = utility::makeOwned<ErrorStatement>(error.location),
-                .name      = "ErrorDeclaration",
-            });
+            result_.setDeclaration(
+                utility::makeOwned<RunnableDeclaration>(utility::makeOwned<ErrorStatement>(error.location), error.location));
         }
 
         void visit(ast::RunnableDeclaration const& runnable) override
         {
-            result_.setDeclaration({
-                .statement = wrap(expand(*runnable.body)),
-                .name      = "RunnableDeclaration",
-            });
+            result_.setDeclaration(
+                utility::makeOwned<RunnableDeclaration>(wrap(expand(*runnable.body)), runnable.location));
         }
 
         void visit(ast::VariableDeclaration const& variable_declaration) override
         {
-            SBuilder builder(*this);
+            utility::Owned<Expression> type = expand(*variable_declaration.type).center;
 
-            utility::Owned<Expression> type = builder.pushExpansion(*variable_declaration.type);
-
-            utility::Owned<Expression> parent_scope =
-                intrinsic(core::Intrinsic::GET_PARENT, variable_declaration.location, utility::makeOwned<CurrentScope>(variable_declaration.location));
-
-            Temporary const& tmp_type = builder.pushTemporary(std::move(type), "VariableDeclaration_Type", variable_declaration.location);
-
-            // We need to go through the initializer expression first, otherwise the name would already be declared.
-            // If we then yield in the initializer other run points could access the undefined variable.
-
-            Temporary const* initial_value;
-
+            utility::Optional<utility::Owned<Expression>> value = std::nullopt;
             if (variable_declaration.value.hasValue())
             {
-                utility::Owned<Expression> value = builder.pushExpansion(**variable_declaration.value);
-                initial_value                    = &builder.pushTemporary(std::move(value), "VariableDeclaration_InitialValue", variable_declaration.location);
-            }
-            else
-            {
-                initial_value = &builder.pushTemporary(
-                    utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location), variable_declaration.location),
-                    "VariableDeclaration_DefaultValue",
-                    variable_declaration.location);
+                value = expand(**variable_declaration.value).center;
             }
 
-            utility::Owned<Expression> declared_expression =
-                intrinsic(core::Intrinsic::DECLARE,
-                          variable_declaration.location,
-                          std::move(parent_scope),
-                          utility::makeOwned<IdentifierCapture>(variable_declaration.identifier, variable_declaration.location),
-                          utility::makeOwned<BoolLiteral>(variable_declaration.assigner.isFinal(), variable_declaration.location),
-                          utility::makeOwned<ReadTemporary>(tmp_type, variable_declaration.location));
-
-            Temporary const& declared =
-                builder.pushTemporary(std::move(declared_expression), "VariableDeclaration_DefaultValue", variable_declaration.location);
-
-            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<Read>(utility::makeOwned<ReadTemporary>(declared, variable_declaration.location), variable_declaration.location),
-                                                            utility::makeOwned<ReadTemporary>(*initial_value, variable_declaration.location),
-                                                            variable_declaration.location));
-
-            result_.setDeclaration({
-                .statement = wrap(builder.take()),
-                .name      = std::format("VariableDeclaration({})", variable_declaration.identifier.text()),
-            });
+            result_.setDeclaration(utility::makeOwned<VariableDeclaration>(variable_declaration.access_modifier,
+                                                                            variable_declaration.execution_modifier,
+                                                                            variable_declaration.identifier,
+                                                                            std::move(type),
+                                                                            variable_declaration.assigner,
+                                                                            std::move(value),
+                                                                            variable_declaration.location));
         }
 
         void visit(ast::FunctionDeclaration const& function_declaration) override
         {
-            SBuilder builder(*this);
-
-            utility::Owned<Expression> type = builder.pushExpansion(ast::Access(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), function_declaration.location));
-
-            utility::Owned<Expression> parent_scope =
-                intrinsic(core::Intrinsic::GET_PARENT, function_declaration.location, utility::makeOwned<CurrentScope>(function_declaration.location));
-
-            Temporary const& tmp_type = builder.pushTemporary(std::move(type), "FunctionDeclaration_Type", function_declaration.location);
-
             utility::List<Parameter> parameters;
             for (auto const& parameter : function_declaration.parameters)
             {
-                utility::Owned<Expression> param_type = builder.pushExpansion(*parameter.type);
+                utility::Owned<Expression> param_type = expand(*parameter.type).center;
                 parameters.emplace_back(parameter.identifier, std::move(param_type), parameter.location);
             }
 
-            utility::Owned<Expression> return_type_expression = function_declaration.return_type.hasValue()
-                ? builder.pushExpansion(**function_declaration.return_type)
-                : builder.pushExpansion(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), function_declaration.location));
+            utility::Owned<Expression> return_type = function_declaration.return_type.hasValue()
+                ? expand(**function_declaration.return_type).center
+                : expand(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), function_declaration.location)).center;
 
             SBuilder body_builder(*this);
             body_builder.pushExpansion(*function_declaration.body);
             utility::Owned<Statement> body = wrap(body_builder.take());
 
-            Temporary const& initial_value = builder.pushTemporary(
-                utility::makeOwned<FunctionConstructor>(function_declaration.identifier, std::move(parameters), std::move(return_type_expression), std::move(body), function_declaration.location),
-                "FunctionDeclaration_InitialValue",
-                function_declaration.location);
+            // todo: as soon as we have custom types, we would need this access here to be in the global scope, e.g. a global:: prefix
+            // todo: or as long as that is not done, just a new type of expression that contains an enum of important types
+            // todo: and the same for the Unit type above - remove that constants file to find all places
+            utility::Owned<Expression> function_type =
+                expand(ast::Access(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), function_declaration.location)).center;
 
-            utility::Owned<Expression> declared_expression =
-                intrinsic(core::Intrinsic::DECLARE,
-                          function_declaration.location,
-                          std::move(parent_scope),
-                          utility::makeOwned<IdentifierCapture>(function_declaration.identifier, function_declaration.location),
-                          utility::makeOwned<BoolLiteral>(true, function_declaration.location),
-                          utility::makeOwned<ReadTemporary>(tmp_type, function_declaration.location));
+            utility::Owned<Expression> function_value = utility::makeOwned<FunctionConstructor>(
+                function_declaration.identifier, std::move(parameters), std::move(return_type), std::move(body), function_declaration.location);
 
-            Temporary const& declared =
-                builder.pushTemporary(std::move(declared_expression), "FunctionDeclaration_Declared", function_declaration.location);
-
-            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<Read>(utility::makeOwned<ReadTemporary>(declared, function_declaration.location), function_declaration.location),
-                                                            utility::makeOwned<ReadTemporary>(initial_value, function_declaration.location),
-                                                            function_declaration.location));
-
-            result_.setDeclaration({
-                .statement = wrap(builder.take()),
-                .name      = std::format("FunctionDeclaration({})", function_declaration.identifier.text()),
-            });
+            result_.setDeclaration(utility::makeOwned<VariableDeclaration>(function_declaration.access_modifier,
+                                                                            function_declaration.execution_modifier,
+                                                                            function_declaration.identifier,
+                                                                            std::move(function_type),
+                                                                            core::Assigner::FINAL_COPY_ASSIGNMENT, // todo: should be final move
+                                                                            std::move(function_value),
+                                                                            function_declaration.location));
         }
 
         void visit(ast::ErrorStatement const& error_statement) override
@@ -465,35 +404,15 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
-            utility::Owned<Expression> type_expression = builder.pushExpansion(*let.type);
-            Temporary const&           type            = builder.pushTemporary(std::move(type_expression), "Let_Type", let.location);
+            utility::Owned<Expression> type = builder.pushExpansion(*let.type);
 
-            Temporary const* initial_value;
-
+            utility::Optional<utility::Owned<Expression>> value = std::nullopt;
             if (let.value.hasValue())
             {
-                utility::Owned<Expression> value = builder.pushExpansion(**let.value);
-                initial_value                    = &builder.pushTemporary(std::move(value), "Let_InitialValue", let.location);
-            }
-            else
-            {
-                initial_value = &builder.pushTemporary(utility::makeOwned<Default>(utility::makeOwned<ReadTemporary>(type, let.location), let.location),
-                                                       "Let_DefaultValue",
-                                                       let.location);
+                value = builder.pushExpansion(**let.value);
             }
 
-            utility::Owned<Expression> declared_expression = intrinsic(core::Intrinsic::DECLARE,
-                                                                       let.location,
-                                                                       utility::makeOwned<CurrentScope>(let.location),
-                                                                       utility::makeOwned<IdentifierCapture>(let.identifier, let.location),
-                                                                       utility::makeOwned<BoolLiteral>(let.assigner.isFinal(), let.location),
-                                                                       utility::makeOwned<ReadTemporary>(type, let.location));
-
-            Temporary const& declared = builder.pushTemporary(std::move(declared_expression), "Let_Declared", let.location);
-
-            builder.pushStatement(utility::makeOwned<Write>(utility::makeOwned<Read>(utility::makeOwned<ReadTemporary>(declared, let.location), let.location),
-                                                            utility::makeOwned<ReadTemporary>(*initial_value, let.location),
-                                                            let.location));
+            builder.pushStatement(utility::makeOwned<Let>(let.identifier, std::move(type), let.assigner, std::move(value), let.location));
 
             result_.setStatements(builder.take());
         }
@@ -503,7 +422,7 @@ struct ance::est::Expander::Implementation
             SBuilder builder(*this);
 
             utility::Owned<Expression> assignee = builder.pushExpansion(*assignment.assignee);
-            utility::Owned<Expression> value = builder.pushExpansion(*assignment.value);
+            utility::Owned<Expression> value    = builder.pushExpansion(*assignment.value);
 
             builder.pushStatement(utility::makeOwned<Write>(std::move(assignee), std::move(value), assignment.location));
 
@@ -544,47 +463,31 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
-            utility::Optional<utility::Owned<Expression>> return_value_expression = std::nullopt;
+            utility::Optional<utility::Owned<Expression>> return_value = std::nullopt;
 
             if (return_statement.value.hasValue())
             {
-                utility::Owned<Expression> value = builder.pushExpansion(**return_statement.value);
-
-                Temporary const& return_value = builder.pushTemporary(std::move(value), "Return_Value", return_statement.location);
-                return_value_expression       = utility::makeOwned<ReadTemporary>(return_value, return_statement.location);
-            }
-            else
-            {
-                return_value_expression = std::nullopt;
+                return_value = builder.pushExpansion(**return_statement.value);
             }
 
-            // The expansion of the return value may have added statements that would be put behind the return statement.
-            // Therefore, we explicitly put the return statement at the end.
+            builder.pushStatement(utility::makeOwned<Return>(std::move(return_value), return_statement.location));
 
-            utility::Owned<Statement> final_statement = utility::makeOwned<Return>(std::move(return_value_expression), return_statement.location);
-            result_.setStatements(builder.take(), std::move(final_statement));
+            result_.setStatements(builder.take());
         }
 
         void visit(ast::While const& while_statement) override
         {
             SBuilder builder(*this);
 
-            {
-                SBuilder exit_builder(*this);
+            utility::Owned<Expression> condition = builder.pushExpansion(*while_statement.condition);
 
-                utility::Owned<Expression> condition_expression = exit_builder.pushExpansion(*while_statement.condition);
-                Temporary const&           condition = exit_builder.pushTemporary(std::move(condition_expression), "While_Condition", while_statement.location);
-
-                exit_builder.pushStatement(
-                    utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT,
-                                                                              utility::makeOwned<ReadTemporary>(condition, while_statement.condition->location),
-                                                                              while_statement.location),
-                                           utility::makeOwned<Break>(while_statement.location),
-                                           utility::makeOwned<Pass>(while_statement.location),
-                                           while_statement.location));
-
-                builder.pushStatement(utility::makeOwned<Block>(exit_builder.take(), while_statement.location));
-            }
+            builder.pushStatement(
+                utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT,
+                                                                          std::move(condition),
+                                                                          while_statement.condition->location),
+                                       utility::makeOwned<Break>(while_statement.location),
+                                       utility::makeOwned<Pass>(while_statement.location),
+                                       while_statement.location));
 
             builder.pushExpansion(*while_statement.body);
 
@@ -661,24 +564,17 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> name = builder.pushExpansion(*intrinsic_expression.name);
 
             utility::List<utility::Owned<Expression>> arguments;
-            arguments.emplace_back(std::move(name));
             for (auto& argument : intrinsic_expression.arguments)
             {
                 arguments.emplace_back(builder.pushExpansion(*argument));
             }
 
-            result_.setExpression(builder.take(
-                utility::makeOwned<Intrinsic>(core::Intrinsic::CALL_INTRINSIC, std::move(arguments), intrinsic_expression.location)));
+            result_.setExpression(builder.take(utility::makeOwned<Intrinsic>(std::move(name), std::move(arguments), intrinsic_expression.location)));
         }
 
         void visit(ast::Access const& access) override
         {
-            utility::Owned<Expression> resolved = intrinsic(core::Intrinsic::RESOLVE,
-                                                            access.location,
-                                                            utility::makeOwned<CurrentScope>(access.location),
-                                                            utility::makeOwned<IdentifierCapture>(access.identifier, access.location));
-
-            result_.setExpression(utility::makeOwned<Read>(std::move(resolved), access.location));
+            result_.setExpression(utility::makeOwned<Access>(access.identifier, access.location));
         }
 
         void visit(ast::Here const& here) override
@@ -719,8 +615,8 @@ struct ance::est::Expander::Implementation
         core::Reporter& reporter_;
         Result          result_;
 
-        std::map<std::string, size_t> temporary_name_counters_;
-        size_t anonymous_function_counter_ = 0;
+        size_t anonymous_function_counter_  = 0;
+        size_t anonymous_variable_counter_  = 0;
     };
 
     utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (template)
@@ -757,19 +653,19 @@ struct ance::est::Expander::Implementation
         return est;
     }
 
-    utility::Optional<utility::Owned<Statement>> expandDeclaration(std::string const& code, std::string const& id)
+    utility::Optional<utility::Owned<Declaration>> expandDeclaration(std::string const& code, std::string const& id)
     {
         utility::Optional<utility::Owned<ast::Declaration>> parsed = parser_.parseDeclaration(code, id);
         if (!parsed.hasValue()) return std::nullopt;
 
-        utility::Owned<AST> ast = utility::makeOwned<AST>(reporter_);
-        DeclarationStatement declaration_statement = ast->expand(**parsed);
+        utility::Owned<AST>         ast         = utility::makeOwned<AST>(reporter_);
+        utility::Owned<Declaration> declaration = ast->expand(**parsed);
 
-        context_.print<Printer>(*declaration_statement.statement, "est", std::filesystem::path("core") / id);
+        context_.print<Printer>(*declaration, "est", std::filesystem::path("core") / id);
 
         if (reporter_.isFailed()) return std::nullopt;
 
-        return std::move(declaration_statement.statement);
+        return declaration;
     }
 
   private:
@@ -795,7 +691,7 @@ ance::utility::Optional<ance::utility::Owned<ance::est::File>> ance::est::Expand
     return implementation_->expandUnorderedFile(file);
 }
 
-ance::utility::Optional<ance::utility::Owned<ance::est::Statement>> ance::est::Expander::expandDeclaration(std::string const& code, std::string const& id)
+ance::utility::Optional<ance::utility::Owned<ance::est::Declaration>> ance::est::Expander::expandDeclaration(std::string const& code, std::string const& id)
 {
     return implementation_->expandDeclaration(code, id);
 }

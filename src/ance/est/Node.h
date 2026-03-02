@@ -1,8 +1,10 @@
 #ifndef ANCE_EST_NODE_H
 #define ANCE_EST_NODE_H
 
+#include "ance/core/AccessModifier.h"
+#include "ance/core/Assigner.h"
+#include "ance/core/ExecutionModifier.h"
 #include "ance/core/Identifier.h"
-#include "ance/core/Intrinsic.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
 
@@ -25,12 +27,14 @@ namespace ance::est
     };
 
     struct Statement;
+    struct Expression;
 
-    /// Describes a declaration statement, which is a top-level statement.
-    struct DeclarationStatement
+    /// Base class for all declaration nodes in the EST.
+    struct Declaration
+        : virtual Node
+        , virtual utility::AbstractNode<Visitor>
     {
-        utility::Owned<Statement> statement;
-        std::string               name;
+        [[nodiscard]] virtual std::string displayName() const = 0;
     };
 
     /// Represents a source file creating an unordered scope.
@@ -40,9 +44,44 @@ namespace ance::est
         : Node
         , utility::ConcreteNode<File, Visitor>
     {
-        File(utility::List<DeclarationStatement> declaration_statement_list, core::Location const& source_location);
+        File(utility::List<utility::Owned<Declaration>> declaration_list, core::Location const& source_location);
 
-        utility::List<DeclarationStatement> declaration_statements = {};
+        utility::List<utility::Owned<Declaration>> declarations = {};
+    };
+
+    /// A runnable declaration runs a statement in an unordered scope.
+    struct RunnableDeclaration final
+        : Declaration
+        , utility::ConcreteNode<RunnableDeclaration, Visitor>
+    {
+        RunnableDeclaration(utility::Owned<Statement> body_statement, core::Location const& source_location);
+
+        [[nodiscard]] std::string displayName() const override;
+
+        utility::Owned<Statement> body;
+    };
+
+    /// Declares a variable in an unordered scope.
+    struct VariableDeclaration final
+        : Declaration
+        , utility::ConcreteNode<VariableDeclaration, Visitor>
+    {
+        VariableDeclaration(core::AccessModifier                          access,
+                            core::ExecutionModifier                       execution,
+                            core::Identifier const&                       name,
+                            utility::Owned<Expression>                    t,
+                            core::Assigner                                assignment,
+                            utility::Optional<utility::Owned<Expression>> definition,
+                            core::Location const&                         source_location);
+
+        [[nodiscard]] std::string displayName() const override;
+
+        core::AccessModifier                          access_modifier;
+        core::ExecutionModifier                       execution_modifier;
+        core::Identifier                              identifier;
+        utility::Owned<Expression>                    type;
+        core::Assigner                                assigner;
+        utility::Optional<utility::Owned<Expression>> value;
     };
 
     /// Statement node in the EST.
@@ -81,8 +120,6 @@ namespace ance::est
 
         utility::List<utility::Owned<Statement>> statements = {};
     };
-
-    struct Expression;
 
     /// Statement that simply wraps an expression, discarding its result.
     struct Independent final
@@ -156,28 +193,21 @@ namespace ance::est
         utility::Optional<utility::Owned<Expression>> value;
     };
 
-    /// Introduce a temporary variable, which works similar to any other local variable but does not have a name it is bound to.
-    struct Temporary final
+    /// Declares a local variable in an ordered scope.
+    struct Let final
         : Statement
-        , utility::ConcreteNode<Temporary, Visitor>
+        , utility::ConcreteNode<Let, Visitor>
     {
-        Temporary(utility::Optional<utility::Owned<Expression>> expression, std::string id, core::Location const& source_location);
+        Let(core::Identifier const&                       name,
+            utility::Owned<Expression>                    t,
+            core::Assigner                                assignment,
+            utility::Optional<utility::Owned<Expression>> definition,
+            core::Location const&                         source_location);
 
-        [[nodiscard]] std::string id() const;
-
-        utility::Optional<utility::Owned<Expression>> definition;
-        std::string                                   identifier;
-    };
-
-    /// Writes a value to a temporary variable.
-    struct WriteTemporary final
-        : Statement
-        , utility::ConcreteNode<WriteTemporary, Visitor>
-    {
-        WriteTemporary(Temporary const& target, utility::Owned<Expression> expression, core::Location const& source_location);
-
-        Temporary const&           temporary;
-        utility::Owned<Expression> value;
+        core::Identifier                              identifier;
+        utility::Owned<Expression>                    type;
+        core::Assigner                                assigner;
+        utility::Optional<utility::Owned<Expression>> value;
     };
 
     /// Expression node in the EST.
@@ -195,14 +225,14 @@ namespace ance::est
         explicit ErrorExpression(core::Location const& source_location);
     };
 
-    /// An intrinsic expression.
+    /// An intrinsic expression, calling an intrinsic specified by a string.
     struct Intrinsic final
         : Expression
         , utility::ConcreteNode<Intrinsic, Visitor>
     {
-        Intrinsic(core::Intrinsic called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location);
+        Intrinsic(utility::Owned<Expression> intrinsic_name, utility::List<utility::Owned<Expression>> argument_list, core::Location const& source_location);
 
-        core::Intrinsic                           intrinsic;
+        utility::Owned<Expression>                name;
         utility::List<utility::Owned<Expression>> arguments;
     };
 
@@ -244,6 +274,16 @@ namespace ance::est
         Read(utility::Owned<Expression> accessed, core::Location const& source_location);
 
         utility::Owned<Expression> target;
+    };
+
+    /// Accesses a variable by identifier.
+    struct Access final
+        : Expression
+        , utility::ConcreteNode<Access, Visitor>
+    {
+        Access(core::Identifier const& ident, core::Location const& source_location);
+
+        core::Identifier identifier;
     };
 
     /// A literal for the unit value.
@@ -302,14 +342,6 @@ namespace ance::est
         explicit Here(core::Location const& source_location);
     };
 
-    /// Expression providing the current scope.
-    struct CurrentScope final
-        : Expression
-        , utility::ConcreteNode<CurrentScope, Visitor>
-    {
-        explicit CurrentScope(core::Location const& source_location);
-    };
-
     /// Applies an operation to an operand.
     struct UnaryOperation final
         : Expression
@@ -321,16 +353,6 @@ namespace ance::est
         utility::Owned<Expression> operand;
     };
 
-    /// Reads the value of a temporary variable.
-    struct ReadTemporary final
-        : Expression
-        , utility::ConcreteNode<ReadTemporary, Visitor>
-    {
-        ReadTemporary(Temporary const& target, core::Location const& source_location);
-
-        Temporary const& temporary;
-    };
-
     /// Gives the type of the value produced by an expression - the expression WILL BE evaluated.
     struct TypeOf final
         : Expression
@@ -339,16 +361,6 @@ namespace ance::est
         TypeOf(utility::Owned<Expression> e, core::Location const& source_location);
 
         utility::Owned<Expression> expression;
-    };
-
-    /// Captures an identifier and allows it to be used in expressions.
-    struct IdentifierCapture final
-        : Expression
-        , utility::ConcreteNode<IdentifierCapture, Visitor>
-    {
-        IdentifierCapture(core::Identifier const& ident, core::Location const& source_location);
-
-        core::Identifier identifier;
     };
 
     /// A parameter for a callable, e.g. a function or lambda.
@@ -370,6 +382,9 @@ namespace ance::est
 
         virtual void visit(File const& file) = 0;
 
+        virtual void visit(RunnableDeclaration const& runnable)   = 0;
+        virtual void visit(VariableDeclaration const& variable_declaration)   = 0;
+
         virtual void visit(ErrorStatement const& error)           = 0;
         virtual void visit(Pass const& pass_statement)            = 0;
         virtual void visit(Block const& block)                    = 0;
@@ -380,25 +395,22 @@ namespace ance::est
         virtual void visit(Break const& break_statement)          = 0;
         virtual void visit(Continue const& continue_statement)    = 0;
         virtual void visit(Return const& return_statement)        = 0;
-        virtual void visit(Temporary const& temporary)            = 0;
-        virtual void visit(WriteTemporary const& write_temporary) = 0;
+        virtual void visit(Let const& let)                        = 0;
 
         virtual void visit(ErrorExpression const& error)                    = 0;
         virtual void visit(Intrinsic const& intrinsic)                      = 0;
         virtual void visit(Call const& call)                                = 0;
         virtual void visit(FunctionConstructor const& function_constructor) = 0;
-        virtual void visit(Read const& access)                              = 0;
+        virtual void visit(Read const& read)                                = 0;
+        virtual void visit(Access const& access)                            = 0;
         virtual void visit(UnitLiteral const& unit_literal)                 = 0;
         virtual void visit(SizeLiteral const& size_literal)                 = 0;
         virtual void visit(StringLiteral const& string_literal)             = 0;
         virtual void visit(BoolLiteral const& bool_literal)                 = 0;
         virtual void visit(Default const& default_value)                    = 0;
         virtual void visit(Here const& here)                                = 0;
-        virtual void visit(CurrentScope const& current_scope)               = 0;
         virtual void visit(UnaryOperation const& unary_operation)           = 0;
-        virtual void visit(ReadTemporary const& read_temporary)             = 0;
         virtual void visit(TypeOf const& type_of)                           = 0;
-        virtual void visit(IdentifierCapture const& identifier_capture)     = 0;
     };
 }
 

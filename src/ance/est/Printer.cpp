@@ -19,28 +19,54 @@ struct ance::est::Printer::Implementation
         {
             bool first = true;
 
-            for (auto const& declaration_statement : file.declaration_statements)
+            for (auto const& declaration : file.declarations)
             {
-                if (!first)
-                {
-                    line();
-                }
+                if (!first) line();
                 first = false;
 
-                print("do /* ");
-                print(declaration_statement.name);
-                print(" */ ");
-
-                if (declaration_statement.statement->isCompound())
-                {
-                    line();
-                    visit(*declaration_statement.statement);
-                }
-                else
-                {
-                    visit(*declaration_statement.statement);
-                }
+                visit(*declaration);
+                line();
             }
+        }
+
+        void visit(RunnableDeclaration const& runnable) override
+        {
+            print("do ");
+            if (runnable.body->isCompound())
+            {
+                line();
+                visit(*runnable.body);
+            }
+            else
+            {
+                visit(*runnable.body);
+            }
+        }
+
+        void visit(VariableDeclaration const& variable_declaration) override
+        {
+            print(variable_declaration.access_modifier);
+            print(" ");
+            if (variable_declaration.execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
+            {
+                print(variable_declaration.execution_modifier);
+                print(" ");
+            }
+            print(variable_declaration.identifier);
+            print(": ");
+            visit(*variable_declaration.type);
+            print(" ");
+            print(variable_declaration.assigner);
+            print(" ");
+            if (variable_declaration.value.hasValue())
+            {
+                visit(**variable_declaration.value);
+            }
+            else
+            {
+                print("default");
+            }
+            print(";");
         }
 
         void visit(ErrorStatement const&) override
@@ -154,28 +180,23 @@ struct ance::est::Printer::Implementation
             print(";");
         }
 
-        void visit(Temporary const& temporary) override
+        void visit(Let const& let) override
         {
-            print("let temporary ");
-            print(temporary.id());
-            if (temporary.definition.hasValue())
-            {
-                print(" ");
-                print(core::Assigner::COPY_ASSIGNMENT);
-                print(" ");
-                visit(**temporary.definition);
-            }
-            print(";");
-        }
-
-        void visit(WriteTemporary const& write_temporary) override
-        {
-            print("temporary ");
-            print(write_temporary.temporary.id());
+            print("let ");
+            print(let.identifier);
+            print(" : ");
+            visit(*let.type);
             print(" ");
-            print(core::Assigner::COPY_ASSIGNMENT);
-            print(" temporary ");
-            visit(*write_temporary.value);
+            print(let.assigner);
+            print(" ");
+            if (let.value.hasValue())
+            {
+                visit(**let.value);
+            }
+            else
+            {
+                print("default");
+            }
             print(";");
         }
 
@@ -187,12 +208,12 @@ struct ance::est::Printer::Implementation
         void visit(Intrinsic const& intrinsic) override
         {
             print("intrinsic ");
-            print(intrinsic.intrinsic);
+            visit(*intrinsic.name);
             print(" (");
             for (size_t index = 0; index < intrinsic.arguments.size(); index++)
             {
-                if (index > 0) print(", ");
                 visit(*intrinsic.arguments[index]);
+                if (index + 1 < intrinsic.arguments.size()) print(", ");
             }
             print(")");
         }
@@ -231,11 +252,16 @@ struct ance::est::Printer::Implementation
             print(")");
         }
 
-        void visit(Read const& access) override
+        void visit(Read const& read) override
         {
             print("(read ");
-            visit(*access.target);
+            visit(*read.target);
             print(")");
+        }
+
+        void visit(Access const& access) override
+        {
+            print(access.identifier);
         }
 
         void visit(UnitLiteral const&) override
@@ -270,11 +296,6 @@ struct ance::est::Printer::Implementation
             print("here");
         }
 
-        void visit(CurrentScope const&) override
-        {
-            print("scope");
-        }
-
         void visit(UnaryOperation const& unary_operation) override
         {
             print(unary_operation.op.toString());
@@ -282,24 +303,11 @@ struct ance::est::Printer::Implementation
             visit(*unary_operation.operand);
         }
 
-        void visit(ReadTemporary const& read_temporary) override
-        {
-            print("(read temporary ");
-            print(read_temporary.temporary.id());
-            print(")");
-        }
-
         void visit(TypeOf const& type_of) override
         {
             print("typeof (");
             visit(*type_of.expression);
             print(")");
-        }
-
-        void visit(IdentifierCapture const& identifier_capture) override
-        {
-            print("#");
-            print(identifier_capture.identifier);
         }
     };
 
@@ -321,6 +329,11 @@ ance::est::Printer::~Printer() = default;
 void ance::est::Printer::print(File const& file) const
 {
     implementation_->print(file);
+}
+
+void ance::est::Printer::print(Declaration const& declaration) const
+{
+    implementation_->print(declaration);
 }
 
 void ance::est::Printer::print(Statement const& statement) const
