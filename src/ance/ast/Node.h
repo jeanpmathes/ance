@@ -242,6 +242,16 @@ namespace ance::ast
         utility::Owned<Statement>  body;
     };
 
+    /// Erases a variable from the current scope, making it inaccessible and causing destruction.
+    struct Erase final
+        : Statement
+        , utility::ConcreteNode<Erase, Visitor>
+    {
+        Erase(core::Identifier const& name, core::Location const& source_location);
+
+        core::Identifier identifier;
+    };
+
     /// An expression is a piece of code that produces a value.
     struct Expression
         : virtual Node
@@ -400,18 +410,19 @@ namespace ance::ast
         virtual void visit(Continue const& continue_statement) = 0;
         virtual void visit(Return const& return_statement)     = 0;
         virtual void visit(While const& while_statement)       = 0;
+        virtual void visit(Erase const& erase)                 = 0;
 
-        virtual void visit(ErrorExpression const& error)                    = 0;
-        virtual void visit(Call const& call)                                = 0;
+        virtual void visit(ErrorExpression const& error)          = 0;
+        virtual void visit(Call const& call)                      = 0;
         virtual void visit(Intrinsic const& intrinsic_expression) = 0;
-        virtual void visit(Lambda const& lambda)                            = 0;
-        virtual void visit(Access const& access)                            = 0;
-        virtual void visit(UnitLiteral const& unit_literal)                 = 0;
-        virtual void visit(SizeLiteral const& size_literal)                 = 0;
-        virtual void visit(StringLiteral const& string_literal)             = 0;
-        virtual void visit(BoolLiteral const& bool_literal)                 = 0;
-        virtual void visit(Here const& here)                                = 0;
-        virtual void visit(UnaryOperation const& unary_operation)           = 0;
+        virtual void visit(Lambda const& lambda)                  = 0;
+        virtual void visit(Access const& access)                  = 0;
+        virtual void visit(UnitLiteral const& unit_literal)       = 0;
+        virtual void visit(SizeLiteral const& size_literal)       = 0;
+        virtual void visit(StringLiteral const& string_literal)   = 0;
+        virtual void visit(BoolLiteral const& bool_literal)       = 0;
+        virtual void visit(Here const& here)                      = 0;
+        virtual void visit(UnaryOperation const& unary_operation) = 0;
     };
 }
 

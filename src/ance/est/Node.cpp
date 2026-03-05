@@ -115,11 +115,12 @@ ance::est::Let::Let(core::Identifier const&                       name,
     , value(std::move(definition))
 {}
 
+ance::est::Erase::Erase(core::Identifier const& name, core::Location const& source_location) : Node(source_location), Statement(), identifier(name) {}
 ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
-ance::est::Intrinsic::Intrinsic(utility::Owned<Expression>                    intrinsic_name,
-                                utility::List<utility::Owned<Expression>>     argument_list,
-                                core::Location const&                         source_location)
+ance::est::Intrinsic::Intrinsic(utility::Owned<Expression>                intrinsic_name,
+                                utility::List<utility::Owned<Expression>> argument_list,
+                                core::Location const&                     source_location)
     : Node(source_location)
     , Expression()
     , name(std::move(intrinsic_name))
@@ -152,11 +153,7 @@ ance::est::Read::Read(utility::Owned<Expression> accessed, core::Location const&
     , target(std::move(accessed))
 {}
 
-ance::est::Access::Access(core::Identifier const& ident, core::Location const& source_location)
-    : Node(source_location)
-    , Expression()
-    , identifier(ident)
-{}
+ance::est::Access::Access(core::Identifier const& ident, core::Location const& source_location) : Node(source_location), Expression(), identifier(ident) {}
 
 ance::est::UnitLiteral::UnitLiteral(core::Location const& source_location) : Node(source_location), Expression() {}
 

@@ -17,10 +17,14 @@ namespace ance::core
         enum Value
         {
             /**
+             * Does nothing.
+             *
              * This intrinsic does not take any parameters and returns the unit type.
              */
             NO_OPERATION,
             /**
+             * Declares a variable in a scope.
+             *
              * This intrinsic takes the following parameters:
              * - The scope to declare the variable in.
              * - The identifier of the variable to declare.
@@ -29,23 +33,39 @@ namespace ance::core
              *
              * It returns a reference to the declared variable.
              */
-            DECLARE,// todo: make method on scope class
+            DECLARE,// todo: after compilation: maybe this should be a method on scope
             /**
+             * Finds a variable in the chain of scopes and provides a reference to it.
+             *
              * This intrinsic takes the following parameters:
              * - The scope to resolve the variable in.
              * - The identifier of the variable to resolve.
              *
              * It returns a reference to the resolved variable.
              */
-            RESOLVE,// todo: make method on scope class
+            RESOLVE,// todo: after compilation: maybe this should be a method on scope
             /**
+             * Erases a variable from a scope, making it inaccessible for future lookups.
+             *
+             * This intrinsic takes the following parameters:
+             * - The scope to erase the variable from.
+             * - The identifier of the variable to erase.
+             *
+             * It returns the unit type.
+             */
+            ERASE,// todo: after compilation: maybe this should be a method on scope
+            /**
+             * Provides access to the parent scope of a scope.
+             *
              * This intrinsic takes the following parameters:
              * - The scope to get the parent of.
              *
              * It returns the parent scope.
              */
-            GET_PARENT,// todo: make method on scope class
+            GET_PARENT,// todo: after compilation: maybe this should be a method on scope
             /**
+             * Converts a boolean value to its string representation.
+             *
              * This intrinsic takes the following parameters:
              * - The boolean to convert.
              *
@@ -53,6 +73,8 @@ namespace ance::core
              */
             B_2_STR,// todo: implement as core function
             /**
+             * Logs a string message as compiler output.
+             *
              * This intrinsic takes the following parameters:
              * - The string message to log.
              * - The location to log the message at.
@@ -61,6 +83,8 @@ namespace ance::core
              */
             LOG,
             /**
+             * Includes a file into the current compilation.
+             *
              * This intrinsic takes the following parameters:
              * - The path of the file to include.
              * - The location of a file to use as base to resolve a relative path.
@@ -69,6 +93,8 @@ namespace ance::core
              */
             INCLUDE,
             /**
+             * Calls an intrinsic by its string name.
+             *
              * This intrinsic takes the following parameters:
              * - The name of the intrinsic to call (string).
              * - Any number of additional arguments to pass to the intrinsic.

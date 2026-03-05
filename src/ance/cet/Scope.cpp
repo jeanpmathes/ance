@@ -58,6 +58,23 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
     return std::nullopt;
 }
 
+ance::cet::EraseResult ance::cet::Scope::erase(core::Identifier const& identifier)
+{
+    if (!isOrdered()) return EraseResult::IS_NOT_ORDERED;
+
+    if (onErase(identifier)) return EraseResult::OK;
+
+    Scope* current_scope = parent_;
+    while (current_scope != nullptr)
+    {
+        if (current_scope->onContains(identifier)) return EraseResult::IS_OUTER;
+
+        current_scope = current_scope->parent();
+    }
+
+    return EraseResult::NOT_FOUND;
+}
+
 ance::cet::Temporary& ance::cet::Scope::createTemporary(bbt::Temporary const& bbt_temporary)
 {
     auto [iterator, inserted] = temporaries_.emplace(&bbt_temporary, utility::makeOwned<Temporary>(type_context_));
@@ -97,15 +114,22 @@ void ance::cet::Scope::removeChildScope(Scope& scope)
     child_scopes_.erase(iterator);
 }
 
+bool ance::cet::Scope::onErase(core::Identifier const&)
+{
+    return false;
+}
+
+bool ance::cet::Scope::isOrdered() const
+{
+    return false;
+}
+
 ance::bbt::TypeContext& ance::cet::Scope::types()
 {
     return type_context_;
 }
 
-ance::cet::CoreScope::CoreScope(bbt::TypeContext& type_context) : Scope(nullptr, type_context)
-{
-
-}
+ance::cet::CoreScope::CoreScope(bbt::TypeContext& type_context) : Scope(nullptr, type_context) {}
 
 ance::cet::DeclarationCheckResult ance::cet::CoreScope::canDeclare(core::Identifier const& identifier) const
 {
@@ -127,6 +151,11 @@ ance::cet::Variable* ance::cet::CoreScope::onFind(core::Identifier const& identi
     }
 
     return nullptr;
+}
+
+bool ance::cet::CoreScope::onContains(core::Identifier const& identifier) const
+{
+    return variables_.contains(identifier);
 }
 
 ance::cet::OrderedScope::OrderedScope(Scope& parent, bbt::TypeContext& type_context) : Scope(&parent, type_context) {}
@@ -154,6 +183,27 @@ ance::cet::Variable* ance::cet::OrderedScope::onFind(core::Identifier const& ide
     return nullptr;
 }
 
+bool ance::cet::OrderedScope::onContains(core::Identifier const& identifier) const
+{
+    return active_variables_.contains(identifier);
+}
+
+bool ance::cet::OrderedScope::onErase(core::Identifier const& identifier)
+{
+    if (active_variables_.contains(identifier))
+    {
+        active_variables_.erase(identifier);
+        return true;
+    }
+
+    return false;
+}
+
+bool ance::cet::OrderedScope::isOrdered() const
+{
+    return true;
+}
+
 ance::cet::UnorderedScope::UnorderedScope(Scope& parent, bbt::TypeContext& type_context) : Scope(&parent, type_context) {}
 
 ance::cet::DeclarationCheckResult ance::cet::UnorderedScope::canDeclare(core::Identifier const& identifier) const
@@ -175,4 +225,9 @@ ance::cet::Variable* ance::cet::UnorderedScope::onFind(core::Identifier const& i
     }
 
     return nullptr;
+}
+
+bool ance::cet::UnorderedScope::onContains(core::Identifier const& identifier) const
+{
+    return variables_.contains(identifier);
 }

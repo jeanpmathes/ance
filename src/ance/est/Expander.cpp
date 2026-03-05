@@ -144,6 +144,11 @@ struct ance::est::Expander::Implementation
                 statements_.emplace_back(std::move(statement));
             }
 
+            void pushIndependentExpression(utility::Owned<Expression> expression)
+            {
+                statements_.emplace_back(utility::makeOwned<Independent>(std::move(expression), expression->location));
+            }
+
             /// Creates an anonymous local variable and returns its identifier.
             /// When using this, do not forget to wrap the expansion in a block so the variable is cleaned up after use.
             core::Identifier pushAnonymousLet(utility::Owned<Expression>                    type,
@@ -151,8 +156,8 @@ struct ance::est::Expander::Implementation
                                               utility::Optional<utility::Owned<Expression>> definition,
                                               core::Location const&                         location)
             {
-                std::string const    id         = std::format("_anonymous'{}", ast_.anonymous_variable_counter_++);
-                core::Identifier     identifier = core::Identifier::make(id, location);
+                std::string const id         = std::format("_anonymous'{}", ast_.anonymous_variable_counter_++);
+                core::Identifier  identifier = core::Identifier::make(id, location);
 
                 statements_.emplace_back(utility::makeOwned<Let>(identifier, std::move(type), assigner, std::move(definition), location));
 
@@ -309,14 +314,12 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::ErrorDeclaration const& error) override
         {
-            result_.setDeclaration(
-                utility::makeOwned<RunnableDeclaration>(utility::makeOwned<ErrorStatement>(error.location), error.location));
+            result_.setDeclaration(utility::makeOwned<RunnableDeclaration>(utility::makeOwned<ErrorStatement>(error.location), error.location));
         }
 
         void visit(ast::RunnableDeclaration const& runnable) override
         {
-            result_.setDeclaration(
-                utility::makeOwned<RunnableDeclaration>(wrap(expand(*runnable.body)), runnable.location));
+            result_.setDeclaration(utility::makeOwned<RunnableDeclaration>(wrap(expand(*runnable.body)), runnable.location));
         }
 
         void visit(ast::VariableDeclaration const& variable_declaration) override
@@ -330,12 +333,12 @@ struct ance::est::Expander::Implementation
             }
 
             result_.setDeclaration(utility::makeOwned<VariableDeclaration>(variable_declaration.access_modifier,
-                                                                            variable_declaration.execution_modifier,
-                                                                            variable_declaration.identifier,
-                                                                            std::move(type),
-                                                                            variable_declaration.assigner,
-                                                                            std::move(value),
-                                                                            variable_declaration.location));
+                                                                           variable_declaration.execution_modifier,
+                                                                           variable_declaration.identifier,
+                                                                           std::move(type),
+                                                                           variable_declaration.assigner,
+                                                                           std::move(value),
+                                                                           variable_declaration.location));
         }
 
         void visit(ast::FunctionDeclaration const& function_declaration) override
@@ -347,9 +350,10 @@ struct ance::est::Expander::Implementation
                 parameters.emplace_back(parameter.identifier, std::move(param_type), parameter.location);
             }
 
-            utility::Owned<Expression> return_type = function_declaration.return_type.hasValue()
-                ? expand(**function_declaration.return_type).center
-                : expand(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), function_declaration.location)).center;
+            utility::Owned<Expression> return_type =
+                function_declaration.return_type.hasValue()
+                    ? expand(**function_declaration.return_type).center
+                    : expand(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), function_declaration.location)).center;
 
             SBuilder body_builder(*this);
             body_builder.pushExpansion(*function_declaration.body);
@@ -361,16 +365,19 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> function_type =
                 expand(ast::Access(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), function_declaration.location)).center;
 
-            utility::Owned<Expression> function_value = utility::makeOwned<FunctionConstructor>(
-                function_declaration.identifier, std::move(parameters), std::move(return_type), std::move(body), function_declaration.location);
+            utility::Owned<Expression> function_value = utility::makeOwned<FunctionConstructor>(function_declaration.identifier,
+                                                                                                std::move(parameters),
+                                                                                                std::move(return_type),
+                                                                                                std::move(body),
+                                                                                                function_declaration.location);
 
             result_.setDeclaration(utility::makeOwned<VariableDeclaration>(function_declaration.access_modifier,
-                                                                            function_declaration.execution_modifier,
-                                                                            function_declaration.identifier,
-                                                                            std::move(function_type),
-                                                                            core::Assigner::FINAL_COPY_ASSIGNMENT, // todo: should be final move
-                                                                            std::move(function_value),
-                                                                            function_declaration.location));
+                                                                           function_declaration.execution_modifier,
+                                                                           function_declaration.identifier,
+                                                                           std::move(function_type),
+                                                                           core::Assigner::FINAL_COPY_ASSIGNMENT,// todo: should be final move
+                                                                           std::move(function_value),
+                                                                           function_declaration.location));
         }
 
         void visit(ast::ErrorStatement const& error_statement) override
@@ -482,9 +489,7 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> condition = builder.pushExpansion(*while_statement.condition);
 
             builder.pushStatement(
-                utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT,
-                                                                          std::move(condition),
-                                                                          while_statement.condition->location),
+                utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, std::move(condition), while_statement.condition->location),
                                        utility::makeOwned<Break>(while_statement.location),
                                        utility::makeOwned<Pass>(while_statement.location),
                                        while_statement.location));
@@ -492,6 +497,11 @@ struct ance::est::Expander::Implementation
             builder.pushExpansion(*while_statement.body);
 
             result_.setStatements(utility::makeOwned<Loop>(wrap(builder.take()), while_statement.location));
+        }
+
+        void visit(ast::Erase const& erase) override
+        {
+            result_.setStatements(utility::makeOwned<Erase>(erase.identifier, erase.location));
         }
 
         void visit(ast::ErrorExpression const& error_expression) override
@@ -553,8 +563,11 @@ struct ance::est::Expander::Implementation
 
             std::string const name = std::format("Lambda'{}", anonymous_function_counter_++);
 
-            result_.setExpression(builder.take(
-                utility::makeOwned<FunctionConstructor>(core::Identifier::make(name, lambda.location), std::move(parameters), std::move(return_type.value()), std::move(body), lambda.location)));
+            result_.setExpression(builder.take(utility::makeOwned<FunctionConstructor>(core::Identifier::make(name, lambda.location),
+                                                                                       std::move(parameters),
+                                                                                       std::move(return_type.value()),
+                                                                                       std::move(body),
+                                                                                       lambda.location)));
         }
 
         void visit(ast::Intrinsic const& intrinsic_expression) override
@@ -615,8 +628,8 @@ struct ance::est::Expander::Implementation
         core::Reporter& reporter_;
         Result          result_;
 
-        size_t anonymous_function_counter_  = 0;
-        size_t anonymous_variable_counter_  = 0;
+        size_t anonymous_function_counter_ = 0;
+        size_t anonymous_variable_counter_ = 0;
     };
 
     utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (template)

@@ -156,7 +156,7 @@ namespace ance::bbt
         : Statement
         , utility::ConcreteNode<Store, Visitor>
     {
-        Store(Temporary const& lref, Temporary const& stored, core::Location const& source_location);
+        Store(Temporary const& l_ref, Temporary const& stored, core::Location const& source_location);
 
         Temporary const& target;
         Temporary const& value;
@@ -241,7 +241,7 @@ namespace ance::bbt
                             Temporary const&         result,
                             core::Location const&    source_location);
 
-        core::Identifier const&  name;
+        core::Identifier         name;
         utility::List<Parameter> parameters;
         Temporary const&         return_type;
         utility::Owned<Flow>     body;
@@ -353,7 +353,7 @@ namespace ance::bbt
       public:
         using AbstractVisitor::visit;
 
-        virtual void visit(Flows const& flows) = 0;
+        virtual void visit(Flows const& flows)                    = 0;
         virtual void visit(UnorderedScope const& unordered_scope) = 0;
 
         virtual void visit(Flow const& flow) = 0;
@@ -372,17 +372,17 @@ namespace ance::bbt
         virtual void visit(Temporary const& temporary)            = 0;
         virtual void visit(CopyTemporary const& write_temporary)  = 0;
 
-        virtual void visit(Intrinsic const& intrinsic)                               = 0;
-        virtual void visit(Call const& call)                                         = 0;
+        virtual void visit(Intrinsic const& intrinsic)                      = 0;
+        virtual void visit(Call const& call)                                = 0;
         virtual void visit(FunctionConstructor const& function_constructor) = 0;
-        virtual void visit(Constant const& constant)                                 = 0;
-        virtual void visit(Default const& default_value)                             = 0;
-        virtual void visit(CurrentScope const& current_scope)                        = 0;
-        virtual void visit(UnaryOperation const& unary_operation)                    = 0;
-        virtual void visit(TypeOf const& type_of)                                    = 0;
-        virtual void visit(OrderedScopeEnter const& scope_enter)                     = 0;
-        virtual void visit(OrderedScopeExit const& scope_exit)                       = 0;
-        virtual void visit(SetReturnValue const& set_return_value)                   = 0;
+        virtual void visit(Constant const& constant)                        = 0;
+        virtual void visit(Default const& default_value)                    = 0;
+        virtual void visit(CurrentScope const& current_scope)               = 0;
+        virtual void visit(UnaryOperation const& unary_operation)           = 0;
+        virtual void visit(TypeOf const& type_of)                           = 0;
+        virtual void visit(OrderedScopeEnter const& scope_enter)            = 0;
+        virtual void visit(OrderedScopeExit const& scope_exit)              = 0;
+        virtual void visit(SetReturnValue const& set_return_value)          = 0;
 
         ~Visitor() override = default;
     };

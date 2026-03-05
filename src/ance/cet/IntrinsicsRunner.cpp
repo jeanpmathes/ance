@@ -69,6 +69,9 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
         case core::Intrinsic::RESOLVE:
             runResolve();
             break;
+        case core::Intrinsic::ERASE:
+            runErase();
+            break;
         case core::Intrinsic::GET_PARENT:
             runGetParent();
             break;
@@ -85,6 +88,8 @@ ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intri
             runCallIntrinsic();
             break;
     }
+
+    assert(state_.return_value_.hasValue() || state_.pending_resolution.hasValue() || state_.aborted);
 
     Result result {.return_value_ = std::move(state_.return_value_), .pending_resolution = std::move(state_.pending_resolution)};
 
@@ -131,6 +136,34 @@ void ance::cet::IntrinsicsRunner::runResolve()
     else
     {
         setPending(identifier);
+    }
+}
+
+void ance::cet::IntrinsicsRunner::runErase()
+{
+    Scope&                  scope      = state_.arguments->at(0)->as<ScopeRef>().value();
+    core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
+
+    EraseResult result = scope.erase(identifier);
+
+    switch (result)
+    {
+        case EraseResult::OK:
+            setResult(bbt::Unit::make(type_context_));
+            break;
+
+        case EraseResult::NOT_FOUND:
+            setPending(identifier);
+            break;
+
+        case EraseResult::IS_OUTER:
+            reporter_.error(identifier.location()) << "Cannot erase " << identifier << " because it is declared in an outer scope";
+            abort();
+            break;
+        case EraseResult::IS_NOT_ORDERED:
+            reporter_.error(state_.location) << "Cannot erase in an un-ordered scope";
+            abort();
+            break;
     }
 }
 
@@ -218,6 +251,7 @@ void ance::cet::IntrinsicsRunner::setResult(utility::Shared<bbt::Value> value)
 
     assert(!state_.return_value_.hasValue());
     assert(!state_.pending_resolution.hasValue());
+    assert(!state_.aborted);
 
     state_.return_value_ = std::move(value);
 }
@@ -226,6 +260,7 @@ void ance::cet::IntrinsicsRunner::setPending(core::Identifier const& identifier)
 {
     assert(!state_.return_value_.hasValue());
     assert(!state_.pending_resolution.hasValue());
+    assert(!state_.aborted);
 
     state_.pending_resolution = PendingResolution {identifier};
 }
@@ -234,7 +269,7 @@ void ance::cet::IntrinsicsRunner::abort()
 {
     assert(!state_.return_value_.hasValue());
     assert(!state_.pending_resolution.hasValue());
+    assert(!state_.aborted);
 
-    state_.return_value_      = std::nullopt;
-    state_.pending_resolution = std::nullopt;
+    state_.aborted = true;
 }

@@ -23,6 +23,8 @@ std::string ance::core::Intrinsic::toString() const
             return "declare";
         case RESOLVE:
             return "resolve";
+        case ERASE:
+            return "erase";
         case GET_PARENT:
             return "get_parent";
         case B_2_STR:
@@ -41,6 +43,7 @@ std::optional<ance::core::Intrinsic> ance::core::Intrinsic::fromString(std::stri
     static std::map<std::string, Value> const lookup = {
         {"nop", NO_OPERATION},
         {"declare", DECLARE},
+        {"erase", ERASE},
         {"resolve", RESOLVE},
         {"get_parent", GET_PARENT},
         {"b_2_str", B_2_STR},

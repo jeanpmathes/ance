@@ -38,6 +38,13 @@ namespace ance::bbt
 
                 break;
             }
+            case core::Intrinsic::ERASE:
+            {
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getScopeRef(), type_context.getIdentifier());
+                return_type = type_context.getUnit();
+
+                break;
+            }
             case core::Intrinsic::GET_PARENT:
             {
                 signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getScopeRef());

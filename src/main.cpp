@@ -118,8 +118,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: erase statement
-
         // todo: and, or expressions with the funny not addition in the middle, have to short-circuit
 
         // todo: assert statement
@@ -215,10 +213,14 @@ namespace ance
         // todo: when compile time is actually typesafe make the compile time execution more machine-like
         // todo: this would mean that pointer ops and such make sense as actual bytes are stored and manipulated
         // todo: but then values can no longer story their type, static typing is needed and to keep type safety the compile time needs to actually do typing
+
+        // todo: with references, add very basic safety checks in the case of erase of variable which has references to it, e.g. counting them, or so
     }
 }
 
+#ifdef ANCE_RELEASE_BUILD
 #define ANCE_HANDLE_ERRORS
+#endif
 
 int main(int const argc, char** argv)
 {

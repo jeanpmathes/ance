@@ -21,6 +21,7 @@ statement
     | 'continue' ';' # ContinueStatement
     | 'return' ( expression )? ';' # ReturnStatement
     | 'while' expression 'do' statement # WhileStatement
+    | 'erase' IDENTIFIER ';' # EraseStatement
     ;
 
 expression

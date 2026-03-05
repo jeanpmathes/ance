@@ -240,6 +240,13 @@ struct ance::ast::Printer::Implementation
             }
         }
 
+        void visit(Erase const& erase) override
+        {
+            print("erase ");
+            print(erase.identifier);
+            print(";");
+        }
+
         void visit(ErrorExpression const&) override
         {
             print("/* error */");

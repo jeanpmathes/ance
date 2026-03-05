@@ -200,6 +200,13 @@ struct ance::est::Printer::Implementation
             print(";");
         }
 
+        void visit(Erase const& erase) override
+        {
+            print("erase ");
+            print(erase.identifier);
+            print(";");
+        }
+
         void visit(ErrorExpression const&) override
         {
             print("/* error */");
@@ -246,7 +253,7 @@ struct ance::est::Printer::Implementation
             }
             print("]), ");
             visit(*function_constructor.return_type);
-            print(", Capture()"); // todo: Capture could take a list of entries, each entry is name + type + (either value or reference)
+            print(", Capture()");// todo: Capture could take a list of entries, each entry is name + type + (either value or reference)
             print(", code ");
             visit(*function_constructor.body);
             print(")");

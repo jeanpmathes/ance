@@ -210,6 +210,16 @@ namespace ance::est
         utility::Optional<utility::Owned<Expression>> value;
     };
 
+    /// Erases a variable from the current scope, making it inaccessible and causing destruction.
+    struct Erase final
+        : Statement
+        , utility::ConcreteNode<Erase, Visitor>
+    {
+        Erase(core::Identifier const& name, core::Location const& source_location);
+
+        core::Identifier identifier;
+    };
+
     /// Expression node in the EST.
     struct Expression
         : virtual Node
@@ -382,20 +392,21 @@ namespace ance::est
 
         virtual void visit(File const& file) = 0;
 
-        virtual void visit(RunnableDeclaration const& runnable)   = 0;
-        virtual void visit(VariableDeclaration const& variable_declaration)   = 0;
+        virtual void visit(RunnableDeclaration const& runnable)             = 0;
+        virtual void visit(VariableDeclaration const& variable_declaration) = 0;
 
-        virtual void visit(ErrorStatement const& error)           = 0;
-        virtual void visit(Pass const& pass_statement)            = 0;
-        virtual void visit(Block const& block)                    = 0;
-        virtual void visit(Independent const& independent)        = 0;
-        virtual void visit(Write const& assignment)               = 0;
-        virtual void visit(If const& if_statement)                = 0;
-        virtual void visit(Loop const& loop)                      = 0;
-        virtual void visit(Break const& break_statement)          = 0;
-        virtual void visit(Continue const& continue_statement)    = 0;
-        virtual void visit(Return const& return_statement)        = 0;
-        virtual void visit(Let const& let)                        = 0;
+        virtual void visit(ErrorStatement const& error)        = 0;
+        virtual void visit(Pass const& pass_statement)         = 0;
+        virtual void visit(Block const& block)                 = 0;
+        virtual void visit(Independent const& independent)     = 0;
+        virtual void visit(Write const& assignment)            = 0;
+        virtual void visit(If const& if_statement)             = 0;
+        virtual void visit(Loop const& loop)                   = 0;
+        virtual void visit(Break const& break_statement)       = 0;
+        virtual void visit(Continue const& continue_statement) = 0;
+        virtual void visit(Return const& return_statement)     = 0;
+        virtual void visit(Let const& let)                     = 0;
+        virtual void visit(Erase const& erase)                 = 0;
 
         virtual void visit(ErrorExpression const& error)                    = 0;
         virtual void visit(Intrinsic const& intrinsic)                      = 0;

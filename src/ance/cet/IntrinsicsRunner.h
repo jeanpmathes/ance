@@ -48,6 +48,7 @@ namespace ance::cet
         void runNoOp();
         void runDeclare();
         void runResolve();
+        void runErase();
         void runGetParent();
         void runLog();
         void runB2Str();
@@ -73,6 +74,7 @@ namespace ance::cet
 
             utility::Optional<utility::Shared<bbt::Value>> return_value_      = std::nullopt;
             utility::Optional<PendingResolution>           pending_resolution = std::nullopt;
+            bool                                           aborted            = false;
         };
 
         State state_;

@@ -132,6 +132,8 @@ ance::ast::While::While(utility::Owned<Expression> expression, utility::Owned<St
     , body(std::move(statement))
 {}
 
+ance::ast::Erase::Erase(core::Identifier const& name, core::Location const& source_location) : Node(source_location), Statement(), identifier(name) {}
+
 ance::ast::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::ast::Call::Call(utility::Owned<Expression> called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)

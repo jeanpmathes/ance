@@ -423,7 +423,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             FlowState previous_state = std::move(state_);
 
-            state_                   = {};
+            state_ = {};
 
             utility::Owned<SimpleBB> entry_block = utility::makeOwned<SimpleBB>();
             std::reference_wrapper   entry       = *entry_block;
@@ -914,6 +914,28 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
+        void visit(est::Erase const& erase) override
+        {
+            Builder builder(*this);
+
+            auto& identifier_tmp = builder.addTemporary("Erase_Identifier", erase.location);
+            builder.addStatement<Constant>(Identifier::make(erase.identifier, type_context_), identifier_tmp, erase.location);
+
+            auto& scope_tmp = builder.addTemporary("Erase_Scope", erase.location);
+            builder.addStatement<CurrentScope>(scope_tmp, erase.location);
+
+            {
+                auto& discard_tmp = builder.addTemporary("Erase_Discard", erase.location);// todo: maybe there is a nicer way?
+
+                utility::List<std::reference_wrapper<Temporary const>> args;
+                args.emplace_back(scope_tmp);
+                args.emplace_back(identifier_tmp);
+                builder.addStatement<Intrinsic>(core::Intrinsic::ERASE, std::move(args), discard_tmp, erase.location);
+            }
+
+            setResult(builder.take());
+        }
+
         void visit(est::ErrorExpression const& error) override
         {
             Builder builder(*this);
@@ -990,24 +1012,29 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
-        void visit(est::FunctionConstructor const& ctor) override
+        void visit(est::FunctionConstructor const& function_constructor) override
         {
             Builder builder(*this);
 
             utility::List<Parameter> parameters;
-            for (auto const& parameter : ctor.parameters)
+            for (auto const& parameter : function_constructor.parameters)
             {
                 auto& parameter_type = builder.addTemporary("FunctionConstructor_ParameterType", parameter.type->location);
                 builder.addSegmented(*parameter.type, parameter_type);
                 parameters.emplace_back(parameter.identifier, parameter_type, parameter.location);
             }
 
-            auto& return_type = builder.addTemporary("FunctionConstructor_ReturnType", ctor.return_type->location);
-            builder.addSegmented(*ctor.return_type, return_type);
+            auto& return_type = builder.addTemporary("FunctionConstructor_ReturnType", function_constructor.return_type->location);
+            builder.addSegmented(*function_constructor.return_type, return_type);
 
-            utility::Owned<Flow> flow = apply(*ctor.body, true, "Function");
+            utility::Owned<Flow> flow = apply(*function_constructor.body, true, "Function");
 
-            builder.addStatement<FunctionConstructor>(ctor.name, std::move(parameters), return_type, std::move(flow), destination(), ctor.location);
+            builder.addStatement<FunctionConstructor>(function_constructor.name,
+                                                      std::move(parameters),
+                                                      return_type,
+                                                      std::move(flow),
+                                                      destination(),
+                                                      function_constructor.location);
 
             setResult(builder.take());
         }
