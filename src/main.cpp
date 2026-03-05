@@ -118,6 +118,14 @@ namespace ance
 
         return exit_code;
 
+        // todo: improve the reporter, begin by removing the non-streaming report methods if never used
+        // todo: it should allow adding new snippets of code, like this: reporter.error(location) << "" << Reporter::Snippet(location) << "more text";
+        // todo: but find a better word than snippet
+        // todo: the result would then be that the location source is printed with underline and all, and the message would be above the snippet
+        // todo: use this to replace the case in Runner::reportBlockers
+
+        // todo: all source snippets should have | on the side and line numbers, indent uniform across all snippets of a message
+
         // todo: and, or expressions with the funny not addition in the middle, have to short-circuit
 
         // todo: assert statement

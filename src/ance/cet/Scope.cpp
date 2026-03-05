@@ -6,6 +6,21 @@
 #include "ance/cet/Temporary.h"
 #include "ance/cet/ValueExtensions.h"
 
+ance::cet::FindResult ance::cet::FindResult::found(utility::Shared<bbt::Value> value)
+{
+    return {std::move(value), Status::FOUND, NotFound {}};
+}
+
+ance::cet::FindResult ance::cet::FindResult::notFound()
+{
+    return {std::nullopt, Status::NOT_FOUND, NotFound {}};
+}
+
+ance::cet::FindResult ance::cet::FindResult::erased(core::Location const& location)
+{
+    return {std::nullopt, Status::ERASED, Erased {location}};
+}
+
 ance::cet::Scope::Scope(Scope* parent, bbt::TypeContext& type_context) : parent_(parent), type_context_(type_context) {}
 
 ance::cet::Scope* ance::cet::Scope::parent() const
@@ -41,21 +56,25 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
     return VariableRef::make(variable_ref, type_context_);
 }
 
-ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::find(core::Identifier const& identifier)
+ance::cet::FindResult ance::cet::Scope::find(core::Identifier const& identifier)
 {
-    Variable* variable = onFind(identifier);
+    FindResult local = onFind(identifier);
 
-    if (variable != nullptr)
-    {
-        return VariableRef::make(*variable, type_context_);
-    }
+    if (local.status == FindResult::Status::FOUND) return local;
 
     if (parent_ != nullptr)
     {
-        return parent_->find(identifier);
+        FindResult from_parent = parent_->find(identifier);
+
+        if (from_parent.status == FindResult::Status::FOUND) return from_parent;
+
+        // In the case that it is not found in the parent scope, we do not want to lose the local erase information.
+        if (local.status == FindResult::Status::ERASED) return local;
+
+        return from_parent;
     }
 
-    return std::nullopt;
+    return local;
 }
 
 ance::cet::EraseResult ance::cet::Scope::erase(core::Identifier const& identifier)
@@ -141,16 +160,12 @@ void ance::cet::CoreScope::onDeclare(utility::Owned<Variable> variable)
     variables_.emplace(variable->name(), std::move(variable));
 }
 
-ance::cet::Variable* ance::cet::CoreScope::onFind(core::Identifier const& identifier)
+ance::cet::FindResult ance::cet::CoreScope::onFind(core::Identifier const& identifier)
 {
-    auto iterator = variables_.find(identifier);
-    if (iterator != variables_.end())
-    {
-        auto& [_, variable] = *iterator;
-        return variable.get();
-    }
+    auto const iterator = variables_.find(identifier);
+    if (iterator != variables_.end()) return FindResult::found(VariableRef::make(*iterator->second, types()));
 
-    return nullptr;
+    return FindResult::notFound();
 }
 
 bool ance::cet::CoreScope::onContains(core::Identifier const& identifier) const
@@ -171,16 +186,14 @@ void ance::cet::OrderedScope::onDeclare(utility::Owned<Variable> variable)
     all_variables_.emplace_back(std::move(variable));
 }
 
-ance::cet::Variable* ance::cet::OrderedScope::onFind(core::Identifier const& identifier)
+ance::cet::FindResult ance::cet::OrderedScope::onFind(core::Identifier const& identifier)
 {
-    if (active_variables_.contains(identifier))
-    {
-        return &active_variables_.at(identifier).get();
-    }
+    if (active_variables_.contains(identifier)) return FindResult::found(VariableRef::make(active_variables_.at(identifier).get(), types()));
+
+    if (erased_variables_.contains(identifier)) return FindResult::erased(erased_variables_.at(identifier));
 
     outer_identifiers_.insert(identifier);
-
-    return nullptr;
+    return FindResult::notFound();
 }
 
 bool ance::cet::OrderedScope::onContains(core::Identifier const& identifier) const
@@ -192,6 +205,7 @@ bool ance::cet::OrderedScope::onErase(core::Identifier const& identifier)
 {
     if (active_variables_.contains(identifier))
     {
+        erased_variables_.emplace(identifier, identifier.location());
         active_variables_.erase(identifier);
         return true;
     }
@@ -217,14 +231,11 @@ void ance::cet::UnorderedScope::onDeclare(utility::Owned<Variable> variable)
     all_variables_.emplace_back(std::move(variable));
 }
 
-ance::cet::Variable* ance::cet::UnorderedScope::onFind(core::Identifier const& identifier)
+ance::cet::FindResult ance::cet::UnorderedScope::onFind(core::Identifier const& identifier)
 {
-    if (variables_.contains(identifier))
-    {
-        return &variables_.at(identifier).get();
-    }
+    if (variables_.contains(identifier)) return FindResult::found(VariableRef::make(variables_.at(identifier).get(), types()));
 
-    return nullptr;
+    return FindResult::notFound();
 }
 
 bool ance::cet::UnorderedScope::onContains(core::Identifier const& identifier) const

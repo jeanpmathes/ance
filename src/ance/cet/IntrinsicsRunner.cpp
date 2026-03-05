@@ -127,15 +127,15 @@ void ance::cet::IntrinsicsRunner::runResolve()
     Scope&                  scope      = state_.arguments->at(0)->as<ScopeRef>().value();
     core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
 
-    utility::Optional<utility::Shared<bbt::Value>> variable = scope.find(identifier);
+    auto [variable, status, reason] = scope.find(identifier);
 
-    if (variable.hasValue())
+    if (status == FindResult::Status::FOUND)
     {
-        setResult(std::move(*variable));
+        setResult(std::move(variable.value()));
     }
     else
     {
-        setPending(identifier);
+        setPending(PendingResolution {identifier, reason});
     }
 }
 
@@ -153,7 +153,7 @@ void ance::cet::IntrinsicsRunner::runErase()
             break;
 
         case EraseResult::NOT_FOUND:
-            setPending(identifier);
+            setPending(PendingResolution {identifier, FindResult::NotFound {}});
             break;
 
         case EraseResult::IS_OUTER:
@@ -236,7 +236,7 @@ void ance::cet::IntrinsicsRunner::runCallIntrinsic()
     }
     else if (inner_result.isPending())
     {
-        setPending(inner_result.getPending().identifier);
+        setPending(inner_result.getPending());
     }
     else
     {
@@ -256,13 +256,13 @@ void ance::cet::IntrinsicsRunner::setResult(utility::Shared<bbt::Value> value)
     state_.return_value_ = std::move(value);
 }
 
-void ance::cet::IntrinsicsRunner::setPending(core::Identifier const& identifier)
+void ance::cet::IntrinsicsRunner::setPending(PendingResolution pending)
 {
     assert(!state_.return_value_.hasValue());
     assert(!state_.pending_resolution.hasValue());
     assert(!state_.aborted);
 
-    state_.pending_resolution = PendingResolution {identifier};
+    state_.pending_resolution = std::move(pending);
 }
 
 void ance::cet::IntrinsicsRunner::abort()

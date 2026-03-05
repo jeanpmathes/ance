@@ -4,6 +4,7 @@
 #include <functional>
 #include <map>
 #include <set>
+#include <variant>
 
 #include "ance/utility/Owners.h"
 
@@ -39,6 +40,32 @@ namespace ance::cet
         IS_NOT_ORDERED,
     };
 
+    struct FindResult
+    {
+        enum class Status
+        {
+            FOUND,
+            NOT_FOUND,
+            ERASED,
+        };
+
+        struct NotFound
+        {
+        };
+        struct Erased
+        {
+            core::Location erase_location;
+        };
+
+        utility::Optional<utility::Shared<bbt::Value>> value;
+        Status                                         status;
+        std::variant<NotFound, Erased>                 reason;
+
+        static FindResult found(utility::Shared<bbt::Value> value);
+        static FindResult notFound();
+        static FindResult erased(core::Location const& location);
+    };
+
     class Scope
     {
       protected:
@@ -55,8 +82,8 @@ namespace ance::cet
                                                                              core::Location const&      location,
                                                                              core::Reporter&            reporter);
 
-        [[nodiscard]] utility::Optional<utility::Shared<bbt::Value>> find(core::Identifier const& identifier);
-        [[nodiscard]] EraseResult                                    erase(core::Identifier const& identifier);
+        [[nodiscard]] FindResult  find(core::Identifier const& identifier);
+        [[nodiscard]] EraseResult erase(core::Identifier const& identifier);
 
         Temporary& createTemporary(bbt::Temporary const& bbt_temporary);
         Temporary& getTemporary(bbt::Temporary const& bbt_temporary);
@@ -67,7 +94,7 @@ namespace ance::cet
       protected:
         [[nodiscard]] virtual DeclarationCheckResult canDeclare(core::Identifier const& identifier) const = 0;
         virtual void                                 onDeclare(utility::Owned<Variable> variable)         = 0;
-        [[nodiscard]] virtual Variable*              onFind(core::Identifier const& identifier)           = 0;
+        [[nodiscard]] virtual FindResult             onFind(core::Identifier const& identifier)           = 0;
         [[nodiscard]] virtual bool                   onContains(core::Identifier const& identifier) const = 0;
         [[nodiscard]] virtual bool                   onErase(core::Identifier const& identifier);
 
@@ -96,8 +123,8 @@ namespace ance::cet
         [[nodiscard]] DeclarationCheckResult canDeclare(core::Identifier const& identifier) const override;
         void                                 onDeclare(utility::Owned<Variable> variable) override;
 
-        [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;
-        [[nodiscard]] bool      onContains(core::Identifier const& identifier) const override;
+        [[nodiscard]] FindResult onFind(core::Identifier const& identifier) override;
+        [[nodiscard]] bool       onContains(core::Identifier const& identifier) const override;
 
       private:
         std::map<core::Identifier, utility::Owned<Variable>> variables_ = {};
@@ -114,9 +141,9 @@ namespace ance::cet
         [[nodiscard]] DeclarationCheckResult canDeclare(core::Identifier const& identifier) const override;
         void                                 onDeclare(utility::Owned<Variable> variable) override;
 
-        [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;
-        [[nodiscard]] bool      onContains(core::Identifier const& identifier) const override;
-        [[nodiscard]] bool      onErase(core::Identifier const& identifier) override;
+        [[nodiscard]] FindResult onFind(core::Identifier const& identifier) override;
+        [[nodiscard]] bool       onContains(core::Identifier const& identifier) const override;
+        [[nodiscard]] bool       onErase(core::Identifier const& identifier) override;
 
         [[nodiscard]] bool isOrdered() const override;
 
@@ -124,6 +151,7 @@ namespace ance::cet
         std::vector<utility::Owned<Variable>>                        all_variables_     = {};
         std::map<core::Identifier, std::reference_wrapper<Variable>> active_variables_  = {};
         std::set<core::Identifier>                                   outer_identifiers_ = {};
+        std::map<core::Identifier, core::Location>                   erased_variables_  = {};
     };
 
     class UnorderedScope final : public Scope
@@ -137,8 +165,8 @@ namespace ance::cet
         [[nodiscard]] DeclarationCheckResult canDeclare(core::Identifier const& identifier) const override;
         void                                 onDeclare(utility::Owned<Variable> variable) override;
 
-        [[nodiscard]] Variable* onFind(core::Identifier const& identifier) override;
-        [[nodiscard]] bool      onContains(core::Identifier const& identifier) const override;
+        [[nodiscard]] FindResult onFind(core::Identifier const& identifier) override;
+        [[nodiscard]] bool       onContains(core::Identifier const& identifier) const override;
 
       private:
         std::vector<utility::Owned<Variable>>                        all_variables_ = {};

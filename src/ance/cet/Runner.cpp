@@ -208,8 +208,15 @@ struct ance::cet::Runner::Implementation
 
                 if (blocker.hasValue())
                 {
-                    auto const& [identifier] = blocker.value();
+                    auto const& [identifier, reason] = blocker.value();
+
                     reporter_.error(identifier.location()) << "Cannot resolve name " << identifier;
+
+                    if (std::holds_alternative<FindResult::Erased>(reason))
+                    {
+                        auto const& erased = std::get<FindResult::Erased>(reason);
+                        reporter_.info(erased.erase_location) << identifier << " was erased here";
+                    }
                 }
             }
         }
@@ -393,9 +400,7 @@ struct ance::cet::Runner::Implementation
 
         void block(PendingResolution const& blocker)
         {
-            auto const& [identifier] = blocker;
-
-            reporter_.trace(prefix, core::Location::project()) << "block execution pending on " << identifier;
+            reporter_.trace(prefix, core::Location::project()) << "block execution pending on " << blocker.identifier;
 
             state_.execution_result = ExecutionResult::Pending;
 

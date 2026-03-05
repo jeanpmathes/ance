@@ -18,7 +18,8 @@ namespace ance::cet
     /// A resolution which could not be completed, resulting in the run point being pending.
     struct PendingResolution
     {
-        core::Identifier identifier;
+        core::Identifier                                       identifier;
+        std::variant<FindResult::NotFound, FindResult::Erased> reason;
     };
 
     class IntrinsicsRunner final
@@ -56,7 +57,7 @@ namespace ance::cet
         void runCallIntrinsic();
 
         void setResult(utility::Shared<bbt::Value> value);
-        void setPending(core::Identifier const& identifier);
+        void setPending(PendingResolution pending);
 
         void abort();
 
