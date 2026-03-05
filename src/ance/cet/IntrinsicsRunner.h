@@ -1,17 +1,29 @@
 #ifndef ANCE_CET_INTRINSICSRUNNER_H
 #define ANCE_CET_INTRINSICSRUNNER_H
 
+#include <filesystem>
 #include <functional>
 
+#include "ance/utility/Owners.h"
+
 #include "ance/core/Intrinsic.h"
-#include "ance/core/Reporter.h"
-
-#include "ance/bbt/Type.h"
-#include "ance/sources/SourceTree.h"
-
 #include "ance/bbt/Value.h"
-
 #include "ance/cet/Scope.h"
+
+namespace ance::sources
+{
+    class SourceTree;
+}
+
+namespace ance::core
+{
+    class Reporter;
+}
+
+namespace ance::bbt
+{
+    class TypeContext;
+}
 
 namespace ance::cet
 {
@@ -30,6 +42,8 @@ namespace ance::cet
                          bbt::TypeContext&                                 type_context,
                          std::function<void(std::filesystem::path const&)> include);
 
+        ~IntrinsicsRunner();
+
         struct Result
         {
             utility::Optional<utility::Shared<bbt::Value>> return_value_      = std::nullopt;
@@ -46,39 +60,8 @@ namespace ance::cet
         Result run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<bbt::Value>>& arguments, core::Location const& location);
 
       private:
-        void runNoOp();
-        void runDeclare();
-        void runResolve();
-        void runErase();
-        void runGetParent();
-        void runLog();
-        void runB2Str();
-        void runInclude();
-        void runCallIntrinsic();
-
-        void setResult(utility::Shared<bbt::Value> value);
-        void setPending(PendingResolution pending);
-
-        void abort();
-
-        sources::SourceTree& source_tree_;
-        core::Reporter&      reporter_;
-        bbt::TypeContext&    type_context_;
-
-        std::function<void(std::filesystem::path const&)> include_;
-
-        struct State
-        {
-            core::Location                                location             = core::Location::project();
-            utility::List<utility::Shared<bbt::Value>>*   arguments            = nullptr;
-            utility::Optional<utility::Shared<bbt::Type>> expected_return_type = std::nullopt;
-
-            utility::Optional<utility::Shared<bbt::Value>> return_value_      = std::nullopt;
-            utility::Optional<PendingResolution>           pending_resolution = std::nullopt;
-            bool                                           aborted            = false;
-        };
-
-        State state_;
+        struct Implementation;
+        utility::Owned<Implementation> implementation_;
     };
 }
 
