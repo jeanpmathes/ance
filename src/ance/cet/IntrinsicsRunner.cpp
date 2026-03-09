@@ -174,9 +174,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
     void runLog()
     {
         std::string const&    value = state_.arguments->at(0)->as<bbt::String>().value();
-        core::Location const& loc   = state_.arguments->at(1)->as<bbt::Location>().value();
+        core::Location const& location = state_.arguments->at(1)->as<bbt::Location>().value();
 
-        reporter_.info(value, loc);
+        reporter_.info(location) << value;
 
         setResult(bbt::Unit::make(type_context_));
     }

@@ -333,27 +333,9 @@ ance::core::Reporter::Reporter(sources::SourceTree& source_tree, std::ostream& o
 
 ance::core::Reporter::~Reporter() = default;
 
-void ance::core::Reporter::trace(std::string const& message, std::string const& compiler_location, Location const& location)
-{
-    implementation_->report(Level::TRACE, message, compiler_location, location);
-}
-
-void ance::core::Reporter::trace(std::function<std::string()> const& message_builder, std::string const& compiler_location, Location const& location)
-{
-    if (implementation_->isTraceEnabled())
-    {
-        implementation_->report(Level::TRACE, message_builder(), compiler_location, location);
-    }
-}
-
 ance::core::Reporter::MessageBuilder ance::core::Reporter::trace(std::string const& compiler_location, Location const& location)
 {
     return implementation_->beginReport(Level::TRACE, compiler_location, location);
-}
-
-void ance::core::Reporter::info(std::string const& message, Location const& location)
-{
-    implementation_->report(Level::INFO, message, "", location);
 }
 
 ance::core::Reporter::MessageBuilder ance::core::Reporter::info(Location const& location)
@@ -361,29 +343,14 @@ ance::core::Reporter::MessageBuilder ance::core::Reporter::info(Location const& 
     return implementation_->beginReport(Level::INFO, "", location);
 }
 
-void ance::core::Reporter::warning(std::string const& message, Location const& location)
-{
-    implementation_->report(Level::WARNING, message, "", location);
-}
-
 ance::core::Reporter::MessageBuilder ance::core::Reporter::warning(Location const& location)
 {
     return implementation_->beginReport(Level::WARNING, "", location);
 }
 
-void ance::core::Reporter::error(std::string const& message, Location const& location)
-{
-    implementation_->report(Level::ERROR, message, "", location);
-}
-
 ance::core::Reporter::MessageBuilder ance::core::Reporter::error(Location const& location)
 {
     return implementation_->beginReport(Level::ERROR, "", location);
-}
-
-void ance::core::Reporter::clear()
-{
-    implementation_->clear();
 }
 
 void ance::core::Reporter::report()

@@ -6,9 +6,9 @@
 
 #include "ance/utility/Owners.h"
 
-#include "ance/core/Intrinsic.h"
 #include "ance/bbt/Value.h"
 #include "ance/cet/Scope.h"
+#include "ance/core/Intrinsic.h"
 
 namespace ance::sources
 {
