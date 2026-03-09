@@ -210,12 +210,13 @@ struct ance::cet::Runner::Implementation
                 {
                     auto const& [identifier, reason] = blocker.value();
 
-                    reporter_.error(identifier.location()) << "Cannot resolve name " << identifier;
+                    auto msg = reporter_.error(identifier.location());
+                    msg << "Cannot resolve name " << identifier;
 
                     if (std::holds_alternative<FindResult::Erased>(reason))
                     {
-                        auto const& erased = std::get<FindResult::Erased>(reason);
-                        reporter_.info(erased.erase_location) << identifier << " was erased here";
+                        auto const& [erase_location] = std::get<FindResult::Erased>(reason);
+                        msg << core::Reporter::Annotation(erase_location) << identifier << " was erased here";
                     }
                 }
             }
@@ -374,19 +375,19 @@ struct ance::cet::Runner::Implementation
 
         core::Reporter::MessageBuilder trace(std::string_view const link_name, bbt::Link const& link)
         {
-            auto builder = reporter_.trace(prefix, core::Location::project());
-            builder << "visit link " << link_name << " " << link.location << " {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null")
+            auto msg = reporter_.trace(prefix, core::Location::project());
+            msg << "visit link " << link_name << " " << link.location << " {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null")
                 << "}";
-            return builder;
+            return msg;
         }
 
         core::Reporter::MessageBuilder trace(std::string_view const statement_name, bbt::Statement const& statement)
         {
-            auto builder = reporter_.trace(prefix, core::Location::project());
-            builder << "visit statement " << statement_name << " " << statement.location
-                    << " {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null")
-                    << ", statement_index=" << state_.current_statement_index << "}";
-            return builder;
+            auto msg = reporter_.trace(prefix, core::Location::project());
+            msg << "visit statement " << statement_name << " " << statement.location
+                << " {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null") << ", statement_index=" << state_.current_statement_index
+                << "}";
+            return msg;
         }
 
         void abort()
@@ -598,19 +599,19 @@ struct ance::cet::Runner::Implementation
         {
             if (reporter_.isTraceEnabled())
             {
-                auto tr = trace("Intrinsic", intrinsic);
-                tr << ", intrinsic=" << intrinsic.intrinsic.toString() << ", args={";
+                auto msg = trace("Intrinsic", intrinsic);
+                msg << ", intrinsic=" << intrinsic.intrinsic.toString() << ", args={";
 
                 bool first = true;
                 for (auto argument : intrinsic.arguments)
                 {
-                    if (!first) tr << ", ";
+                    if (!first) msg << ", ";
                     else first = false;
 
-                    tr << temp(argument);
+                    msg << temp(argument);
                 }
 
-                tr << "}, destination=" << intrinsic.destination.id();
+                msg << "}, destination=" << intrinsic.destination.id();
             }
 
             auto [signature, _] = bbt::getIntrinsicSignature(intrinsic.intrinsic, type_context_);
@@ -659,19 +660,19 @@ struct ance::cet::Runner::Implementation
         {
             if (reporter_.isTraceEnabled())
             {
-                auto tr = trace("Call", call);
-                tr << ", called=" << temp(call.called) << ", args={";
+                auto msg = trace("Call", call);
+                msg << ", called=" << temp(call.called) << ", args={";
 
                 bool first = true;
                 for (auto argument : call.arguments)
                 {
-                    if (!first) tr << ", ";
+                    if (!first) msg << ", ";
                     else first = false;
 
-                    tr << temp(argument);
+                    msg << temp(argument);
                 }
 
-                tr << "}, destination=" << call.destination.id();
+                msg << "}, destination=" << call.destination.id();
             }
 
             RunPoint& run_point = *state_.current_run_point;
@@ -746,19 +747,19 @@ struct ance::cet::Runner::Implementation
         {
             if (reporter_.isTraceEnabled())
             {
-                auto tr = trace("FunctionConstructor", function_constructor);
-                tr << ", name=" << function_constructor.name << ", parameters={";
+                auto msg = trace("FunctionConstructor", function_constructor);
+                msg << ", name=" << function_constructor.name << ", parameters={";
 
                 bool first = true;
                 for (auto const& param : function_constructor.parameters)
                 {
-                    if (!first) tr << ", ";
+                    if (!first) msg << ", ";
                     else first = false;
 
-                    tr << param.identifier << ": " << temp(param.type);
+                    msg << param.identifier << ": " << temp(param.type);
                 }
 
-                tr << "}" << ", return_type=" << temp(function_constructor.return_type) << ", destination=" << function_constructor.destination.id();
+                msg << "}" << ", return_type=" << temp(function_constructor.return_type) << ", destination=" << function_constructor.destination.id();
             }
 
             utility::List<bbt::Signature::Parameter> parameters = {};

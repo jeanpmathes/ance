@@ -1,9 +1,9 @@
 #ifndef ANCE_CORE_REPORTER_H
 #define ANCE_CORE_REPORTER_H
 
-#include <functional>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "ance/utility/Owners.h"
 
@@ -29,12 +29,25 @@ namespace ance::core
             ERROR
         };
 
+        /// A snippet of source code (referred to by a location) that can be included in messages.
+        /// Adding an annotation to a message will use all following text as the label of the annotation.
+        class Annotation
+        {
+          public:
+            explicit Annotation(Location const& location);
+
+            [[nodiscard]] Location const& location() const;
+
+          private:
+            Location location_;
+        };
+
         class MessageBuilder
         {
-        public:
+          public:
             MessageBuilder() = delete;
 
-            MessageBuilder(Reporter& reporter, Level level, std::string  compiler_location, Location const& location, bool enabled);
+            MessageBuilder(Reporter& reporter, Level level, std::string compiler_location, Location const& location, bool enabled);
             MessageBuilder(MessageBuilder&& other) noexcept;
 
             MessageBuilder(MessageBuilder const&) = delete;
@@ -45,19 +58,27 @@ namespace ance::core
             ~MessageBuilder();
 
             template<typename T>
+                requires(!std::is_same_v<T, Annotation>)
             MessageBuilder& operator<<(T const& value)
             {
-                if (stream_.hasValue()) stream_.value() << value;
+                if (!annotations_.empty())
+                {
+                    auto& [annotation, stream] = annotations_.back();
+
+                    stream << value;
+                }
+
                 return *this;
             }
 
-        private:
-            Reporter*                               reporter_;
-            Level                                  level_;
-            std::string                    compiler_location_;
-            Location                                location_;
+            MessageBuilder& operator<<(Annotation const& annotation);
 
-            utility::Optional<std::ostringstream> stream_   = std::nullopt;
+          private:
+            Reporter*   reporter_;
+            Level       level_;
+            std::string compiler_location_;
+
+            std::vector<std::tuple<Annotation, std::ostringstream>> annotations_;
         };
 
         Reporter(sources::SourceTree& source_tree, std::ostream& out, bool trace_enabled);

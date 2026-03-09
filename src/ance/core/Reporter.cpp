@@ -102,37 +102,9 @@ struct ance::core::Reporter::Implementation
         return ansi::ColorReset;
     }
 
-    void report(Level const level, std::string const& message, std::string const& compiler_location, Location const& location)
+    void outputAnnotation(Location const& location, std::string const& message, Level const level, bool const indent) const
     {
-        if (level == Level::TRACE && !isTraceEnabled()) return;
-
-        if (level == Level::ERROR) error_count_++;
-        if (level == Level::WARNING) warning_count_++;
-
-        size_t start = 0;
-
-        out_ << "ance: ";
-
-        switch (level)
-        {
-            case Level::ERROR:
-                out_ << ansi::ColorError << "error" << ansi::ColorReset << ": ";
-                break;
-            case Level::WARNING:
-                out_ << ansi::ColorWarning << "warning" << ansi::ColorReset << ": ";
-                break;
-            case Level::INFO:
-                out_ << ansi::ColorInfo << "info" << ansi::ColorReset << ": ";
-                break;
-            case Level::TRACE:
-                out_ << ansi::ColorTrace << "trace" << ansi::ColorReset << ": ";
-                break;
-        }
-
-        if (!compiler_location.empty())
-        {
-            out_ << "[" << compiler_location << "] ";
-        }
+        if (indent) out_ << "      ";
 
         if (location.isProject())
         {
@@ -162,6 +134,8 @@ struct ance::core::Reporter::Implementation
 
         out_ << std::endl;
 
+        size_t start = 0;
+
         std::u32string_view const line_view = text::trim(source_file.getLine(location.line()), start);
         out_ << '\t' << boost::locale::conv::utf_to_utf<char>(std::u32string(line_view)) << std::endl;
 
@@ -189,6 +163,8 @@ struct ance::core::Reporter::Implementation
 
         out_ << std::endl;
     }
+
+    void report(Level const level, std::vector<std::tuple<Annotation, std::ostringstream>> const& annotations, std::string const& compiler_location);
 
     void clear()
     {
@@ -282,24 +258,31 @@ struct ance::core::Reporter::Implementation
     bool                 trace_enabled_;
 };
 
-ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter& reporter, Level level, std::string compiler_location, Location const& location, bool const enabled)
+ance::core::Reporter::Annotation::Annotation(Location const& location) : location_(location) {}
+
+ance::core::Location const& ance::core::Reporter::Annotation::location() const
+{
+    return location_;
+}
+
+ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter&       reporter,
+                                                     Level const     level,
+                                                     std::string     compiler_location,
+                                                     Location const& location,
+                                                     bool const      enabled)
     : reporter_(&reporter)
     , level_(level)
     , compiler_location_(std::move(compiler_location))
-    , location_(location)
 {
     if (enabled)
-    {
-        stream_ = utility::makeOptional(std::ostringstream());
-    }
+        annotations_.emplace_back(Annotation(location), std::ostringstream());
 }
 
 ance::core::Reporter::MessageBuilder::MessageBuilder(MessageBuilder&& other) noexcept
     : reporter_(other.reporter_)
     , level_(other.level_)
     , compiler_location_(std::move(other.compiler_location_))
-    , location_(other.location_)
-    , stream_(std::move(other.stream_))
+    , annotations_(std::move(other.annotations_))
 {
     other.reporter_ = nullptr;
 }
@@ -311,8 +294,7 @@ ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::oper
     reporter_          = other.reporter_;
     level_             = other.level_;
     compiler_location_ = std::move(other.compiler_location_);
-    location_          = other.location_;
-    stream_            = std::move(other.stream_);
+    annotations_       = std::move(other.annotations_);
 
     other.reporter_ = nullptr;
 
@@ -321,15 +303,65 @@ ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::oper
 
 ance::core::Reporter::MessageBuilder::~MessageBuilder()
 {
-    if (reporter_ != nullptr && stream_.hasValue())
+    if (reporter_ != nullptr && !annotations_.empty())
     {
-        reporter_->implementation_->report(level_, stream_.value().str(), compiler_location_, location_);
+        reporter_->implementation_->report(level_, annotations_, compiler_location_);
     }
+}
+
+ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::operator<<(Annotation const& annotation)
+{
+    if (reporter_ != nullptr && !annotations_.empty())
+    {
+        annotations_.emplace_back(annotation, std::ostringstream());
+    }
+
+    return *this;
 }
 
 ance::core::Reporter::Reporter(sources::SourceTree& source_tree, std::ostream& out, bool trace_enabled)
     : implementation_(utility::makeOwned<Implementation>(this, source_tree, out, trace_enabled))
 {}
+
+void ance::core::Reporter::Implementation::report(Level const                                                    level,
+                                                  std::vector<std::tuple<Annotation, std::ostringstream>> const& annotations,
+                                                  std::string const&                                             compiler_location)
+{
+    if (level == Level::TRACE && !isTraceEnabled()) return;
+
+    if (level == Level::ERROR) error_count_++;
+    if (level == Level::WARNING) warning_count_++;
+
+    out_ << "ance: ";
+
+    switch (level)
+    {
+        case Level::ERROR:
+            out_ << ansi::ColorError << "error" << ansi::ColorReset << ": ";
+            break;
+        case Level::WARNING:
+            out_ << ansi::ColorWarning << "warning" << ansi::ColorReset << ": ";
+            break;
+        case Level::INFO:
+            out_ << ansi::ColorInfo << "info" << ansi::ColorReset << ": ";
+            break;
+        case Level::TRACE:
+            out_ << ansi::ColorTrace << "trace" << ansi::ColorReset << ": ";
+            break;
+    }
+
+    if (!compiler_location.empty())
+    {
+        out_ << "[" << compiler_location << "] ";
+    }
+
+    bool first = true;
+    for (auto const& [annotation, stream] : annotations)
+    {
+        outputAnnotation(annotation.location(), stream.str(), first ? level : Level::INFO, !first);
+        first = false;
+    }
+}
 
 ance::core::Reporter::~Reporter() = default;
 
