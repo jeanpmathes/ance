@@ -13,12 +13,12 @@
 
 namespace ansi
 {
-    inline auto ColorSuccess = "\x1B[32m";
-    inline auto ColorError   = "\x1B[31m";
-    inline auto ColorWarning = "\x1B[33m";
-    inline auto ColorInfo    = "\x1B[34m";
-    inline auto ColorTrace   = "\x1B[36m";
-    inline auto ColorMeta    = "\x1B[90m";
+    inline auto ColorSuccess  = "\x1B[32m";
+    inline auto ColorError    = "\x1B[31m";
+    inline auto ColorWarning  = "\x1B[33m";
+    inline auto ColorInfo     = "\x1B[34m";
+    inline auto ColorTrace    = "\x1B[36m";
+    inline auto ColorMeta     = "\x1B[90m";
     inline auto ColorCritical = "\x1B[35m";
 
     inline auto ColorReset = "\x1B[0m";
@@ -85,7 +85,7 @@ struct ance::core::Reporter::Implementation
         , trace_enabled_(trace_enable)
     {}
 
-    static char const* colorForLevel(Level level)
+    static char const* colorForLevel(Level const level)
     {
         switch (level)
         {
@@ -102,14 +102,14 @@ struct ance::core::Reporter::Implementation
         return ansi::ColorReset;
     }
 
-    void outputAnnotation(Location const& location, std::string const& message, Level const level, bool const indent) const
+    bool outputAnnotation(Location const& location, std::string const& message, Level const level, bool const indent, size_t max_line_digits) const
     {
-        if (indent) out_ << "      ";
+        if (indent) out_ << "  ";
 
         if (location.isProject())
         {
             out_ << message << std::endl;
-            return;
+            return false;
         }
 
         if (location.isCore())
@@ -122,7 +122,7 @@ struct ance::core::Reporter::Implementation
                 out_ << std::endl;
             }
 
-            return;
+            return false;
         }
 
         sources::SourceFile const& source_file = source_tree_.getFile(location.fileIndex());
@@ -130,14 +130,18 @@ struct ance::core::Reporter::Implementation
         out_ << source_file.getRelativePath().generic_string() << " ";
         out_ << location << " " << message << std::endl;
 
-        if (location.isFile()) return;
+        if (location.isFile()) return false;
 
-        out_ << std::endl;
+        std::string const line_prefix       = std::format(" {0:>{1}} | ", location.line(), max_line_digits);
+        std::string const empty_line_prefix = std::format(" {0:>{1}} | ", "", max_line_digits);
+        assert(line_prefix.length() == empty_line_prefix.length());
+
+        out_ << empty_line_prefix << std::endl;
 
         size_t start = 0;
 
         std::u32string_view const line_view = text::trim(source_file.getLine(location.line()), start);
-        out_ << '\t' << boost::locale::conv::utf_to_utf<char>(std::u32string(line_view)) << std::endl;
+        out_ << line_prefix << boost::locale::conv::utf_to_utf<char>(std::u32string(line_view)) << std::endl;
 
         if (location.isSingleLine())
         {
@@ -153,18 +157,20 @@ struct ance::core::Reporter::Implementation
             size_t const marker_start  = std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 0uz);
             size_t const marker_length = std::max(text::estimateWidth(text_with_mark) + missing_with_mark, 1uz);
 
-            out_ << '\t' << std::string(marker_start, ' ') << colorForLevel(level) << std::string(marker_length, '~') << ansi::ColorReset << std::endl;
+            out_ << empty_line_prefix << std::string(marker_start, ' ') << colorForLevel(level) << std::string(marker_length, '~') << ansi::ColorReset
+                 << std::endl;
         }
         else
         {
             size_t const extra_lines = location.lineEnd() - location.line();
-            out_ << '\t' << ansi::ColorMeta << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")" << ansi::ColorReset << std::endl;
+            out_ << empty_line_prefix << ansi::ColorMeta << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")" << ansi::ColorReset
+                 << std::endl;
         }
 
-        out_ << std::endl;
+        return true;
     }
 
-    void report(Level const level, std::vector<std::tuple<Annotation, std::ostringstream>> const& annotations, std::string const& compiler_location);
+    void report(Level level, std::vector<std::tuple<Annotation, std::ostringstream>> const& annotations, std::string const& compiler_location);
 
     void clear()
     {
@@ -274,8 +280,7 @@ ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter&       reporter,
     , level_(level)
     , compiler_location_(std::move(compiler_location))
 {
-    if (enabled)
-        annotations_.emplace_back(Annotation(location), std::ostringstream());
+    if (enabled) annotations_.emplace_back(Annotation(location), std::ostringstream());
 }
 
 ance::core::Reporter::MessageBuilder::MessageBuilder(MessageBuilder&& other) noexcept
@@ -355,11 +360,22 @@ void ance::core::Reporter::Implementation::report(Level const                   
         out_ << "[" << compiler_location << "] ";
     }
 
-    bool first = true;
+    size_t max_line = 0;
+    for (auto const& [annotation, stream] : annotations) max_line = std::max(max_line, annotation.location().line());
+    auto const max_line_digits = static_cast<size_t>(std::log10(max_line) + 1);
+
+    bool first            = true;
+    bool included_snippet = false;
+
     for (auto const& [annotation, stream] : annotations)
     {
-        outputAnnotation(annotation.location(), stream.str(), first ? level : Level::INFO, !first);
+        included_snippet |= outputAnnotation(annotation.location(), stream.str(), first ? level : Level::INFO, !first, max_line_digits);
         first = false;
+    }
+
+    if (included_snippet)
+    {
+        out_ << std::endl;
     }
 }
 

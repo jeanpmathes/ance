@@ -118,8 +118,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: all source snippets should have | on the side and line numbers, indent uniform across all snippets of a message
-
         // todo: and, or expressions with the funny not addition in the middle, have to short-circuit
 
         // todo: assert statement
