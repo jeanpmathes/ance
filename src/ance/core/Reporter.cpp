@@ -362,7 +362,7 @@ void ance::core::Reporter::Implementation::report(Level const                   
 
     size_t max_line = 0;
     for (auto const& [annotation, stream] : annotations) max_line = std::max(max_line, annotation.location().line());
-    auto const max_line_digits = static_cast<size_t>(std::log10(max_line) + 1);
+    auto const max_line_digits = max_line == 0 ? 1uz : static_cast<size_t>(std::log10(max_line) + 1);
 
     bool first            = true;
     bool included_snippet = false;
