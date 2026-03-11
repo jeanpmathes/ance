@@ -312,6 +312,26 @@ struct ance::ast::Printer::Implementation
             print(")");
         }
 
+        void visit(BlockExpression const& block_expression) override
+        {
+            print("({");
+            line();
+            enter();
+            for (auto& statement : block_expression.statements)
+            {
+                visit(*statement);
+                line();
+            }
+            if (block_expression.result.hasValue())
+            {
+                print("=> ");
+                visit(**block_expression.result);
+                line();
+            }
+            exit();
+            print("})");
+        }
+
         void visit(Access const& access) override
         {
             print(access.identifier);

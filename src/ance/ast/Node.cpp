@@ -152,6 +152,15 @@ ance::ast::Intrinsic::Intrinsic(utility::Owned<Expression>                intrin
     , arguments(std::move(args))
 {}
 
+ance::ast::BlockExpression::BlockExpression(utility::List<utility::Owned<Statement>>      statement_list,
+                                            utility::Optional<utility::Owned<Expression>> expression,
+                                            core::Location const&                         source_location)
+    : Node(source_location)
+    , Expression()
+    , statements(std::move(statement_list))
+    , result(std::move(expression))
+{}
+
 ance::ast::Lambda::Lambda(utility::List<Parameter>                      params,
                           utility::Optional<utility::Owned<Expression>> type,
                           utility::Optional<utility::Owned<Expression>> expression,

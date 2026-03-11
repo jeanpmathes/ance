@@ -225,6 +225,23 @@ struct ance::est::Printer::Implementation
             print(")");
         }
 
+        void visit(BlockExpression const& block_expression) override
+        {
+            print("({");
+            line();
+            enter();
+            for (auto& statement : block_expression.statements)
+            {
+                visit(*statement);
+                line();
+            }
+            print("=> ");
+            visit(*block_expression.result);
+            line();
+            exit();
+            print("})");
+        }
+
         void visit(Call const& call) override
         {
             visit(*call.callee);

@@ -585,6 +585,30 @@ struct ance::est::Expander::Implementation
             result_.setExpression(builder.take(utility::makeOwned<Intrinsic>(std::move(name), std::move(arguments), intrinsic_expression.location)));
         }
 
+        void visit(ast::BlockExpression const& block_expression) override
+        {
+            SBuilder builder(*this);
+
+            for (auto& statement : block_expression.statements)
+            {
+                builder.pushExpansion(*statement);
+            }
+
+            utility::Optional<utility::Owned<Expression>> result;
+            if (block_expression.result.hasValue())
+            {
+                // todo: SBuilder stores expression cleanup in take(); for block expressions this can run cleanup before the result is evaluated in Segmenter.
+                // todo: when expansion is reworked, ensure the result expression's cleanup executes after the result expression, not before.
+                result = builder.pushExpansion(**block_expression.result);
+            }
+            else
+            {
+                result = utility::makeOwned<UnitLiteral>(block_expression.location);
+            }
+
+            result_.setExpression(utility::makeOwned<BlockExpression>(builder.take(), std::move(result.value()), block_expression.location));
+        }
+
         void visit(ast::Access const& access) override
         {
             result_.setExpression(utility::makeOwned<Access>(access.identifier, access.location));

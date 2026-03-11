@@ -4,6 +4,9 @@ unorderedScopeFile : ( declaration )* EOF ;
 
 orderedScopeFile : statement EOF ;
 
+// todo: plan to re-think all syntax, streamline it, simplify it, make it more consistent and logical
+// todo: also make sure that EST is perfectly valid AST as well, needs things like the code expression
+
 declaration
     : 'do' statement # RunnableDeclaration
     | accessModifier ( executionMode )? IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # VariableDeclaration
@@ -41,6 +44,7 @@ postfixExpression
 primaryExpression
     : '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
     | 'intrinsic' name=expression '(' (expression (',' expression)* )? ')' # IntrinsicExpression
+    | '({' ( statement )* ( '=>' expression )? '})' # BlockExpression
     | IDENTIFIER # AccessExpression
     | literal # LiteralExpression
     | 'here' # HereExpression

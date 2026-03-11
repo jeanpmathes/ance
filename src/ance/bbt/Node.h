@@ -186,15 +186,15 @@ namespace ance::bbt
         std::string identifier;
     };
 
-    /// Writes a value to a temporary variable.
-    struct CopyTemporary final
+    /// Dereferences a value, unwrapping every l-ref until a concrete value is reached.
+    struct Dereference final
         : Statement
-        , utility::ConcreteNode<CopyTemporary, Visitor>
+        , utility::ConcreteNode<Dereference, Visitor>
     {
-        CopyTemporary(Temporary const& target, Temporary const& value, core::Location const& source_location);
+        Dereference(Temporary const& value, Temporary const& result, core::Location const& source_location);
 
+        Temporary const& target;
         Temporary const& destination;
-        Temporary const& source;
     };
 
     /// Performs a compiler-provided operation like operators or functions.
@@ -370,7 +370,7 @@ namespace ance::bbt
         virtual void visit(Store const& store)                    = 0;
         virtual void visit(Access const& access)                  = 0;
         virtual void visit(Temporary const& temporary)            = 0;
-        virtual void visit(CopyTemporary const& write_temporary)  = 0;
+        virtual void visit(Dereference const& dereference)        = 0;
 
         virtual void visit(Intrinsic const& intrinsic)                      = 0;
         virtual void visit(Call const& call)                                = 0;

@@ -247,7 +247,7 @@ struct ance::cet::Runner::Implementation
             utility::Shared<bbt::Value> return_value = state_.return_value.valueOr(bbt::Unit::make(type_context_));
 
             reporter_.trace(prefix, core::Location::project()) << "execute run point exit {result=" << result << ", return_value=" << return_value->toString()
-                                                              << ", return_type=" << return_value->type()->name() << "}";
+                                                               << ", return_type=" << return_value->type()->name() << "}";
 
             state_ = std::move(previous_state);
 
@@ -301,7 +301,8 @@ struct ance::cet::Runner::Implementation
             {
                 if (argument_count < arity)
                 {
-                    reporter_.error(location) << "Call to " << signature.annotated() << " with too few arguments: expected at least " << arity << " but got " << argument_count;
+                    reporter_.error(location) << "Call to " << signature.annotated() << " with too few arguments: expected at least " << arity << " but got "
+                                              << argument_count;
                     return false;
                 }
 
@@ -318,7 +319,8 @@ struct ance::cet::Runner::Implementation
             {
                 if (arity != argument_count)
                 {
-                    reporter_.error(location) << "Call to " << signature.annotated() << " with wrong number of arguments: expected " << arity << " but got " << argument_count;
+                    reporter_.error(location) << "Call to " << signature.annotated() << " with wrong number of arguments: expected " << arity << " but got "
+                                              << argument_count;
                     ok = false;
                 }
 
@@ -587,12 +589,12 @@ struct ance::cet::Runner::Implementation
             scope().createTemporary(temporary);
         }
 
-        void visit(bbt::CopyTemporary const& copy_temporary) override
+        void visit(bbt::Dereference const& dereference) override
         {
-            trace("CopyTemporary", copy_temporary) << ", source=" << temp(copy_temporary.source) << ", destination=" << copy_temporary.destination.id();
+            trace("Dereference", dereference) << ", target=" << temp(dereference.target) << ", destination=" << dereference.destination.id();
 
-            utility::Shared<bbt::Value> value = scope().getTemporary(copy_temporary.source).read();
-            scope().getTemporary(copy_temporary.destination).write(deLReference(value));
+            utility::Shared<bbt::Value> value = scope().getTemporary(dereference.target).read();
+            scope().getTemporary(dereference.destination).write(deLReference(value));
         }
 
         void visit(bbt::Intrinsic const& intrinsic) override
@@ -791,7 +793,8 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Constant const& constant) override
         {
-            trace("Constant", constant) << ", value=" << constant.value->toString() << ", type=" << constant.value->type().name() << ", destination=" << constant.destination.id();
+            trace("Constant", constant) << ", value=" << constant.value->toString() << ", type=" << constant.value->type().name()
+                                        << ", destination=" << constant.destination.id();
 
             // Because the value class is immutable, this operation is logically const, but requires mutability to copy the shared ownership.
             auto* mutable_constant = const_cast<bbt::Constant*>(&constant);// todo: think about a nicer way to do this
@@ -838,7 +841,8 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::UnaryOperation const& unary_operation) override
         {
-            trace("UnaryOperation", unary_operation) << ", op=" << unary_operation.op << ", operand=" << temp(unary_operation.operand) << ", destination=" << unary_operation.destination.id();
+            trace("UnaryOperation", unary_operation) << ", op=" << unary_operation.op << ", operand=" << temp(unary_operation.operand)
+                                                     << ", destination=" << unary_operation.destination.id();
 
             utility::Shared<bbt::Value> value = scope().getTemporary(unary_operation.operand).read();
 
@@ -900,10 +904,10 @@ struct ance::cet::Runner::Implementation
         {
             value = deLReference(std::move(value));
 
-            utility::Optional<utility::Shared<bbt::Value>> declared = core_language_scope_->declare(name, value->type(), true, core::Location::core(), reporter_);
+            utility::Optional<utility::Shared<bbt::Value>> declared =
+                core_language_scope_->declare(name, value->type(), true, core::Location::core(), reporter_);
 
-            if (declared.hasValue())
-                (*declared)->as<VariableRef>().value().write(std::move(value));
+            if (declared.hasValue()) (*declared)->as<VariableRef>().value().write(std::move(value));
         }
 
       private:
@@ -949,11 +953,11 @@ struct ance::cet::Runner::Implementation
         IntrinsicsRunner intrinsics_ {source_tree_, reporter_, type_context_, include_};
 
         std::list<RunPoint>                       run_points_     = {};
-        utility::List<utility::Owned<bbt::Flow>> core_flows_     = {};
+        utility::List<utility::Owned<bbt::Flow>>  core_flows_     = {};
         utility::List<utility::Owned<bbt::Flows>> included_flows_ = {};
 
         utility::Owned<CoreScope> core_language_scope_;
-        Scope&                      project_scope_;
+        Scope&                    project_scope_;
 
         struct State
         {
@@ -1075,15 +1079,13 @@ struct ance::cet::Runner::Implementation
     {
         utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentDeclaration(code, id);
 
-        if (!flow.hasValue())
-            throw std::logic_error("Failed to parse core code");
+        if (!flow.hasValue()) throw std::logic_error("Failed to parse core code");
 
         bbt_->scheduleCore(std::move(flow.value()));
 
         bool const ok = run(*bbt_);
 
-        if (!ok)
-            throw std::logic_error("Failed to run core code");
+        if (!ok) throw std::logic_error("Failed to run core code");
     }
 
     bbt::TypeContext& getTypeContext()
@@ -1092,11 +1094,11 @@ struct ance::cet::Runner::Implementation
     }
 
   private:
-    sources::SourceTree&                    source_tree_;
-    core::Reporter&                         reporter_;
-    bbt::TypeContext                        type_context_ {};
-    bbt::Segmenter                          segmenter_;
-    core::Context&                          context_;
+    sources::SourceTree& source_tree_;
+    core::Reporter&      reporter_;
+    bbt::TypeContext     type_context_ {};
+    bbt::Segmenter       segmenter_;
+    core::Context&       context_;
 
     utility::Owned<BBT> bbt_;
 };

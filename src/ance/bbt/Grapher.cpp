@@ -1,9 +1,9 @@
 #include "Grapher.h"
 
+#include <queue>
 #include <sstream>
 #include <string>
 #include <unordered_set>
-#include <queue>
 
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Printer.h"
@@ -120,7 +120,7 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(Temporary const&) override {}
 
-        void visit(CopyTemporary const&) override {}
+        void visit(Dereference const&) override {}
 
         void visit(Intrinsic const&) override {}
 
@@ -160,8 +160,8 @@ struct ance::bbt::Grapher::Implementation
       private:
         size_t current_id_ = 0;
 
-        size_t flow_depth_ = 0;
-        std::queue<Flow const*> nested_flows_to_graph_;
+        size_t                          flow_depth_ = 0;
+        std::queue<Flow const*>         nested_flows_to_graph_;
         std::unordered_set<Flow const*> graphed_flows_;
     };
 

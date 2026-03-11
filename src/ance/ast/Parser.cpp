@@ -625,6 +625,24 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitBlockExpression(grammar::anceParser::BlockExpressionContext* context) override
+        {
+            utility::List<utility::Owned<Statement>> statements;
+            for (grammar::anceParser::StatementContext* statement : context->statement())
+            {
+                statements.push_back(expectStatement(statement));
+            }
+
+            utility::Optional<utility::Owned<Expression>> expression;
+            if (context->expression() != nullptr)
+            {
+                expression = expectExpression(context->expression());
+            }
+
+            Expression* block_expression = new BlockExpression(std::move(statements), std::move(expression), location(context));
+            return block_expression;
+        }
+
         std::any visitAccessExpression(grammar::anceParser::AccessExpressionContext* ctx) override
         {
             core::Identifier const accessed = identifier(ctx->IDENTIFIER());

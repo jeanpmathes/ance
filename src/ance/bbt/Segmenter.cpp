@@ -709,22 +709,30 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
-        void visit(est::Block const& block) override
+        template<typename Node, typename BuildInner>
+        void setResultInOrderedScope(Node const& node, BuildInner build_inner)
         {
             Builder builder(*this);
 
-            auto& scope_enter = builder.addStatement<OrderedScopeEnter>(block.location.first());
+            auto& scope_enter = builder.addStatement<OrderedScopeEnter>(node.location.first());
             state_.scopes.emplace_back(&scope_enter);
 
-            for (auto& statement : block.statements)
-            {
-                builder.addSegmented(*statement);
-            }
+            build_inner(builder, node);
 
             state_.scopes.pop_back();
-            builder.addStatement<OrderedScopeExit>(scope_enter, block.location.last());
+            builder.addStatement<OrderedScopeExit>(scope_enter, node.location.last());
 
             setResult(builder.take());
+        }
+
+        void visit(est::Block const& block) override
+        {
+            setResultInOrderedScope(block, [](Builder& builder, est::Block const& node) {
+                for (auto& statement : node.statements)
+                {
+                    builder.addSegmented(*statement);
+                }
+            });
         }
 
         void visit(est::Independent const& independent) override
@@ -966,6 +974,20 @@ struct ance::bbt::Segmenter::Implementation
             builder.addStatement<Intrinsic>(core::Intrinsic::CALL_INTRINSIC, std::move(arguments), destination(), intrinsic.location);
 
             setResult(builder.take());
+        }
+
+        void visit(est::BlockExpression const& block_expression) override
+        {
+            setResultInOrderedScope(block_expression, [this](Builder& builder, est::BlockExpression const& node) {
+                for (auto& statement : node.statements)
+                {
+                    builder.addSegmented(*statement);
+                }
+
+                auto& result_tmp = builder.addTemporary("BlockExpression_Result", node.location);
+                builder.addSegmented(*node.result, result_tmp);
+                builder.addStatement<Dereference>(result_tmp, destination(), node.location);
+            });
         }
 
         void visit(est::Access const& access) override

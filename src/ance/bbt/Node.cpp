@@ -80,11 +80,11 @@ std::string ance::bbt::Temporary::id() const
     return std::format("t\"{}\"", identifier);
 }
 
-ance::bbt::CopyTemporary::CopyTemporary(Temporary const& target, Temporary const& value, core::Location const& source_location)
+ance::bbt::Dereference::Dereference(Temporary const& value, Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , destination(target)
-    , source(value)
+    , target(value)
+    , destination(result)
 {}
 
 ance::bbt::Intrinsic::Intrinsic(core::Intrinsic                                        used,

@@ -246,6 +246,17 @@ namespace ance::est
         utility::List<utility::Owned<Expression>> arguments;
     };
 
+    /// An expression that combines a sequence of statements with a final expression inside an ordered scope.
+    struct BlockExpression final
+        : Expression
+        , utility::ConcreteNode<BlockExpression, Visitor>
+    {
+        BlockExpression(utility::List<utility::Owned<Statement>> statement_list, utility::Owned<Expression> expression, core::Location const& source_location);
+
+        utility::List<utility::Owned<Statement>> statements;
+        utility::Owned<Expression>               result;
+    };
+
     /// A call expression.
     struct Call final
         : Expression
@@ -410,6 +421,7 @@ namespace ance::est
 
         virtual void visit(ErrorExpression const& error)                    = 0;
         virtual void visit(Intrinsic const& intrinsic)                      = 0;
+        virtual void visit(BlockExpression const& block_expression)         = 0;
         virtual void visit(Call const& call)                                = 0;
         virtual void visit(FunctionConstructor const& function_constructor) = 0;
         virtual void visit(Read const& read)                                = 0;

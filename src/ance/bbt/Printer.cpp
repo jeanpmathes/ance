@@ -150,7 +150,7 @@ struct ance::bbt::Printer::Implementation
         {
             print(access.destination.id());
             print(" ");
-            print(core::Assigner::COPY_ASSIGNMENT);
+            print(core::Assigner::MOVE_ASSIGNMENT);
             print(" access ");
             print(access.variable.id());
             print(";");
@@ -163,13 +163,13 @@ struct ance::bbt::Printer::Implementation
             print(";");
         }
 
-        void visit(CopyTemporary const& write_temporary) override
+        void visit(Dereference const& dereference) override
         {
-            print(write_temporary.destination.id());
+            print(dereference.destination.id());
             print(" ");
-            print(core::Assigner::COPY_ASSIGNMENT);
-            print(" ");
-            print(write_temporary.source.id());
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" dereference ");
+            print(dereference.target.id());
             print(";");
         }
 
