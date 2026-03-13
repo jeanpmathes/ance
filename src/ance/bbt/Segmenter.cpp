@@ -1061,18 +1061,6 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
-        void visit(est::Read const& access) override
-        {
-            Builder builder(*this);
-
-            auto& target = builder.addTemporary("Read_Target", access.target->location);
-            builder.addSegmented(*access.target, target);
-
-            builder.addStatement<Access>(target, destination(), access.location);
-
-            setResult(builder.take());
-        }
-
         void visit(est::UnitLiteral const& unit_literal) override
         {
             Builder builder(*this);

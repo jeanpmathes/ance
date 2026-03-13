@@ -156,12 +156,6 @@ ance::est::FunctionConstructor::FunctionConstructor(core::Identifier const&    i
     , body(std::move(statement))
 {}
 
-ance::est::Read::Read(utility::Owned<Expression> accessed, core::Location const& source_location)
-    : Node(source_location)
-    , Expression()
-    , target(std::move(accessed))
-{}
-
 ance::est::Access::Access(core::Identifier const& ident, core::Location const& source_location) : Node(source_location), Expression(), identifier(ident) {}
 
 ance::est::UnitLiteral::UnitLiteral(core::Location const& source_location) : Node(source_location), Expression() {}

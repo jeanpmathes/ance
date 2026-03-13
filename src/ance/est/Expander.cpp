@@ -21,19 +21,6 @@ struct ance::est::Expander::Implementation
 
     using Statements = utility::List<utility::Owned<Statement>>;
 
-    struct Expansion
-    {
-        Statements                 before;
-        utility::Owned<Expression> center;
-        Statements                 after;
-    };
-
-    struct ParameterExpansion
-    {
-        Expansion        expansion;
-        core::Identifier identifier;
-    };
-
     class Result
     {
       public:
@@ -70,20 +57,9 @@ struct ance::est::Expander::Implementation
             setResult(std::move(statements));
         }
 
-        void setExpression(Expansion expansion)
-        {
-            setResult(std::move(expansion));
-        }
-
         void setExpression(utility::Owned<Expression> expression)
         {
-            Expansion expansion = {.before = {}, .center = std::move(expression), .after = {}};
-            setResult(std::move(expansion));
-        }
-
-        void setParameter(ParameterExpansion parameter_expansion)
-        {
-            setResult(std::move(parameter_expansion));
+            setResult(std::move(expression));
         }
 
         template<typename T>
@@ -98,7 +74,7 @@ struct ance::est::Expander::Implementation
         }
 
       private:
-        using ResultVariant = std::variant<utility::Owned<File>, utility::Owned<Declaration>, Statements, Expansion, ParameterExpansion>;
+        using ResultVariant = std::variant<utility::Owned<File>, utility::Owned<Declaration>, Statements, utility::Owned<Expression>>;
 
         template<typename T>
         void setResult(T value)
@@ -123,14 +99,9 @@ struct ance::est::Expander::Implementation
           public:
             explicit SBuilder(AST& ast) : ast_(ast) {}
 
-            [[nodiscard]] utility::Owned<Expression> pushExpansion(ast::Expression const& expression)
+            void pushIndependentExpansion(ast::Expression const& expression)
             {
-                Expansion expansion = ast_.expand(expression);
-
-                append(statements_, std::move(expansion.before));
-                cleanup_statements_.emplace_back(std::move(expansion.after));
-
-                return std::move(expansion.center);
+                pushStatement(utility::makeOwned<Independent>(ast_.expand(expression), expression.location));
             }
 
             void pushExpansion(ast::Statement const& statement)
@@ -156,8 +127,7 @@ struct ance::est::Expander::Implementation
                                               utility::Optional<utility::Owned<Expression>> definition,
                                               core::Location const&                         location)
             {
-                std::string const id         = std::format("_anonymous'{}", ast_.anonymous_variable_counter_++);
-                core::Identifier  identifier = core::Identifier::make(id, location);
+                core::Identifier const identifier = ast_.getAnonymousIdentifier(location);
 
                 statements_.emplace_back(utility::makeOwned<Let>(identifier, std::move(type), assigner, std::move(definition), location));
 
@@ -166,79 +136,94 @@ struct ance::est::Expander::Implementation
 
             Statements&& take()
             {
-                for (size_t index = cleanup_statements_.size(); index > 0; index--)
-                {
-                    append(statements_, std::move(cleanup_statements_[index - 1]));
-                }
-
-                cleanup_statements_.clear();
-
                 return std::move(statements_);
             }
 
             void reset()
             {
                 statements_.clear();
-                cleanup_statements_.clear();
             }
 
           private:
             AST& ast_;
 
-            Statements                statements_;
-            utility::List<Statements> cleanup_statements_;
+            Statements statements_;
         };
 
         class EBuilder final
         {
           public:
-            explicit EBuilder(AST& ast) : ast_(ast) {}
+            explicit EBuilder(AST& ast, core::Location const& location) : ast_(ast), location_(location) {}
 
-            [[nodiscard]] utility::Owned<Expression> pushExpansion(ast::Expression const& expression)
+            core::Identifier pushAnonymousLet(utility::Owned<Expression>                    type,
+                                              core::Assigner const                          assigner,
+                                              utility::Optional<utility::Owned<Expression>> definition)
             {
-                Expansion expansion = ast_.expand(expression);
+                core::Identifier const identifier = ast_.getAnonymousIdentifier(location_);
 
-                append(before_, std::move(expansion.before));
-                after_.emplace_back(std::move(expansion.after));
+                statements_.emplace_back(utility::makeOwned<Let>(identifier, std::move(type), assigner, std::move(definition), location_));
 
-                return std::move(expansion.center);
+                return identifier;
             }
 
-            [[nodiscard]] Parameter pushParameterExpansion(ast::Parameter const& parameter)
+            void pushAnonymousLetAndSetAsResult(utility::Owned<Expression>                    type,
+                                                core::Assigner const                          assigner,
+                                                utility::Optional<utility::Owned<Expression>> definition)
             {
-                Expansion expansion = ast_.expand(*parameter.type);
+                core::Identifier const identifier = pushAnonymousLet(std::move(type), assigner, std::move(definition));
 
-                append(before_, std::move(expansion.before));
-                after_.emplace_back(std::move(expansion.after));
-
-                return {parameter.identifier, std::move(expansion.center), parameter.location};
+                result_ = identifier;
             }
 
-            Expansion take(utility::Owned<Expression> expression)
+            [[nodiscard]] utility::Owned<Expression> createAccess(core::Identifier const& identifier)
             {
-                Statements after;
-                for (size_t index = after_.size(); index > 0; index--)
-                {
-                    append(after, std::move(after_[index - 1]));
-                }
+                return utility::makeOwned<Access>(identifier, location_);
+            }
 
-                Expansion expansion = {
-                    .before = std::move(before_),
-                    .center = std::move(expression),
-                    .after  = std::move(after),
-                };
+            [[nodiscard]] utility::Owned<Expression> createAccessToResult()
+            {
+                assert(result_.hasValue());
 
-                before_.clear();
-                after_.clear();
+                return createAccess(result_.value());
+            }
 
-                return expansion;
+            void pushAssignment(core::Identifier const& identifier, utility::Owned<Expression> value)
+            {
+                statements_.emplace_back(utility::makeOwned<Write>(createAccess(identifier), std::move(value), location_));
+            }
+
+            void pushExpansionAssignment(core::Identifier const& identifier, ast::Expression const& expression)
+            {
+                pushAssignment(identifier, ast_.expand(expression));
+            }
+
+            void pushAssignmentToResult(utility::Owned<Expression> value)
+            {
+                assert(result_.hasValue());
+                pushAssignment(result_.value(), std::move(value));
+            }
+
+            void pushExpansionAssignmentToResult(ast::Expression const& expression)
+            {
+                pushAssignmentToResult(ast_.expand(expression));
+            }
+
+            void pushStatement(utility::Owned<Statement> statement)
+            {
+                statements_.emplace_back(std::move(statement));
+            }
+
+            utility::Owned<Expression> take()
+            {
+                return utility::makeOwned<BlockExpression>(std::move(statements_), createAccessToResult(), location_);
             }
 
           private:
-            AST& ast_;
+            AST&           ast_;
+            core::Location location_;
 
-            Statements                before_;
-            utility::List<Statements> after_;
+            Statements                                    statements_;
+            utility::Optional<core::Identifier> result_;
         };
 
         utility::Owned<File> expand(ast::File const& file)
@@ -266,11 +251,24 @@ struct ance::est::Expander::Implementation
             return result_.take<Statements>();
         }
 
-        Expansion expand(ast::Expression const& expression)
+        utility::Owned<Expression> expand(ast::Expression const& expression)
         {
             result_.reset();
             visit(expression);
-            return result_.take<Expansion>();
+            return result_.take<utility::Owned<Expression>>();
+        }
+
+        [[nodiscard]] Parameter expand(ast::Parameter const& parameter)
+        {
+            return {parameter.identifier, expand(*parameter.type), parameter.location};
+        }
+
+        core::Identifier getAnonymousIdentifier(core::Location const& location)
+        {
+            std::string const      id         = std::format("anonymous<{}>", anonymous_variable_counter_++);
+            core::Identifier const identifier = core::Identifier::make(id, location);
+
+            return identifier;
         }
 
         static void append(Statements& target, Statements&& source)
@@ -324,12 +322,12 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::VariableDeclaration const& variable_declaration) override
         {
-            utility::Owned<Expression> type = expand(*variable_declaration.type).center;
+            utility::Owned<Expression> type = expand(*variable_declaration.type);
 
             utility::Optional<utility::Owned<Expression>> value = std::nullopt;
             if (variable_declaration.value.hasValue())
             {
-                value = expand(**variable_declaration.value).center;
+                value = expand(**variable_declaration.value);
             }
 
             result_.setDeclaration(utility::makeOwned<VariableDeclaration>(variable_declaration.access_modifier,
@@ -346,14 +344,14 @@ struct ance::est::Expander::Implementation
             utility::List<Parameter> parameters;
             for (auto const& parameter : function_declaration.parameters)
             {
-                utility::Owned<Expression> param_type = expand(*parameter.type).center;
-                parameters.emplace_back(parameter.identifier, std::move(param_type), parameter.location);
+                utility::Owned<Expression> parameter_type = expand(*parameter.type);
+                parameters.emplace_back(parameter.identifier, std::move(parameter_type), parameter.location);
             }
 
             utility::Owned<Expression> return_type =
                 function_declaration.return_type.hasValue()
-                    ? expand(**function_declaration.return_type).center
-                    : expand(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), function_declaration.location)).center;
+                    ? expand(**function_declaration.return_type)
+                    : expand(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), function_declaration.location));
 
             SBuilder body_builder(*this);
             body_builder.pushExpansion(*function_declaration.body);
@@ -363,7 +361,7 @@ struct ance::est::Expander::Implementation
             // todo: or as long as that is not done, just a new type of expression that contains an enum of important types
             // todo: and the same for the Unit type above - remove that constants file to find all places
             utility::Owned<Expression> function_type =
-                expand(ast::Access(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), function_declaration.location)).center;
+                expand(ast::Access(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), function_declaration.location));
 
             utility::Owned<Expression> function_value = utility::makeOwned<FunctionConstructor>(function_declaration.identifier,
                                                                                                 std::move(parameters),
@@ -401,8 +399,7 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
-            utility::Owned<Expression> expression = builder.pushExpansion(*independent.expression);
-            builder.pushStatement(utility::makeOwned<Independent>(std::move(expression), independent.location));
+            builder.pushIndependentExpansion(*independent.expression);
 
             result_.setStatements(builder.take());
         }
@@ -411,12 +408,12 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
-            utility::Owned<Expression> type = builder.pushExpansion(*let.type);
+            utility::Owned<Expression> type = expand(*let.type);
 
             utility::Optional<utility::Owned<Expression>> value = std::nullopt;
             if (let.value.hasValue())
             {
-                value = builder.pushExpansion(**let.value);
+                value = expand(**let.value);
             }
 
             builder.pushStatement(utility::makeOwned<Let>(let.identifier, std::move(type), let.assigner, std::move(value), let.location));
@@ -428,8 +425,8 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
-            utility::Owned<Expression> assignee = builder.pushExpansion(*assignment.assignee);
-            utility::Owned<Expression> value    = builder.pushExpansion(*assignment.value);
+            utility::Owned<Expression> assignee = expand(*assignment.assignee);
+            utility::Owned<Expression> value    = expand(*assignment.value);
 
             builder.pushStatement(utility::makeOwned<Write>(std::move(assignee), std::move(value), assignment.location));
 
@@ -440,7 +437,7 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
-            utility::Owned<Expression> condition = builder.pushExpansion(*if_statement.condition);
+            utility::Owned<Expression> condition = expand(*if_statement.condition);
 
             Statements true_statements  = expand(*if_statement.true_part);
             Statements false_statements = if_statement.false_part.hasValue() ? expand(**if_statement.false_part) : Statements();
@@ -474,7 +471,7 @@ struct ance::est::Expander::Implementation
 
             if (return_statement.value.hasValue())
             {
-                return_value = builder.pushExpansion(**return_statement.value);
+                return_value = expand(**return_statement.value);
             }
 
             builder.pushStatement(utility::makeOwned<Return>(std::move(return_value), return_statement.location));
@@ -486,7 +483,7 @@ struct ance::est::Expander::Implementation
         {
             SBuilder builder(*this);
 
-            utility::Owned<Expression> condition = builder.pushExpansion(*while_statement.condition);
+            utility::Owned<Expression> condition = expand(*while_statement.condition);
 
             builder.pushStatement(
                 utility::makeOwned<If>(utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, std::move(condition), while_statement.condition->location),
@@ -511,47 +508,43 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Call const& call) override
         {
-            EBuilder builder(*this);
-
-            utility::Owned<Expression> callee = builder.pushExpansion(*call.callee);
+            utility::Owned<Expression> callee = expand(*call.callee);
 
             utility::List<utility::Owned<Expression>> arguments;
             for (auto& argument : call.arguments)
             {
-                arguments.emplace_back(builder.pushExpansion(*argument));
+                arguments.emplace_back(expand(*argument));
             }
 
-            result_.setExpression(builder.take(utility::makeOwned<Call>(std::move(callee), std::move(arguments), call.location)));
+            result_.setExpression(utility::makeOwned<Call>(std::move(callee), std::move(arguments), call.location));
         }
 
         void visit(ast::Lambda const& lambda) override
         {
-            EBuilder builder(*this);
-
             utility::List<Parameter> parameters;
             for (auto& parameter : lambda.parameters)
             {
-                parameters.emplace_back(builder.pushParameterExpansion(parameter));
+                parameters.emplace_back(expand(parameter));
             }
 
             utility::Optional<utility::Owned<Expression>> return_type;
             if (lambda.return_type.hasValue())
             {
-                return_type = builder.pushExpansion(**lambda.return_type);
+                return_type = expand(**lambda.return_type);
             }
             else
             {
                 // todo: as soon as we have custom types, we would need this access here to be in the global scope, e.g. a global:: prefix
                 // todo: or as long as that is not done, just a new type of expression that contains an enum of important types
                 // todo: and the same for the Function type above in function declaration - remove that constants file to find all places
-                return_type = builder.pushExpansion(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), lambda.location));
+                return_type = expand(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), lambda.location));
             }
 
             SBuilder body_builder(*this);
 
             if (lambda.expression_body.hasValue())
             {
-                utility::Owned<Expression> expression = builder.pushExpansion(**lambda.expression_body);
+                utility::Owned<Expression> expression = expand(**lambda.expression_body);
                 body_builder.pushStatement(utility::makeOwned<Return>(std::move(expression), lambda.location));
             }
             else
@@ -563,26 +556,24 @@ struct ance::est::Expander::Implementation
 
             std::string const name = std::format("Lambda'{}", anonymous_function_counter_++);
 
-            result_.setExpression(builder.take(utility::makeOwned<FunctionConstructor>(core::Identifier::make(name, lambda.location),
-                                                                                       std::move(parameters),
-                                                                                       std::move(return_type.value()),
-                                                                                       std::move(body),
-                                                                                       lambda.location)));
+            result_.setExpression(utility::makeOwned<FunctionConstructor>(core::Identifier::make(name, lambda.location),
+                                                                          std::move(parameters),
+                                                                          std::move(return_type.value()),
+                                                                          std::move(body),
+                                                                          lambda.location));
         }
 
         void visit(ast::Intrinsic const& intrinsic_expression) override
         {
-            EBuilder builder(*this);
-
-            utility::Owned<Expression> name = builder.pushExpansion(*intrinsic_expression.name);
+            utility::Owned<Expression> name = expand(*intrinsic_expression.name);
 
             utility::List<utility::Owned<Expression>> arguments;
             for (auto& argument : intrinsic_expression.arguments)
             {
-                arguments.emplace_back(builder.pushExpansion(*argument));
+                arguments.emplace_back(expand(*argument));
             }
 
-            result_.setExpression(builder.take(utility::makeOwned<Intrinsic>(std::move(name), std::move(arguments), intrinsic_expression.location)));
+            result_.setExpression(utility::makeOwned<Intrinsic>(std::move(name), std::move(arguments), intrinsic_expression.location));
         }
 
         void visit(ast::BlockExpression const& block_expression) override
@@ -597,9 +588,7 @@ struct ance::est::Expander::Implementation
             utility::Optional<utility::Owned<Expression>> result;
             if (block_expression.result.hasValue())
             {
-                // todo: SBuilder stores expression cleanup in take(); for block expressions this can run cleanup before the result is evaluated in Segmenter.
-                // todo: when expansion is reworked, ensure the result expression's cleanup executes after the result expression, not before.
-                result = builder.pushExpansion(**block_expression.result);
+                result = expand(**block_expression.result);
             }
             else
             {
@@ -641,11 +630,7 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::UnaryOperation const& unary_operation) override
         {
-            EBuilder builder(*this);
-
-            utility::Owned<Expression> operand = builder.pushExpansion(*unary_operation.operand);
-
-            result_.setExpression(builder.take(utility::makeOwned<UnaryOperation>(unary_operation.op, std::move(operand), unary_operation.location)));
+            result_.setExpression(utility::makeOwned<UnaryOperation>(unary_operation.op, expand(*unary_operation.operand), unary_operation.location));
         }
 
       private:

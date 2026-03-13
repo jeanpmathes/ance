@@ -287,16 +287,6 @@ namespace ance::est
         utility::Owned<Statement>  body;
     };
 
-    /// Reads the value of a variable.
-    struct Read final
-        : Expression
-        , utility::ConcreteNode<Read, Visitor>
-    {
-        Read(utility::Owned<Expression> accessed, core::Location const& source_location);
-
-        utility::Owned<Expression> target;
-    };
-
     /// Accesses a variable by identifier.
     struct Access final
         : Expression
@@ -424,7 +414,6 @@ namespace ance::est
         virtual void visit(BlockExpression const& block_expression)         = 0;
         virtual void visit(Call const& call)                                = 0;
         virtual void visit(FunctionConstructor const& function_constructor) = 0;
-        virtual void visit(Read const& read)                                = 0;
         virtual void visit(Access const& access)                            = 0;
         virtual void visit(UnitLiteral const& unit_literal)                 = 0;
         virtual void visit(SizeLiteral const& size_literal)                 = 0;

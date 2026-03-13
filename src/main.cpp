@@ -118,10 +118,8 @@ namespace ance
 
         return exit_code;
 
-        // todo: simplify expansion to not do STMT,EXPR,STMT but just EXPR for expressions (but the builder might still support that model, and SBuilder can also be used for expressions with some util)
-        // todo: maybe also require statements to always expand to STMT by usage of block
-
         // todo: and, or expressions with the funny not addition in the middle, have to short-circuit
+        // todo: use and adapt the new expression builder EBuilder
         // todo: need to use expression blocks to ensure correct cleanup, but they can be used to make expansion of expressions generally simpler
         // todo: also needs a new utility to get an anonymous / unique name for var
 

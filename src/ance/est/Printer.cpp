@@ -276,13 +276,6 @@ struct ance::est::Printer::Implementation
             print(")");
         }
 
-        void visit(Read const& read) override
-        {
-            print("(read ");
-            visit(*read.target);
-            print(")");
-        }
-
         void visit(Access const& access) override
         {
             print(access.identifier);
