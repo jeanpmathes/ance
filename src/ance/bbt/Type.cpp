@@ -162,22 +162,28 @@ namespace ance::bbt
 
     utility::Shared<Type> TypeContext::getBool()
     {
-        return Implementation::getOrCreate(implementation_->bool_type, [&] { return utility::makeShared<Type>(core::Identifier::make("Bool", core::Location::core()), *this); });
+        return Implementation::getOrCreate(implementation_->bool_type, [&] {
+            return utility::makeShared<Type>(core::Identifier::make(core::BOOL_TYPE_NAME, core::Location::core()), *this);
+        });
     }
 
     utility::Shared<Type> TypeContext::getUnit()
     {
-        return Implementation::getOrCreate(implementation_->unit_type, [&] { return utility::makeShared<Type>(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), *this); });
+        return Implementation::getOrCreate(implementation_->unit_type, [&] {
+            return utility::makeShared<Type>(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), *this);
+        });
     }
 
     utility::Shared<Type> TypeContext::getSize()
     {
-        return Implementation::getOrCreate(implementation_->size_type, [&] { return utility::makeShared<Type>(core::Identifier::make("Size", core::Location::core()), *this); });
+        return Implementation::getOrCreate(implementation_->size_type,
+                                           [&] { return utility::makeShared<Type>(core::Identifier::make("Size", core::Location::core()), *this); });
     }
 
     utility::Shared<Type> TypeContext::getString()
     {
-        return Implementation::getOrCreate(implementation_->string_type, [&] { return utility::makeShared<Type>(core::Identifier::make("String", core::Location::core()), *this); });
+        return Implementation::getOrCreate(implementation_->string_type,
+                                           [&] { return utility::makeShared<Type>(core::Identifier::make("String", core::Location::core()), *this); });
     }
 
     utility::Shared<Type> TypeContext::getVariableRef()
@@ -200,18 +206,21 @@ namespace ance::bbt
 
     utility::Shared<Type> TypeContext::getFunction()
     {
-        return Implementation::getOrCreate(implementation_->function_type,
-                                           [&] { return utility::makeShared<Type>(core::Identifier::make("Function", core::Location::core()), *this); });
+        return Implementation::getOrCreate(implementation_->function_type, [&] {
+            return utility::makeShared<Type>(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), *this);
+        });
     }
 
     utility::Shared<Type> TypeContext::getType()
     {
-        return Implementation::getOrCreate(implementation_->type_type, [&] { return utility::makeShared<Type>(core::Identifier::make("Type", core::Location::core()), *this); });
+        return Implementation::getOrCreate(implementation_->type_type,
+                                           [&] { return utility::makeShared<Type>(core::Identifier::make("Type", core::Location::core()), *this); });
     }
 
     utility::Shared<Type> TypeContext::getScopeRef()
     {
-        return Implementation::getOrCreate(implementation_->scope_ref_type, [&] { return utility::makeShared<Type>(core::Identifier::make(".Scope", core::Location::core()), *this); });
+        return Implementation::getOrCreate(implementation_->scope_ref_type,
+                                           [&] { return utility::makeShared<Type>(core::Identifier::make(".Scope", core::Location::core()), *this); });
     }
 
     utility::Shared<Type> TypeContext::getLocation()

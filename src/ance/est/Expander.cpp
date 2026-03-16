@@ -10,6 +10,8 @@
 #include "ance/est/Node.h"
 #include "ance/est/Printer.h"
 
+#include <llvm/IR/Instruction.h>
+
 struct ance::est::Expander::Implementation
 {
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
@@ -187,25 +189,48 @@ struct ance::est::Expander::Implementation
                 return createAccess(result_.value());
             }
 
-            void pushAssignment(core::Identifier const& identifier, utility::Owned<Expression> value)
+            utility::Owned<Statement> createAssignment(core::Identifier const& identifier, core::Assigner const assigner, utility::Owned<Expression> value)
             {
-                statements_.emplace_back(utility::makeOwned<Write>(createAccess(identifier), std::move(value), location_));
+                return utility::makeOwned<Assignment>(createAccess(identifier), assigner, std::move(value), location_);
             }
 
-            void pushExpansionAssignment(core::Identifier const& identifier, ast::Expression const& expression)
+            utility::Owned<Statement> createExpansionAssignment(core::Identifier const& identifier,
+                                                                core::Assigner const    assigner,
+                                                                ast::Expression const&  expression)
             {
-                pushAssignment(identifier, ast_.expand(expression));
+                return createAssignment(identifier, assigner, ast_.expand(expression));
             }
 
-            void pushAssignmentToResult(utility::Owned<Expression> value)
+            utility::Owned<Statement> createAssignmentToResult(core::Assigner const assigner, utility::Owned<Expression> value)
             {
                 assert(result_.hasValue());
-                pushAssignment(result_.value(), std::move(value));
+                return createAssignment(result_.value(), assigner, std::move(value));
             }
 
-            void pushExpansionAssignmentToResult(ast::Expression const& expression)
+            utility::Owned<Statement> createExpansionAssignmentToResult(core::Assigner const assigner, ast::Expression const& expression)
             {
-                pushAssignmentToResult(ast_.expand(expression));
+                assert(result_.hasValue());
+                return createAssignmentToResult(assigner, ast_.expand(expression));
+            }
+
+            void pushAssignment(core::Identifier const& identifier, core::Assigner const assigner, utility::Owned<Expression> value)
+            {
+                pushStatement(createAssignment(identifier, assigner, std::move(value)));
+            }
+
+            void pushExpansionAssignment(core::Identifier const& identifier, core::Assigner const assigner, ast::Expression const& expression)
+            {
+                pushStatement(createExpansionAssignment(identifier, assigner, expression));
+            }
+
+            void pushAssignmentToResult(core::Assigner const assigner, utility::Owned<Expression> value)
+            {
+                pushStatement(createAssignmentToResult(assigner, std::move(value)));
+            }
+
+            void pushExpansionAssignmentToResult(core::Assigner const assigner, ast::Expression const& expression)
+            {
+                pushStatement(createExpansionAssignmentToResult(assigner, expression));
             }
 
             void pushStatement(utility::Owned<Statement> statement)
@@ -351,7 +376,7 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> return_type =
                 function_declaration.return_type.hasValue()
                     ? expand(**function_declaration.return_type)
-                    : expand(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), function_declaration.location));
+                    : utility::makeOwned<Access>(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), function_declaration.location);
 
             SBuilder body_builder(*this);
             body_builder.pushExpansion(*function_declaration.body);
@@ -361,7 +386,7 @@ struct ance::est::Expander::Implementation
             // todo: or as long as that is not done, just a new type of expression that contains an enum of important types
             // todo: and the same for the Unit type above - remove that constants file to find all places
             utility::Owned<Expression> function_type =
-                expand(ast::Access(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), function_declaration.location));
+                utility::makeOwned<Access>(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), function_declaration.location);
 
             utility::Owned<Expression> function_value = utility::makeOwned<FunctionConstructor>(function_declaration.identifier,
                                                                                                 std::move(parameters),
@@ -428,7 +453,7 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> assignee = expand(*assignment.assignee);
             utility::Owned<Expression> value    = expand(*assignment.value);
 
-            builder.pushStatement(utility::makeOwned<Write>(std::move(assignee), std::move(value), assignment.location));
+            builder.pushStatement(utility::makeOwned<Assignment>(std::move(assignee), assignment.assigner, std::move(value), assignment.location));
 
             result_.setStatements(builder.take());
         }
@@ -506,6 +531,58 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<ErrorExpression>(error_expression.location));
         }
 
+        void visit(ast::And const& and_expression) override
+        {
+            EBuilder builder(*this, and_expression.location);
+
+            // todo: assigners should be move assignments as soon as supported
+
+            builder.pushAnonymousLetAndSetAsResult(
+                utility::makeOwned<Access>(core::Identifier::make(core::BOOL_TYPE_NAME, core::Location::core()), and_expression.location),
+                core::Assigner::COPY_ASSIGNMENT,
+                expand(*and_expression.left));
+
+            builder.pushStatement(utility::makeOwned<If>(builder.createAccessToResult(),
+                                                         builder.createExpansionAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, *and_expression.right),
+                                                         utility::makeOwned<Pass>(and_expression.location),
+                                                         and_expression.location));
+
+            utility::Owned<Expression> result = builder.take();
+
+            if (and_expression.negated)
+            {
+                result = utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, std::move(result), and_expression.location);
+            }
+
+            result_.setExpression(std::move(result));
+        }
+
+        void visit(ast::Or const& or_expression) override
+        {
+            EBuilder builder(*this, or_expression.location);
+
+            // todo: assigners should be move assignments as soon as supported
+
+            builder.pushAnonymousLetAndSetAsResult(
+                utility::makeOwned<Access>(core::Identifier::make(core::BOOL_TYPE_NAME, core::Location::core()), or_expression.location),
+                core::Assigner::COPY_ASSIGNMENT,
+                expand(*or_expression.left));
+
+            builder.pushStatement(utility::makeOwned<If>(builder.createAccessToResult(),
+                                                         utility::makeOwned<Pass>(or_expression.location),
+                                                         builder.createExpansionAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, *or_expression.right),
+                                                         or_expression.location));
+
+            utility::Owned<Expression> result = builder.take();
+
+            if (or_expression.negated)
+            {
+                result = utility::makeOwned<UnaryOperation>(core::UnaryOperator::NOT, std::move(result), or_expression.location);
+            }
+
+            result_.setExpression(std::move(result));
+        }
+
         void visit(ast::Call const& call) override
         {
             utility::Owned<Expression> callee = expand(*call.callee);
@@ -537,7 +614,7 @@ struct ance::est::Expander::Implementation
                 // todo: as soon as we have custom types, we would need this access here to be in the global scope, e.g. a global:: prefix
                 // todo: or as long as that is not done, just a new type of expression that contains an enum of important types
                 // todo: and the same for the Function type above in function declaration - remove that constants file to find all places
-                return_type = expand(ast::Access(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), lambda.location));
+                return_type = utility::makeOwned<Access>(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), lambda.location);
             }
 
             SBuilder body_builder(*this);

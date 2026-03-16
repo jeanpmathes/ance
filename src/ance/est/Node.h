@@ -131,14 +131,15 @@ namespace ance::est
         utility::Owned<Expression> expression;
     };
 
-    /// A write statement writes a value to an assignable.
-    struct Write final
+    /// An assignment statement assigns a value to an assignable.
+    struct Assignment final
         : Statement
-        , utility::ConcreteNode<Write, Visitor>
+        , utility::ConcreteNode<Assignment, Visitor>
     {
-        Write(utility::Owned<Expression> variable, utility::Owned<Expression> expression, core::Location const& source_location);
+        Assignment(utility::Owned<Expression> left, core::Assigner assignment, utility::Owned<Expression> right, core::Location const& source_location);
 
-        utility::Owned<Expression> target;
+        utility::Owned<Expression> assignee;
+        core::Assigner             assigner;
         utility::Owned<Expression> value;
     };
 
@@ -400,7 +401,7 @@ namespace ance::est
         virtual void visit(Pass const& pass_statement)         = 0;
         virtual void visit(Block const& block)                 = 0;
         virtual void visit(Independent const& independent)     = 0;
-        virtual void visit(Write const& assignment)            = 0;
+        virtual void visit(Assignment const& assignment)       = 0;
         virtual void visit(If const& if_statement)             = 0;
         virtual void visit(Loop const& loop)                   = 0;
         virtual void visit(Break const& break_statement)       = 0;

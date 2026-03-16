@@ -267,6 +267,30 @@ namespace ance::ast
         explicit ErrorExpression(core::Location const& source_location);
     };
 
+    /// Logical, short-circuiting and-expression. Can be negated to create a nand-expression.
+    struct And final
+        : Expression
+        , utility::ConcreteNode<And, Visitor>
+    {
+        And(utility::Owned<Expression> lhs, bool neg, utility::Owned<Expression> rhs, core::Location const& source_location);
+
+        utility::Owned<Expression> left;
+        bool                       negated;
+        utility::Owned<Expression> right;
+    };
+
+    /// Logical, short-circuiting or-expression. Can be negated to create a nor-expression.
+    struct Or final
+        : Expression
+        , utility::ConcreteNode<Or, Visitor>
+    {
+        Or(utility::Owned<Expression> lhs, bool neg, utility::Owned<Expression> rhs, core::Location const& source_location);
+
+        utility::Owned<Expression> left;
+        bool                       negated;
+        utility::Owned<Expression> right;
+    };
+
     /// A call is an expression that performs the call-operator on a callable entity.
     struct Call final
         : Expression
@@ -277,8 +301,6 @@ namespace ance::ast
         utility::Owned<Expression>                callee;
         utility::List<utility::Owned<Expression>> arguments;
     };
-
-    struct Parameter;
 
     /// A lambda expression creates an anonymous function.
     struct Lambda final
@@ -426,6 +448,8 @@ namespace ance::ast
         virtual void visit(Erase const& erase)                 = 0;
 
         virtual void visit(ErrorExpression const& error)            = 0;
+        virtual void visit(And const& and_expression)               = 0;
+        virtual void visit(Or const& or_expression)                = 0;
         virtual void visit(Call const& call)                        = 0;
         virtual void visit(Intrinsic const& intrinsic)              = 0;
         virtual void visit(BlockExpression const& block_expression) = 0;

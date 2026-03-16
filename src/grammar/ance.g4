@@ -28,7 +28,13 @@ statement
     ;
 
 expression
-    : unaryExpression
+    : infixExpression
+    ;
+
+infixExpression
+    : unaryExpression # UnaryExpressionExpression
+    | left=infixExpression ( NOT )? 'and' right=unaryExpression # And
+    | left=infixExpression ( NOT )? 'or' right=unaryExpression  # Or
     ;
 
 unaryExpression
@@ -68,7 +74,7 @@ parameter
     ;
 
 unary
-    : 'not' # UnaryNot
+    : NOT # UnaryNot
     ;
 
 assigner
@@ -86,6 +92,8 @@ executionMode
     : 'compiletime' # CompileTime
     | 'runtime' # Runtime
     ;
+
+NOT : 'not' ;
 
 IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )
            | [\p{Emoji}] ;

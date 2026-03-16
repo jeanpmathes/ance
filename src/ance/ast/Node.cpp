@@ -136,6 +136,22 @@ ance::ast::Erase::Erase(core::Identifier const& name, core::Location const& sour
 
 ance::ast::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
+ance::ast::And::And(utility::Owned<Expression> lhs, bool const neg, utility::Owned<Expression> rhs, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , left(std::move(lhs))
+    , negated(neg)
+    , right(std::move(rhs))
+{}
+
+ance::ast::Or::Or(utility::Owned<Expression> lhs, bool const neg, utility::Owned<Expression> rhs, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , left(std::move(lhs))
+    , negated(neg)
+    , right(std::move(rhs))
+{}
+
 ance::ast::Call::Call(utility::Owned<Expression> called, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
     : Node(source_location)
     , Expression()

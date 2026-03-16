@@ -745,17 +745,17 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
-        void visit(est::Write const& assignment) override
+        void visit(est::Assignment const& assignment) override
         {
             Builder builder(*this);
 
-            auto& target = builder.addTemporary("Write_Target", assignment.target->location);
-            builder.addSegmented(*assignment.target, target);
+            auto& target = builder.addTemporary("Assignment_Target", assignment.assignee->location);
+            builder.addSegmented(*assignment.assignee, target);
 
-            auto& value = builder.addTemporary("Write_Value", assignment.value->location);
+            auto& value = builder.addTemporary("Assignment_Value", assignment.value->location);
             builder.addSegmented(*assignment.value, value);
 
-            builder.addStatement<Store>(target, value, assignment.location);
+            builder.addStatement<Store>(target, value, assignment.location);// todo: pass assigner to this and use
 
             setResult(builder.take());
         }

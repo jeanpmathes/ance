@@ -107,14 +107,13 @@ struct ance::est::Printer::Implementation
             print(";");
         }
 
-        void visit(Write const& assignment) override
+        void visit(Assignment const& assignment) override
         {
-            print("write(");
-            print(core::Assigner::COPY_ASSIGNMENT);
-            print(") ");
+            visit(*assignment.assignee);
+            print(" ");
+            print(assignment.assigner);
+            print(" ");
             visit(*assignment.value);
-            print(" to ");
-            visit(*assignment.target);
             print(";");
         }
 

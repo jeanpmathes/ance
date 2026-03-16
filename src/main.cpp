@@ -118,11 +118,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: and, or expressions with the funny not addition in the middle, have to short-circuit
-        // todo: use and adapt the new expression builder EBuilder
-        // todo: need to use expression blocks to ensure correct cleanup, but they can be used to make expansion of expressions generally simpler
-        // todo: also needs a new utility to get an anonymous / unique name for var
-
         // todo: assert statement
 
         // todo: match statement
@@ -161,9 +156,15 @@ namespace ance
 
         // todo: go through all TODOs in the other code, check if completable now or soon or maybe already completed, potentially move them here
 
+        // todo: check grammar for ambiguity, repeat this step later
+
         // todo: rework SourceFile class to read into single string buffer, then use string views instead of line-by-line reading
 
         // todo: struct types
+
+        // todo: better reporting: all reports should have an ID (decide whether number or string [!] ), and if possible parameters (maybe they can be extracted from the message builder stream interface, skipping char* and potentially string)
+        // todo: reporter then can suppress identical reports, if already reported, using only ID, location and params for check - hash that
+        // todo: later, when going back to the tests, they should also assert specific IDs
 
         // todo: all variants of char and string types and literals, check that char might need to be called codepoint
 

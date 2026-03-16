@@ -68,11 +68,15 @@ ance::est::Independent::Independent(utility::Owned<Expression> independent_expre
     , expression(std::move(independent_expression))
 {}
 
-ance::est::Write::Write(utility::Owned<Expression> variable, utility::Owned<Expression> expression, core::Location const& source_location)
+ance::est::Assignment::Assignment(utility::Owned<Expression> left,
+                                  core::Assigner const       assignment,
+                                  utility::Owned<Expression> right,
+                                  core::Location const&      source_location)
     : Node(source_location)
     , Statement()
-    , target(std::move(variable))
-    , value(std::move(expression))
+    , assignee(std::move(left))
+    , assigner(assignment)
+    , value(std::move(right))
 {}
 
 ance::est::If::If(utility::Owned<Expression> expression,

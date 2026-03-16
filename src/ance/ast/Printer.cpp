@@ -141,7 +141,6 @@ struct ance::ast::Printer::Implementation
                 print(" ");
                 visit(**let.value);
             }
-
             print(";");
         }
 
@@ -250,6 +249,22 @@ struct ance::ast::Printer::Implementation
         void visit(ErrorExpression const&) override
         {
             print("/* error */");
+        }
+
+        void visit(And const& and_expression) override
+        {
+            visit(*and_expression.left);
+            if (and_expression.negated) print(" not");
+            print(" and ");
+            visit(*and_expression.right);
+        }
+
+        void visit(Or const& or_expression) override
+        {
+            visit(*or_expression.left);
+            if (or_expression.negated) print(" not");
+            print(" or ");
+            visit(*or_expression.right);
         }
 
         void visit(Call const& call) override

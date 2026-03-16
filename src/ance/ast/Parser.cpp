@@ -562,6 +562,28 @@ namespace ance::ast
             return statement;
         }
 
+        std::any visitAnd(grammar::anceParser::AndContext* context) override
+        {
+            utility::Owned<Expression> left  = expectExpression(context->left);
+            utility::Owned<Expression> right = expectExpression(context->right);
+
+            bool const negated = context->NOT() != nullptr;
+
+            Expression* expression = new And(std::move(left), negated, std::move(right), location(context));
+            return expression;
+        }
+
+        std::any visitOr(grammar::anceParser::OrContext* context) override
+        {
+            utility::Owned<Expression> left  = expectExpression(context->left);
+            utility::Owned<Expression> right = expectExpression(context->right);
+
+            bool const negated = context->NOT() != nullptr;
+
+            Expression* expression = new Or(std::move(left), negated, std::move(right), location(context));
+            return expression;
+        }
+
         std::any visitUnaryOperationExpression(grammar::anceParser::UnaryOperationExpressionContext* ctx) override
         {
             core::UnaryOperator const  op      = expectUnaryOperator(ctx->unary());
