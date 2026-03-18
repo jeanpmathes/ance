@@ -118,8 +118,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: assert statement
-
         // todo: match statement
 
         // todo: if expression
@@ -179,6 +177,7 @@ namespace ance
         // todo: might need its own value type (defined in CET namespace), do not use the one from BBT or LLVM
         // todo: this is the point where the tests should be brought back in, maybe deactivate those that certainly won't work yet and maybe prioritize them, add TODOs to bring them back
         // todo: also add loads of tests for all the new things, e.g. lambdas, better cmp, different types, etc.
+        // todo: do runtime library calls through an intrinsic, e.g. runtime_library_call, the intrinsic would check whether lib is available, would take string (from list of constants), the intrinsic itself would be a compiletime intrinsic that returns a runtime function
 
         // todo: pointer type, pointer type expression, uiptr, ptr and diff type (renamed to Diff, Pointer, UIntPointer)
         // todo: also adapt Size type to work like Diff and UIntPointer meaning that it is correctly sized depending on platform

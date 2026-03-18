@@ -533,6 +533,30 @@ struct ance::cet::Runner::Implementation
             // Intentionally left empty.
         }
 
+        void visit(bbt::Assert const& assert_statement) override
+        {
+            trace("Assert", assert_statement);
+
+            // todo: assert can be replaced with a function when compiletime exec is good enough
+            // todo: in compiletime, it would use an advanced version of the log intrinsic, maybe in combination with a fail intrinsic
+            // todo: in runtime, it would call the corresponding function of the language runtime, using a runtime_library_call intrinsic
+            // todo: to select the right variant, one could have overloads that just differ in execution mode
+
+            utility::Shared<bbt::Value> condition = scope().getTemporary(assert_statement.condition).read();
+
+            if (!expectType(*type_context_.getBool(), *condition->type(), assert_statement.condition.location))
+            {
+                abort();
+                return;
+            }
+
+            if (!deLReference<bbt::Bool>(condition).value())
+            {
+                reporter_.error(assert_statement.location) << "Assertion failed";
+                abort();
+            }
+        }
+
         void visit(bbt::Store const& store) override
         {
             trace("Store", store) << ", target=" << temp(store.target) << ", value=" << temp(store.value);

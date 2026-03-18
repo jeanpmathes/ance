@@ -944,6 +944,18 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
+        void visit(est::Assert const& assert) override
+        {
+            Builder builder(*this);
+
+            auto& condition_tmp = builder.addTemporary("Assert_Condition", assert.condition->location);
+            builder.addSegmented(*assert.condition, condition_tmp);
+
+            builder.addStatement<Assert>(condition_tmp, assert.condition->location);
+
+            setResult(builder.take());
+        }
+
         void visit(est::ErrorExpression const& error) override
         {
             Builder builder(*this);

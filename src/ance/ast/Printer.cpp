@@ -246,6 +246,13 @@ struct ance::ast::Printer::Implementation
             print(";");
         }
 
+        void visit(Assert const& assert) override
+        {
+            print("assert ");
+            visit(*assert.condition);
+            print(";");
+        }
+
         void visit(ErrorExpression const&) override
         {
             print("/* error */");

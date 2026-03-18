@@ -252,6 +252,16 @@ namespace ance::ast
         core::Identifier identifier;
     };
 
+    /// Asserts that a condition is true. If not, execution is stopped.
+    struct Assert final
+        : Statement
+        , utility::ConcreteNode<Assert, Visitor>
+    {
+        Assert(utility::Owned<Expression> expression, core::Location const& source_location);
+
+        utility::Owned<Expression> condition;
+    };
+
     /// An expression is a piece of code that produces a value.
     struct Expression
         : virtual Node
@@ -446,10 +456,11 @@ namespace ance::ast
         virtual void visit(Return const& return_statement)     = 0;
         virtual void visit(While const& while_statement)       = 0;
         virtual void visit(Erase const& erase)                 = 0;
+        virtual void visit(Assert const& assert)               = 0;
 
         virtual void visit(ErrorExpression const& error)            = 0;
         virtual void visit(And const& and_expression)               = 0;
-        virtual void visit(Or const& or_expression)                = 0;
+        virtual void visit(Or const& or_expression)                 = 0;
         virtual void visit(Call const& call)                        = 0;
         virtual void visit(Intrinsic const& intrinsic)              = 0;
         virtual void visit(BlockExpression const& block_expression) = 0;

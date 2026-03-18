@@ -59,6 +59,8 @@ ance::bbt::ErrorStatement::ErrorStatement(core::Location const& source_location)
 
 ance::bbt::Pass::Pass(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::bbt::Assert::Assert(Temporary const& expression, core::Location const& source_location) : Node(source_location), Statement(), condition(expression) {}
+
 ance::bbt::Store::Store(Temporary const& l_ref, Temporary const& stored, core::Location const& source_location)
     : Node(source_location)
     , Statement()

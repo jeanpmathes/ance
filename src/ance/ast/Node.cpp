@@ -134,6 +134,12 @@ ance::ast::While::While(utility::Owned<Expression> expression, utility::Owned<St
 
 ance::ast::Erase::Erase(core::Identifier const& name, core::Location const& source_location) : Node(source_location), Statement(), identifier(name) {}
 
+ance::ast::Assert::Assert(utility::Owned<Expression> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , condition(std::move(expression))
+{}
+
 ance::ast::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::ast::And::And(utility::Owned<Expression> lhs, bool const neg, utility::Owned<Expression> rhs, core::Location const& source_location)

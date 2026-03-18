@@ -562,6 +562,14 @@ namespace ance::ast
             return statement;
         }
 
+        std::any visitAssertStatement(grammar::anceParser::AssertStatementContext* context) override
+        {
+            utility::Owned<Expression> expression = expectExpression(context->expression());
+
+            Statement* statement = new Assert(std::move(expression), location(context));
+            return statement;
+        }
+
         std::any visitAnd(grammar::anceParser::AndContext* context) override
         {
             utility::Owned<Expression> left  = expectExpression(context->left);

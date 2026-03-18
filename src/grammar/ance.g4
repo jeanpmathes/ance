@@ -25,6 +25,7 @@ statement
     | 'return' ( expression )? ';' # ReturnStatement
     | 'while' expression 'do' statement # WhileStatement
     | 'erase' IDENTIFIER ';' # EraseStatement
+    | 'assert' expression ';' # AssertStatement
     ;
 
 expression

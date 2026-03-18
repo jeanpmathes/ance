@@ -120,6 +120,13 @@ ance::est::Let::Let(core::Identifier const&                       name,
 {}
 
 ance::est::Erase::Erase(core::Identifier const& name, core::Location const& source_location) : Node(source_location), Statement(), identifier(name) {}
+
+ance::est::Assert::Assert(utility::Owned<Expression> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , condition(std::move(expression))
+{}
+
 ance::est::ErrorExpression::ErrorExpression(core::Location const& source_location) : Node(source_location), Expression() {}
 
 ance::est::Intrinsic::Intrinsic(utility::Owned<Expression>                intrinsic_name,

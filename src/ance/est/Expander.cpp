@@ -247,7 +247,7 @@ struct ance::est::Expander::Implementation
             AST&           ast_;
             core::Location location_;
 
-            Statements                                    statements_;
+            Statements                          statements_;
             utility::Optional<core::Identifier> result_;
         };
 
@@ -524,6 +524,11 @@ struct ance::est::Expander::Implementation
         void visit(ast::Erase const& erase) override
         {
             result_.setStatements(utility::makeOwned<Erase>(erase.identifier, erase.location));
+        }
+
+        void visit(ast::Assert const& assert) override
+        {
+            result_.setStatements(utility::makeOwned<Assert>(expand(*assert.condition), assert.location));
         }
 
         void visit(ast::ErrorExpression const& error_expression) override

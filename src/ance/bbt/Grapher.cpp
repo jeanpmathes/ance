@@ -114,6 +114,8 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(Pass const&) override {}
 
+        void visit(Assert const&) override {}
+
         void visit(Store const&) override {}
 
         void visit(Access const&) override {}

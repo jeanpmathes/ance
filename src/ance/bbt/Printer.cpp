@@ -1,7 +1,7 @@
 #include "Printer.h"
 
-#include <unordered_set>
 #include <queue>
+#include <unordered_set>
 
 #include "ance/core/Printer.h"
 
@@ -135,6 +135,13 @@ struct ance::bbt::Printer::Implementation
         void visit(Pass const&) override
         {
             print("pass;");
+        }
+
+        void visit(Assert const& assert) override
+        {
+            print("assert ");
+            print(assert.condition.id());
+            print(";");
         }
 
         void visit(Store const& store) override
@@ -301,8 +308,8 @@ struct ance::bbt::Printer::Implementation
         }
 
       private:
-        size_t flow_depth_ = 0;
-        std::queue<Flow const*> nested_flows_to_print_;
+        size_t                          flow_depth_ = 0;
+        std::queue<Flow const*>         nested_flows_to_print_;
         std::unordered_set<Flow const*> printed_flows_;
     };
 

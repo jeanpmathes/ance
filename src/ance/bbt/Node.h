@@ -151,6 +151,16 @@ namespace ance::bbt
         explicit Pass(core::Location const& source_location);
     };
 
+    /// Asserts that a condition is true. If not, execution is stopped.
+    struct Assert final
+        : Statement
+        , utility::ConcreteNode<Assert, Visitor>
+    {
+        Assert(Temporary const& expression, core::Location const& source_location);
+
+        Temporary const& condition;
+    };
+
     /// Stores a value to an l-reference.
     struct Store final
         : Statement
@@ -365,13 +375,13 @@ namespace ance::bbt
         virtual void visit(Branch const& branch_link)   = 0;
         virtual void visit(Jump const& jump_link)       = 0;
 
-        virtual void visit(ErrorStatement const& error_statement) = 0;
-        virtual void visit(Pass const& pass_statement)            = 0;
-        virtual void visit(Store const& store)                    = 0;
-        virtual void visit(Access const& access)                  = 0;
-        virtual void visit(Temporary const& temporary)            = 0;
-        virtual void visit(Dereference const& dereference)        = 0;
-
+        virtual void visit(ErrorStatement const& error_statement)           = 0;
+        virtual void visit(Pass const& pass_statement)                      = 0;
+        virtual void visit(Assert const& assert_statement)                  = 0;
+        virtual void visit(Store const& store)                              = 0;
+        virtual void visit(Access const& access)                            = 0;
+        virtual void visit(Temporary const& temporary)                      = 0;
+        virtual void visit(Dereference const& dereference)                  = 0;
         virtual void visit(Intrinsic const& intrinsic)                      = 0;
         virtual void visit(Call const& call)                                = 0;
         virtual void visit(FunctionConstructor const& function_constructor) = 0;
