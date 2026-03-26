@@ -1,7 +1,7 @@
 #include "Printer.h"
 
 #include <queue>
-#include <unordered_set>
+#include <set>
 
 #include "ance/core/Printer.h"
 
@@ -116,7 +116,7 @@ struct ance::bbt::Printer::Implementation
             print(std::to_string(branch_link.true_branch.id));
             print(", ");
             print(std::to_string(branch_link.false_branch.id));
-            print(") on temporary ");
+            print(") on ");
             print(branch_link.condition.id());
         }
 
@@ -125,6 +125,26 @@ struct ance::bbt::Printer::Implementation
             print("jump (");
             print(std::to_string(jump_link.target.id));
             print(")");
+        }
+
+        void visit(Switch const& match_link) override
+        {
+            print("switch (");
+            print(match_link.condition.id());
+            print(")");
+            line();
+            print("{");
+            line();
+            enter();
+
+            for (auto& switch_case : match_link.cases)
+            {
+                visit(*switch_case);
+                line();
+            }
+
+            exit();
+            print("}");
         }
 
         void visit(ErrorStatement const&) override
@@ -290,12 +310,12 @@ struct ance::bbt::Printer::Implementation
 
         void visit(OrderedScopeEnter const&) override
         {
-            print("// enter scope");
+            print("scope enter");
         }
 
         void visit(OrderedScopeExit const&) override
         {
-            print("// exit scope");
+            print("scope exit");
         }
 
         void visit(SetReturnValue const& set_return_value) override
@@ -307,10 +327,26 @@ struct ance::bbt::Printer::Implementation
             print(";");
         }
 
+        void visit(SwitchCase const& switch_case) override
+        {
+            print("(");
+            print(std::to_string(switch_case.target.id));
+            print(") on ");
+
+            if (switch_case.pattern != nullptr)
+            {
+                print(switch_case.pattern->id());
+            }
+            else
+            {
+                print("any");
+            }
+        }
+
       private:
         size_t                          flow_depth_ = 0;
         std::queue<Flow const*>         nested_flows_to_print_;
-        std::unordered_set<Flow const*> printed_flows_;
+        std::set<Flow const*>           printed_flows_;
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}

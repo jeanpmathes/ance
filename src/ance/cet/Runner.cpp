@@ -358,6 +358,27 @@ struct ance::cet::Runner::Implementation
             return deLReference(value)->as<T>();
         }
 
+        utility::Optional<utility::Shared<bbt::Type>> getCommonType(utility::List<utility::Shared<bbt::Type>>& types)
+        {
+            if (types.empty()) return std::nullopt;
+
+            {// Check whether all types are the same type.
+                utility::Shared<bbt::Type> common_type = types[0];
+
+                for (size_t index = 1; index < types.size(); index++)
+                {
+                    if (*types[index] != *common_type)
+                    {
+                        return std::nullopt;
+                    }
+                }
+
+                return common_type;
+            }
+
+            // todo: also check conversions to find common type
+        }
+
         struct TemporaryOutput
         {
             BBT*                  bbt;
@@ -515,6 +536,110 @@ struct ance::cet::Runner::Implementation
             trace("Jump", jump_link) << ", target=" << jump_link.target.id;
 
             state_.next = &jump_link.target;
+        }
+
+        void visit(bbt::Switch const& switch_link) override
+        {
+            trace("Switch", switch_link) << ", condition=" << temp(switch_link.condition) << ", #cases=" << switch_link.cases.size();
+
+            utility::Shared<bbt::Value> condition      = scope().getTemporary(switch_link.condition).read();
+            utility::Shared<bbt::Type>  condition_type = condition->type();
+
+            utility::List<utility::Shared<bbt::Value>> case_patterns = {};
+            utility::Optional<core::Location>          default_pattern_location;
+            bool                                       has_invalid_case = false;
+            for (auto const& current_case : switch_link.cases)
+            {
+                if (current_case->pattern == nullptr)
+                {
+                    default_pattern_location = current_case->pattern_location;
+                    break;
+                }
+
+                utility::Shared<bbt::Value> value = scope().getTemporary(*current_case->pattern).read();
+
+                if (!expectType(*condition_type, *value->type(), current_case->pattern->location))
+                {
+                    has_invalid_case = true;
+                    continue;
+                }
+
+                case_patterns.emplace_back(std::move(value));
+            }
+
+            if (has_invalid_case)
+            {
+                abort();
+                return;
+            }
+
+            if (!default_pattern_location.hasValue())
+            {
+                // todo: should actually depend on the number of states of type, e.g. for bool two patterns with no default would be fine
+                // todo: that should also bring back the countability and abstract and all the other extra checks of old match, but better
+
+                reporter_.error(switch_link.location) << "Match does not cover all possible states of type " << condition_type->annotated();
+
+                abort();
+                return;
+            }
+
+            if (case_patterns.size() + 1 < switch_link.cases.size())
+            {
+                for (size_t index = case_patterns.size() + 1; index < switch_link.cases.size(); index++)
+                {
+                    reporter_.warning(switch_link.cases[index]->pattern_location)
+                        << "Pattern not reachable" << core::Reporter::Annotation(default_pattern_location.value()) << "Covered by preceding default pattern";
+                }
+
+                abort();
+                return;
+            }
+
+            for (size_t index = 0; index < case_patterns.size(); index++)
+            {
+                utility::Shared<bbt::Value> current_pattern = case_patterns[index];
+
+                for (size_t other_index = 0; other_index < index; other_index++)
+                {
+                    utility::Shared<bbt::Value> other_pattern = case_patterns[other_index];
+
+                    if (other_pattern->equals(*current_pattern))
+                    {
+                        reporter_.warning(switch_link.cases[index]->pattern_location)
+                            << "Pattern not reachable" << core::Reporter::Annotation(switch_link.cases[other_index]->pattern_location)
+                            << "Covered by preceding pattern";
+
+                        break;
+                    }
+                }
+            }
+
+            bbt::BasicBlock const* next = nullptr;
+
+            for (size_t index = 0; index < switch_link.cases.size(); index++)
+            {
+                bool const is_default_case = switch_link.cases[index]->pattern == nullptr;
+
+                if (is_default_case || case_patterns[index]->equals(*condition))
+                {
+                    next = &switch_link.cases[index]->target;
+
+                    break;
+                }
+            }
+
+            if (next == nullptr)
+            {
+                throw std::logic_error("Failed to match any case of validated switch");
+            }
+
+            state_.next = next;
+        }
+
+        void visit(bbt::SwitchCase const&) override
+        {
+            // Completely handled in visit(bbt::Switch const&) and therefore empty here.
         }
 
         void visit(bbt::ErrorStatement const& error_statement) override

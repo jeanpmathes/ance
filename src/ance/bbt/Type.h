@@ -13,7 +13,7 @@ namespace ance::bbt
     class TypeContext;
 
     /// Represents a type.
-    class Type : public Value
+    class Type : public ValueBase<Type>
     {
       public:
         /// Creates a new type.
@@ -32,6 +32,8 @@ namespace ance::bbt
 
         Type(Type&&)            = delete;
         Type& operator=(Type&&) = delete;
+
+        ~Type() override = default;
 
         /// Gets the name of this type.
         [[nodiscard]] core::Identifier const& name() const;
@@ -56,6 +58,7 @@ namespace ance::bbt
         [[nodiscard]] Type const& getConstructorType(size_t index) const;
 
         [[nodiscard]] std::string toString() const override;
+        [[nodiscard]] bool        equals(Type const& other) const override;
 
       private:
         core::Identifier                     identifier_;

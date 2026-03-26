@@ -7,14 +7,14 @@
 namespace ance::bbt
 {
     Function::Function(Signature signature, utility::Shared<Type> return_type, Flow const& body, TypeContext& type_context)
-        : Value(type_context.getFunction(), type_context)
+        : ValueBase(type_context.getFunction(), type_context)
         , signature_(std::move(signature))
         , return_type_(std::move(return_type))
         , body_(body)
     {}
 
     Function::Function(Signature signature, utility::Shared<Type> return_type, utility::Shared<Flow> body, TypeContext& type_context)
-        : Value(type_context.getFunction(), type_context)
+        : ValueBase(type_context.getFunction(), type_context)
         , signature_(std::move(signature))
         , return_type_(std::move(return_type))
         , body_(*body)
@@ -22,7 +22,7 @@ namespace ance::bbt
     {}
 
     Function::Function(Signature signature, utility::Shared<Type> return_type, utility::Owned<Flow> body, TypeContext& type_context)
-        : Value(type_context.getFunction(), type_context)
+        : ValueBase(type_context.getFunction(), type_context)
         , signature_(std::move(signature))
         , return_type_(std::move(return_type))
         , body_(*body)
@@ -62,6 +62,11 @@ namespace ance::bbt
     std::string Function::toString() const
     {
         return "@" + std::string(signature_.name().text());
+    }
+
+    bool Function::equals(Function const& other) const
+    {
+        return &other == this;
     }
 }
 

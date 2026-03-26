@@ -20,7 +20,7 @@ namespace ance::core
 
         /// Create a nowhere location. A nowhere location is used for code that does not have a location.
         /// \return A nowhere location.
-        static Location nowhere(); // todo: possibly remove with Optional<Location> as soon as language has Optional
+        static Location nowhere();// todo: possibly remove with Optional<Location> as soon as language has Optional
 
         /// Create a project location. A project location is used for code that is associated with a project but not an actual source location.
         /// \return A project location.
@@ -97,6 +97,8 @@ namespace ance::core
         /// Get the first location of two locations.
         /// \return The first location.
         static Location getFirst(Location const& a, Location const& b);
+
+        bool operator==(Location const& location) const = default;
 
         friend std::ostream& operator<<(std::ostream& os, Location const& location);
 

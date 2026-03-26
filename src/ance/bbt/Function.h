@@ -17,7 +17,7 @@ namespace ance::bbt
     class TypeContext;
 
     /// Represents a function.
-    class Function final : public Value
+    class Function final : public ValueBase<Function>
     {
       public:
         Function(Signature signature, utility::Shared<Type> return_type, Flow const& body, TypeContext& type_context);
@@ -34,6 +34,7 @@ namespace ance::bbt
         [[nodiscard]] Flow const& body() const;
 
         [[nodiscard]] std::string toString() const override;
+        [[nodiscard]] bool        equals(Function const& other) const override;
 
       private:
         Signature             signature_;

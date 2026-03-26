@@ -66,10 +66,10 @@ namespace ance::bbt
         return types;
     }
 
-    Type::Type(core::Identifier const& identifier, TypeContext& type_context) : Value(std::nullopt, type_context), identifier_(identifier) {}
+    Type::Type(core::Identifier const& identifier, TypeContext& type_context) : ValueBase(std::nullopt, type_context), identifier_(identifier) {}
 
     Type::Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructor_type, TypeContext& type_context)
-        : Value(std::nullopt, type_context)
+        : ValueBase(std::nullopt, type_context)
         , identifier_(identifier)
         , constructor_types_(std::move(constructor_type))
     {}
@@ -117,6 +117,11 @@ namespace ance::bbt
     std::string Type::toString() const
     {
         return std::string(identifier_.text());
+    }
+
+    bool Type::equals(Type const& other) const
+    {
+        return other == *this;
     }
 
     LReferenceType::LReferenceType(utility::Shared<Type> referenced_type, TypeContext& type_context)

@@ -1,9 +1,9 @@
 #include "Grapher.h"
 
 #include <queue>
+#include <set>
 #include <sstream>
 #include <string>
-#include <unordered_set>
 
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Printer.h"
@@ -110,6 +110,21 @@ struct ance::bbt::Grapher::Implementation
             addEdge(current_id_, jump_link.target.id);
         }
 
+        void visit(Switch const& switch_link) override
+        {
+            std::set<size_t> connected;
+
+            for (auto& switch_case : switch_link.cases)
+            {
+                auto [_, inserted] = connected.insert(switch_case->target.id);
+
+                if (inserted)
+                {
+                    addEdge(current_id_, switch_case->target.id);
+                }
+            }
+        }
+
         void visit(ErrorStatement const&) override {}
 
         void visit(Pass const&) override {}
@@ -149,6 +164,8 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(SetReturnValue const&) override {}
 
+        void visit(SwitchCase const&) override {}
+
         void begin()
         {
             beginGraph();
@@ -162,9 +179,9 @@ struct ance::bbt::Grapher::Implementation
       private:
         size_t current_id_ = 0;
 
-        size_t                          flow_depth_ = 0;
-        std::queue<Flow const*>         nested_flows_to_graph_;
-        std::unordered_set<Flow const*> graphed_flows_;
+        size_t                  flow_depth_ = 0;
+        std::queue<Flow const*> nested_flows_to_graph_;
+        std::set<Flow const*>   graphed_flows_;
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}

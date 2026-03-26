@@ -100,6 +100,13 @@ ance::est::Break::Break(core::Location const& source_location) : Node(source_loc
 
 ance::est::Continue::Continue(core::Location const& source_location) : Node(source_location), Statement() {}
 
+ance::est::Match::Match(utility::Owned<Expression> expression, utility::List<utility::Owned<MatchCase>> case_list, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , value(std::move(expression))
+    , cases(std::move(case_list))
+{}
+
 ance::est::Return::Return(utility::Optional<utility::Owned<Expression>> expression, core::Location const& source_location)
     : Node(source_location)
     , Statement()
@@ -190,6 +197,16 @@ ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
 {}
 
 ance::est::TypeOf::TypeOf(utility::Owned<Expression> e, core::Location const& source_location) : Node(source_location), Expression(), expression(std::move(e))
+{}
+ance::est::MatchCase::MatchCase(utility::List<utility::Owned<Expression>> pattern_list,
+                                core::Location const&                     default_location,
+                                utility::Owned<Statement>                 code,
+                                core::Location const&                     source_location)
+    : Node(source_location)
+    , Auxiliary()
+    , patterns(std::move(pattern_list))
+    , default_pattern_location(default_location)
+    , body(std::move(code))
 {}
 
 ance::est::Parameter::Parameter(core::Identifier const& name, utility::Owned<Expression> t, core::Location const& source_location)

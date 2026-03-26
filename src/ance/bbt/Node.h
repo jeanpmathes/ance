@@ -1,6 +1,7 @@
 #ifndef ANCE_BBT_NODE_H
 #define ANCE_BBT_NODE_H
 
+#include "Node.h"
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Location.h"
 #include "ance/core/UnaryOperator.h"
@@ -124,6 +125,19 @@ namespace ance::bbt
         Jump(BasicBlock const& link, core::Location const& source_location);
 
         BasicBlock const& target;
+    };
+
+    struct SwitchCase;
+
+    /// Matches a value against a series of cases and jumps to the block corresponding to the first matching case.
+    struct Switch final
+        : Link
+        , utility::ConcreteNode<Switch, Visitor>
+    {
+        Switch(Temporary const& temporary, utility::List<utility::Owned<SwitchCase>> case_list, core::Location const& source_location);
+
+        Temporary const&                          condition;
+        utility::List<utility::Owned<SwitchCase>> cases;
     };
 
     /// Statement node in the BBT.
@@ -348,8 +362,31 @@ namespace ance::bbt
         Temporary const& value;
     };
 
+    /// Auxiliary nodes which are used as parts of links and statements.
+    struct Auxiliary
+        : virtual Node
+        , virtual utility::AbstractNode<Visitor>
+    {
+    };
+
+    /// A case of a switch link. Has either a single pattern or no patterns if it matches everything.
+    struct SwitchCase final
+        : Auxiliary
+        , utility::ConcreteNode<SwitchCase, Visitor>
+    {
+        // todo: do not forget that the patterns should become compiletime-only at some point
+        // todo: then we could have a pattern node type, and default would become an actual node, and we would not need the pattern location here and all the other nodes as a separate field
+
+        SwitchCase(Temporary const& temporary, BasicBlock const& block, core::Location const& source_location);
+        SwitchCase(core::Location const& loc, BasicBlock const& block, core::Location const& source_location);
+
+        core::Location    pattern_location;
+        Temporary const*  pattern;
+        BasicBlock const& target;
+    };
+
     /// A parameter for a callable, e.g. a function or lambda.
-    struct Parameter final
+    struct Parameter final// todo: make this a node, make it visitable, use that in visitors
     {
         Parameter(core::Identifier const& name, Temporary const& t, core::Location const& source_location);
 
@@ -374,6 +411,7 @@ namespace ance::bbt
         virtual void visit(Return const& return_link)   = 0;
         virtual void visit(Branch const& branch_link)   = 0;
         virtual void visit(Jump const& jump_link)       = 0;
+        virtual void visit(Switch const& switch_link)   = 0;
 
         virtual void visit(ErrorStatement const& error_statement)           = 0;
         virtual void visit(Pass const& pass_statement)                      = 0;
@@ -393,6 +431,8 @@ namespace ance::bbt
         virtual void visit(OrderedScopeEnter const& scope_enter)            = 0;
         virtual void visit(OrderedScopeExit const& scope_exit)              = 0;
         virtual void visit(SetReturnValue const& set_return_value)          = 0;
+
+        virtual void visit(SwitchCase const& switch_case) = 0;
 
         ~Visitor() override = default;
     };

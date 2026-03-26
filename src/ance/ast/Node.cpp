@@ -132,6 +132,13 @@ ance::ast::While::While(utility::Owned<Expression> expression, utility::Owned<St
     , body(std::move(statement))
 {}
 
+ance::ast::Match::Match(utility::Owned<Expression> expression, utility::List<utility::Owned<MatchCase>> case_list, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , condition(std::move(expression))
+    , cases(std::move(case_list))
+{}
+
 ance::ast::Erase::Erase(core::Identifier const& name, core::Location const& source_location) : Node(source_location), Statement(), identifier(name) {}
 
 ance::ast::Assert::Assert(utility::Owned<Expression> expression, core::Location const& source_location)
@@ -215,6 +222,17 @@ ance::ast::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , Expression()
     , op(kind)
     , operand(std::move(expression))
+{}
+
+ance::ast::MatchCase::MatchCase(utility::List<utility::Owned<Expression>> pattern_list,
+                                core::Location                            default_location,
+                                utility::Owned<Statement>                 code,
+                                core::Location const&                     source_location)
+    : Node(source_location)
+    , Auxiliary()
+    , patterns(std::move(pattern_list))
+    , default_pattern_location(default_location)
+    , body(std::move(code))
 {}
 
 ance::ast::Parameter::Parameter(core::Identifier const& name, utility::Owned<Expression> t, core::Location const& source_location)

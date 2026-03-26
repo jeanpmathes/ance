@@ -8,7 +8,6 @@
 namespace ance::cet
 {
     struct Unit;
-    struct BasicBlock;
 
     /// Prints the CET (Compile-able Element Tree) to a stream.
     class Printer

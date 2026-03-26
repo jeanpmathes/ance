@@ -8,7 +8,7 @@
 
 namespace ance::cet
 {
-    ScopeRef::ScopeRef(Scope& scope, bbt::TypeContext& type_context) : Value(type_context.getScopeRef(), type_context), scope_(scope) {}
+    ScopeRef::ScopeRef(Scope& scope, bbt::TypeContext& type_context) : ValueBase(type_context.getScopeRef(), type_context), scope_(scope) {}
 
     utility::Shared<ScopeRef> ScopeRef::make(Scope& scope, bbt::TypeContext& type_context)
     {
@@ -25,7 +25,13 @@ namespace ance::cet
         return scope_;
     }
 
-    VariableRef::VariableRef(Variable& variable, bbt::TypeContext& type_context) : Value(type_context.getVariableRef(), type_context), variable_(variable) {}
+    bool ScopeRef::equals(ScopeRef const& other) const
+    {
+        return &scope_ == &other.scope_;
+    }
+
+    VariableRef::VariableRef(Variable& variable, bbt::TypeContext& type_context) : ValueBase(type_context.getVariableRef(), type_context), variable_(variable)
+    {}
 
     utility::Shared<VariableRef> VariableRef::make(Variable& variable, bbt::TypeContext& type_context)
     {
@@ -42,8 +48,13 @@ namespace ance::cet
         return variable_;
     }
 
+    bool VariableRef::equals(VariableRef const& other) const
+    {
+        return &variable_ == &other.variable_;
+    }
+
     LReference::LReference(Address address, utility::Shared<bbt::Type> referenced_type, bbt::TypeContext& type_context)
-        : Value(type_context.getLRef(std::move(referenced_type)), type_context)
+        : ValueBase(type_context.getLRef(std::move(referenced_type)), type_context)
         , address_(std::move(address))
     {}
 
@@ -54,8 +65,7 @@ namespace ance::cet
 
     std::string LReference::toString() const
     {
-        if (!address().isDefined())
-            return "<undefined l-ref>";
+        if (!address().isDefined()) return "<undefined l-ref>";
 
         return address().read()->toString();
     }
@@ -63,5 +73,10 @@ namespace ance::cet
     Address const& LReference::address() const
     {
         return address_;
+    }
+
+    bool LReference::equals(LReference const& other) const
+    {
+        return address_.read()->equals(*other.address_.read());
     }
 }

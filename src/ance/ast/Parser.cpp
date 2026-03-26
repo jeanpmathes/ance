@@ -252,23 +252,23 @@ namespace ance::ast
             return core::Location::file(file_index_.value());
         }
 
-        core::Location location(antlr4::ParserRuleContext const* ctx) const
+        core::Location location(antlr4::ParserRuleContext const* context) const
         {
-            size_t const start_line   = ctx->getStart()->getLine();
-            size_t const start_column = ctx->getStart()->getCharPositionInLine() + 1;
+            size_t const start_line   = context->getStart()->getLine();
+            size_t const start_column = context->getStart()->getCharPositionInLine() + 1;
 
-            size_t const end_line   = ctx->getStop()->getLine();
-            size_t const end_column = ctx->getStop()->getCharPositionInLine() + getUtf32Length(ctx->getStop()->getText());
+            size_t const end_line   = context->getStop()->getLine();
+            size_t const end_column = context->getStop()->getCharPositionInLine() + getUtf32Length(context->getStop()->getText());
             // todo: check if -1 is needed for end_column
 
             return location(start_line, start_column, end_line, end_column);
         }
 
-        core::Identifier identifier(antlr4::tree::TerminalNode* i) const
+        core::Location location(antlr4::tree::TerminalNode* terminal_node) const
         {
-            std::string const text = i->getText();
+            std::string const text = terminal_node->getText();
 
-            auto const token = i->getSymbol();
+            auto const token = terminal_node->getSymbol();
 
             size_t const start_line   = token->getLine();
             size_t const start_column = token->getCharPositionInLine() + 1;
@@ -276,174 +276,191 @@ namespace ance::ast
             size_t const end_line   = start_line;
             size_t const end_column = start_column + getUtf32Length(text) - 1;
 
-            return core::Identifier::make(text, location(start_line, start_column, end_line, end_column));
+            return location(start_line, start_column, end_line, end_column);
+        }
+
+        core::Identifier identifier(antlr4::tree::TerminalNode* terminal_node) const
+        {
+            return core::Identifier::make(terminal_node->getText(), location(terminal_node));
         }
 
       public:
-        utility::Owned<File> expectFile(grammar::anceParser::UnorderedScopeFileContext* ctx)
+        utility::Owned<File> expectFile(grammar::anceParser::UnorderedScopeFileContext* context)
         {
-            if (ctx == nullptr) return utility::makeOwned<File>(utility::List<utility::Owned<Declaration>> {}, location());
+            if (context == nullptr) return utility::makeOwned<File>(utility::List<utility::Owned<Declaration>> {}, location());
 
-            if (std::any const result = visit(ctx); result.has_value()) return utility::wrap<File>(result);
+            if (std::any const result = visit(context); result.has_value()) return utility::wrap<File>(result);
 
-            return utility::makeOwned<File>(utility::List<utility::Owned<Declaration>> {}, location(ctx));
+            return utility::makeOwned<File>(utility::List<utility::Owned<Declaration>> {}, location(context));
         }
 
         template<typename T>
-        utility::Owned<Declaration> expectDeclaration(T* ctx)
+        utility::Owned<Declaration> expectDeclaration(T* context)
         {
-            if (ctx == nullptr) return utility::makeOwned<ErrorDeclaration>(location());
+            if (context == nullptr) return utility::makeOwned<ErrorDeclaration>(location());
 
-            if (std::any const result = visit(ctx); result.has_value()) return utility::wrap<Declaration>(result);
+            if (std::any const result = visit(context); result.has_value()) return utility::wrap<Declaration>(result);
 
-            return utility::makeOwned<ErrorDeclaration>(location(ctx));
+            return utility::makeOwned<ErrorDeclaration>(location(context));
         }
 
         template<typename T>
-        utility::Owned<Statement> expectStatement(T* ctx)
+        utility::Owned<Statement> expectStatement(T* context)
         {
-            if (ctx == nullptr) return utility::makeOwned<ErrorStatement>(location());
+            if (context == nullptr) return utility::makeOwned<ErrorStatement>(location());
 
-            if (std::any const result = visit(ctx); result.has_value()) return utility::wrap<Statement>(result);
+            if (std::any const result = visit(context); result.has_value()) return utility::wrap<Statement>(result);
 
-            return utility::makeOwned<ErrorStatement>(location(ctx));
+            return utility::makeOwned<ErrorStatement>(location(context));
         }
 
         template<typename T>
-        utility::Owned<Expression> expectExpression(T* ctx)
+        utility::Owned<Expression> expectExpression(T* context)
         {
-            if (ctx == nullptr) return utility::makeOwned<ErrorExpression>(location());
+            if (context == nullptr) return utility::makeOwned<ErrorExpression>(location());
 
-            if (std::any const result = visit(ctx); result.has_value()) return utility::wrap<Expression>(result);
+            if (std::any const result = visit(context); result.has_value()) return utility::wrap<Expression>(result);
 
-            return utility::makeOwned<ErrorExpression>(location(ctx));
+            return utility::makeOwned<ErrorExpression>(location(context));
         }
 
-        Parameter expectParameter(grammar::anceParser::ParameterContext* ctx)
+        template<typename T, typename Context>
+        utility::Optional<utility::Owned<T>> expect(Context* context)
         {
-            core::Identifier const     name     = identifier(ctx->IDENTIFIER());
-            utility::Owned<Expression> type     = expectExpression(ctx->expression());
-            core::Location const       location = this->location(ctx);
+            if (context == nullptr) return std::nullopt;
+
+            if (std::any const result = visit(context); result.has_value()) return std::move(utility::wrap<T>(result));
+
+            return std::nullopt;
+        }
+
+        Parameter expectParameter(grammar::anceParser::ParameterContext* context)
+        {
+            // todo: when Parameter becomes auxiliary as well, this would be replaced with the method above
+
+            core::Identifier const     name     = identifier(context->IDENTIFIER());
+            utility::Owned<Expression> type     = expectExpression(context->expression());
+            core::Location const       location = this->location(context);
 
             return {name, std::move(type), location};
         }
 
-        core::UnaryOperator expectUnaryOperator(grammar::anceParser::UnaryContext* ctx)
+        core::UnaryOperator expectUnaryOperator(grammar::anceParser::UnaryContext* context)
         {
-            if (ctx == nullptr) return core::UnaryOperator::UNSPECIFIED;
+            if (context == nullptr) return core::UnaryOperator::UNSPECIFIED;
 
-            if (std::any const result = visit(ctx); result.has_value()) return std::any_cast<core::UnaryOperator>(result);
+            if (std::any const result = visit(context); result.has_value()) return std::any_cast<core::UnaryOperator>(result);
 
             return core::UnaryOperator::UNSPECIFIED;
         }
 
-        core::Assigner expectAssigner(grammar::anceParser::AssignerContext* ctx)
+        core::Assigner expectAssigner(grammar::anceParser::AssignerContext* context)
         {
-            if (ctx == nullptr) return core::Assigner::UNSPECIFIED;
+            if (context == nullptr) return core::Assigner::UNSPECIFIED;
 
-            if (std::any const result = visit(ctx); result.has_value()) return std::any_cast<core::Assigner>(result);
+            if (std::any const result = visit(context); result.has_value()) return std::any_cast<core::Assigner>(result);
 
             return core::Assigner::UNSPECIFIED;
         }
 
-        core::AccessModifier expectAccessModifier(grammar::anceParser::AccessModifierContext* ctx)
+        core::AccessModifier expectAccessModifier(grammar::anceParser::AccessModifierContext* context)
         {
-            if (ctx == nullptr) return core::AccessModifier::PRIVATE_ACCESS;
+            if (context == nullptr) return core::AccessModifier::PRIVATE_ACCESS;
 
-            if (std::any const result = visit(ctx); result.has_value()) return std::any_cast<core::AccessModifier>(result);
+            if (std::any const result = visit(context); result.has_value()) return std::any_cast<core::AccessModifier>(result);
 
             return core::AccessModifier::PRIVATE_ACCESS;
         }
 
-        core::ExecutionModifier expectExecutionModifier(grammar::anceParser::ExecutionModeContext* ctx)
+        core::ExecutionModifier expectExecutionModifier(grammar::anceParser::ExecutionModeContext* context)
         {
-            if (ctx == nullptr) return core::ExecutionModifier::ANY_EXECUTION;
+            if (context == nullptr) return core::ExecutionModifier::ANY_EXECUTION;
 
-            if (std::any const result = visit(ctx); result.has_value()) return std::any_cast<core::ExecutionModifier>(result);
+            if (std::any const result = visit(context); result.has_value()) return std::any_cast<core::ExecutionModifier>(result);
 
             return core::ExecutionModifier::ANY_EXECUTION;
         }
 
       protected:
-        std::any visitUnorderedScopeFile(grammar::anceParser::UnorderedScopeFileContext* ctx) override
+        std::any visitUnorderedScopeFile(grammar::anceParser::UnorderedScopeFileContext* context) override
         {
             utility::List<utility::Owned<Declaration>> declarations;
 
-            for (grammar::anceParser::DeclarationContext* declaration : ctx->declaration())
+            for (grammar::anceParser::DeclarationContext* declaration : context->declaration())
             {
                 declarations.push_back(expectDeclaration(declaration));
             }
 
-            File* file = new File(std::move(declarations), location(ctx));
+            File* file = new File(std::move(declarations), location(context));
             return file;
         }
 
-        std::any visitOrderedScopeFile(grammar::anceParser::OrderedScopeFileContext* ctx) override
+        std::any visitOrderedScopeFile(grammar::anceParser::OrderedScopeFileContext* context) override
         {
-            return visit(ctx->statement());
+            return visit(context->statement());
         }
 
-        std::any visitRunnableDeclaration(grammar::anceParser::RunnableDeclarationContext* ctx) override
+        std::any visitRunnableDeclaration(grammar::anceParser::RunnableDeclarationContext* context) override
         {
-            utility::Owned<Statement> body = expectStatement(ctx->statement());
+            utility::Owned<Statement> body = expectStatement(context->statement());
 
-            Declaration* declaration = new RunnableDeclaration(std::move(body), location(ctx));
+            Declaration* declaration = new RunnableDeclaration(std::move(body), location(context));
             return declaration;
         }
 
-        std::any visitVariableDeclaration(grammar::anceParser::VariableDeclarationContext* ctx) override
+        std::any visitVariableDeclaration(grammar::anceParser::VariableDeclarationContext* context) override
         {
-            core::AccessModifier const access_modifier    = expectAccessModifier(ctx->accessModifier());
-            core::ExecutionModifier    execution_modifier = expectExecutionModifier(ctx->executionMode());
-            core::Identifier const     name               = identifier(ctx->IDENTIFIER());
-            utility::Owned<Expression> type               = expectExpression(ctx->varType);
+            core::AccessModifier const access_modifier    = expectAccessModifier(context->accessModifier());
+            core::ExecutionModifier    execution_modifier = expectExecutionModifier(context->executionMode());
+            core::Identifier const     name               = identifier(context->IDENTIFIER());
+            utility::Owned<Expression> type               = expectExpression(context->varType);
 
             if (execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
             {
-                reporter_.error(location(ctx->executionMode())) << "Execution modifiers are not yet supported";
+                reporter_.error(location(context->executionMode())) << "Execution modifiers are not yet supported";
                 execution_modifier = core::ExecutionModifier::ANY_EXECUTION;
             }
 
             core::Assigner                                assigner = core::Assigner::UNSPECIFIED;
             utility::Optional<utility::Owned<Expression>> expression;
-            if (ctx->assigned != nullptr)
+            if (context->assigned != nullptr)
             {
-                assigner   = expectAssigner(ctx->assigner());
-                expression = expectExpression(ctx->assigned);
+                assigner   = expectAssigner(context->assigner());
+                expression = expectExpression(context->assigned);
 
                 if (!assigner.isFinal())
                 {
-                    reporter_.error(location(ctx->assigner())) << "Unordered scope variable declarations must be final";
+                    reporter_.error(location(context->assigner())) << "Unordered scope variable declarations must be final";
                 }
             }
 
             Declaration* declaration =
-                new VariableDeclaration(access_modifier, execution_modifier, name, std::move(type), assigner, std::move(expression), location(ctx));
+                new VariableDeclaration(access_modifier, execution_modifier, name, std::move(type), assigner, std::move(expression), location(context));
             return declaration;
         }
 
-        std::any visitFunctionDeclaration(grammar::anceParser::FunctionDeclarationContext* ctx) override
+        std::any visitFunctionDeclaration(grammar::anceParser::FunctionDeclarationContext* context) override
         {
-            core::AccessModifier const access_modifier    = expectAccessModifier(ctx->accessModifier());
-            core::ExecutionModifier    execution_modifier = expectExecutionModifier(ctx->executionMode());
-            core::Identifier const     name               = identifier(ctx->IDENTIFIER());
+            core::AccessModifier const access_modifier    = expectAccessModifier(context->accessModifier());
+            core::ExecutionModifier    execution_modifier = expectExecutionModifier(context->executionMode());
+            core::Identifier const     name               = identifier(context->IDENTIFIER());
 
             if (execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
             {
-                reporter_.error(location(ctx->executionMode())) << "Execution modifiers are not yet supported";
+                reporter_.error(location(context->executionMode())) << "Execution modifiers are not yet supported";
                 execution_modifier = core::ExecutionModifier::ANY_EXECUTION;
             }
 
             utility::List<Parameter> parameters;
-            for (grammar::anceParser::ParameterContext* parameter_ctx : ctx->parameter()) parameters.push_back(expectParameter(parameter_ctx));
+            for (grammar::anceParser::ParameterContext* parameter_context : context->parameter()) parameters.push_back(expectParameter(parameter_context));
 
             utility::Optional<utility::Owned<Expression>> return_type;
-            if (ctx->type != nullptr)
+            if (context->type != nullptr)
             {
-                return_type = expectExpression(ctx->type);
+                return_type = expectExpression(context->type);
             }
 
-            utility::Owned<Statement> body = utility::Owned<Statement>(*createBlockStatement(ctx->statement(), location(ctx)));
+            utility::Owned<Statement> body = utility::Owned<Statement>(*createBlockStatement(context->statement(), location(context)));
 
             Declaration* declaration = new FunctionDeclaration(access_modifier,
                                                                execution_modifier,
@@ -451,107 +468,143 @@ namespace ance::ast
                                                                std::move(parameters),
                                                                std::move(return_type),
                                                                std::move(body),
-                                                               location(ctx));
+                                                               location(context));
             return declaration;
         }
 
-        std::any visitBlockStatement(grammar::anceParser::BlockStatementContext* ctx) override
+        std::any visitBlockStatement(grammar::anceParser::BlockStatementContext* context) override
         {
-            Statement* statement = createBlockStatement(ctx->statement(), location(ctx));
+            Statement* statement = createBlockStatement(context->statement(), location(context));
             return statement;
         }
 
-        std::any visitExpressionStatement(grammar::anceParser::ExpressionStatementContext* ctx) override
+        std::any visitExpressionStatement(grammar::anceParser::ExpressionStatementContext* context) override
         {
-            utility::Owned<Expression> expression = expectExpression(ctx->expression());
+            utility::Owned<Expression> expression = expectExpression(context->expression());
 
-            Statement* statement = new Independent(std::move(expression), location(ctx));
+            Statement* statement = new Independent(std::move(expression), location(context));
             return statement;
         }
 
-        std::any visitLetStatement(grammar::anceParser::LetStatementContext* ctx) override
+        std::any visitLetStatement(grammar::anceParser::LetStatementContext* context) override
         {
-            core::Identifier const     name = identifier(ctx->IDENTIFIER());
-            utility::Owned<Expression> type = expectExpression(ctx->varType);
+            core::Identifier const     name = identifier(context->IDENTIFIER());
+            utility::Owned<Expression> type = expectExpression(context->varType);
 
             core::Assigner                                assigner = core::Assigner::UNSPECIFIED;
             utility::Optional<utility::Owned<Expression>> expression;
-            if (ctx->assigned != nullptr)
+            if (context->assigned != nullptr)
             {
-                assigner   = expectAssigner(ctx->assigner());
-                expression = expectExpression(ctx->assigned);
+                assigner   = expectAssigner(context->assigner());
+                expression = expectExpression(context->assigned);
             }
 
-            Statement* statement = new Let(name, std::move(type), assigner, std::move(expression), location(ctx));
+            Statement* statement = new Let(name, std::move(type), assigner, std::move(expression), location(context));
             return statement;
         }
 
-        std::any visitAssignmentStatement(grammar::anceParser::AssignmentStatementContext* ctx) override
+        std::any visitAssignmentStatement(grammar::anceParser::AssignmentStatementContext* context) override
         {
-            utility::Owned<Expression> assignee = expectExpression(ctx->assignee);
-            core::Assigner const       assigner = expectAssigner(ctx->assigner());
-            utility::Owned<Expression> assigned = expectExpression(ctx->assgined);
+            utility::Owned<Expression> assignee = expectExpression(context->assignee);
+            core::Assigner const       assigner = expectAssigner(context->assigner());
+            utility::Owned<Expression> assigned = expectExpression(context->assgined);
 
             if (assigner.isFinal())
             {
-                reporter_.error(location(ctx->assigner())) << "Assignment to existing variable cannot be final";
+                reporter_.error(location(context->assigner())) << "Assignment to existing variable cannot be final";
             }
 
-            Statement* statement = new Assignment(std::move(assignee), assigner, std::move(assigned), location(ctx));
+            Statement* statement = new Assignment(std::move(assignee), assigner, std::move(assigned), location(context));
             return statement;
         }
 
-        std::any visitIfStatement(grammar::anceParser::IfStatementContext* ctx) override
+        std::any visitIfStatement(grammar::anceParser::IfStatementContext* context) override
         {
-            utility::Owned<Expression> condition = expectExpression(ctx->expression());
-            utility::Owned<Statement>  true_part = expectStatement(ctx->trueBlock);
+            utility::Owned<Expression> condition = expectExpression(context->expression());
+            utility::Owned<Statement>  true_part = expectStatement(context->trueBlock);
 
             utility::Optional<utility::Owned<Statement>> false_part;
-            if (ctx->falseBlock != nullptr)
+            if (context->falseBlock != nullptr)
             {
-                false_part = expectStatement(ctx->falseBlock);
+                false_part = expectStatement(context->falseBlock);
             }
 
-            Statement* statement = new If(std::move(condition), std::move(true_part), std::move(false_part), location(ctx));
+            Statement* statement = new If(std::move(condition), std::move(true_part), std::move(false_part), location(context));
             return statement;
         }
 
-        std::any visitLoopStatement(grammar::anceParser::LoopStatementContext* ctx) override
+        std::any visitLoopStatement(grammar::anceParser::LoopStatementContext* context) override
         {
-            utility::Owned<Statement> body = expectStatement(ctx->statement());
+            utility::Owned<Statement> body = expectStatement(context->statement());
 
-            Statement* statement = new Loop(std::move(body), location(ctx));
+            Statement* statement = new Loop(std::move(body), location(context));
             return statement;
         }
 
-        std::any visitBreakStatement(grammar::anceParser::BreakStatementContext* ctx) override
+        std::any visitBreakStatement(grammar::anceParser::BreakStatementContext* context) override
         {
-            Statement* statement = new Break(location(ctx));
+            Statement* statement = new Break(location(context));
             return statement;
         }
 
-        std::any visitContinueStatement(grammar::anceParser::ContinueStatementContext* ctx) override
+        std::any visitContinueStatement(grammar::anceParser::ContinueStatementContext* context) override
         {
-            Statement* statement = new Continue(location(ctx));
+            Statement* statement = new Continue(location(context));
             return statement;
         }
 
-        std::any visitReturnStatement(grammar::anceParser::ReturnStatementContext* ctx) override
+        std::any visitReturnStatement(grammar::anceParser::ReturnStatementContext* context) override
         {
             utility::Optional<utility::Owned<Expression>> value = {};
-            if (ctx->expression() != nullptr) value = expectExpression(ctx->expression());
+            if (context->expression() != nullptr) value = expectExpression(context->expression());
 
-            Statement* statement = new Return(std::move(value), location(ctx));
+            Statement* statement = new Return(std::move(value), location(context));
             return statement;
         }
 
-        std::any visitWhileStatement(grammar::anceParser::WhileStatementContext* ctx) override
+        std::any visitWhileStatement(grammar::anceParser::WhileStatementContext* context) override
         {
-            utility::Owned<Expression> condition = expectExpression(ctx->expression());
-            utility::Owned<Statement>  body      = expectStatement(ctx->statement());
+            utility::Owned<Expression> condition = expectExpression(context->expression());
+            utility::Owned<Statement>  body      = expectStatement(context->statement());
 
-            Statement* statement = new While(std::move(condition), std::move(body), location(ctx));
+            Statement* statement = new While(std::move(condition), std::move(body), location(context));
             return statement;
+        }
+
+        std::any visitMatchStatement(grammar::anceParser::MatchStatementContext* context) override
+        {
+            utility::Owned<Expression> value = expectExpression(context->expression());
+
+            utility::List<utility::Owned<MatchCase>> cases;
+            for (grammar::anceParser::MatchCaseContext* case_context : context->matchCase())
+            {
+                utility::Optional<utility::Owned<MatchCase>> match_case = expect<MatchCase>(case_context);
+                if (match_case.hasValue())
+                {
+                    cases.push_back(std::move(match_case.value()));
+                }
+            }
+
+            Statement* statement = new Match(std::move(value), std::move(cases), location(context));
+            return statement;
+        }
+
+        std::any visitExpressionMatchCase(grammar::anceParser::ExpressionMatchCaseContext* context) override
+        {
+            utility::List<utility::Owned<Expression>> patterns;
+            for (grammar::anceParser::ExpressionContext* pattern_context : context->expression())
+            {
+                patterns.push_back(expectExpression(pattern_context));
+            }
+
+            utility::Owned<Statement> code = expectStatement(context->statement());
+
+            return new MatchCase(std::move(patterns), core::Location::nowhere(), std::move(code), location(context));
+        }
+
+        std::any visitDefaultMatchCase(grammar::anceParser::DefaultMatchCaseContext* context) override
+        {
+            return new MatchCase({}, location(context->DEFAULT()), expectStatement(context->statement()), location(context));
         }
 
         std::any visitEraseStatement(grammar::anceParser::EraseStatementContext* context) override
@@ -592,66 +645,66 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitUnaryOperationExpression(grammar::anceParser::UnaryOperationExpressionContext* ctx) override
+        std::any visitUnaryOperationExpression(grammar::anceParser::UnaryOperationExpressionContext* context) override
         {
-            core::UnaryOperator const  op      = expectUnaryOperator(ctx->unary());
-            utility::Owned<Expression> operand = expectExpression(ctx->target);
+            core::UnaryOperator const  op      = expectUnaryOperator(context->unary());
+            utility::Owned<Expression> operand = expectExpression(context->target);
 
-            Expression* expression = new UnaryOperation(op, std::move(operand), location(ctx));
+            Expression* expression = new UnaryOperation(op, std::move(operand), location(context));
             return expression;
         }
 
-        std::any visitCallExpression(grammar::anceParser::CallExpressionContext* ctx) override
+        std::any visitCallExpression(grammar::anceParser::CallExpressionContext* context) override
         {
-            utility::Owned<Expression> callee = expectExpression(ctx->callee);
+            utility::Owned<Expression> callee = expectExpression(context->callee);
 
             utility::List<utility::Owned<Expression>> arguments;
-            for (grammar::anceParser::ExpressionContext* expression : ctx->expression()) arguments.push_back(expectExpression(expression));
+            for (grammar::anceParser::ExpressionContext* expression : context->expression()) arguments.push_back(expectExpression(expression));
 
-            Expression* expression = new Call(std::move(callee), std::move(arguments), location(ctx));
+            Expression* expression = new Call(std::move(callee), std::move(arguments), location(context));
             return expression;
         }
 
-        std::any visitLambdaExpression(grammar::anceParser::LambdaExpressionContext* ctx) override
+        std::any visitLambdaExpression(grammar::anceParser::LambdaExpressionContext* context) override
         {
             utility::List<Parameter> parameters;
-            for (grammar::anceParser::ParameterContext* parameter_ctx : ctx->parameter()) parameters.push_back(expectParameter(parameter_ctx));
+            for (grammar::anceParser::ParameterContext* parameter_context : context->parameter()) parameters.push_back(expectParameter(parameter_context));
 
             utility::Optional<utility::Owned<Expression>> return_type;
-            if (ctx->type != nullptr)
+            if (context->type != nullptr)
             {
-                return_type = expectExpression(ctx->type);
+                return_type = expectExpression(context->type);
             }
 
             utility::Optional<utility::Owned<Expression>> expression_body;
             utility::Optional<utility::Owned<Statement>>  statement_body;
-            if (ctx->body != nullptr)
+            if (context->body != nullptr)
             {
-                expression_body = expectExpression(ctx->body);
+                expression_body = expectExpression(context->body);
             }
-            else if (!ctx->statement().empty())
+            else if (!context->statement().empty())
             {
-                statement_body = utility::wrap<Statement>(createBlockStatement(ctx->statement(), location(ctx)));
+                statement_body = utility::wrap<Statement>(createBlockStatement(context->statement(), location(context)));
             }
 
             Expression* expression =
-                new Lambda(std::move(parameters), std::move(return_type), std::move(expression_body), std::move(statement_body), location(ctx));
+                new Lambda(std::move(parameters), std::move(return_type), std::move(expression_body), std::move(statement_body), location(context));
             return expression;
         }
 
-        std::any visitIntrinsicExpression(grammar::anceParser::IntrinsicExpressionContext* ctx) override
+        std::any visitIntrinsicExpression(grammar::anceParser::IntrinsicExpressionContext* context) override
         {
-            utility::Owned<Expression> name = expectExpression(ctx->name);
+            utility::Owned<Expression> name = expectExpression(context->name);
 
             utility::List<utility::Owned<Expression>> arguments;
-            for (grammar::anceParser::ExpressionContext* expression : ctx->expression())
+            for (grammar::anceParser::ExpressionContext* expression : context->expression())
             {
-                if (expression == ctx->name) continue;
+                if (expression == context->name) continue;
 
                 arguments.push_back(expectExpression(expression));
             }
 
-            Expression* expression = new Intrinsic(std::move(name), std::move(arguments), location(ctx));
+            Expression* expression = new Intrinsic(std::move(name), std::move(arguments), location(context));
             return expression;
         }
 
@@ -673,17 +726,17 @@ namespace ance::ast
             return block_expression;
         }
 
-        std::any visitAccessExpression(grammar::anceParser::AccessExpressionContext* ctx) override
+        std::any visitAccessExpression(grammar::anceParser::AccessExpressionContext* context) override
         {
-            core::Identifier const accessed = identifier(ctx->IDENTIFIER());
+            core::Identifier const accessed = identifier(context->IDENTIFIER());
 
-            Expression* expression = new Access(accessed, location(ctx));
+            Expression* expression = new Access(accessed, location(context));
             return expression;
         }
 
-        std::any visitHereExpression(grammar::anceParser::HereExpressionContext* ctx) override
+        std::any visitHereExpression(grammar::anceParser::HereExpressionContext* context) override
         {
-            Expression* expression = new Here(location(ctx));
+            Expression* expression = new Here(location(context));
             return expression;
         }
 
@@ -693,39 +746,39 @@ namespace ance::ast
             return op;
         }
 
-        std::any visitTrue(grammar::anceParser::TrueContext* ctx) override
+        std::any visitTrue(grammar::anceParser::TrueContext* context) override
         {
-            Expression* expression = new BoolLiteral(true, location(ctx));
+            Expression* expression = new BoolLiteral(true, location(context));
             return expression;
         }
 
-        std::any visitFalse(grammar::anceParser::FalseContext* ctx) override
+        std::any visitFalse(grammar::anceParser::FalseContext* context) override
         {
-            Expression* expression = new BoolLiteral(false, location(ctx));
+            Expression* expression = new BoolLiteral(false, location(context));
             return expression;
         }
 
-        std::any visitSizeLiteral(grammar::anceParser::SizeLiteralContext* ctx) override
+        std::any visitSizeLiteral(grammar::anceParser::SizeLiteralContext* context) override
         {
             // todo: use llvm::APInt instead of size_t
             // todo: do all the validation of integer literals and stuff like whether they actually fit into their type
 
-            Expression* expression = new SizeLiteral(ctx->getText(), location(ctx));
+            Expression* expression = new SizeLiteral(context->getText(), location(context));
             return expression;
         }
 
-        std::any visitUnitLiteral(grammar::anceParser::UnitLiteralContext* ctx) override
+        std::any visitUnitLiteral(grammar::anceParser::UnitLiteralContext* context) override
         {
-            Expression* expression = new UnitLiteral(location(ctx));
+            Expression* expression = new UnitLiteral(location(context));
             return expression;
         }
 
-        std::any visitStringLiteral(grammar::anceParser::StringLiteralContext* ctx) override
+        std::any visitStringLiteral(grammar::anceParser::StringLiteralContext* context) override
         {
-            std::string text = ctx->getText();
+            std::string text = context->getText();
             text             = text.substr(1, text.size() - 2);// Remove quotes.
 
-            Expression* expression = new StringLiteral(text, location(ctx));
+            Expression* expression = new StringLiteral(text, location(context));
             return expression;
         }
 
@@ -798,10 +851,10 @@ namespace ance::ast
 
 struct ance::ast::Parser::Implementation
 {
-    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& ctx)
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
         : source_tree_(source_tree)
         , reporter_(reporter)
-        , ctx_(ctx)
+        , context_(context)
     {}
 
     template<typename Target, typename Code, typename Reader>
@@ -843,7 +896,7 @@ struct ance::ast::Parser::Implementation
         if (source_file != nullptr) file_path = source_file->getRelativePath();
         else file_path = std::filesystem::path("core") / id;
 
-        ctx_.print<Printer>(**result, "ast", file_path);
+        context_.print<Printer>(**result, "ast", file_path);
 
         if (reporter_.isFailed()) return std::nullopt;
 
@@ -894,11 +947,11 @@ struct ance::ast::Parser::Implementation
   private:
     sources::SourceTree& source_tree_;
     core::Reporter&      reporter_;
-    core::Context&       ctx_;
+    core::Context&       context_;
 };
 
-ance::ast::Parser::Parser(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& ctx)
-    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, ctx))
+ance::ast::Parser::Parser(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
 {}
 
 ance::ast::Parser::~Parser() = default;

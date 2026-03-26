@@ -16,6 +16,14 @@ struct ance::ast::Printer::Implementation
         explicit AST(std::ostream& out) : Printer(out) {}
         ~AST() override = default;
 
+        void print(Statement const& statement)
+        {
+            if (statement.isCompound()) line();
+            visit(statement);
+        }
+
+        using Printer::print;
+
         void visit(File const& file) override
         {
             bool first = true;
@@ -38,10 +46,7 @@ struct ance::ast::Printer::Implementation
         void visit(RunnableDeclaration const& runnable) override
         {
             print("do ");
-
-            if (runnable.body->isCompound()) line();
-
-            visit(*runnable.body);
+            print(*runnable.body);
         }
 
         void visit(VariableDeclaration const& variable_declaration) override
@@ -141,6 +146,7 @@ struct ance::ast::Printer::Implementation
                 print(" ");
                 visit(**let.value);
             }
+
             print(";");
         }
 
@@ -160,45 +166,20 @@ struct ance::ast::Printer::Implementation
             visit(*if_statement.condition);
             print(" then ");
 
-            if (if_statement.true_part->isCompound())
-            {
-                line();
-                visit(*if_statement.true_part);
-            }
-            else
-            {
-                visit(*if_statement.true_part);
-            }
+            print(*if_statement.true_part);
 
             if (if_statement.false_part.hasValue())
             {
                 line();
                 print("else ");
-
-                if (if_statement.false_part.value()->isCompound())
-                {
-                    line();
-                    visit(**if_statement.false_part);
-                }
-                else
-                {
-                    visit(**if_statement.false_part);
-                }
+                print(**if_statement.false_part);
             }
         }
 
         void visit(Loop const& loop) override
         {
             print("loop ");
-            if (loop.body->isCompound())
-            {
-                line();
-                visit(*loop.body);
-            }
-            else
-            {
-                visit(*loop.body);
-            }
+            print(*loop.body);
         }
 
         void visit(Break const&) override
@@ -227,16 +208,27 @@ struct ance::ast::Printer::Implementation
             print("while ");
             visit(*while_statement.condition);
             print(" do ");
+            print(*while_statement.body);
+        }
 
-            if (while_statement.body->isCompound())
+        void visit(Match const& match_statement) override
+        {
+            print("match ");
+            visit(*match_statement.condition);
+            print(" with");
+            line();
+            print("{");
+            line();
+            enter();
+
+            for (auto& match_case : match_statement.cases)
             {
+                visit(*match_case);
                 line();
-                visit(*while_statement.body);
             }
-            else
-            {
-                visit(*while_statement.body);
-            }
+
+            exit();
+            print("}");
         }
 
         void visit(Erase const& erase) override
@@ -278,17 +270,20 @@ struct ance::ast::Printer::Implementation
         {
             visit(*call.callee);
             print("(");
+
             for (size_t index = 0; index < call.arguments.size(); index++)
             {
                 visit(*call.arguments[index]);
                 if (index + 1 < call.arguments.size()) print(", ");
             }
+
             print(")");
         }
 
         void visit(Lambda const& lambda) override
         {
             print("\\[](");
+
             for (size_t index = 0; index < lambda.parameters.size(); index++)
             {
                 print(lambda.parameters[index].identifier);
@@ -296,12 +291,15 @@ struct ance::ast::Printer::Implementation
                 visit(*lambda.parameters[index].type);
                 if (index + 1 < lambda.parameters.size()) print(", ");
             }
+
             print(")");
+
             if (lambda.return_type.hasValue())
             {
                 print(" : ");
                 visit(**lambda.return_type);
             }
+
             if (lambda.expression_body.hasValue())
             {
                 print(" => ");
@@ -309,15 +307,7 @@ struct ance::ast::Printer::Implementation
             }
             else if (lambda.statement_body.hasValue())
             {
-                if ((*lambda.statement_body)->isCompound())
-                {
-                    line();
-                    visit(**lambda.statement_body);
-                }
-                else
-                {
-                    visit(**lambda.statement_body);
-                }
+                print(**lambda.statement_body);
             }
         }
 
@@ -326,11 +316,13 @@ struct ance::ast::Printer::Implementation
             print("intrinsic ");
             visit(*intrinsic_expression.name);
             print(" (");
+
             for (size_t index = 0; index < intrinsic_expression.arguments.size(); index++)
             {
                 visit(*intrinsic_expression.arguments[index]);
                 if (index + 1 < intrinsic_expression.arguments.size()) print(", ");
             }
+
             print(")");
         }
 
@@ -339,17 +331,20 @@ struct ance::ast::Printer::Implementation
             print("({");
             line();
             enter();
+
             for (auto& statement : block_expression.statements)
             {
                 visit(*statement);
                 line();
             }
+
             if (block_expression.result.hasValue())
             {
                 print("=> ");
                 visit(**block_expression.result);
                 line();
             }
+
             exit();
             print("})");
         }
@@ -389,6 +384,25 @@ struct ance::ast::Printer::Implementation
             print(unary_operation.op);
             print(" ");
             visit(*unary_operation.operand);
+        }
+
+        void visit(MatchCase const& match_case) override
+        {
+            if (!match_case.patterns.empty())
+            {
+                for (size_t index = 0; index < match_case.patterns.size(); index++)
+                {
+                    visit(*match_case.patterns[index]);
+                    if (index + 1 < match_case.patterns.size()) print(" or ");
+                }
+            }
+            else
+            {
+                print("default");
+            }
+
+            print(" => ");
+            print(*match_case.body);
         }
     };
 

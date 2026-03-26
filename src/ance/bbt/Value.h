@@ -27,9 +27,14 @@ namespace ance::bbt
         [[nodiscard]] Type const&         type() const;
         [[nodiscard]] virtual std::string toString() const = 0;
 
+        /// Checks whether this value is equal to another value.
+        [[nodiscard]] virtual bool equals(Value const& other) const = 0;
+
         template<typename T>
         bool is() const
-        { return dynamic_cast<T const*>(this) != nullptr; }
+        {
+            return dynamic_cast<T const*>(this) != nullptr;
+        }
 
         template<typename T>
         T const& as() const
@@ -44,7 +49,28 @@ namespace ance::bbt
         TypeContext&                             type_context_;
     };
 
-    class Unit final : public Value
+    template<typename T>
+    class ValueBase : public Value
+    {
+      public:
+        ValueBase(utility::Optional<utility::Shared<Type>> type, TypeContext& type_context) : Value(type, type_context) {}
+
+        ~ValueBase() override = default;
+
+        [[nodiscard]] virtual bool equals(T const& other) const = 0;
+
+        [[nodiscard]] bool equals(Value const& other) const final
+        {
+            if (other.is<T>())
+            {
+                return equals(other.as<T>());
+            }
+
+            return false;
+        }
+    };
+
+    class Unit final : public ValueBase<Unit>
     {
       public:
         explicit Unit(TypeContext& type_context);
@@ -54,9 +80,10 @@ namespace ance::bbt
         ~Unit() override = default;
 
         [[nodiscard]] std::string toString() const override;
+        [[nodiscard]] bool        equals(Unit const& other) const override;
     };
 
-    class Bool final : public Value
+    class Bool final : public ValueBase<Bool>
     {
       public:
         Bool(bool value, TypeContext& type_context);
@@ -66,14 +93,14 @@ namespace ance::bbt
         ~Bool() override = default;
 
         [[nodiscard]] std::string toString() const override;
-
         [[nodiscard]] bool value() const;
+        [[nodiscard]] bool        equals(Bool const& other) const override;
 
       private:
         bool value_;
     };
 
-    class Size final : public Value
+    class Size final : public ValueBase<Size>
     {
       public:
         Size(size_t value, TypeContext& type_context);
@@ -83,14 +110,14 @@ namespace ance::bbt
         ~Size() override = default;
 
         [[nodiscard]] std::string toString() const override;
-
         [[nodiscard]] size_t value() const;
+        [[nodiscard]] bool        equals(Size const& other) const override;
 
       private:
         size_t value_;
     };
 
-    class Identifier final : public Value// todo: try to make the core::Identifier a value in some way
+    class Identifier final : public ValueBase<Identifier>// todo: try to make the core::Identifier a value in some way
     {
       public:
         Identifier(core::Identifier const& identifier, TypeContext& type_context);
@@ -100,14 +127,14 @@ namespace ance::bbt
         ~Identifier() override = default;
 
         [[nodiscard]] std::string toString() const override;
-
         [[nodiscard]] core::Identifier const& value() const;
+        [[nodiscard]] bool                    equals(Identifier const& other) const override;
 
       private:
         core::Identifier identifier_;
     };
 
-    class Location final : public Value
+    class Location final : public ValueBase<Location>
     {
       public:
         explicit Location(core::Location const& location, TypeContext& type_context);
@@ -117,14 +144,14 @@ namespace ance::bbt
         ~Location() override = default;
 
         [[nodiscard]] std::string toString() const override;
-
         [[nodiscard]] core::Location const& value() const;
+        [[nodiscard]] bool                  equals(Location const& other) const override;
 
       private:
         core::Location location_;
     };
 
-    class String final : public Value
+    class String final : public ValueBase<String>
     {
       public:
         String(std::string value, TypeContext& type_context);
@@ -134,8 +161,8 @@ namespace ance::bbt
         ~String() override = default;
 
         [[nodiscard]] std::string toString() const override;
-
         [[nodiscard]] std::string const& value() const;
+        [[nodiscard]] bool               equals(String const& other) const override;
 
       private:
         std::string value_;

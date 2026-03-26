@@ -64,6 +64,11 @@ struct ance::est::Expander::Implementation
             setResult(std::move(expression));
         }
 
+        void setMatchCase(utility::Owned<MatchCase> match_case)
+        {
+            setResult(std::move(match_case));
+        }
+
         template<typename T>
         T take()
         {
@@ -76,7 +81,8 @@ struct ance::est::Expander::Implementation
         }
 
       private:
-        using ResultVariant = std::variant<utility::Owned<File>, utility::Owned<Declaration>, Statements, utility::Owned<Expression>>;
+        using ResultVariant =
+            std::variant<utility::Owned<File>, utility::Owned<Declaration>, Statements, utility::Owned<Expression>, utility::Owned<MatchCase>>;
 
         template<typename T>
         void setResult(T value)
@@ -281,6 +287,13 @@ struct ance::est::Expander::Implementation
             result_.reset();
             visit(expression);
             return result_.take<utility::Owned<Expression>>();
+        }
+
+        utility::Owned<MatchCase> expand(ast::MatchCase const& match_case)
+        {
+            result_.reset();
+            visit(match_case);
+            return result_.take<utility::Owned<MatchCase>>();
         }
 
         [[nodiscard]] Parameter expand(ast::Parameter const& parameter)
@@ -521,6 +534,23 @@ struct ance::est::Expander::Implementation
             result_.setStatements(utility::makeOwned<Loop>(wrap(builder.take()), while_statement.location));
         }
 
+        void visit(ast::Match const& match_statement) override
+        {
+            SBuilder builder(*this);
+
+            utility::Owned<Expression> condition = expand(*match_statement.condition);
+
+            utility::List<utility::Owned<MatchCase>> cases;
+            for (auto& match_case : match_statement.cases)
+            {
+                cases.emplace_back(expand(*match_case));
+            }
+
+            builder.pushStatement(utility::makeOwned<Match>(std::move(condition), std::move(cases), match_statement.location));
+
+            result_.setStatements(builder.take());
+        }
+
         void visit(ast::Erase const& erase) override
         {
             result_.setStatements(utility::makeOwned<Erase>(erase.identifier, erase.location));
@@ -713,6 +743,19 @@ struct ance::est::Expander::Implementation
         void visit(ast::UnaryOperation const& unary_operation) override
         {
             result_.setExpression(utility::makeOwned<UnaryOperation>(unary_operation.op, expand(*unary_operation.operand), unary_operation.location));
+        }
+
+        void visit(ast::MatchCase const& match_case) override
+        {
+            utility::List<utility::Owned<Expression>> patterns;
+            for (auto& pattern : match_case.patterns)
+            {
+                patterns.emplace_back(expand(*pattern));
+            }
+
+            utility::Owned<Statement> body = wrap(expand(*match_case.body));
+
+            result_.setMatchCase(utility::makeOwned<MatchCase>(std::move(patterns), match_case.default_pattern_location, std::move(body), match_case.location));
         }
 
       private:

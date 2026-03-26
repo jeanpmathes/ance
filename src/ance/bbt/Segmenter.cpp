@@ -15,6 +15,7 @@
 #include "Printer.h"
 #include "Type.h"
 #include "Value.h"
+#include "ance/ast/Node.h"
 
 struct ance::bbt::Segmenter::Implementation
 {
@@ -254,6 +255,81 @@ struct ance::bbt::Segmenter::Implementation
         core::Location source_location_;
     };
 
+    class SwitchBB final : public BaseBB
+    {
+      public:
+        SwitchBB()           = delete;
+        ~SwitchBB() override = default;
+
+        struct Case
+        {
+            Temporary const*               pattern = nullptr;
+            core::Location                 pattern_location;
+            std::reference_wrapper<BaseBB> block;
+            core::Location                 location;
+        };
+
+        SwitchBB(Temporary const& condition, utility::List<Case> cases, core::Location const& source_location)
+            : condition_(condition)
+            , cases_(std::move(cases))
+            , source_location_(source_location)
+        {
+            for (auto& current_case : cases_)
+            {
+                current_case.block.get().enter(*this);
+            }
+        }
+
+        [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) override
+        {
+            utility::List<utility::Owned<SwitchCase>> switch_cases;
+            switch_cases.reserve(cases_.size());
+
+            for (auto& [pattern, pattern_location, block, location] : cases_)
+            {
+                if (pattern != nullptr)
+                {
+                    switch_cases.emplace_back(utility::makeOwned<SwitchCase>(*pattern, *blocks[block.get().index()], location));
+                }
+                else
+                {
+                    switch_cases.emplace_back(utility::makeOwned<SwitchCase>(pattern_location, *blocks[block.get().index()], location));
+                }
+            }
+
+            return utility::makeOwned<Switch>(condition_, std::move(switch_cases), source_location_);
+        }
+
+        [[nodiscard]] std::set<BaseBB*> next() const override
+        {
+            std::set<BaseBB*> links;
+
+            for (auto& [pattern, pattern_location, block, location] : cases_)
+            {
+                links.emplace(&block.get());
+            }
+
+            return links;
+        }
+
+        void swap(std::reference_wrapper<BaseBB> const original, std::reference_wrapper<BaseBB> const replacement) override
+        {
+            for (auto& current_case : cases_)
+            {
+                if (&current_case.block.get() == &original.get())
+                {
+                    current_case.block = replacement;
+                }
+            }
+        }
+
+      private:
+        Temporary const&    condition_;
+        utility::List<Case> cases_;
+
+        core::Location source_location_;
+    };
+
     class ReturnBB final : public BaseBB
     {
       public:
@@ -301,8 +377,12 @@ struct ance::bbt::Segmenter::Implementation
           public:
             explicit Builder(RET& ret) : ret_(ret)
             {
-                entry_ = createEmptyBlock();
+                utility::Owned<SimpleBB> block = utility::makeOwned<SimpleBB>();
+
+                entry_ = std::ref(*block);
                 exit_  = entry_;
+
+                blocks_.emplace_back(std::move(block));
             }
 
             template<typename StatementType, typename... Args>
@@ -353,15 +433,22 @@ struct ance::bbt::Segmenter::Implementation
                 blocks_.emplace_back(std::move(block));
 
                 link(exit_.value(), ref);
-                addDisconnectedExitBlock();
+                addDisconnectedBlock();
 
                 return ref;
             }
 
-            std::reference_wrapper<SimpleBB> addDisconnectedExitBlock()
+            void addDisconnectedBlock()
             {
-                exit_ = createEmptyBlock();
-                return exit_.value();
+                addDisconnectedBlock(utility::makeOwned<SimpleBB>());
+            }
+
+            void addDisconnectedBlock(utility::Owned<SimpleBB> block)
+            {
+                std::reference_wrapper block_ref = *block;
+
+                blocks_.emplace_back(std::move(block));
+                exit_ = block_ref;
             }
 
             [[nodiscard]] std::reference_wrapper<SimpleBB> getEntry() const
@@ -385,14 +472,6 @@ struct ance::bbt::Segmenter::Implementation
             }
 
           private:
-            std::reference_wrapper<SimpleBB> createEmptyBlock()
-            {
-                utility::Owned<SimpleBB>     block = utility::makeOwned<SimpleBB>();
-                std::reference_wrapper const ref   = *block;
-                blocks_.emplace_back(std::move(block));
-                return ref;
-            }
-
             RET& ret_;
 
             utility::List<utility::Owned<BaseBB>> blocks_ = {};
@@ -613,9 +692,19 @@ struct ance::bbt::Segmenter::Implementation
             return *state_.segment.destination;
         }
 
-        void setResult(utility::List<utility::Owned<BaseBB>>&& blocks, SimpleBB& entry, SimpleBB& exit)
+        void storeBlocks(utility::List<utility::Owned<BaseBB>>&& blocks)
         {
             state_.bbs.insert(state_.bbs.end(), std::make_move_iterator(blocks.begin()), std::make_move_iterator(blocks.end()));
+        }
+
+        void storeBlocks(Result&& result)
+        {
+            storeBlocks(std::move(result.blocks));
+        }
+
+        void setResult(utility::List<utility::Owned<BaseBB>>&& blocks, SimpleBB& entry, SimpleBB& exit)
+        {
+            storeBlocks(std::move(blocks));
 
             state_.segment.entry_bb = &entry;
             state_.segment.exit_bb  = &exit;
@@ -623,10 +712,7 @@ struct ance::bbt::Segmenter::Implementation
 
         void setResult(Result&& result)
         {
-            state_.bbs.insert(state_.bbs.end(), std::make_move_iterator(result.blocks.begin()), std::make_move_iterator(result.blocks.end()));
-
-            state_.segment.entry_bb = &result.entry.get();
-            state_.segment.exit_bb  = &result.exit.get();
+            setResult(std::move(result.blocks), result.entry.get(), result.exit.get());
         }
 
         void setEmptyResult()
@@ -668,8 +754,8 @@ struct ance::bbt::Segmenter::Implementation
             auto& scope_tmp = builder.addTemporary("VariableDeclaration_Scope", variable_declaration.location);
             builder.addStatement<CurrentScope>(scope_tmp, variable_declaration.location);
 
-            auto& ident_tmp = builder.addTemporary("VariableDeclaration_Identifier", variable_declaration.location);
-            builder.addStatement<Constant>(Identifier::make(variable_declaration.identifier, type_context_), ident_tmp, variable_declaration.location);
+            auto& identifier_tmp = builder.addTemporary("VariableDeclaration_Identifier", variable_declaration.location);
+            builder.addStatement<Constant>(Identifier::make(variable_declaration.identifier, type_context_), identifier_tmp, variable_declaration.location);
 
             auto& is_final_tmp = builder.addTemporary("VariableDeclaration_IsFinal", variable_declaration.location);
             builder.addStatement<Constant>(Bool::make(variable_declaration.assigner.isFinal(), type_context_), is_final_tmp, variable_declaration.location);
@@ -678,7 +764,7 @@ struct ance::bbt::Segmenter::Implementation
             {
                 utility::List<std::reference_wrapper<Temporary const>> args;
                 args.emplace_back(scope_tmp);
-                args.emplace_back(ident_tmp);
+                args.emplace_back(identifier_tmp);
                 args.emplace_back(is_final_tmp);
                 args.emplace_back(type_tmp);
                 builder.addStatement<Intrinsic>(core::Intrinsic::DECLARE, std::move(args), declared_tmp, variable_declaration.location);
@@ -739,8 +825,8 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& value = builder.addTemporary("Independent", independent.location);
-            builder.addSegmented(*independent.expression, value);
+            auto& value_tmp = builder.addTemporary("Independent", independent.location);
+            builder.addSegmented(*independent.expression, value_tmp);
 
             setResult(builder.take());
         }
@@ -749,13 +835,13 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& target = builder.addTemporary("Assignment_Target", assignment.assignee->location);
-            builder.addSegmented(*assignment.assignee, target);
+            auto& target_tmp = builder.addTemporary("Assignment_Target", assignment.assignee->location);
+            builder.addSegmented(*assignment.assignee, target_tmp);
 
-            auto& value = builder.addTemporary("Assignment_Value", assignment.value->location);
-            builder.addSegmented(*assignment.value, value);
+            auto& value_tmp = builder.addTemporary("Assignment_Value", assignment.value->location);
+            builder.addSegmented(*assignment.value, value_tmp);
 
-            builder.addStatement<Store>(target, value, assignment.location);// todo: pass assigner to this and use
+            builder.addStatement<Store>(target_tmp, value_tmp, assignment.location);// todo: pass assigner to this and use
 
             setResult(builder.take());
         }
@@ -764,17 +850,16 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& condition = builder.addTemporary("If_Condition", if_statement.condition->location);
-            builder.addSegmented(*if_statement.condition, condition);
+            auto& condition_tmp = builder.addTemporary("If_Condition", if_statement.condition->location);
+            builder.addSegmented(*if_statement.condition, condition_tmp);
 
             auto [true_entry, true_exit]   = segment(*if_statement.true_block);
             auto [false_entry, false_exit] = segment(*if_statement.false_block);
 
-            builder.addSpecialBlock<BranchBB>(condition, true_entry.get(), false_entry.get(), if_statement.location);
+            builder.addSpecialBlock<BranchBB>(condition_tmp, true_entry.get(), false_entry.get(), if_statement.location);
 
-            std::reference_wrapper exit = builder.addDisconnectedExitBlock();
-            link(true_exit, exit);
-            link(false_exit, exit);
+            link(true_exit, builder.getExit());
+            link(false_exit, builder.getExit());
 
             setResult(builder.take());
         }
@@ -783,7 +868,7 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            builder.addDisconnectedExitBlock();
+            builder.addDisconnectedBlock();
 
             std::reference_wrapper const entry = builder.getEntry();
             std::reference_wrapper const exit  = builder.getExit();
@@ -821,7 +906,7 @@ struct ance::bbt::Segmenter::Implementation
 
             link(builder.getExit(), state_.loops.back().exit);
 
-            builder.addDisconnectedExitBlock();
+            builder.addDisconnectedBlock();
 
             setResult(builder.take());
         }
@@ -847,7 +932,48 @@ struct ance::bbt::Segmenter::Implementation
 
             link(builder.getExit(), state_.loops.back().entry);
 
-            builder.addDisconnectedExitBlock();
+            builder.addDisconnectedBlock();
+
+            setResult(builder.take());
+        }
+
+        void visit(est::Match const& match) override
+        {
+            Builder builder(*this);
+
+            auto& value_tmp = builder.addTemporary("Match_Value", match.value->location);
+            builder.addSegmented(*match.value, value_tmp);
+
+            utility::Owned<SimpleBB> match_end = utility::makeOwned<SimpleBB>();
+
+            utility::List<SwitchBB::Case> cases;
+            for (auto& match_case : match.cases)
+            {
+                Builder case_builder(*this);
+                case_builder.addSegmented(*match_case->body);
+                link(case_builder.getExit(), *match_end);
+
+                bool has_patterns = false;
+                for (auto& pattern : match_case->patterns)
+                {
+                    auto& pattern_tmp = builder.addTemporary("Match_Pattern", pattern->location);
+                    builder.addSegmented(*pattern, pattern_tmp);
+
+                    cases.emplace_back(&pattern_tmp, pattern->location, case_builder.getEntry(), pattern->location);
+
+                    has_patterns = true;
+                }
+
+                if (!has_patterns)
+                {
+                    cases.emplace_back(nullptr, match_case->default_pattern_location, case_builder.getEntry(), match_case->location);
+                }
+
+                storeBlocks(case_builder.take());
+            }
+
+            builder.addSpecialBlock<SwitchBB>(value_tmp, std::move(cases), match.location);
+            builder.addDisconnectedBlock(std::move(match_end));
 
             setResult(builder.take());
         }
@@ -863,10 +989,10 @@ struct ance::bbt::Segmenter::Implementation
 
             if (return_statement.value.hasValue())
             {
-                auto& return_value = builder.addTemporary("Return_Value", return_statement.value->get()->location);
-                builder.addSegmented(**return_statement.value, return_value);
+                auto& return_value_tmp = builder.addTemporary("Return_Value", return_statement.value->get()->location);
+                builder.addSegmented(**return_statement.value, return_value_tmp);
 
-                builder.addStatement<SetReturnValue>(return_value, return_statement.location);
+                builder.addStatement<SetReturnValue>(return_value_tmp, return_statement.location);
             }
 
             for (size_t i = state_.scopes.size(); i > 0; i--)
@@ -899,8 +1025,8 @@ struct ance::bbt::Segmenter::Implementation
             auto& scope_tmp = builder.addTemporary("Let_Scope", let.location);
             builder.addStatement<CurrentScope>(scope_tmp, let.location);
 
-            auto& ident_tmp = builder.addTemporary("Let_Identifier", let.location);
-            builder.addStatement<Constant>(Identifier::make(let.identifier, type_context_), ident_tmp, let.location);
+            auto& identifier_tmp = builder.addTemporary("Let_Identifier", let.location);
+            builder.addStatement<Constant>(Identifier::make(let.identifier, type_context_), identifier_tmp, let.location);
 
             auto& is_final_tmp = builder.addTemporary("Let_IsFinal", let.location);
             builder.addStatement<Constant>(Bool::make(let.assigner.isFinal(), type_context_), is_final_tmp, let.location);
@@ -909,7 +1035,7 @@ struct ance::bbt::Segmenter::Implementation
             {
                 utility::List<std::reference_wrapper<Temporary const>> args;
                 args.emplace_back(scope_tmp);
-                args.emplace_back(ident_tmp);
+                args.emplace_back(identifier_tmp);
                 args.emplace_back(is_final_tmp);
                 args.emplace_back(type_tmp);
                 builder.addStatement<Intrinsic>(core::Intrinsic::DECLARE, std::move(args), declared_tmp, let.location);
@@ -977,10 +1103,10 @@ struct ance::bbt::Segmenter::Implementation
 
             for (size_t index = 0; index < intrinsic.arguments.size(); index++)
             {
-                auto& argument = builder.addTemporary(std::format("Intrinsic_Argument{}", index), intrinsic.arguments[index]->location);
-                builder.addSegmented(*intrinsic.arguments[index], argument);
+                auto& argument_tmp = builder.addTemporary(std::format("Intrinsic_Argument{}", index), intrinsic.arguments[index]->location);
+                builder.addSegmented(*intrinsic.arguments[index], argument_tmp);
 
-                arguments.emplace_back(argument);
+                arguments.emplace_back(argument_tmp);
             }
 
             builder.addStatement<Intrinsic>(core::Intrinsic::CALL_INTRINSIC, std::move(arguments), destination(), intrinsic.location);
@@ -1009,14 +1135,14 @@ struct ance::bbt::Segmenter::Implementation
             auto& scope_tmp = builder.addTemporary("Access_Scope", access.location);
             builder.addStatement<CurrentScope>(scope_tmp, access.location);
 
-            auto& ident_tmp = builder.addTemporary("Access_Identifier", access.location);
-            builder.addStatement<Constant>(Identifier::make(access.identifier, type_context_), ident_tmp, access.location);
+            auto& identifier_tmp = builder.addTemporary("Access_Identifier", access.location);
+            builder.addStatement<Constant>(Identifier::make(access.identifier, type_context_), identifier_tmp, access.location);
 
             auto& resolved_tmp = builder.addTemporary("Access_Resolved", access.location);
             {
                 utility::List<std::reference_wrapper<Temporary const>> args;
                 args.emplace_back(scope_tmp);
-                args.emplace_back(ident_tmp);
+                args.emplace_back(identifier_tmp);
                 builder.addStatement<Intrinsic>(core::Intrinsic::RESOLVE, std::move(args), resolved_tmp, access.location);
             }
 
@@ -1029,19 +1155,19 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& callee = builder.addTemporary("Call_Callee", call.callee->location);
-            builder.addSegmented(*call.callee, callee);
+            auto& callee_tmp = builder.addTemporary("Call_Callee", call.callee->location);
+            builder.addSegmented(*call.callee, callee_tmp);
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (size_t index = 0; index < call.arguments.size(); index++)
             {
-                auto& argument = builder.addTemporary(std::format("Call_Argument{}", index), call.arguments[index]->location);
-                builder.addSegmented(*call.arguments[index], argument);
+                auto& argument_tmp = builder.addTemporary(std::format("Call_Argument{}", index), call.arguments[index]->location);
+                builder.addSegmented(*call.arguments[index], argument_tmp);
 
-                arguments.emplace_back(argument);
+                arguments.emplace_back(argument_tmp);
             }
 
-            builder.addStatement<Call>(callee, std::move(arguments), destination(), call.location);
+            builder.addStatement<Call>(callee_tmp, std::move(arguments), destination(), call.location);
 
             setResult(builder.take());
         }
@@ -1053,19 +1179,19 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<Parameter> parameters;
             for (auto const& parameter : function_constructor.parameters)
             {
-                auto& parameter_type = builder.addTemporary("FunctionConstructor_ParameterType", parameter.type->location);
-                builder.addSegmented(*parameter.type, parameter_type);
-                parameters.emplace_back(parameter.identifier, parameter_type, parameter.location);
+                auto& parameter_type_tmp = builder.addTemporary("FunctionConstructor_ParameterType", parameter.type->location);
+                builder.addSegmented(*parameter.type, parameter_type_tmp);
+                parameters.emplace_back(parameter.identifier, parameter_type_tmp, parameter.location);
             }
 
-            auto& return_type = builder.addTemporary("FunctionConstructor_ReturnType", function_constructor.return_type->location);
-            builder.addSegmented(*function_constructor.return_type, return_type);
+            auto& return_type_tmp = builder.addTemporary("FunctionConstructor_ReturnType", function_constructor.return_type->location);
+            builder.addSegmented(*function_constructor.return_type, return_type_tmp);
 
             utility::Owned<Flow> flow = apply(*function_constructor.body, true, "Function");
 
             builder.addStatement<FunctionConstructor>(function_constructor.name,
                                                       std::move(parameters),
-                                                      return_type,
+                                                      return_type_tmp,
                                                       std::move(flow),
                                                       destination(),
                                                       function_constructor.location);
@@ -1134,10 +1260,10 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& operand = builder.addTemporary("UnaryOperation_Operand", unary_operation.operand->location);
-            builder.addSegmented(*unary_operation.operand, operand);
+            auto& operand_tmp = builder.addTemporary("UnaryOperation_Operand", unary_operation.operand->location);
+            builder.addSegmented(*unary_operation.operand, operand_tmp);
 
-            builder.addStatement<UnaryOperation>(unary_operation.op, operand, destination(), unary_operation.location);
+            builder.addStatement<UnaryOperation>(unary_operation.op, operand_tmp, destination(), unary_operation.location);
 
             setResult(builder.take());
         }
@@ -1146,12 +1272,17 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            auto& value = builder.addTemporary("TypeOf_Value", type_of.expression->location);
-            builder.addSegmented(*type_of.expression, value);
+            auto& value_tmp = builder.addTemporary("TypeOf_Value", type_of.expression->location);
+            builder.addSegmented(*type_of.expression, value_tmp);
 
-            builder.addStatement<TypeOf>(value, destination(), type_of.location);
+            builder.addStatement<TypeOf>(value_tmp, destination(), type_of.location);
 
             setResult(builder.take());
+        }
+
+        void visit(est::MatchCase const&) override
+        {
+            // Cases are also handled in the match visit method; therefore, this method is intentionally empty.
         }
 
         struct Loop

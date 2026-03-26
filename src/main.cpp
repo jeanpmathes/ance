@@ -118,10 +118,10 @@ namespace ance
 
         return exit_code;
 
-        // todo: match statement
+        // todo: typeof should give common type of list of provided types, error if no common type exists (using new expectCommonType which internally uses getCommonType)
 
-        // todo: if expression
-        // todo: match expression
+        // todo: if expression, use typeof list for type of result variable
+        // todo: match expression, use typeof list for type of result variable
 
         // todo: add all four float types
 
@@ -162,7 +162,8 @@ namespace ance
 
         // todo: better reporting: all reports should have an ID (decide whether number or string [!] ), and if possible parameters (maybe they can be extracted from the message builder stream interface, skipping char* and potentially string)
         // todo: reporter then can suppress identical reports, if already reported, using only ID, location and params for check - hash that
-        // todo: later, when going back to the tests, they should also assert specific IDs
+        // todo: trace should never be suppressed if identical
+        // todo: later, when going back to the tests, they should also assert specific IDs (find
 
         // todo: all variants of char and string types and literals, check that char might need to be called codepoint
 
@@ -178,6 +179,9 @@ namespace ance
         // todo: this is the point where the tests should be brought back in, maybe deactivate those that certainly won't work yet and maybe prioritize them, add TODOs to bring them back
         // todo: also add loads of tests for all the new things, e.g. lambdas, better cmp, different types, etc.
         // todo: do runtime library calls through an intrinsic, e.g. runtime_library_call, the intrinsic would check whether lib is available, would take string (from list of constants), the intrinsic itself would be a compiletime intrinsic that returns a runtime function
+
+        // todo: time to go back to tests, run them and such (add a mechanism to ignore tests through a file, maybe remove that later again)
+        // todo: add more texts to tests, make them a bit more specification-like
 
         // todo: pointer type, pointer type expression, uiptr, ptr and diff type (renamed to Diff, Pointer, UIntPointer)
         // todo: also adapt Size type to work like Diff and UIntPointer meaning that it is correctly sized depending on platform

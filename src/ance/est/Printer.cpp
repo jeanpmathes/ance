@@ -15,6 +15,14 @@ struct ance::est::Printer::Implementation
         explicit EST(std::ostream& out) : Printer(out) {}
         ~EST() override = default;
 
+        void print(Statement const& statement)
+        {
+            if (statement.isCompound()) line();
+            visit(statement);
+        }
+
+        using Printer::print;
+
         void visit(File const& file) override
         {
             bool first = true;
@@ -32,15 +40,7 @@ struct ance::est::Printer::Implementation
         void visit(RunnableDeclaration const& runnable) override
         {
             print("do ");
-            if (runnable.body->isCompound())
-            {
-                line();
-                visit(*runnable.body);
-            }
-            else
-            {
-                visit(*runnable.body);
-            }
+            print(*runnable.body);
         }
 
         void visit(VariableDeclaration const& variable_declaration) override
@@ -122,40 +122,16 @@ struct ance::est::Printer::Implementation
             print("if ");
             visit(*if_statement.condition);
             print(" then ");
-            if (if_statement.true_block->isCompound())
-            {
-                line();
-                visit(*if_statement.true_block);
-            }
-            else
-            {
-                visit(*if_statement.true_block);
-            }
+            print(*if_statement.true_block);
             line();
             print("else ");
-            if (if_statement.false_block->isCompound())
-            {
-                line();
-                visit(*if_statement.false_block);
-            }
-            else
-            {
-                visit(*if_statement.false_block);
-            }
+            print(*if_statement.false_block);
         }
 
         void visit(Loop const& loop) override
         {
             print("loop ");
-            if (loop.body->isCompound())
-            {
-                line();
-                visit(*loop.body);
-            }
-            else
-            {
-                visit(*loop.body);
-            }
+            print(*loop.body);
         }
 
         void visit(Break const&) override
@@ -166,6 +142,26 @@ struct ance::est::Printer::Implementation
         void visit(Continue const&) override
         {
             print("continue;");
+        }
+
+        void visit(Match const& match_statement) override
+        {
+            print("match ");
+            visit(*match_statement.value);
+            print(" with");
+            line();
+            print("{");
+            line();
+            enter();
+
+            for (auto& match_case : match_statement.cases)
+            {
+                visit(*match_case);
+                line();
+            }
+
+            exit();
+            print("}");
         }
 
         void visit(Return const& return_statement) override
@@ -331,6 +327,25 @@ struct ance::est::Printer::Implementation
             print("typeof (");
             visit(*type_of.expression);
             print(")");
+        }
+
+        void visit(MatchCase const& match_case) override
+        {
+            if (!match_case.patterns.empty())
+            {
+                for (size_t index = 0; index < match_case.patterns.size(); index++)
+                {
+                    visit(*match_case.patterns[index]);
+                    if (index + 1 < match_case.patterns.size()) print(" or ");
+                }
+            }
+            else
+            {
+                print("default");
+            }
+
+            print(" => ");
+            print(*match_case.body);
         }
     };
 

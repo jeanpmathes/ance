@@ -48,6 +48,13 @@ ance::bbt::Branch::Branch(Temporary const& temporary, BasicBlock const& true_lin
     , false_branch(false_link)
 {}
 
+ance::bbt::Switch::Switch(Temporary const& temporary, utility::List<utility::Owned<SwitchCase>> case_list, core::Location const& source_location)
+    : Node(source_location)
+    , Link()
+    , condition(temporary)
+    , cases(std::move(case_list))
+{}
+
 ance::bbt::Jump::Jump(BasicBlock const& link, core::Location const& source_location) : Node(source_location), Link(), target(link) {}
 
 bool ance::bbt::Statement::isRelevantForReachability() const
@@ -182,6 +189,22 @@ ance::bbt::SetReturnValue::SetReturnValue(Temporary const& return_value, core::L
     : Node(source_location)
     , Statement()
     , value(return_value)
+{}
+
+ance::bbt::SwitchCase::SwitchCase(Temporary const& temporary, BasicBlock const& block, core::Location const& source_location)
+    : Node(source_location)
+    , Auxiliary()
+    , pattern_location(temporary.location)
+    , pattern(&temporary)
+    , target(block)
+{}
+
+ance::bbt::SwitchCase::SwitchCase(core::Location const& loc, BasicBlock const& block, core::Location const& source_location)
+    : Node(source_location)
+    , Auxiliary()
+    , pattern_location(loc)
+    , pattern(nullptr)
+    , target(block)
 {}
 
 ance::bbt::Parameter::Parameter(core::Identifier const& name, Temporary const& t, core::Location const& source_location)

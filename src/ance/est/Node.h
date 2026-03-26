@@ -184,6 +184,19 @@ namespace ance::est
         explicit Continue(core::Location const& source_location);
     };
 
+    struct MatchCase;
+
+    /// Matches an expression against a series of patterns and executes the code of the first matching pattern.
+    struct Match final
+        : Statement
+        , utility::ConcreteNode<Match, Visitor>
+    {
+        Match(utility::Owned<Expression> expression, utility::List<utility::Owned<MatchCase>> case_list, core::Location const& source_location);
+
+        utility::Owned<Expression>               value;
+        utility::List<utility::Owned<MatchCase>> cases;
+    };
+
     /// Returns from the current runnable, optionally with a value.
     struct Return final
         : Statement
@@ -385,8 +398,30 @@ namespace ance::est
         utility::Owned<Expression> expression;
     };
 
+    /// Auxiliary nodes which are used as parts of expressions and statements.
+    struct Auxiliary
+        : virtual Node
+        , virtual utility::AbstractNode<Visitor>
+    {
+    };
+
+    /// A case of a match statement. Has a set of patterns, or no patterns if it is the default case.
+    struct MatchCase final
+        : Auxiliary
+        , utility::ConcreteNode<MatchCase, Visitor>
+    {
+        MatchCase(utility::List<utility::Owned<Expression>> pattern_list,
+                  core::Location const&                     default_location,
+                  utility::Owned<Statement>                 code,
+                  core::Location const&                     source_location);
+
+        utility::List<utility::Owned<Expression>> patterns;
+        core::Location                            default_pattern_location;// todo: make default a pattern with an actual node, then no special field is needed
+        utility::Owned<Statement>                 body;
+    };
+
     /// A parameter for a callable, e.g. a function or lambda.
-    struct Parameter final
+    struct Parameter final// todo: make this a node, make it visitable, use that in visitors
     {
         Parameter(core::Identifier const& name, utility::Owned<Expression> t, core::Location const& source_location);
 
@@ -416,6 +451,7 @@ namespace ance::est
         virtual void visit(Loop const& loop)                   = 0;
         virtual void visit(Break const& break_statement)       = 0;
         virtual void visit(Continue const& continue_statement) = 0;
+        virtual void visit(Match const& match)                 = 0;
         virtual void visit(Return const& return_statement)     = 0;
         virtual void visit(Let const& let)                     = 0;
         virtual void visit(Erase const& erase)                 = 0;
@@ -435,6 +471,8 @@ namespace ance::est
         virtual void visit(Here const& here)                                = 0;
         virtual void visit(UnaryOperation const& unary_operation)           = 0;
         virtual void visit(TypeOf const& type_of)                           = 0;
+
+        virtual void visit(MatchCase const& match_case) = 0;
     };
 }
 

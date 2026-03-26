@@ -24,8 +24,14 @@ statement
     | 'continue' ';' # ContinueStatement
     | 'return' ( expression )? ';' # ReturnStatement
     | 'while' expression 'do' statement # WhileStatement
+    | 'match' expression 'with' '{' ( matchCase )* '}' # MatchStatement
     | 'erase' IDENTIFIER ';' # EraseStatement
     | 'assert' expression ';' # AssertStatement
+    ;
+
+matchCase
+    : expression ( 'or' expression )* '=>' statement # ExpressionMatchCase
+    | DEFAULT '=>' statement # DefaultMatchCase
     ;
 
 expression
@@ -95,6 +101,8 @@ executionMode
     ;
 
 NOT : 'not' ;
+
+DEFAULT : 'default' ;
 
 IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )
            | [\p{Emoji}] ;
