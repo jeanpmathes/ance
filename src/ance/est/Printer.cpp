@@ -324,8 +324,14 @@ struct ance::est::Printer::Implementation
 
         void visit(TypeOf const& type_of) override
         {
-            print("typeof (");
-            visit(*type_of.expression);
+            print("typeof(");
+
+            for (size_t index = 0; index < type_of.expressions.size(); index++)
+            {
+                visit(*type_of.expressions[index]);
+                if (index + 1 < type_of.expressions.size()) print(", ");
+            }
+
             print(")");
         }
 

@@ -708,6 +708,18 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitTypeOfExpression(grammar::anceParser::TypeOfExpressionContext* context) override
+        {
+            utility::List<utility::Owned<Expression>> expressions;
+            for (grammar::anceParser::ExpressionContext* expression : context->expression())
+            {
+                expressions.push_back(expectExpression(expression));
+            }
+
+            Expression* expression = new TypeOf(std::move(expressions), location(context));
+            return expression;
+        }
+
         std::any visitBlockExpression(grammar::anceParser::BlockExpressionContext* context) override
         {
             utility::List<utility::Owned<Statement>> statements;

@@ -181,6 +181,12 @@ ance::ast::Intrinsic::Intrinsic(utility::Owned<Expression>                intrin
     , arguments(std::move(args))
 {}
 
+ance::ast::TypeOf::TypeOf(utility::List<utility::Owned<Expression>> expression_list, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , expressions(std::move(expression_list))
+{}
+
 ance::ast::BlockExpression::BlockExpression(utility::List<utility::Owned<Statement>>      statement_list,
                                             utility::Optional<utility::Owned<Expression>> expression,
                                             core::Location const&                         source_location)

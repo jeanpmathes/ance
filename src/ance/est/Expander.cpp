@@ -745,6 +745,17 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<UnaryOperation>(unary_operation.op, expand(*unary_operation.operand), unary_operation.location));
         }
 
+        void visit(ast::TypeOf const& type_of) override
+        {
+            utility::List<utility::Owned<Expression>> expressions;
+            for (auto const& expression : type_of.expressions)
+            {
+                expressions.emplace_back(expand(*expression));
+            }
+
+            result_.setExpression(utility::makeOwned<TypeOf>(std::move(expressions), type_of.location));
+        }
+
         void visit(ast::MatchCase const& match_case) override
         {
             utility::List<utility::Owned<Expression>> patterns;

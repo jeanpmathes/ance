@@ -160,10 +160,10 @@ ance::bbt::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind,
     , destination(result)
 {}
 
-ance::bbt::TypeOf::TypeOf(Temporary const& expr, Temporary const& result, core::Location const& source_location)
+ance::bbt::TypeOf::TypeOf(utility::List<std::reference_wrapper<Temporary const>> value_list, Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()
-    , expression(expr)
+    , values(std::move(value_list))
     , destination(result)
 {}
 

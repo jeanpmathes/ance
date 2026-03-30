@@ -57,6 +57,7 @@ postfixExpression
 primaryExpression
     : '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
     | 'intrinsic' name=expression '(' (expression (',' expression)* )? ')' # IntrinsicExpression
+    | 'typeof' '(' expression (',' expression)* ')' # TypeOfExpression // todo: looks like a function, which is not ideal, but one might be able to make it a core function
     | '({' ( statement )* ( '=>' expression )? '})' # BlockExpression
     | IDENTIFIER # AccessExpression
     | literal # LiteralExpression

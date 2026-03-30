@@ -118,8 +118,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: typeof should give common type of list of provided types, error if no common type exists (using new expectCommonType which internally uses getCommonType)
-
         // todo: if expression, use typeof list for type of result variable
         // todo: match expression, use typeof list for type of result variable
 

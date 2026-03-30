@@ -196,7 +196,10 @@ ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , operand(std::move(expression))
 {}
 
-ance::est::TypeOf::TypeOf(utility::Owned<Expression> e, core::Location const& source_location) : Node(source_location), Expression(), expression(std::move(e))
+ance::est::TypeOf::TypeOf(utility::List<utility::Owned<Expression>> expression_list, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , expressions(std::move(expression_list))
 {}
 ance::est::MatchCase::MatchCase(utility::List<utility::Owned<Expression>> pattern_list,
                                 core::Location const&                     default_location,

@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <functional>
 #include <list>
+#include <set>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -377,6 +378,44 @@ struct ance::cet::Runner::Implementation
             }
 
             // todo: also check conversions to find common type
+        }
+
+        bool expectCommonType(utility::List<utility::Shared<bbt::Type>>&     types,
+                              utility::Optional<utility::Shared<bbt::Type>>* common_type,
+                              core::Location const&                          location)
+        {
+            auto result = getCommonType(types);
+            if (result.hasValue())
+            {
+                if (common_type != nullptr) *common_type = std::move(result.value());
+
+                return true;
+            }
+
+            utility::List<utility::Shared<bbt::Type>> unique_types;
+            unique_types.reserve(types.size());
+
+            for (auto& type : types)
+            {
+                if (std::ranges::find(unique_types, type) == unique_types.end())
+                {
+                    unique_types.emplace_back(type);
+                }
+            }
+
+            {
+                auto msg = reporter_.error(location);
+                msg << "Could not find common type for types ";
+
+                for (size_t index = 0; index < unique_types.size(); index++)
+                {
+                    if (index == unique_types.size() - 1) msg << " and ";
+                    else if (index > 0) msg << ", ";
+                    msg << unique_types[index]->annotated();
+                }
+            }
+
+            return false;
         }
 
         struct TemporaryOutput
@@ -1015,10 +1054,38 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::TypeOf const& type_of) override
         {
-            trace("TypeOf", type_of) << ", expression=" << temp(type_of.expression) << ", destination=" << type_of.destination.id();
+            if (reporter_.isTraceEnabled())
+            {
+                auto msg = trace("TypeOf", type_of);
+                msg << "values={";
 
-            utility::Shared<bbt::Value> value = scope().getTemporary(type_of.expression).read();
-            scope().getTemporary(type_of.destination).write(value->type());
+                bool first = true;
+                for (auto& value : type_of.values)
+                {
+                    if (!first) msg << ", ";
+                    else first = false;
+
+                    msg << temp(value);
+                }
+
+                msg << ", destination=" << type_of.destination.id();
+            }
+
+            utility::List<utility::Shared<bbt::Type>> types;
+            for (auto const& expression : type_of.values)
+            {
+                types.emplace_back(scope().getTemporary(expression.get()).read()->type());
+            }
+
+            utility::Optional<utility::Shared<bbt::Type>> common_type;
+            if (expectCommonType(types, &common_type, type_of.location))
+            {
+                scope().getTemporary(type_of.destination).write(*common_type);
+            }
+            else
+            {
+                abort();
+            }
         }
 
         void visit(bbt::OrderedScopeEnter const& scope_enter) override

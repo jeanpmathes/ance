@@ -316,16 +316,15 @@ namespace ance::bbt
         Temporary const&    destination;
     };
 
-    /// Stores the type of the value produced by an expression into the destination temporary variable.
-    /// The expression WILL BE evaluated.
+    /// Finds the common type of all provided values.
     struct TypeOf final
         : Statement
         , utility::ConcreteNode<TypeOf, Visitor>
     {
-        TypeOf(Temporary const& expr, Temporary const& result, core::Location const& source_location);
+        TypeOf(utility::List<std::reference_wrapper<Temporary const>> value_list, Temporary const& result, core::Location const& source_location);
 
-        Temporary const& expression;
-        Temporary const& destination;
+        utility::List<std::reference_wrapper<Temporary const>> values;
+        Temporary const&                                       destination;
     };
 
     /// Enters an ordered scope, which is used to manage variable lifetimes and visibility.

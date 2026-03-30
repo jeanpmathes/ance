@@ -401,6 +401,16 @@ namespace ance::ast
         utility::List<utility::Owned<Expression>> arguments;
     };
 
+    /// Gives the common type of the values produced by the expressions - the expressions WILL BE evaluated.
+    struct TypeOf final
+        : Expression
+        , utility::ConcreteNode<TypeOf, Visitor>
+    {
+        TypeOf(utility::List<utility::Owned<Expression>> expression_list, core::Location const& source_location);
+
+        utility::List<utility::Owned<Expression>> expressions;
+    };
+
     /// An expression that combines a sequence of statements with a final expression inside an ordered scope.
     struct BlockExpression final
         : Expression
@@ -499,6 +509,7 @@ namespace ance::ast
         virtual void visit(Or const& or_expression)                 = 0;
         virtual void visit(Call const& call)                        = 0;
         virtual void visit(Intrinsic const& intrinsic)              = 0;
+        virtual void visit(TypeOf const& type_of)                   = 0;
         virtual void visit(BlockExpression const& block_expression) = 0;
         virtual void visit(Lambda const& lambda)                    = 0;
         virtual void visit(Access const& access)                    = 0;

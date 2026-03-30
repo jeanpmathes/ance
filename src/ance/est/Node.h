@@ -388,14 +388,14 @@ namespace ance::est
         utility::Owned<Expression> operand;
     };
 
-    /// Gives the type of the value produced by an expression - the expression WILL BE evaluated.
+    /// Gives the common type of the values produced by the expressions - the expressions WILL BE evaluated.
     struct TypeOf final
         : Expression
         , utility::ConcreteNode<TypeOf, Visitor>
     {
-        TypeOf(utility::Owned<Expression> e, core::Location const& source_location);
+        TypeOf(utility::List<utility::Owned<Expression>> expression_list, core::Location const& source_location);
 
-        utility::Owned<Expression> expression;
+        utility::List<utility::Owned<Expression>> expressions;
     };
 
     /// Auxiliary nodes which are used as parts of expressions and statements.

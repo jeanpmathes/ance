@@ -302,9 +302,15 @@ struct ance::bbt::Printer::Implementation
         {
             print(type_of.destination.id());
             print(" ");
-            print(core::Assigner::COPY_ASSIGNMENT);
-            print(" typeof ( ");
-            print(type_of.expression.id());
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" typeof( ");
+
+            for (size_t index = 0; index < type_of.values.size(); index++)
+            {
+                print(type_of.values[index].get().id());
+                if (index + 1 < type_of.values.size()) print(", ");
+            }
+
             print(");");
         }
 
