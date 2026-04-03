@@ -30,7 +30,7 @@ statement
     ;
 
 matchCase
-    : expression ( 'or' expression )* '=>' statement # ExpressionMatchCase
+    : expression ( '|' expression )* '=>' statement # ExpressionMatchCase
     | DEFAULT '=>' statement # DefaultMatchCase
     ;
 
@@ -67,7 +67,7 @@ primaryExpression
     ;
 
 matchExpressionCase
-    : expression ( 'or' expression )* '=>' expression # ExpressionMatchExpressionCase
+    : expression ( '|' expression )* '=>' expression # ExpressionMatchExpressionCase
     | DEFAULT '=>' expression # DefaultMatchExpressionCase
     ;
 

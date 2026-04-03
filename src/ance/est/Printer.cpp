@@ -342,7 +342,7 @@ struct ance::est::Printer::Implementation
                 for (size_t index = 0; index < match_case.patterns.size(); index++)
                 {
                     visit(*match_case.patterns[index]);
-                    if (index + 1 < match_case.patterns.size()) print(" or ");
+                    if (index + 1 < match_case.patterns.size()) print(" | ");
                 }
             }
             else
