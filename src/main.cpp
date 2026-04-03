@@ -118,10 +118,7 @@ namespace ance
 
         return exit_code;
 
-        // todo: if expression, use typeof list for type of result variable
-        // todo: match expression, use typeof list for type of result variable
-
-        // todo: add all four float types
+        // todo: add all four float types and literals
 
         // todo: WHEN WORKING ON TYPES: TYPES SHOULD DEFINE THEIR OPS USING SOURCE CODE (HARDCODED IN C++), just like the core functions, using intrinsics
 
@@ -218,6 +215,8 @@ namespace ance
         // todo: when compile time is actually typesafe make the compile time execution more machine-like
         // todo: this would mean that pointer ops and such make sense as actual bytes are stored and manipulated
         // todo: but then values can no longer story their type, static typing is needed and to keep type safety the compile time needs to actually do typing
+        // todo: static typing is essential for typeof as well, so that it no longer needs to evaluate the expressions which is important for if expression, match expression
+        // todo: when typeof gives the static type, a new expression to get the dynamic type is needed as well
 
         // todo: with references, add very basic safety checks in the case of erase of variable which has references to it, e.g. counting them, or so
     }

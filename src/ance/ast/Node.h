@@ -402,7 +402,7 @@ namespace ance::ast
     };
 
     /// Gives the common type of the values produced by the expressions - the expressions WILL BE evaluated.
-    struct TypeOf final
+    struct TypeOf final// todo: should no longer evaluate the expressions
         : Expression
         , utility::ConcreteNode<TypeOf, Visitor>
     {
@@ -432,6 +432,36 @@ namespace ance::ast
         explicit Here(core::Location const& source_location);
     };
 
+    /// An expression that evaluates to one of two expressions based on a condition.
+    struct IfExpression final
+        : Expression
+        , utility::ConcreteNode<IfExpression, Visitor>
+    {
+        IfExpression(utility::Owned<Expression>                    expression,
+                     utility::Owned<Expression>                    then_part,
+                     utility::Optional<utility::Owned<Expression>> else_part,
+                     core::Location const&                         source_location);
+
+        utility::Owned<Expression>                    condition;
+        utility::Owned<Expression>                    then_expression;
+        utility::Optional<utility::Owned<Expression>> else_expression;
+    };
+
+    struct MatchExpressionCase;
+
+    /// An expression that evaluates to one of several expressions based on a condition.
+    struct MatchExpression final
+        : Expression
+        , utility::ConcreteNode<MatchExpression, Visitor>
+    {
+        MatchExpression(utility::Owned<Expression>                         expression,
+                        utility::List<utility::Owned<MatchExpressionCase>> case_list,
+                        core::Location const&                              source_location);
+
+        utility::Owned<Expression>                         condition;
+        utility::List<utility::Owned<MatchExpressionCase>> cases;
+    };
+
     /// Applies an operation to an operand.
     struct UnaryOperation final
         : Expression
@@ -443,7 +473,7 @@ namespace ance::ast
         utility::Owned<Expression> operand;
     };
 
-    /// Auxiliary nodes which are used as parts of expressions and statements.
+    /// Auxiliary nodes that are used as parts of expressions and statements.
     struct Auxiliary
         : virtual Node
         , virtual utility::AbstractNode<Visitor>
@@ -463,6 +493,21 @@ namespace ance::ast
         utility::List<utility::Owned<Expression>> patterns;
         core::Location                            default_pattern_location;// todo: make default a pattern with an actual node, then no special field is needed
         utility::Owned<Statement>                 body;
+    };
+
+    /// A case of a match expression. Has a set of patterns, or no patterns if it is the default case.
+    struct MatchExpressionCase final
+        : Auxiliary
+        , utility::ConcreteNode<MatchExpressionCase, Visitor>
+    {
+        MatchExpressionCase(utility::List<utility::Owned<Expression>> pattern_list,
+                            core::Location const&                     default_location,
+                            utility::Owned<Expression>                code,
+                            core::Location const&                     source_location);
+
+        utility::List<utility::Owned<Expression>> patterns;
+        core::Location                            default_pattern_location;
+        utility::Owned<Expression>                result;
     };
 
     /// A parameter for a callable, e.g. a function or lambda.
@@ -517,10 +562,13 @@ namespace ance::ast
         virtual void visit(SizeLiteral const& size_literal)         = 0;
         virtual void visit(StringLiteral const& string_literal)     = 0;
         virtual void visit(BoolLiteral const& bool_literal)         = 0;
+        virtual void visit(IfExpression const& if_expression)       = 0;
+        virtual void visit(MatchExpression const& match_expression) = 0;
         virtual void visit(Here const& here)                        = 0;
         virtual void visit(UnaryOperation const& unary_operation)   = 0;
 
-        virtual void visit(MatchCase const& match_case) = 0;
+        virtual void visit(MatchCase const& match_case)                      = 0;
+        virtual void visit(MatchExpressionCase const& match_expression_case) = 0;
     };
 }
 

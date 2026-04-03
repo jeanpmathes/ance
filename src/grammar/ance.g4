@@ -57,13 +57,19 @@ postfixExpression
 primaryExpression
     : '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
     | 'intrinsic' name=expression '(' (expression (',' expression)* )? ')' # IntrinsicExpression
-    | 'typeof' '(' expression (',' expression)* ')' # TypeOfExpression // todo: looks like a function, which is not ideal, but one might be able to make it a core function
+    | 'typeof' '(' expression (',' expression)* ')' # TypeOfExpression // todo: looks like a function, which is not ideal, but one might be able to make it a core function especially with inference, maybe it could then be typeof(#expr)
+    | 'if' condition=expression 'then' trueBlock=expression ( 'else' falseBlock=expression )? # IfExpression
+    | 'match' condition=expression 'with' '{' ( matchExpressionCase ( ',' matchExpressionCase )* )? '}' # MatchExpression
     | '({' ( statement )* ( '=>' expression )? '})' # BlockExpression
     | IDENTIFIER # AccessExpression
     | literal # LiteralExpression
     | 'here' # HereExpression
     ;
 
+matchExpressionCase
+    : expression ( 'or' expression )* '=>' expression # ExpressionMatchExpressionCase
+    | DEFAULT '=>' expression # DefaultMatchExpressionCase
+    ;
 
 literal
     : boolean # BooleanLiteral

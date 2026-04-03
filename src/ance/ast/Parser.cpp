@@ -720,6 +720,58 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitIfExpression(grammar::anceParser::IfExpressionContext* context) override
+        {
+            utility::Owned<Expression> condition  = expectExpression(context->condition);
+            utility::Owned<Expression> true_block = expectExpression(context->trueBlock);
+
+            utility::Optional<utility::Owned<Expression>> false_block;
+            if (context->falseBlock != nullptr)
+            {
+                false_block = expectExpression(context->falseBlock);
+            }
+
+            Expression* expression = new IfExpression(std::move(condition), std::move(true_block), std::move(false_block), location(context));
+            return expression;
+        }
+
+        std::any visitMatchExpression(grammar::anceParser::MatchExpressionContext* context) override
+        {
+            utility::Owned<Expression> condition = expectExpression(context->condition);
+
+            utility::List<utility::Owned<MatchExpressionCase>> cases;
+            for (grammar::anceParser::MatchExpressionCaseContext* case_context : context->matchExpressionCase())
+            {
+                utility::Optional<utility::Owned<MatchExpressionCase>> match_case = expect<MatchExpressionCase>(case_context);
+                if (match_case.hasValue())
+                {
+                    cases.push_back(std::move(match_case.value()));
+                }
+            }
+
+            Expression* expression = new MatchExpression(std::move(condition), std::move(cases), location(context));
+            return expression;
+        }
+
+        std::any visitExpressionMatchExpressionCase(grammar::anceParser::ExpressionMatchExpressionCaseContext* context) override
+        {
+            utility::List<utility::Owned<Expression>> patterns;
+            for (grammar::anceParser::ExpressionContext* pattern_context : context->expression())
+            {
+                patterns.push_back(expectExpression(pattern_context));
+            }
+
+            utility::Owned<Expression> expression = std::move(patterns.back());
+            patterns.pop_back();
+
+            return new MatchExpressionCase(std::move(patterns), core::Location::nowhere(), std::move(expression), location(context));
+        }
+
+        std::any visitDefaultMatchExpressionCase(grammar::anceParser::DefaultMatchExpressionCaseContext* context) override
+        {
+            return new MatchExpressionCase({}, location(context->DEFAULT()), expectExpression(context->expression()), location(context));
+        }
+
         std::any visitBlockExpression(grammar::anceParser::BlockExpressionContext* context) override
         {
             utility::List<utility::Owned<Statement>> statements;

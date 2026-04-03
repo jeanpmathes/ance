@@ -1272,15 +1272,15 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            utility::List<std::reference_wrapper<Temporary const>> value_tmps;
+            utility::List<std::reference_wrapper<Temporary const>> arguments;
             for (auto const& expression : type_of.expressions)
             {
                 auto& value_tmp = builder.addTemporary("TypeOf_Value", expression->location);
                 builder.addSegmented(*expression, value_tmp);
-                value_tmps.emplace_back(value_tmp);
+                arguments.emplace_back(value_tmp);
             }
 
-            builder.addStatement<TypeOf>(std::move(value_tmps), destination(), type_of.location);
+            builder.addStatement<TypeOf>(std::move(arguments), destination(), type_of.location);
 
             setResult(builder.take());
         }

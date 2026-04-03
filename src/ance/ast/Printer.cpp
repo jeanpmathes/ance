@@ -6,7 +6,7 @@
 
 struct ance::ast::Printer::Implementation
 {
-    class AST final
+    class AST
         : public Visitor
         , core::Printer
     {
@@ -392,6 +392,45 @@ struct ance::ast::Printer::Implementation
             print(bool_literal.value ? "true" : "false");
         }
 
+        void visit(IfExpression const& if_expression) override
+        {
+            print("if ");
+            visit(*if_expression.condition);
+            print(" then ");
+            visit(*if_expression.then_expression);
+
+            if (if_expression.else_expression.hasValue())
+            {
+                print(" else ");
+                visit(**if_expression.else_expression);
+            }
+        }
+
+        void visit(MatchExpression const& match_expression) override
+        {
+            print("match ");
+            visit(*match_expression.condition);
+            print(" with");
+            line();
+            print("{");
+            line();
+            enter();
+
+            for (size_t index = 0; index < match_expression.cases.size(); index++)
+            {
+                visit(*match_expression.cases[index]);
+                if (index + 1 < match_expression.cases.size())
+                {
+                    print(",");
+                    line();
+                }
+            }
+
+            exit();
+            line();
+            print("}");
+        }
+
         void visit(UnaryOperation const& unary_operation) override
         {
             print(unary_operation.op);
@@ -416,6 +455,25 @@ struct ance::ast::Printer::Implementation
 
             print(" => ");
             print(*match_case.body);
+        }
+
+        void visit(MatchExpressionCase const& match_case) override
+        {
+            if (!match_case.patterns.empty())
+            {
+                for (size_t index = 0; index < match_case.patterns.size(); index++)
+                {
+                    visit(*match_case.patterns[index]);
+                    if (index + 1 < match_case.patterns.size()) print(" or ");
+                }
+            }
+            else
+            {
+                print("default");
+            }
+
+            print(" => ");
+            visit(*match_case.result);
         }
     };
 

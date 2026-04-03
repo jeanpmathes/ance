@@ -179,7 +179,7 @@ struct ance::est::Printer::Implementation
         {
             print("let ");
             print(let.identifier);
-            print(" : ");
+            print(": ");
             visit(*let.type);
             print(" ");
             print(let.assigner);

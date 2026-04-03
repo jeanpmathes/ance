@@ -241,6 +241,37 @@ ance::ast::MatchCase::MatchCase(utility::List<utility::Owned<Expression>> patter
     , body(std::move(code))
 {}
 
+ance::ast::MatchExpressionCase::MatchExpressionCase(utility::List<utility::Owned<Expression>> pattern_list,
+                                                    core::Location const&                     default_location,
+                                                    utility::Owned<Expression>                code,
+                                                    core::Location const&                     source_location)
+    : Node(source_location)
+    , Auxiliary()
+    , patterns(std::move(pattern_list))
+    , default_pattern_location(default_location)
+    , result(std::move(code))
+{}
+
+ance::ast::IfExpression::IfExpression(utility::Owned<Expression>                    expression,
+                                      utility::Owned<Expression>                    then_part,
+                                      utility::Optional<utility::Owned<Expression>> else_part,
+                                      core::Location const&                         source_location)
+    : Node(source_location)
+    , Expression()
+    , condition(std::move(expression))
+    , then_expression(std::move(then_part))
+    , else_expression(std::move(else_part))
+{}
+
+ance::ast::MatchExpression::MatchExpression(utility::Owned<Expression>                         expression,
+                                            utility::List<utility::Owned<MatchExpressionCase>> case_list,
+                                            core::Location const&                              source_location)
+    : Node(source_location)
+    , Expression()
+    , condition(std::move(expression))
+    , cases(std::move(case_list))
+{}
+
 ance::ast::Parameter::Parameter(core::Identifier const& name, utility::Owned<Expression> t, core::Location const& source_location)
     : identifier(name)
     , type(std::move(t))

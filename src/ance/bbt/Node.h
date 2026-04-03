@@ -317,7 +317,7 @@ namespace ance::bbt
     };
 
     /// Finds the common type of all provided values.
-    struct TypeOf final
+    struct TypeOf final// todo: should no longer evaluate the expressions
         : Statement
         , utility::ConcreteNode<TypeOf, Visitor>
     {
@@ -361,7 +361,7 @@ namespace ance::bbt
         Temporary const& value;
     };
 
-    /// Auxiliary nodes which are used as parts of links and statements.
+    /// Auxiliary nodes that are used as parts of links and statements.
     struct Auxiliary
         : virtual Node
         , virtual utility::AbstractNode<Visitor>

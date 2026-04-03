@@ -389,7 +389,7 @@ namespace ance::est
     };
 
     /// Gives the common type of the values produced by the expressions - the expressions WILL BE evaluated.
-    struct TypeOf final
+    struct TypeOf final// todo: should no longer evaluate the expressions
         : Expression
         , utility::ConcreteNode<TypeOf, Visitor>
     {

@@ -740,6 +740,75 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<BoolLiteral>(bool_literal.value, bool_literal.location));
         }
 
+        void visit(ast::IfExpression const& if_expression) override
+        {
+            EBuilder builder(*this, if_expression.location);
+
+            utility::List<utility::Owned<Expression>> typeof_parameters;
+            typeof_parameters.push_back(expand(*if_expression.then_expression));
+            if (if_expression.else_expression.hasValue())
+            {
+                typeof_parameters.push_back(expand(**if_expression.else_expression));
+            }
+            else
+            {
+                typeof_parameters.push_back(utility::makeOwned<BoolLiteral>(true, if_expression.location));
+            }
+            utility::Owned<Expression> common_type = utility::makeOwned<TypeOf>(std::move(typeof_parameters), if_expression.location);
+
+            // todo: semantics are actually not correctly implemented because typeof currently evaluates the expressions
+            builder.pushAnonymousLetAndSetAsResult(std::move(common_type), core::Assigner::COPY_ASSIGNMENT, std::nullopt);
+
+            utility::Owned<Statement> then_part = builder.createExpansionAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, *if_expression.then_expression);
+            utility::Optional<utility::Owned<Statement>> else_part;
+            if (if_expression.else_expression.hasValue())
+            {
+                else_part = builder.createExpansionAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, **if_expression.else_expression);
+            }
+            else
+            {
+                else_part = builder.createAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, utility::makeOwned<BoolLiteral>(true, if_expression.location));
+            }
+
+            builder.pushStatement(
+                utility::makeOwned<If>(expand(*if_expression.condition), std::move(then_part), std::move(else_part.value()), if_expression.location));
+
+            result_.setExpression(builder.take());
+        }
+
+        void visit(ast::MatchExpression const& match_expression) override
+        {
+            EBuilder builder(*this, match_expression.location);
+
+            utility::List<utility::Owned<Expression>> typeof_parameters;
+            for (auto const& match_case : match_expression.cases)
+            {
+                typeof_parameters.push_back(expand(*match_case->result));
+            }
+            utility::Owned<Expression> common_type = utility::makeOwned<TypeOf>(std::move(typeof_parameters), match_expression.location);
+
+            // todo: semantics are actually not correctly implemented because typeof currently evaluates the expressions
+            builder.pushAnonymousLetAndSetAsResult(std::move(common_type), core::Assigner::MOVE_ASSIGNMENT, std::nullopt);
+
+            utility::List<utility::Owned<MatchCase>> cases;
+            for (auto const& match_case : match_expression.cases)
+            {
+                utility::List<utility::Owned<Expression>> patterns;
+                for (auto& pattern : match_case->patterns)
+                {
+                    patterns.emplace_back(expand(*pattern));
+                }
+
+                utility::Owned<Statement> body = builder.createExpansionAssignmentToResult(core::Assigner::MOVE_ASSIGNMENT, *match_case->result);
+                cases.emplace_back(
+                    utility::makeOwned<MatchCase>(std::move(patterns), match_case->default_pattern_location, std::move(body), match_case->location));
+            }
+
+            builder.pushStatement(utility::makeOwned<Match>(expand(*match_expression.condition), std::move(cases), match_expression.location));
+
+            result_.setExpression(builder.take());
+        }
+
         void visit(ast::UnaryOperation const& unary_operation) override
         {
             result_.setExpression(utility::makeOwned<UnaryOperation>(unary_operation.op, expand(*unary_operation.operand), unary_operation.location));
@@ -767,6 +836,13 @@ struct ance::est::Expander::Implementation
             utility::Owned<Statement> body = wrap(expand(*match_case.body));
 
             result_.setMatchCase(utility::makeOwned<MatchCase>(std::move(patterns), match_case.default_pattern_location, std::move(body), match_case.location));
+        }
+
+        void visit(ast::MatchExpressionCase const& match_case) override
+        {
+            // This is handled inside visit(ast::MatchExpression)
+            (void) match_case;
+            assert(false);
         }
 
       private:
