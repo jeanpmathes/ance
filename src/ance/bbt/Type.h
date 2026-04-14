@@ -96,6 +96,9 @@ namespace ance::bbt
         /// Get the size type, which has a platform-dependent size always larger enough to serve as a memory index.
         utility::Shared<Type> getSize();
 
+        /// Get a float type by its precision.
+        utility::Shared<Type> getFloat(core::Precision precision);
+
         /// Get the string type.
         utility::Shared<Type> getString();
 

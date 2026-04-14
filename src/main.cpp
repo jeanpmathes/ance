@@ -118,14 +118,11 @@ namespace ance
 
         return exit_code;
 
-        // todo: add all four float types and literals
-
         // todo: WHEN WORKING ON TYPES: TYPES SHOULD DEFINE THEIR OPS USING SOURCE CODE (HARDCODED IN C++), just like the core functions, using intrinsics
 
-        // todo: additive and multiplicative ops
-        // todo: unary ops
-        // todo: bitwise binary ops and shifts
-        // todo: relational and equality ops
+        // todo: additive and multiplicative ops (for size and floats and maybe others)
+        // todo: unary ops (for floats and maybe others)
+        // todo: relational and equality ops (for string, size, bool, floats and maybe others)
 
         // todo: parenthesis expression
 
@@ -139,6 +136,8 @@ namespace ance
         // todo: pretend that the intrinsics are generic and take generic parameters, e.g. intrinsic "int_add" {N} (a, b)
         // todo: to do this, add a GenericIntrinsicSignature class which is used by IntrinsicSignature, getIntrinsicSignature would take the generic parameters
         // todo: the int types can then simply use string manipulation to put the right N there
+
+        // todo: bitwise binary ops and shifts
 
         // todo: array type, array literals
         // todo: subscript operator

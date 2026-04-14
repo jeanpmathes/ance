@@ -382,6 +382,12 @@ struct ance::ast::Printer::Implementation
             print(size_literal.value);
         }
 
+        void visit(FloatingPointLiteral const& literal) override
+        {
+            print(literal.value);
+            print(literal.precision);
+        }
+
         void visit(StringLiteral const& string_literal) override
         {
             print("\"" + string_literal.value + "\"");

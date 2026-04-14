@@ -65,6 +65,14 @@ namespace ance::bbt
         return utility::makeShared<Size>(value, type_context);
     }
 
+    utility::Shared<Size> Size::make(std::string const& value, TypeContext& type_context)
+    {
+        // todo: should use llvm::APInt and it should know the actual bit size here already (maybe through type context)
+        // todo: should also do the checks that it is only within the guaranteed ranges
+
+        return make(std::stoull(value), type_context);
+    }
+
     std::string Size::toString() const
     {
         return std::to_string(value_);
@@ -76,6 +84,40 @@ namespace ance::bbt
     }
 
     bool Size::equals(Size const& other) const
+    {
+        return value_ == other.value_;
+    }
+
+    Float::Float(llvm::APFloat value, TypeContext& type_context)
+        : ValueBase(type_context.getFloat(core::Precision::get(value.getSemantics())), type_context)
+        , value_(std::move(value))
+    {}
+
+    utility::Shared<Float> Float::make(llvm::APFloat value, TypeContext& type_context)
+    {
+        return utility::makeShared<Float>(std::move(value), type_context);
+    }
+
+    utility::Shared<Float> Float::make(std::string const& value, core::Precision const precision, TypeContext& type_context)
+    {
+        return make(llvm::APFloat(precision.getLlvmSemantics(), value), type_context);
+    }
+
+    std::string Float::toString() const
+    {
+        std::string              result;
+        llvm::raw_string_ostream os(result);
+        value_.print(os);
+        os << core::Precision::get(value_.getSemantics());
+        return result;
+    }
+
+    llvm::APFloat Float::value() const
+    {
+        return value_;
+    }
+
+    bool Float::equals(Float const& other) const
     {
         return value_ == other.value_;
     }

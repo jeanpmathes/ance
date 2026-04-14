@@ -3,10 +3,13 @@
 
 #include <string>
 
+#include <llvm/ADT/APFloat.h>
+
 #include "ance/utility/Owners.h"
 
 #include "ance/core/Identifier.h"
 #include "ance/core/Location.h"
+#include "ance/core/Precision.h"
 
 namespace ance::bbt
 {
@@ -93,7 +96,7 @@ namespace ance::bbt
         ~Bool() override = default;
 
         [[nodiscard]] std::string toString() const override;
-        [[nodiscard]] bool value() const;
+        [[nodiscard]] bool        value() const;
         [[nodiscard]] bool        equals(Bool const& other) const override;
 
       private:
@@ -106,15 +109,34 @@ namespace ance::bbt
         Size(size_t value, TypeContext& type_context);
 
         static utility::Shared<Size> make(size_t value, TypeContext& type_context);
+        static utility::Shared<Size> make(std::string const& value, TypeContext& type_context);
 
         ~Size() override = default;
 
         [[nodiscard]] std::string toString() const override;
-        [[nodiscard]] size_t value() const;
+        [[nodiscard]] size_t      value() const;
         [[nodiscard]] bool        equals(Size const& other) const override;
 
       private:
         size_t value_;
+    };
+
+    class Float final : public ValueBase<Float>
+    {
+      public:
+        Float(llvm::APFloat value, TypeContext& type_context);
+
+        static utility::Shared<Float> make(llvm::APFloat value, TypeContext& type_context);
+        static utility::Shared<Float> make(std::string const& value, core::Precision precision, TypeContext& type_context);
+
+        ~Float() override = default;
+
+        [[nodiscard]] std::string   toString() const override;
+        [[nodiscard]] llvm::APFloat value() const;
+        [[nodiscard]] bool          equals(Float const& other) const override;
+
+      private:
+        llvm::APFloat value_;
     };
 
     class Identifier final : public ValueBase<Identifier>// todo: try to make the core::Identifier a value in some way
@@ -126,7 +148,7 @@ namespace ance::bbt
 
         ~Identifier() override = default;
 
-        [[nodiscard]] std::string toString() const override;
+        [[nodiscard]] std::string             toString() const override;
         [[nodiscard]] core::Identifier const& value() const;
         [[nodiscard]] bool                    equals(Identifier const& other) const override;
 
@@ -143,7 +165,7 @@ namespace ance::bbt
 
         ~Location() override = default;
 
-        [[nodiscard]] std::string toString() const override;
+        [[nodiscard]] std::string           toString() const override;
         [[nodiscard]] core::Location const& value() const;
         [[nodiscard]] bool                  equals(Location const& other) const override;
 
@@ -160,7 +182,7 @@ namespace ance::bbt
 
         ~String() override = default;
 
-        [[nodiscard]] std::string toString() const override;
+        [[nodiscard]] std::string        toString() const override;
         [[nodiscard]] std::string const& value() const;
         [[nodiscard]] bool               equals(String const& other) const override;
 

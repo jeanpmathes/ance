@@ -147,6 +147,11 @@ namespace ance::bbt
         utility::Optional<utility::Shared<Type>> scope_ref_type;
         utility::Optional<utility::Shared<Type>> location_type;
 
+        utility::Optional<utility::Shared<Type>> float_half_type;
+        utility::Optional<utility::Shared<Type>> float_single_type;
+        utility::Optional<utility::Shared<Type>> float_double_type;
+        utility::Optional<utility::Shared<Type>> float_quad_type;
+
         TypeDictionary<> lref_types;
 
         template<typename Factory>
@@ -183,6 +188,30 @@ namespace ance::bbt
     {
         return Implementation::getOrCreate(implementation_->size_type,
                                            [&] { return utility::makeShared<Type>(core::Identifier::make("Size", core::Location::core()), *this); });
+    }
+
+    utility::Shared<Type> TypeContext::getFloat(core::Precision const precision)
+    {
+        switch (precision)
+        {
+            case core::Precision::HALF:
+                return Implementation::getOrCreate(implementation_->float_half_type,
+                                                   [&] { return utility::makeShared<Type>(core::Identifier::make("Half", core::Location::core()), *this); });
+
+            case core::Precision::SINGLE:
+                return Implementation::getOrCreate(implementation_->float_single_type,
+                                                   [&] { return utility::makeShared<Type>(core::Identifier::make("Single", core::Location::core()), *this); });
+
+            case core::Precision::DOUBLE:
+                return Implementation::getOrCreate(implementation_->float_double_type,
+                                                   [&] { return utility::makeShared<Type>(core::Identifier::make("Double", core::Location::core()), *this); });
+
+            case core::Precision::QUAD:
+                return Implementation::getOrCreate(implementation_->float_quad_type,
+                                                   [&] { return utility::makeShared<Type>(core::Identifier::make("Quad", core::Location::core()), *this); });
+        }
+
+        throw std::logic_error("Invalid precision");
     }
 
     utility::Shared<Type> TypeContext::getString()

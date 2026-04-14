@@ -1,10 +1,13 @@
 #ifndef ANCE_AST_NODE_H
 #define ANCE_AST_NODE_H
 
+#include "Node.h"
+
 #include "ance/core/AccessModifier.h"
 #include "ance/core/Assigner.h"
 #include "ance/core/ExecutionModifier.h"
 #include "ance/core/Identifier.h"
+#include "ance/core/Precision.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
 
@@ -370,6 +373,17 @@ namespace ance::ast
         std::string value;
     };
 
+    /// A literal for a value of the floating point types.
+    struct FloatingPointLiteral final
+        : Expression
+        , utility::ConcreteNode<FloatingPointLiteral, Visitor>
+    {
+        FloatingPointLiteral(core::Precision kind, std::string text, core::Location const& source_location);
+
+        core::Precision precision;
+        std::string     value;
+    };
+
     /// A literal for a string value.
     struct StringLiteral final
         : Expression
@@ -549,23 +563,24 @@ namespace ance::ast
         virtual void visit(Erase const& erase)                 = 0;
         virtual void visit(Assert const& assert)               = 0;
 
-        virtual void visit(ErrorExpression const& error)            = 0;
-        virtual void visit(And const& and_expression)               = 0;
-        virtual void visit(Or const& or_expression)                 = 0;
-        virtual void visit(Call const& call)                        = 0;
-        virtual void visit(Intrinsic const& intrinsic)              = 0;
-        virtual void visit(TypeOf const& type_of)                   = 0;
-        virtual void visit(BlockExpression const& block_expression) = 0;
-        virtual void visit(Lambda const& lambda)                    = 0;
-        virtual void visit(Access const& access)                    = 0;
-        virtual void visit(UnitLiteral const& unit_literal)         = 0;
-        virtual void visit(SizeLiteral const& size_literal)         = 0;
-        virtual void visit(StringLiteral const& string_literal)     = 0;
-        virtual void visit(BoolLiteral const& bool_literal)         = 0;
-        virtual void visit(IfExpression const& if_expression)       = 0;
-        virtual void visit(MatchExpression const& match_expression) = 0;
-        virtual void visit(Here const& here)                        = 0;
-        virtual void visit(UnaryOperation const& unary_operation)   = 0;
+        virtual void visit(ErrorExpression const& error)                       = 0;
+        virtual void visit(And const& and_expression)                          = 0;
+        virtual void visit(Or const& or_expression)                            = 0;
+        virtual void visit(Call const& call)                                   = 0;
+        virtual void visit(Intrinsic const& intrinsic)                         = 0;
+        virtual void visit(TypeOf const& type_of)                              = 0;
+        virtual void visit(BlockExpression const& block_expression)            = 0;
+        virtual void visit(Lambda const& lambda)                               = 0;
+        virtual void visit(Access const& access)                               = 0;
+        virtual void visit(UnitLiteral const& unit_literal)                    = 0;
+        virtual void visit(SizeLiteral const& size_literal)                    = 0;
+        virtual void visit(FloatingPointLiteral const& floating_point_literal) = 0;
+        virtual void visit(StringLiteral const& string_literal)                = 0;
+        virtual void visit(BoolLiteral const& bool_literal)                    = 0;
+        virtual void visit(IfExpression const& if_expression)                  = 0;
+        virtual void visit(MatchExpression const& match_expression)            = 0;
+        virtual void visit(Here const& here)                                   = 0;
+        virtual void visit(UnaryOperation const& unary_operation)              = 0;
 
         virtual void visit(MatchCase const& match_case)                      = 0;
         virtual void visit(MatchExpressionCase const& match_expression_case) = 0;

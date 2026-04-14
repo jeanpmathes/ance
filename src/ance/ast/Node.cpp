@@ -216,6 +216,13 @@ ance::ast::UnitLiteral::UnitLiteral(core::Location const& source_location) : Nod
 
 ance::ast::SizeLiteral::SizeLiteral(std::string text, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(text)) {}
 
+ance::ast::FloatingPointLiteral::FloatingPointLiteral(core::Precision const kind, std::string text, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , precision(kind)
+    , value(std::move(text))
+{}
+
 ance::ast::StringLiteral::StringLiteral(std::string text, core::Location const& source_location) : Node(source_location), Expression(), value(std::move(text))
 {}
 

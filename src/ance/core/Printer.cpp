@@ -52,7 +52,13 @@ void ance::core::Printer::print(Assigner const assigner)
     out_ << assigner.getSymbol();// todo: assigner should provide operator<<
 }
 
-void ance::core::Printer::print(Intrinsic const& intrinsic)
+void ance::core::Printer::print(Precision const precision)
+{
+    indent();
+    out_ << precision.getSuffix();// todo: precision should provide operator<<
+}
+
+void ance::core::Printer::print(Intrinsic const intrinsic)
 {
     indent();
     out_ << intrinsic.toString();// todo: intrinsic should provide operator<<

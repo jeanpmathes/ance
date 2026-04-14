@@ -730,6 +730,12 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<SizeLiteral>(size_literal.value, size_literal.location));
         }
 
+        void visit(ast::FloatingPointLiteral const& floating_point_literal) override
+        {
+            result_.setExpression(
+                utility::makeOwned<FloatingPointLiteral>(floating_point_literal.precision, floating_point_literal.value, floating_point_literal.location));
+        }
+
         void visit(ast::StringLiteral const& string_literal) override
         {
             result_.setExpression(utility::makeOwned<StringLiteral>(string_literal.value, string_literal.location));
@@ -752,7 +758,7 @@ struct ance::est::Expander::Implementation
             }
             else
             {
-                typeof_parameters.push_back(utility::makeOwned<BoolLiteral>(true, if_expression.location));
+                typeof_parameters.emplace_back(utility::makeOwned<BoolLiteral>(true, if_expression.location));
             }
             utility::Owned<Expression> common_type = utility::makeOwned<TypeOf>(std::move(typeof_parameters), if_expression.location);
 
@@ -767,6 +773,7 @@ struct ance::est::Expander::Implementation
             }
             else
             {
+                // todo: the usage of bool literal is not quite uniform and should be replaced with the unit literal but only if unit has an implcit conversion to bool true
                 else_part = builder.createAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, utility::makeOwned<BoolLiteral>(true, if_expression.location));
             }
 

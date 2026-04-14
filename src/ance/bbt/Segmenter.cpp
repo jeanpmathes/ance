@@ -1212,7 +1212,18 @@ struct ance::bbt::Segmenter::Implementation
         {
             Builder builder(*this);
 
-            builder.addStatement<Constant>(Size::make(std::stoull(size_literal.value), type_context_), destination(), size_literal.location);
+            builder.addStatement<Constant>(Size::make(size_literal.value, type_context_), destination(), size_literal.location);
+
+            setResult(builder.take());
+        }
+
+        void visit(est::FloatingPointLiteral const& floating_point_literal) override
+        {
+            Builder builder(*this);
+
+            builder.addStatement<Constant>(Float::make(floating_point_literal.value, floating_point_literal.precision, type_context_),
+                                           destination(),
+                                           floating_point_literal.location);
 
             setResult(builder.take());
         }

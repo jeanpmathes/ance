@@ -74,6 +74,10 @@ matchExpressionCase
 literal
     : boolean # BooleanLiteral
     | INTEGER # SizeLiteral
+    | HALF # HalfLiteral
+    | SINGLE # SingleLiteral
+    | DOUBLE # DoubleLiteral
+    | QUAD # QuadLiteral
     | '(' ')' # UnitLiteral
     | STRING # StringLiteral
     ;
@@ -116,6 +120,13 @@ IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{G
 
 INTEGER : [0-9]+ ;
 STRING : '"' .*? '"' ; // todo: handle escape sequences (see old grammar) - needs code changes to preserve printing and do correct escaping
+
+HALF : DECIMAL 'h' ;
+SINGLE : DECIMAL 's' ;
+DOUBLE : DECIMAL 'd' ;
+QUAD : DECIMAL 'q' ;
+
+DECIMAL : ( '+' | '-' )? ( [0-9]* '.' [0-9]+ ) ( [eE] ( '+' | '-' )? [0-9]+ )? ;
 
 LAMBDA : '\\' ;
 SEMICOLON : ';' ;

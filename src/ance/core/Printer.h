@@ -8,6 +8,7 @@
 #include "ance/core/Assigner.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/UnaryOperator.h"
+#include "ance/core/Precision.h"
 
 namespace ance::core
 {
@@ -43,8 +44,11 @@ namespace ance::core
         /// Print an assigner to the output stream.
         void print(Assigner assigner);
 
+        /// Print a precision to the output stream.
+        void print(Precision precision);
+
         /// Print an intrinsic to the output stream.
-        void print(Intrinsic const& intrinsic);
+        void print(Intrinsic intrinsic);
 
         /// Start a new line.
         void line();

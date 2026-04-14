@@ -381,7 +381,6 @@ namespace ance::ast
             return core::ExecutionModifier::ANY_EXECUTION;
         }
 
-      protected:
         std::any visitUnorderedScopeFile(grammar::anceParser::UnorderedScopeFileContext* context) override
         {
             utility::List<utility::Owned<Declaration>> declarations;
@@ -828,6 +827,42 @@ namespace ance::ast
             // todo: do all the validation of integer literals and stuff like whether they actually fit into their type
 
             Expression* expression = new SizeLiteral(context->getText(), location(context));
+            return expression;
+        }
+
+        std::any visitHalfLiteral(grammar::anceParser::HalfLiteralContext* context) override
+        {
+            std::string text = context->getText();
+            text             = text.substr(0, text.size() - 1);// Remove type suffix.
+
+            Expression* expression = new FloatingPointLiteral(core::Precision::HALF, text, location(context));
+            return expression;
+        }
+
+        std::any visitSingleLiteral(grammar::anceParser::SingleLiteralContext* context) override
+        {
+            std::string text = context->getText();
+            text             = text.substr(0, text.size() - 1);// Remove type suffix.
+
+            Expression* expression = new FloatingPointLiteral(core::Precision::SINGLE, text, location(context));
+            return expression;
+        }
+
+        std::any visitDoubleLiteral(grammar::anceParser::DoubleLiteralContext* context) override
+        {
+            std::string text = context->getText();
+            text             = text.substr(0, text.size() - 1);// Remove type suffix.
+
+            Expression* expression = new FloatingPointLiteral(core::Precision::DOUBLE, text, location(context));
+            return expression;
+        }
+
+        std::any visitQuadLiteral(grammar::anceParser::QuadLiteralContext* context) override
+        {
+            std::string text = context->getText();
+            text             = text.substr(0, text.size() - 1);// Remove type suffix.
+
+            Expression* expression = new FloatingPointLiteral(core::Precision::QUAD, text, location(context));
             return expression;
         }
 
