@@ -41,11 +41,13 @@ expression
 infixExpression
     : unaryExpression # UnaryExpressionExpression
     | left=infixExpression ( NOT )? 'and' right=unaryExpression # And
-    | left=infixExpression ( NOT )? 'or' right=unaryExpression  # Or
+    | left=infixExpression ( NOT )? 'or' right=unaryExpression # Or
+    | left=infixExpression binaryOperatorMultiplicative right=unaryExpression # BinaryOperationExpression
+    | left=infixExpression binaryOperatorAdditive right=unaryExpression # BinaryOperationExpression
     ;
 
 unaryExpression
-    : unary target=unaryExpression # UnaryOperationExpression
+    : unaryOperator target=unaryExpression # UnaryOperationExpression
     | postfixExpression # PostfixExpressionExpression
     ;
 
@@ -91,8 +93,19 @@ parameter
     : IDENTIFIER ':' expression
     ;
 
-unary
+unaryOperator
     : NOT # UnaryNot
+    ;
+
+binaryOperatorMultiplicative
+    : '*' # Multiplication
+    | '/' # Division
+    | '%' # Remainder
+    ;
+
+binaryOperatorAdditive
+    : '+' # Addition
+    | '-' # Subtraction
     ;
 
 assigner

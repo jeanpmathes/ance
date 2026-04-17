@@ -160,6 +160,19 @@ ance::bbt::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind,
     , destination(result)
 {}
 
+ance::bbt::GetBinaryOperatorFunction::GetBinaryOperatorFunction(core::BinaryOperator  kind,
+                                                                Temporary const&      left_type_param,
+                                                                Temporary const&      right_type_param,
+                                                                Temporary const&      result,
+                                                                core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , op(kind)
+    , left_type(left_type_param)
+    , right_type(right_type_param)
+    , destination(result)
+{}
+
 ance::bbt::TypeOf::TypeOf(utility::List<std::reference_wrapper<Temporary const>> value_list, Temporary const& result, core::Location const& source_location)
     : Node(source_location)
     , Statement()

@@ -9,6 +9,7 @@
 #include "ance/core/Identifier.h"
 #include "ance/core/Precision.h"
 #include "ance/core/Reporter.h"
+#include "ance/core/BinaryOperator.h"
 #include "ance/core/UnaryOperator.h"
 
 #include "ance/utility/Containers.h"
@@ -487,6 +488,21 @@ namespace ance::ast
         utility::Owned<Expression> operand;
     };
 
+    /// Applies a binary operation to two operands.
+    struct BinaryOperation final
+        : Expression
+        , utility::ConcreteNode<BinaryOperation, Visitor>
+    {
+        BinaryOperation(utility::Owned<Expression> lhs,
+                        core::BinaryOperator       kind,
+                        utility::Owned<Expression> rhs,
+                        core::Location const&      source_location);
+
+        utility::Owned<Expression> left;
+        core::BinaryOperator       op;
+        utility::Owned<Expression> right;
+    };
+
     /// Auxiliary nodes that are used as parts of expressions and statements.
     struct Auxiliary
         : virtual Node
@@ -581,6 +597,7 @@ namespace ance::ast
         virtual void visit(MatchExpression const& match_expression)            = 0;
         virtual void visit(Here const& here)                                   = 0;
         virtual void visit(UnaryOperation const& unary_operation)              = 0;
+        virtual void visit(BinaryOperation const& binary_operation)            = 0;
 
         virtual void visit(MatchCase const& match_case)                      = 0;
         virtual void visit(MatchExpressionCase const& match_expression_case) = 0;

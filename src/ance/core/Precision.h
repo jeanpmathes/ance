@@ -11,32 +11,22 @@ namespace llvm
 
 namespace ance::core
 {
-    /**
-     * Defines floating-point precision.
-     */
+    /// Defines floating-point precision.
     class Precision
     {
       public:
         enum Value : uint8_t
         {
-            /**
-             * Half-precision, meaning 16 bit.
-             */
+            /// Half-precision, meaning 16 bit.
             HALF,
 
-            /**
-             * Single-precision, meaning 32 bit.
-             */
+            /// Single-precision, meaning 32 bit.
             SINGLE,
 
-            /**
-             * Double-precision, meaning 64 bit.
-             */
+            /// Double-precision, meaning 64 bit.
             DOUBLE,
 
-            /**
-             * Quadruple-precision, meaning 128 bit.
-             */
+            /// Quadruple-precision, meaning 128 bit.
             QUAD,
         };
 
@@ -47,12 +37,10 @@ namespace ance::core
         explicit operator bool() = delete;
 
         static Precision get(llvm::fltSemantics const& semantics);
-        llvm::fltSemantics const& getLlvmSemantics() const;
+        [[nodiscard]] llvm::fltSemantics const& getLlvmSemantics() const;
 
-        /**
-         * Get the suffix for this precision.
-         * @return The suffix for this precision.
-         */
+        /// Get the suffix for this precision.
+        /// @return The suffix for this precision.
         [[nodiscard]] std::string getSuffix() const;
 
       private:

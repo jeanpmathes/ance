@@ -8,6 +8,7 @@
 #include "ance/core/Assigner.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/UnaryOperator.h"
+#include "ance/core/BinaryOperator.h"
 #include "ance/core/Precision.h"
 
 namespace ance::core
@@ -40,6 +41,9 @@ namespace ance::core
 
         /// Print a unary operator to the output stream.
         void print(UnaryOperator unary_operator);
+
+        /// Print a binary operator to the output stream.
+        void print(BinaryOperator binary_operator);
 
         /// Print an assigner to the output stream.
         void print(Assigner assigner);

@@ -24,6 +24,11 @@ namespace
         declare_type(runner.types().getType());
         declare_type(runner.types().getLocation());
         declare_type(runner.types().getFunction());
+
+        declare_type(runner.types().getFloat(ance::core::Precision::HALF));
+        declare_type(runner.types().getFloat(ance::core::Precision::SINGLE));
+        declare_type(runner.types().getFloat(ance::core::Precision::DOUBLE));
+        declare_type(runner.types().getFloat(ance::core::Precision::QUAD));
     }
 
     void defineLanguageCoreValues(ance::cet::Runner& runner)
@@ -68,6 +73,42 @@ public log2s (value: String, location: Location)
     intrinsic "log" (value, location);
 }
 )CODE","log2s");
+
+        runner.declareCore(R"CODE(
+public log1fh (value: Half)
+{
+    let string_value: String := intrinsic "fh_2_str" (value);
+    intrinsic "log" (string_value, nowhere);
+}
+)CODE",
+                           "log1fh");
+
+        runner.declareCore(R"CODE(
+public log1fs (value: Single)
+{
+    let string_value: String := intrinsic "fs_2_str" (value);
+    intrinsic "log" (string_value, nowhere);
+}
+)CODE",
+                           "log1fs");
+
+        runner.declareCore(R"CODE(
+public log1fd (value: Double)
+{
+    let string_value: String := intrinsic "fd_2_str" (value);
+    intrinsic "log" (string_value, nowhere);
+}
+)CODE",
+                           "log1fd");
+
+        runner.declareCore(R"CODE(
+public log1fq (value: Quad)
+{
+    let string_value: String := intrinsic "fq_2_str" (value);
+    intrinsic "log" (string_value, nowhere);
+}
+)CODE",
+                           "log1fq");
 
         runner.declareCore(R"CODE(
 public include (file: String, location: Location)

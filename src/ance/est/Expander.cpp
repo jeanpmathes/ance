@@ -821,6 +821,14 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<UnaryOperation>(unary_operation.op, expand(*unary_operation.operand), unary_operation.location));
         }
 
+        void visit(ast::BinaryOperation const& binary_operation) override
+        {
+            result_.setExpression(utility::makeOwned<BinaryOperation>(expand(*binary_operation.left),
+                                                                      binary_operation.op,
+                                                                      expand(*binary_operation.right),
+                                                                      binary_operation.location));
+        }
+
         void visit(ast::TypeOf const& type_of) override
         {
             utility::List<utility::Owned<Expression>> expressions;

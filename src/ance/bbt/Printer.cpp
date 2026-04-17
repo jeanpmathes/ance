@@ -298,6 +298,20 @@ struct ance::bbt::Printer::Implementation
             print(";");
         }
 
+        void visit(GetBinaryOperatorFunction const& get_binary_operator_function) override
+        {
+            print(get_binary_operator_function.destination.id());
+            print(" ");
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" get_binary_op_fn ");
+            print(get_binary_operator_function.op.toString());
+            print(" (");
+            print(get_binary_operator_function.left_type.id());
+            print(", ");
+            print(get_binary_operator_function.right_type.id());
+            print(");");
+        }
+
         void visit(TypeOf const& type_of) override
         {
             print(type_of.destination.id());

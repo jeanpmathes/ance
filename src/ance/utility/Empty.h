@@ -3,9 +3,7 @@
 
 namespace ance::utility
 {
-    /**
-     * An empty class. All instances are considered the same.
-     */
+    /// An empty class. All instances are considered the same.
     class Empty
     {
       public:

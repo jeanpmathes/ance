@@ -237,6 +237,17 @@ ance::ast::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , operand(std::move(expression))
 {}
 
+ance::ast::BinaryOperation::BinaryOperation(utility::Owned<Expression> lhs,
+                                            core::BinaryOperator       kind,
+                                            utility::Owned<Expression> rhs,
+                                            core::Location const&      source_location)
+    : Node(source_location)
+    , Expression()
+    , left(std::move(lhs))
+    , op(kind)
+    , right(std::move(rhs))
+{}
+
 ance::ast::MatchCase::MatchCase(utility::List<utility::Owned<Expression>> pattern_list,
                                 core::Location                            default_location,
                                 utility::Owned<Statement>                 code,

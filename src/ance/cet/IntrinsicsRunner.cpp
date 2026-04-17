@@ -73,11 +73,97 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::B_2_STR:
                 runB2Str();
                 break;
+            case core::Intrinsic::FH_2_STR:
+            case core::Intrinsic::FS_2_STR:
+            case core::Intrinsic::FD_2_STR:
+            case core::Intrinsic::FQ_2_STR:
+                runAny2Str();
+                break;
             case core::Intrinsic::INCLUDE:
                 runInclude();
                 break;
             case core::Intrinsic::CALL_INTRINSIC:
                 runCallIntrinsic();
+                break;
+
+            case core::Intrinsic::SIZE_ADD:
+                runSizeAdd();
+                break;
+            case core::Intrinsic::SIZE_SUB:
+                runSizeSub();
+                break;
+            case core::Intrinsic::SIZE_MUL:
+                runSizeMul();
+                break;
+            case core::Intrinsic::SIZE_DIV:
+                runSizeDiv();
+                break;
+            case core::Intrinsic::SIZE_REM:
+                runSizeRem();
+                break;
+
+            case core::Intrinsic::HALF_ADD:
+                runFloatAdd(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_SUB:
+                runFloatSub(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_MUL:
+                runFloatMul(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_DIV:
+                runFloatDiv(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_REM:
+                runFloatRem(core::Precision::HALF);
+                break;
+
+            case core::Intrinsic::SINGLE_ADD:
+                runFloatAdd(core::Precision::SINGLE);
+                break;
+            case core::Intrinsic::SINGLE_SUB:
+                runFloatSub(core::Precision::SINGLE);
+                break;
+            case core::Intrinsic::SINGLE_MUL:
+                runFloatMul(core::Precision::SINGLE);
+                break;
+            case core::Intrinsic::SINGLE_DIV:
+                runFloatDiv(core::Precision::SINGLE);
+                break;
+            case core::Intrinsic::SINGLE_REM:
+                runFloatRem(core::Precision::SINGLE);
+                break;
+
+            case core::Intrinsic::DOUBLE_ADD:
+                runFloatAdd(core::Precision::DOUBLE);
+                break;
+            case core::Intrinsic::DOUBLE_SUB:
+                runFloatSub(core::Precision::DOUBLE);
+                break;
+            case core::Intrinsic::DOUBLE_MUL:
+                runFloatMul(core::Precision::DOUBLE);
+                break;
+            case core::Intrinsic::DOUBLE_DIV:
+                runFloatDiv(core::Precision::DOUBLE);
+                break;
+            case core::Intrinsic::DOUBLE_REM:
+                runFloatRem(core::Precision::DOUBLE);
+                break;
+
+            case core::Intrinsic::QUAD_ADD:
+                runFloatAdd(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_SUB:
+                runFloatSub(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_MUL:
+                runFloatMul(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_DIV:
+                runFloatDiv(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_REM:
+                runFloatRem(core::Precision::QUAD);
                 break;
         }
 
@@ -188,6 +274,11 @@ struct ance::cet::IntrinsicsRunner::Implementation
         setResult(bbt::String::make(value ? "true" : "false", type_context_));
     }
 
+    void runAny2Str()
+    {
+        setResult(bbt::String::make(state_.arguments->at(0)->toString(), type_context_));
+    }
+
     void runInclude()
     {
         std::string const&    file     = state_.arguments->at(0)->as<bbt::String>().value();
@@ -232,6 +323,97 @@ struct ance::cet::IntrinsicsRunner::Implementation
             // todo: currently we cannot handle the any result type safely, which is why we do not use setResult here
             state_.return_value_ = inner_result.getResult();
         }
+    }
+
+    void runSizeAdd()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+        setResult(bbt::Size::make(lhs + rhs, type_context_));
+    }
+
+    void runSizeSub()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+        setResult(bbt::Size::make(lhs - rhs, type_context_));
+    }
+
+    void runSizeMul()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+        setResult(bbt::Size::make(lhs * rhs, type_context_));
+    }
+
+    void runSizeDiv()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+
+        if (rhs == 0)
+        {
+            reporter_.error(state_.location) << "Division by zero";
+            abort();
+            return;
+        }
+
+        setResult(bbt::Size::make(lhs / rhs, type_context_));
+    }
+
+    void runSizeRem()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+
+        if (rhs == 0)
+        {
+            reporter_.error(state_.location) << "Division by zero";
+            abort();
+            return;
+        }
+
+        setResult(bbt::Size::make(lhs % rhs, type_context_));
+    }
+
+    void runFloatAdd(core::Precision const)
+    {
+        llvm::APFloat lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat rhs = state_.arguments->at(1)->as<bbt::Float>().value();
+        lhs.add(rhs, llvm::APFloat::rmNearestTiesToEven);
+        setResult(bbt::Float::make(std::move(lhs), type_context_));
+    }
+
+    void runFloatSub(core::Precision const)
+    {
+        llvm::APFloat lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat rhs = state_.arguments->at(1)->as<bbt::Float>().value();
+        lhs.subtract(rhs, llvm::APFloat::rmNearestTiesToEven);
+        setResult(bbt::Float::make(std::move(lhs), type_context_));
+    }
+
+    void runFloatMul(core::Precision const)
+    {
+        llvm::APFloat lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat rhs = state_.arguments->at(1)->as<bbt::Float>().value();
+        lhs.multiply(rhs, llvm::APFloat::rmNearestTiesToEven);
+        setResult(bbt::Float::make(std::move(lhs), type_context_));
+    }
+
+    void runFloatDiv(core::Precision const)
+    {
+        llvm::APFloat lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat rhs = state_.arguments->at(1)->as<bbt::Float>().value();
+        lhs.divide(rhs, llvm::APFloat::rmNearestTiesToEven);
+        setResult(bbt::Float::make(std::move(lhs), type_context_));
+    }
+
+    void runFloatRem(core::Precision const)
+    {
+        llvm::APFloat lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat rhs = state_.arguments->at(1)->as<bbt::Float>().value();
+        lhs.remainder(rhs);
+        setResult(bbt::Float::make(std::move(lhs), type_context_));
     }
 
     void setResult(utility::Shared<bbt::Value> value)

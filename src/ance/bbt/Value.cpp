@@ -105,10 +105,17 @@ namespace ance::bbt
 
     std::string Float::toString() const
     {
-        std::string              result;
-        llvm::raw_string_ostream os(result);
-        value_.print(os);
-        os << core::Precision::get(value_.getSemantics());
+        llvm::SmallVector<char, 32> number;
+        value_.toString(number);
+
+        std::string const suffix = core::Precision::get(value_.getSemantics()).getSuffix();
+
+        std::string result;
+        result.reserve(number.size() + suffix.size());
+
+        result.append(number.begin(), number.end());
+        result.append(suffix);
+
         return result;
     }
 
@@ -180,7 +187,7 @@ namespace ance::bbt
 
     std::string String::toString() const
     {
-        return value_;
+        return std::format("\"{}\"", value_);
     }
 
     std::string const& String::value() const

@@ -3,9 +3,7 @@
 
 namespace ance
 {
-    /**
-     * The version of ANCE.
-     */
+    /// The version of ANCE.
     static constexpr const char* VERSION = "@PROJECT_VERSION@";
 }
 

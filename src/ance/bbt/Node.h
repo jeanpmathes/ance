@@ -2,6 +2,7 @@
 #define ANCE_BBT_NODE_H
 
 #include "Node.h"
+#include "ance/core/BinaryOperator.h"
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Location.h"
 #include "ance/core/UnaryOperator.h"
@@ -316,6 +317,26 @@ namespace ance::bbt
         Temporary const&    destination;
     };
 
+    /// Retrieves the operator function for a binary operation from the left operand's type.
+    struct GetBinaryOperatorFunction final
+        : Statement
+        , utility::ConcreteNode<GetBinaryOperatorFunction, Visitor>
+    {
+        // todo: unify this with member function access as soon as those are added, consider whether this should be an intrinsic instead or use a completely different approach
+        // todo: i really feel that this is ugly, and should rather be an intrinsic
+
+        GetBinaryOperatorFunction(core::BinaryOperator  kind,
+                                  Temporary const&      left_type,
+                                  Temporary const&      right_type,
+                                  Temporary const&      result,
+                                  core::Location const& source_location);
+
+        core::BinaryOperator op;
+        Temporary const&     left_type;
+        Temporary const&     right_type;
+        Temporary const&     destination;
+    };
+
     /// Finds the common type of all provided values.
     struct TypeOf final// todo: should no longer evaluate the expressions
         : Statement
@@ -426,6 +447,7 @@ namespace ance::bbt
         virtual void visit(Default const& default_value)                    = 0;
         virtual void visit(CurrentScope const& current_scope)               = 0;
         virtual void visit(UnaryOperation const& unary_operation)           = 0;
+        virtual void visit(GetBinaryOperatorFunction const& get_binary_operator_function) = 0;
         virtual void visit(TypeOf const& type_of)                           = 0;
         virtual void visit(OrderedScopeEnter const& scope_enter)            = 0;
         virtual void visit(OrderedScopeExit const& scope_exit)              = 0;

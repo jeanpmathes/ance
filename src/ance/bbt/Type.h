@@ -1,12 +1,21 @@
 #ifndef ANCE_BBT_TYPE_H
 #define ANCE_BBT_TYPE_H
 
+#include <map>
 #include <ostream>
+#include <utility>
 
+#include "ance/core/BinaryOperator.h"
 #include "ance/core/Identifier.h"
 #include "ance/utility/Containers.h"
+#include "ance/utility/Optional.h"
 
 #include "Value.h"
+
+namespace ance::cet
+{
+    class Runner;
+}
 
 namespace ance::bbt
 {
@@ -21,11 +30,11 @@ namespace ance::bbt
         /// \param type_context The type context in which this type is created.
         Type(core::Identifier const& identifier, TypeContext& type_context);
 
-        /// Creates a new type.
+        /// Creates a new numeric type with binary operator functions.
         /// \param identifier The identifier of the type.
-        /// \param constructor_type The types used to construct this type.
+        /// \param constructing_types The types used to construct this type.
         /// \param type_context The type context in which this type is created.
-        Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructor_type, TypeContext& type_context);
+        Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types, TypeContext& type_context);
 
         Type(Type const&)            = delete;
         Type& operator=(Type const&) = delete;
@@ -49,20 +58,28 @@ namespace ance::bbt
         [[nodiscard]] virtual bool isLReference() const;
 
         /// Gets the number of types used to construct this type.
-        /// Note that member types (e.g. for structs) are not considered constructor types.
-        [[nodiscard]] size_t getConstructorTypeCount() const;
+        /// Note that member types (e.g., for structs) are not considered constructing types.
+        [[nodiscard]] size_t getConstructingTypeCount() const;
 
-        /// Gets the i-th constructor type of this type.
-        [[nodiscard]] utility::Shared<Type> getConstructorType(size_t index);
-        /// Gets the i-th constructor type of this type.
-        [[nodiscard]] Type const& getConstructorType(size_t index) const;
+        /// Gets the i-th constructing type of this type.
+        [[nodiscard]] utility::Shared<Type> getConstructingType(size_t index);
+        /// Gets the i-th constructing type of this type.
+        [[nodiscard]] Type const& getConstructingType(size_t index) const;
 
         [[nodiscard]] std::string toString() const override;
         [[nodiscard]] bool        equals(Type const& other) const override;
 
+        /// Returns true if this type has a binary operator function for the given operator and right-hand type.
+        [[nodiscard]] bool isBinaryOperatorDefined(core::BinaryOperator binary_operator, Type const& rhs_type) const;
+
+        /// Returns the binary operator function for the given operator and right-hand type, if defined.
+        [[nodiscard]] utility::Optional<utility::Shared<Value>> getBinaryOperatorFunction(core::BinaryOperator binary_operator, Type const& rhs_type);
+
       private:
-        core::Identifier                     identifier_;
-        utility::List<utility::Shared<Type>> constructor_types_;
+        friend class TypeContext;
+
+        struct Implementation;
+        utility::Owned<Implementation> implementation_;
     };
 
     /// Represents an assignable reference type.
@@ -84,7 +101,7 @@ namespace ance::bbt
     class TypeContext
     {
       public:
-        TypeContext();
+        explicit TypeContext(cet::Runner& runner);
         ~TypeContext();
 
         /// Get the boolean type, which has two values: true and false.

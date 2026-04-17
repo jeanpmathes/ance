@@ -1279,6 +1279,53 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
+        void visit(est::BinaryOperation const& binary_operation) override
+        {
+            Builder builder(*this);
+
+            auto& left_tmp = builder.addTemporary("BinaryOperation_Left", binary_operation.left->location);
+            builder.addSegmented(*binary_operation.left, left_tmp);
+
+            auto& left_dereferenced_tmp = builder.addTemporary("BinaryOperation_Left_Dereferenced", binary_operation.left->location);
+            builder.addStatement<Dereference>(left_tmp, left_dereferenced_tmp, binary_operation.left->location);
+
+            auto& right_tmp = builder.addTemporary("BinaryOperation_Right", binary_operation.right->location);
+            builder.addSegmented(*binary_operation.right, right_tmp);
+
+            auto& right_dereferenced_tmp = builder.addTemporary("BinaryOperation_Right_Dereferenced", binary_operation.right->location);
+            builder.addStatement<Dereference>(right_tmp, right_dereferenced_tmp, binary_operation.right->location);
+
+            auto& left_type_tmp = builder.addTemporary("BinaryOperation_Left_Type", binary_operation.location);
+            {
+                utility::List<std::reference_wrapper<Temporary const>> type_args;
+                type_args.emplace_back(left_dereferenced_tmp);
+                builder.addStatement<TypeOf>(std::move(type_args), left_type_tmp, binary_operation.location);
+            }
+
+            auto& right_type_tmp = builder.addTemporary("BinaryOperation_Right_Type", binary_operation.location);
+            {
+                utility::List<std::reference_wrapper<Temporary const>> type_args;
+                type_args.emplace_back(right_dereferenced_tmp);
+                builder.addStatement<TypeOf>(std::move(type_args), right_type_tmp, binary_operation.location);
+            }
+
+            auto& operator_function_tmp = builder.addTemporary("BinaryOperation_OperatorFunction", binary_operation.location);
+            builder.addStatement<GetBinaryOperatorFunction>(binary_operation.op,
+                                                            left_type_tmp,
+                                                            right_type_tmp,
+                                                            operator_function_tmp,
+                                                            binary_operation.location);
+
+            {
+                utility::List<std::reference_wrapper<Temporary const>> call_args;
+                call_args.emplace_back(left_dereferenced_tmp);
+                call_args.emplace_back(right_dereferenced_tmp);
+                builder.addStatement<Call>(operator_function_tmp, std::move(call_args), destination(), binary_operation.location);
+            }
+
+            setResult(builder.take());
+        }
+
         void visit(est::TypeOf const& type_of) override
         {
             Builder builder(*this);

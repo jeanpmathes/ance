@@ -15,3 +15,23 @@ Use `vcpkg` to install the dependencies:
 ```bash
 vcpkg install llvm antlr4 boost icu
 ```
+
+# Architecture
+
+The current compiler is designed as a staged pipeline:
+
+1. `AST` (`src/ance/ast`): Consume source files, parse them and create the abstract syntax tree (`AST`).
+2. `EST` (`src/ance/est`): Remove all syntactic sugar from the AST and expand it into the expanded syntax tree (`EST`).
+3. `BBT` (`src/ance/bbt`): Lower EST into linear (not nested) statements forming control flow graphs as part of the
+   basic block tree (`BBT`).
+4. `CET` (`src/ance/cet`): Run the BBT at compile time to produce the compilable element tree (`CET`).
+5. `build` (`src/ance/build`): Build the CET into the final output, using LLVM.
+
+Each stage uses the previous stage, as such the entry point into the compiler is actually the last stage.
+Because compile-time evaluation is central to the language, it is used to perform many tasks normally done through other
+means.
+For example, the compiler always only runs a single file; to include more files in a compilation, the include function
+is used.
+
+Note: `src_old/` contains the legacy compiler implementation, is currently not used and will be removed in the future.
+

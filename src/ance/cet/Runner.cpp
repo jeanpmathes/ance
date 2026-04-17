@@ -272,16 +272,11 @@ struct ance::cet::Runner::Implementation
         {
             bool ok = true;
 
-            bbt::Type const* actual_ptr = &actual;
+            bbt::Type const& actual_dereferenced = deLReferenceType(actual);
 
-            while (actual_ptr->isLReference())
+            if (actual_dereferenced != expected)
             {
-                actual_ptr = &actual_ptr->getConstructorType(0);
-            }
-
-            if (*actual_ptr != expected)
-            {
-                reporter_.error(location) << "Expected type " << expected.annotated() << " but got " << actual_ptr->annotated();
+                reporter_.error(location) << "Expected type " << expected.annotated() << " but got " << actual_dereferenced.annotated();
                 ok = false;
             }
 
@@ -338,6 +333,28 @@ struct ance::cet::Runner::Implementation
             }
 
             return ok;
+        }
+
+        [[nodiscard]] static utility::Shared<bbt::Type> deLReferenceType(utility::Shared<bbt::Type> type)
+        {
+            while (type->isLReference())
+            {
+                type = type->getConstructingType(0);
+            }
+
+            return type;
+        }
+
+        [[nodiscard]] static bbt::Type const& deLReferenceType(bbt::Type const& type)
+        {
+            bbt::Type const* current = &type;
+
+            while (current->isLReference())
+            {
+                current = &current->getConstructingType(0);
+            }
+
+            return *current;
         }
 
         [[nodiscard]] static utility::Shared<bbt::Value> deLReference(utility::Shared<bbt::Value> value)
@@ -739,7 +756,7 @@ struct ance::cet::Runner::Implementation
 
             utility::Shared<LReference> reference = target.cast<LReference>();
 
-            if (!expectType(*target->type()->getConstructorType(0), *value->type(), store.value.location))
+            if (!expectType(*target->type()->getConstructingType(0), *value->type(), store.value.location))
             {
                 abort();
                 return;
@@ -1011,6 +1028,8 @@ struct ance::cet::Runner::Implementation
                 if (type == *type_context_.getLocation()) return bbt::Location::make(core::Location::project(), type_context_);
                 if (type == *type_context_.getString()) return bbt::String::make("", type_context_);
 
+                // todo: float types
+
                 reporter_.error(default_value.type.location) << "Cannot create default value for type " << type.annotated();
 
                 return bbt::Unit::make(type_context_);
@@ -1050,6 +1069,29 @@ struct ance::cet::Runner::Implementation
                     scope().getTemporary(unary_operation.destination).write(bbt::Bool::make(!deLReference<bbt::Bool>(value).value(), type_context_));
                     break;
             }
+        }
+
+        void visit(bbt::GetBinaryOperatorFunction const& get_binary_operator_function) override
+        {
+            trace("GetBinaryOperatorFunction", get_binary_operator_function)
+                << ", op=" << get_binary_operator_function.op.toString() << ", left_type=" << get_binary_operator_function.left_type.id()
+                << ", right_type=" << get_binary_operator_function.right_type.id() << ", destination=" << get_binary_operator_function.destination.id();
+
+            utility::Shared<bbt::Type> left_type  = scope().getTemporary(get_binary_operator_function.left_type).read().cast<bbt::Type>();
+            utility::Shared<bbt::Type> right_type = scope().getTemporary(get_binary_operator_function.right_type).read().cast<bbt::Type>();
+
+            utility::Optional<utility::Shared<bbt::Value>> operator_function =
+                left_type->getBinaryOperatorFunction(get_binary_operator_function.op, *right_type);
+
+            if (!operator_function.hasValue())
+            {
+                reporter_.error(get_binary_operator_function.location)
+                    << "Operator '" << get_binary_operator_function.op.toString() << "' is not defined for type " << left_type->annotated();
+                abort();
+                return;
+            }
+
+            scope().getTemporary(get_binary_operator_function.destination).write(operator_function.value());
         }
 
         void visit(bbt::TypeOf const& type_of) override
@@ -1120,10 +1162,28 @@ struct ance::cet::Runner::Implementation
         {
             value = deLReference(std::move(value));
 
+            FindResult const result = core_language_scope_->find(name);
+            if (result.status == FindResult::Status::FOUND && result.value.hasValue())
+            {
+                return;// todo: generally, we would want to throw in this case, but for now that is not possible
+            }
+
             utility::Optional<utility::Shared<bbt::Value>> declared =
                 core_language_scope_->declare(name, value->type(), true, core::Location::core(), reporter_);
 
             if (declared.hasValue()) (*declared)->as<VariableRef>().value().write(std::move(value));
+        }
+
+        utility::Shared<bbt::Value> getCoreVariableValue(core::Identifier const& name)
+        {
+            FindResult result = core_language_scope_->find(name);
+
+            if (result.status != FindResult::Status::FOUND || !result.value.hasValue())
+            {
+                throw std::logic_error("Failed to find core variable '" + std::string(name.text()) + "'");
+            }
+
+            return deLReference(result.value.value()->as<VariableRef>().value().read());
         }
 
       private:
@@ -1199,9 +1259,10 @@ struct ance::cet::Runner::Implementation
         State state_;
     };
 
-    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context, Runner& runner)
         : source_tree_(source_tree)
         , reporter_(reporter)
+        , type_context_(runner)
         , segmenter_(source_tree, reporter, context, type_context_)
         , context_(context)
         , bbt_(utility::makeOwned<BBT>(source_tree_, reporter_, type_context_, [&](std::filesystem::path const& f) { return readUnorderedFile(f); }))
@@ -1291,6 +1352,11 @@ struct ance::cet::Runner::Implementation
         bbt_->declareCoreVariable(name, value);
     }
 
+    utility::Shared<bbt::Value> getCoreVariableValue(core::Identifier const& name)
+    {
+        return bbt_->getCoreVariableValue(name);
+    }
+
     void declareCore(std::string const& code, std::string const& id)
     {
         utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentDeclaration(code, id);
@@ -1312,7 +1378,7 @@ struct ance::cet::Runner::Implementation
   private:
     sources::SourceTree& source_tree_;
     core::Reporter&      reporter_;
-    bbt::TypeContext     type_context_ {};
+    bbt::TypeContext     type_context_;
     bbt::Segmenter       segmenter_;
     core::Context&       context_;
 
@@ -1320,7 +1386,7 @@ struct ance::cet::Runner::Implementation
 };
 
 ance::cet::Runner::Runner(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
-    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
+    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context, *this))
 {}
 
 ance::cet::Runner::~Runner() = default;
@@ -1328,6 +1394,11 @@ ance::cet::Runner::~Runner() = default;
 void ance::cet::Runner::declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value> value)
 {
     return implementation_->declareCoreVariable(name, std::move(value));
+}
+
+ance::utility::Shared<ance::bbt::Value> ance::cet::Runner::getCoreVariableValue(core::Identifier const& name)
+{
+    return implementation_->getCoreVariableValue(name);
 }
 
 void ance::cet::Runner::declareCore(std::string const& code, std::string const& id)

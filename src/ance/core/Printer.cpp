@@ -34,16 +34,22 @@ void ance::core::Printer::print(AccessModifier const access_modifier)
     out_ << access_modifier.toString();// todo: access modifier should provide operator<<
 }
 
-void ance::core::Printer::print(ExecutionModifier execution_modifier)
+void ance::core::Printer::print(ExecutionModifier const execution_modifier)
 {
     indent();
     out_ << execution_modifier.toString(); // todo: execution modifier should provide operator<<
 }
 
-void ance::core::Printer::print(UnaryOperator unary_operator)
+void ance::core::Printer::print(UnaryOperator const unary_operator)
 {
     indent();
     out_ << unary_operator.toString();// todo: unary operator should provide operator<<
+}
+
+void ance::core::Printer::print(BinaryOperator const binary_operator)
+{
+    indent();
+    out_ << binary_operator.toString();// todo: binary operator should provide operator<<
 }
 
 void ance::core::Printer::print(Assigner const assigner)

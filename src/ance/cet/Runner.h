@@ -46,7 +46,12 @@ namespace ance::cet
         /// \param value The value of the variable to declare.
         void declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value> value);
 
-        /// Run the given code, containing a declaration, and make the declared entities available for all subsequently run code.
+        /// Look up a variable from the core scope by identifier and read its value.
+        /// \param name The identifier to look up.
+        /// \return The variable value associated with the identifier, or an absent optional if not found.
+        utility::Shared<bbt::Value> getCoreVariableValue(core::Identifier const& name);
+
+        /// Run the given code containing a declaration and make the declared entities available for all subsequently run code.
         /// The code is run the core language scope, the core scope.
         /// \param code The code to run, containing a single declaration.
         /// \param id An identifier to use for the declaration.

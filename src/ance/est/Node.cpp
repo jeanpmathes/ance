@@ -203,6 +203,17 @@ ance::est::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind, utili
     , operand(std::move(expression))
 {}
 
+ance::est::BinaryOperation::BinaryOperation(utility::Owned<Expression> lhs,
+                                            core::BinaryOperator       kind,
+                                            utility::Owned<Expression> rhs,
+                                            core::Location const&      source_location)
+    : Node(source_location)
+    , Expression()
+    , left(std::move(lhs))
+    , op(kind)
+    , right(std::move(rhs))
+{}
+
 ance::est::TypeOf::TypeOf(utility::List<utility::Owned<Expression>> expression_list, core::Location const& source_location)
     : Node(source_location)
     , Expression()

@@ -15,6 +15,7 @@
 #include "ance/core/Context.h"
 #include "ance/core/ExecutionModifier.h"
 #include "ance/core/Identifier.h"
+#include "ance/core/BinaryOperator.h"
 #include "ance/core/UnaryOperator.h"
 
 #include "ance/sources/SourceFile.h"
@@ -345,13 +346,31 @@ namespace ance::ast
             return {name, std::move(type), location};
         }
 
-        core::UnaryOperator expectUnaryOperator(grammar::anceParser::UnaryContext* context)
+        core::UnaryOperator expectUnaryOperator(grammar::anceParser::UnaryOperatorContext* context)
         {
             if (context == nullptr) return core::UnaryOperator::UNSPECIFIED;
 
             if (std::any const result = visit(context); result.has_value()) return std::any_cast<core::UnaryOperator>(result);
 
             return core::UnaryOperator::UNSPECIFIED;
+        }
+
+        core::BinaryOperator expectBinaryOperator(grammar::anceParser::BinaryOperatorMultiplicativeContext* context)
+        {
+            if (context == nullptr) return core::BinaryOperator::UNSPECIFIED;
+
+            if (std::any const result = visit(context); result.has_value()) return std::any_cast<core::BinaryOperator>(result);
+
+            return core::BinaryOperator::UNSPECIFIED;
+        }
+
+        core::BinaryOperator expectBinaryOperator(grammar::anceParser::BinaryOperatorAdditiveContext* context)
+        {
+            if (context == nullptr) return core::BinaryOperator::UNSPECIFIED;
+
+            if (std::any const result = visit(context); result.has_value()) return std::any_cast<core::BinaryOperator>(result);
+
+            return core::BinaryOperator::UNSPECIFIED;
         }
 
         core::Assigner expectAssigner(grammar::anceParser::AssignerContext* context)
@@ -644,9 +663,22 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitBinaryOperationExpression(grammar::anceParser::BinaryOperationExpressionContext* context) override
+        {
+            utility::Owned<Expression> left  = expectExpression(context->left);
+            utility::Owned<Expression> right = expectExpression(context->right);
+
+            core::BinaryOperator op = core::BinaryOperator::UNSPECIFIED;
+            if (context->binaryOperatorMultiplicative() != nullptr) op = expectBinaryOperator(context->binaryOperatorMultiplicative());
+            if (context->binaryOperatorAdditive() != nullptr) op = expectBinaryOperator(context->binaryOperatorAdditive());
+
+            Expression* expression = new BinaryOperation(std::move(left), op, std::move(right), location(context));
+            return expression;
+        }
+
         std::any visitUnaryOperationExpression(grammar::anceParser::UnaryOperationExpressionContext* context) override
         {
-            core::UnaryOperator const  op      = expectUnaryOperator(context->unary());
+            core::UnaryOperator const  op      = expectUnaryOperator(context->unaryOperator());
             utility::Owned<Expression> operand = expectExpression(context->target);
 
             Expression* expression = new UnaryOperation(op, std::move(operand), location(context));
@@ -806,6 +838,36 @@ namespace ance::ast
         std::any visitUnaryNot(grammar::anceParser::UnaryNotContext*) override
         {
             core::UnaryOperator op = core::UnaryOperator::NOT;
+            return op;
+        }
+
+        std::any visitMultiplication(grammar::anceParser::MultiplicationContext*) override
+        {
+            core::BinaryOperator op = core::BinaryOperator::MULTIPLICATION;
+            return op;
+        }
+
+        std::any visitDivision(grammar::anceParser::DivisionContext*) override
+        {
+            core::BinaryOperator op = core::BinaryOperator::DIVISION;
+            return op;
+        }
+
+        std::any visitRemainder(grammar::anceParser::RemainderContext*) override
+        {
+            core::BinaryOperator op = core::BinaryOperator::REMAINDER;
+            return op;
+        }
+
+        std::any visitAddition(grammar::anceParser::AdditionContext*) override
+        {
+            core::BinaryOperator op = core::BinaryOperator::ADDITION;
+            return op;
+        }
+
+        std::any visitSubtraction(grammar::anceParser::SubtractionContext*) override
+        {
+            core::BinaryOperator op = core::BinaryOperator::SUBTRACTION;
             return op;
         }
 

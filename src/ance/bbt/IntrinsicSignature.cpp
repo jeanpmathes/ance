@@ -6,6 +6,12 @@
 
 namespace ance::bbt
 {
+    static std::tuple<Signature, utility::Shared<Type>> makeBinarySignature(core::Intrinsic const intrinsic, utility::Shared<Type> type)
+    {
+        Signature signature = Signature::makeAndNameParameters(intrinsic.identifier(), type, type);
+        return {std::move(signature), type};
+    }
+
     std::tuple<Signature, utility::Shared<Type>> getIntrinsicSignature(core::Intrinsic intrinsic, TypeContext& type_context)
     {
         utility::Optional<Signature>             signature;
@@ -66,6 +72,34 @@ namespace ance::bbt
 
                 break;
             }
+            case core::Intrinsic::FH_2_STR:
+            {
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getFloat(core::Precision::HALF));
+                return_type = type_context.getString();
+
+                break;
+            }
+            case core::Intrinsic::FS_2_STR:
+            {
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getFloat(core::Precision::SINGLE));
+                return_type = type_context.getString();
+
+                break;
+            }
+            case core::Intrinsic::FD_2_STR:
+            {
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getFloat(core::Precision::DOUBLE));
+                return_type = type_context.getString();
+
+                break;
+            }
+            case core::Intrinsic::FQ_2_STR:
+            {
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getFloat(core::Precision::QUAD));
+                return_type = type_context.getString();
+
+                break;
+            }
             case core::Intrinsic::INCLUDE:
             {
                 signature   = Signature::makeAndNameParameters(intrinsic.identifier(),
@@ -83,6 +117,56 @@ namespace ance::bbt
                 signature   = Signature(intrinsic.identifier(), std::move(parameters), true);
                 return_type = type_context.getUnit();// Return type is determined dynamically by the called intrinsic.
 
+                break;
+            }
+
+            case core::Intrinsic::SIZE_ADD:
+            case core::Intrinsic::SIZE_SUB:
+            case core::Intrinsic::SIZE_MUL:
+            case core::Intrinsic::SIZE_DIV:
+            case core::Intrinsic::SIZE_REM:
+            {
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getSize());
+                break;
+            }
+
+            case core::Intrinsic::HALF_ADD:
+            case core::Intrinsic::HALF_SUB:
+            case core::Intrinsic::HALF_MUL:
+            case core::Intrinsic::HALF_DIV:
+            case core::Intrinsic::HALF_REM:
+            {
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::HALF));
+                break;
+            }
+
+            case core::Intrinsic::SINGLE_ADD:
+            case core::Intrinsic::SINGLE_SUB:
+            case core::Intrinsic::SINGLE_MUL:
+            case core::Intrinsic::SINGLE_DIV:
+            case core::Intrinsic::SINGLE_REM:
+            {
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::SINGLE));
+                break;
+            }
+
+            case core::Intrinsic::DOUBLE_ADD:
+            case core::Intrinsic::DOUBLE_SUB:
+            case core::Intrinsic::DOUBLE_MUL:
+            case core::Intrinsic::DOUBLE_DIV:
+            case core::Intrinsic::DOUBLE_REM:
+            {
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::DOUBLE));
+                break;
+            }
+
+            case core::Intrinsic::QUAD_ADD:
+            case core::Intrinsic::QUAD_SUB:
+            case core::Intrinsic::QUAD_MUL:
+            case core::Intrinsic::QUAD_DIV:
+            case core::Intrinsic::QUAD_REM:
+            {
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::QUAD));
                 break;
             }
         }

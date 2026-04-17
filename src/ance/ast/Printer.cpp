@@ -444,6 +444,15 @@ struct ance::ast::Printer::Implementation
             visit(*unary_operation.operand);
         }
 
+        void visit(BinaryOperation const& binary_operation) override
+        {
+            visit(*binary_operation.left);
+            print(" ");
+            print(binary_operation.op);
+            print(" ");
+            visit(*binary_operation.right);
+        }
+
         void visit(MatchCase const& match_case) override
         {
             if (!match_case.patterns.empty())

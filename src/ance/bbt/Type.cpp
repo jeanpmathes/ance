@@ -1,10 +1,17 @@
 #include "Type.h"
 
+#include <format>
 #include <vector>
 
+#include "ance/core/BinaryOperator.h"
 #include "ance/core/Constants.h"
+#include "ance/core/Identifier.h"
+#include "ance/core/Location.h"
+#include "ance/core/Precision.h"
 
 #include "ance/utility/Empty.h"
+
+#include "ance/cet/Runner.h"
 
 namespace ance::bbt
 {
@@ -66,22 +73,84 @@ namespace ance::bbt
         return types;
     }
 
-    Type::Type(core::Identifier const& identifier, TypeContext& type_context) : ValueBase(std::nullopt, type_context), identifier_(identifier) {}
+    struct Type::Implementation
+    {
+        explicit Implementation(core::Identifier const& identifier) : identifier_(identifier) {}
 
-    Type::Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructor_type, TypeContext& type_context)
+        Implementation(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types)
+            : identifier_(identifier)
+            , constructing_types_(std::move(constructing_types))
+        {}
+
+        [[nodiscard]] core::Identifier const& identifier() const
+        {
+            return identifier_;
+        }
+
+        [[nodiscard]] size_t getConstructingTypeCount() const
+        {
+            return constructing_types_.size();
+        }
+
+        utility::Shared<Type> getConstructingType(size_t const index)
+        {
+            return constructing_types_.at(index);
+        }
+
+        [[nodiscard]] Type const& getConstructingType(size_t const index) const
+        {
+            return *constructing_types_.at(index);
+        }
+
+        void addBinaryOperatorFunction(core::BinaryOperator const binary_operator, Type const& rhs_type, utility::Shared<Value> function)
+        {
+            auto const key = std::make_pair(binary_operator, &rhs_type);
+            binary_operator_map_.emplace(key, function);
+        }
+
+        [[nodiscard]] bool isBinaryOperatorDefined(core::BinaryOperator const binary_operator, Type const& rhs_type) const
+        {
+            auto const key = std::make_pair(binary_operator, &rhs_type);
+            return binary_operator_map_.contains(key);
+        }
+
+        utility::Optional<utility::Shared<Value>> getBinaryOperatorFunction(core::BinaryOperator const binary_operator, Type const& rhs_type)
+        {
+            auto const key      = std::make_pair(binary_operator, &rhs_type);
+            auto const iterator = binary_operator_map_.find(key);
+
+            if (iterator == binary_operator_map_.end())
+            {
+                return std::nullopt;
+            }
+
+            return iterator->second;
+        }
+
+      private:
+        core::Identifier                                                               identifier_;
+        utility::List<utility::Shared<Type>>                                           constructing_types_  = {};
+        std::map<std::pair<core::BinaryOperator, Type const*>, utility::Shared<Value>> binary_operator_map_ = {};
+    };
+
+    Type::Type(core::Identifier const& identifier, TypeContext& type_context)
         : ValueBase(std::nullopt, type_context)
-        , identifier_(identifier)
-        , constructor_types_(std::move(constructor_type))
+        , implementation_(utility::makeOwned<Implementation>(identifier))
+    {}
+
+    Type::Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types, TypeContext& type_context)
+        : ValueBase(std::nullopt, type_context)
+        , implementation_(utility::makeOwned<Implementation>(identifier, std::move(constructing_types)))
     {}
 
     core::Identifier const& Type::name() const
     {
-        return identifier_;
+        return implementation_->identifier();
     }
 
     std::string Type::annotated() const
     {
-        return std::format("'{}'", identifier_.text());
+        return std::format("'{}'", implementation_->identifier().text());
     }
 
     bool Type::operator==(Type const& other) const
@@ -99,29 +168,39 @@ namespace ance::bbt
         return false;
     }
 
-    size_t Type::getConstructorTypeCount() const
+    size_t Type::getConstructingTypeCount() const
     {
-        return constructor_types_.size();
+        return implementation_->getConstructingTypeCount();
     }
 
-    utility::Shared<Type> Type::getConstructorType(size_t const index)
+    utility::Shared<Type> Type::getConstructingType(size_t const index)
     {
-        return constructor_types_.at(index);
+        return implementation_->getConstructingType(index);
     }
 
-    Type const& Type::getConstructorType(size_t const index) const
+    Type const& Type::getConstructingType(size_t const index) const
     {
-        return *constructor_types_.at(index);
+        return implementation_->getConstructingType(index);
     }
 
     std::string Type::toString() const
     {
-        return std::string(identifier_.text());
+        return std::string(implementation_->identifier().text());
     }
 
     bool Type::equals(Type const& other) const
     {
         return other == *this;
+    }
+
+    bool Type::isBinaryOperatorDefined(core::BinaryOperator const binary_operator, Type const& rhs_type) const
+    {
+        return implementation_->isBinaryOperatorDefined(binary_operator, rhs_type);
+    }
+
+    utility::Optional<utility::Shared<Value>> Type::getBinaryOperatorFunction(core::BinaryOperator const binary_operator, Type const& rhs_type)
+    {
+        return implementation_->getBinaryOperatorFunction(binary_operator, rhs_type);
     }
 
     LReferenceType::LReferenceType(utility::Shared<Type> referenced_type, TypeContext& type_context)
@@ -136,6 +215,10 @@ namespace ance::bbt
 
     struct TypeContext::Implementation
     {
+        explicit Implementation(cet::Runner& runner) : runner_(runner) {}
+
+        cet::Runner& runner_;
+
         utility::Optional<utility::Shared<Type>> bool_type;
         utility::Optional<utility::Shared<Type>> unit_type;
         utility::Optional<utility::Shared<Type>> size_type;
@@ -164,9 +247,61 @@ namespace ance::bbt
 
             return type_slot.value();
         }
+
+        utility::Shared<Value> declareBinaryOperatorFunction(std::string const&         type_name,
+                                                             std::string const&         type_prefix,
+                                                             core::BinaryOperator const binary_operator)
+        {
+            std::string const short_name     = binary_operator.toShortName();
+            std::string const function_name  = std::format("__core_{}_op_{}", type_name, short_name);
+            std::string const intrinsic_name = std::format("{}_{}", type_prefix, short_name);
+
+            std::string const code = std::format("public {} (lhs: {}, rhs: {}) : {}\n"
+                                                 "{{\n"
+                                                 "    return intrinsic \"{}\" (lhs, rhs);\n"
+                                                 "}}\n",
+                                                 function_name,
+                                                 type_name,
+                                                 type_name,
+                                                 type_name,
+                                                 intrinsic_name);
+
+            runner_.declareCore(code, function_name);
+
+            return runner_.getCoreVariableValue(core::Identifier::make(function_name, core::Location::core()));
+        }
+
+        void addBinaryOperator(Type& type, std::string const& type_prefix, core::BinaryOperator const binary_operator)
+        {
+            type.implementation_->addBinaryOperatorFunction(binary_operator,
+                                                            type,
+                                                            declareBinaryOperatorFunction(type.toString(), type_prefix, binary_operator));
+        }
+
+        void addArithmeticOperators(Type& type, std::string const& type_prefix)
+        {
+            for (auto const op : {core::BinaryOperator::ADDITION,
+                                  core::BinaryOperator::SUBTRACTION,
+                                  core::BinaryOperator::MULTIPLICATION,
+                                  core::BinaryOperator::DIVISION,
+                                  core::BinaryOperator::REMAINDER})
+            {
+                addBinaryOperator(type, type_prefix, op);
+            }
+        }
+
+        void ensureReadiness(utility::Shared<Type> type) const
+        {
+            // todo: that this function is necessary is really ugly, it should be removed at some point
+            // todo: ideally, we can define the core types entirely using source code, we build that and we pass it to the runner like we do with all other parts of the language core
+            // todo: it would then do everything and we simply query once to get the type
+            // todo: when that is the case, we can also remove that the runner check for core declarations that they do not already exists (and skips when they do), instead it could throw
+
+            runner_.declareCoreVariable(type->name(), type);
+        }
     };
 
-    TypeContext::TypeContext() : implementation_(utility::makeOwned<Implementation>()) {}
+    TypeContext::TypeContext(cet::Runner& runner) : implementation_(utility::makeOwned<Implementation>(runner)) {}
 
     TypeContext::~TypeContext() = default;
 
@@ -186,29 +321,49 @@ namespace ance::bbt
 
     utility::Shared<Type> TypeContext::getSize()
     {
-        return Implementation::getOrCreate(implementation_->size_type,
-                                           [&] { return utility::makeShared<Type>(core::Identifier::make("Size", core::Location::core()), *this); });
+        return Implementation::getOrCreate(implementation_->size_type, [&] {
+            std::string const type_name   = "Size";
+            std::string const type_prefix = "size";
+
+            utility::Shared<Type> type = utility::makeShared<Type>(core::Identifier::make(type_name, core::Location::core()), *this);
+
+            implementation_->ensureReadiness(type);
+            implementation_->ensureReadiness(getFunction());
+
+            implementation_->addArithmeticOperators(*type, type_prefix);
+
+            return type;
+        });
     }
 
     utility::Shared<Type> TypeContext::getFloat(core::Precision const precision)
     {
+        auto getOrCreateFloatType = [&](utility::Optional<utility::Shared<Type>>& slot, std::string const& type_name, std::string const& type_prefix) {
+            return Implementation::getOrCreate(slot, [&] {
+                utility::Shared<Type> type = utility::makeShared<Type>(core::Identifier::make(type_name, core::Location::core()), *this);
+
+                implementation_->ensureReadiness(type);
+                implementation_->ensureReadiness(getFunction());
+
+                implementation_->addArithmeticOperators(*type, type_prefix);
+
+                return type;
+            });
+        };
+
         switch (precision)
         {
             case core::Precision::HALF:
-                return Implementation::getOrCreate(implementation_->float_half_type,
-                                                   [&] { return utility::makeShared<Type>(core::Identifier::make("Half", core::Location::core()), *this); });
+                return getOrCreateFloatType(implementation_->float_half_type, "Half", "half");
 
             case core::Precision::SINGLE:
-                return Implementation::getOrCreate(implementation_->float_single_type,
-                                                   [&] { return utility::makeShared<Type>(core::Identifier::make("Single", core::Location::core()), *this); });
+                return getOrCreateFloatType(implementation_->float_single_type, "Single", "single");
 
             case core::Precision::DOUBLE:
-                return Implementation::getOrCreate(implementation_->float_double_type,
-                                                   [&] { return utility::makeShared<Type>(core::Identifier::make("Double", core::Location::core()), *this); });
+                return getOrCreateFloatType(implementation_->float_double_type, "Double", "double");
 
             case core::Precision::QUAD:
-                return Implementation::getOrCreate(implementation_->float_quad_type,
-                                                   [&] { return utility::makeShared<Type>(core::Identifier::make("Quad", core::Location::core()), *this); });
+                return getOrCreateFloatType(implementation_->float_quad_type, "Quad", "quad");
         }
 
         throw std::logic_error("Invalid precision");

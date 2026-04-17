@@ -3,6 +3,7 @@
 
 #include "ance/core/AccessModifier.h"
 #include "ance/core/Assigner.h"
+#include "ance/core/BinaryOperator.h"
 #include "ance/core/ExecutionModifier.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/Precision.h"
@@ -400,6 +401,18 @@ namespace ance::est
         utility::Owned<Expression> operand;
     };
 
+    /// Applies a binary operation to two operands.
+    struct BinaryOperation final
+        : Expression
+        , utility::ConcreteNode<BinaryOperation, Visitor>
+    {
+        BinaryOperation(utility::Owned<Expression> lhs, core::BinaryOperator kind, utility::Owned<Expression> rhs, core::Location const& source_location);
+
+        utility::Owned<Expression> left;
+        core::BinaryOperator       op;
+        utility::Owned<Expression> right;
+    };
+
     /// Gives the common type of the values produced by the expressions - the expressions WILL BE evaluated.
     struct TypeOf final// todo: should no longer evaluate the expressions
         : Expression
@@ -483,6 +496,7 @@ namespace ance::est
         virtual void visit(Default const& default_value)                       = 0;
         virtual void visit(Here const& here)                                   = 0;
         virtual void visit(UnaryOperation const& unary_operation)              = 0;
+        virtual void visit(BinaryOperation const& binary_operation)            = 0;
         virtual void visit(TypeOf const& type_of)                              = 0;
 
         virtual void visit(MatchCase const& match_case) = 0;

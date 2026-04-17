@@ -7,9 +7,7 @@ class Storage;
 
 namespace ance::core
 {
-    /**
-     * Represents different access levels of declared entities.
-     */
+    /// Represents different access levels of declared entities.
     class AccessModifier
     {
       public:
@@ -26,10 +24,8 @@ namespace ance::core
         operator Value() const;// NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
 
-        /**
-         * Get this access modifier as string.
-         * @return The string.
-         */
+        /// Get this access modifier as a string.
+        /// @return The string.
         [[nodiscard]] std::string toString() const;
 
       private:
