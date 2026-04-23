@@ -149,14 +149,14 @@ ance::bbt::Default::Default(Temporary const& t, Temporary const& result, core::L
 ance::bbt::CurrentScope::CurrentScope(Temporary const& result, core::Location const& source_location) : Node(source_location), Statement(), destination(result)
 {}
 
-ance::bbt::UnaryOperation::UnaryOperation(core::UnaryOperator const& kind,
-                                          Temporary const&           value,
-                                          Temporary const&           result,
-                                          core::Location const&      source_location)
+ance::bbt::GetUnaryOperatorFunction::GetUnaryOperatorFunction(core::UnaryOperator const kind,
+                                                              Temporary const&          operand_type,
+                                                              Temporary const&          result,
+                                                              core::Location const&     source_location)
     : Node(source_location)
     , Statement()
     , op(kind)
-    , operand(value)
+    , type(operand_type)
     , destination(result)
 {}
 

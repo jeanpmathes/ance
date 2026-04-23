@@ -100,6 +100,13 @@ namespace ance::bbt
 
                 break;
             }
+            case core::Intrinsic::BOOL_NOT:
+            {
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getBool());
+                return_type = type_context.getBool();
+
+                break;
+            }
             case core::Intrinsic::INCLUDE:
             {
                 signature   = Signature::makeAndNameParameters(intrinsic.identifier(),

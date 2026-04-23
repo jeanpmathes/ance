@@ -25,8 +25,9 @@ namespace ance::core
         explicit operator bool() = delete;
 
         [[nodiscard]] std::string toString() const;
+        [[nodiscard]] std::string toShortName() const;
 
-    private:
+      private:
         Value value_;
     };
 }

@@ -20,3 +20,17 @@ std::string ance::core::UnaryOperator::toString() const
 
     throw std::logic_error("Invalid unary operator");
 }
+
+std::string ance::core::UnaryOperator::toShortName() const
+{
+    switch (value_)
+    {
+        case UNSPECIFIED:
+            return "";
+
+        case NOT:
+            return "not";
+    }
+
+    throw std::logic_error("Invalid unary operator");
+}

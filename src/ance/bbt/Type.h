@@ -1,12 +1,11 @@
 #ifndef ANCE_BBT_TYPE_H
 #define ANCE_BBT_TYPE_H
 
-#include <map>
 #include <ostream>
-#include <utility>
 
 #include "ance/core/BinaryOperator.h"
 #include "ance/core/Identifier.h"
+#include "ance/core/UnaryOperator.h"
 #include "ance/utility/Containers.h"
 #include "ance/utility/Optional.h"
 
@@ -68,6 +67,12 @@ namespace ance::bbt
 
         [[nodiscard]] std::string toString() const override;
         [[nodiscard]] bool        equals(Type const& other) const override;
+
+        /// Returns true if this type has a unary operator function for the given operator.
+        [[nodiscard]] bool isUnaryOperatorDefined(core::UnaryOperator unary_operator) const;
+
+        /// Returns the unary operator function for the given operator, if defined.
+        [[nodiscard]] utility::Optional<utility::Shared<Value>> getUnaryOperatorFunction(core::UnaryOperator unary_operator);
 
         /// Returns true if this type has a binary operator function for the given operator and right-hand type.
         [[nodiscard]] bool isBinaryOperatorDefined(core::BinaryOperator binary_operator, Type const& rhs_type) const;

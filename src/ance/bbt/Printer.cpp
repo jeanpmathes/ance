@@ -286,16 +286,16 @@ struct ance::bbt::Printer::Implementation
             print(" scope;");
         }
 
-        void visit(UnaryOperation const& unary_operation) override
+        void visit(GetUnaryOperatorFunction const& get_unary_operator_function) override
         {
-            print(unary_operation.destination.id());
+            print(get_unary_operator_function.destination.id());
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
-            print(" ");
-            print(unary_operation.op.toString());
-            print(" ");
-            print(unary_operation.operand.id());
-            print(";");
+            print(" get_unary_op_fn ");
+            print(get_unary_operator_function.op.toString());
+            print(" (");
+            print(get_unary_operator_function.type.id());
+            print(");");
         }
 
         void visit(GetBinaryOperatorFunction const& get_binary_operator_function) override

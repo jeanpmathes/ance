@@ -120,13 +120,13 @@ struct ance::cet::Runner::Implementation
                 next->return_value = lower_return_value;
             }
 
-            void pushLevel(bbt::BasicBlock const& start, Scope& initial_scope)
+            void pushLevel(bbt::BasicBlock const& start, Scope& initial_scope) const
             {
                 RunPoint& lower_level     = stack().emplace_back(start, &initial_scope);
-                lower_level.target_stack_ = &stack_;
+                lower_level.target_stack_ = target_stack_;
             }
 
-            utility::Optional<PendingResolution> const& getBlocker() const
+            [[nodiscard]] utility::Optional<PendingResolution> const& getBlocker() const
             {
                 return getExecutableRunPoint().blocker_;
             }
@@ -1046,29 +1046,25 @@ struct ance::cet::Runner::Implementation
             scope().getTemporary(current_scope.destination).write(ScopeRef::make(scope(), type_context_));
         }
 
-        void visit(bbt::UnaryOperation const& unary_operation) override
+        void visit(bbt::GetUnaryOperatorFunction const& get_unary_operator_function) override
         {
-            trace("UnaryOperation", unary_operation) << ", op=" << unary_operation.op << ", operand=" << temp(unary_operation.operand)
-                                                     << ", destination=" << unary_operation.destination.id();
+            trace("GetUnaryOperatorFunction", get_unary_operator_function)
+                << ", op=" << get_unary_operator_function.op.toString() << ", type=" << get_unary_operator_function.type.id()
+                << ", destination=" << get_unary_operator_function.destination.id();
 
-            utility::Shared<bbt::Value> value = scope().getTemporary(unary_operation.operand).read();
+            utility::Shared<bbt::Type> type = scope().getTemporary(get_unary_operator_function.type).read().cast<bbt::Type>();
 
-            if (!expectType(*type_context_.getBool(), *value->type(), unary_operation.operand.location))
+            utility::Optional<utility::Shared<bbt::Value>> operator_function = type->getUnaryOperatorFunction(get_unary_operator_function.op);
+
+            if (!operator_function.hasValue())
             {
+                reporter_.error(get_unary_operator_function.location)
+                    << "Operator '" << get_unary_operator_function.op.toString() << "' is not defined for type " << type->annotated();
                 abort();
                 return;
             }
 
-            switch (unary_operation.op)
-            {
-                case core::UnaryOperator::UNSPECIFIED:
-                    abort();
-                    break;
-
-                case core::UnaryOperator::NOT:
-                    scope().getTemporary(unary_operation.destination).write(bbt::Bool::make(!deLReference<bbt::Bool>(value).value(), type_context_));
-                    break;
-            }
+            scope().getTemporary(get_unary_operator_function.destination).write(operator_function.value());
         }
 
         void visit(bbt::GetBinaryOperatorFunction const& get_binary_operator_function) override

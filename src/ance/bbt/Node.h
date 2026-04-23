@@ -305,15 +305,17 @@ namespace ance::bbt
         Temporary const& destination;
     };
 
-    /// Applies an operation to an operand.
-    struct UnaryOperation final
+    /// Retrieves the operator function for a unary operation from the operand type.
+    struct GetUnaryOperatorFunction final
         : Statement
-        , utility::ConcreteNode<UnaryOperation, Visitor>
+        , utility::ConcreteNode<GetUnaryOperatorFunction, Visitor>
     {
-        UnaryOperation(core::UnaryOperator const& kind, Temporary const& value, Temporary const& result, core::Location const& source_location);
+        // todo: ugly, see comments at GetBinaryOperatorFunction
+
+        GetUnaryOperatorFunction(core::UnaryOperator kind, Temporary const& operand_type, Temporary const& result, core::Location const& source_location);
 
         core::UnaryOperator op;
-        Temporary const&    operand;
+        Temporary const&    type;
         Temporary const&    destination;
     };
 
@@ -323,7 +325,9 @@ namespace ance::bbt
         , utility::ConcreteNode<GetBinaryOperatorFunction, Visitor>
     {
         // todo: unify this with member function access as soon as those are added, consider whether this should be an intrinsic instead or use a completely different approach
-        // todo: i really feel that this is ugly, and should rather be an intrinsic
+        // todo: I really feel that this is ugly, and should rather be an intrinsic
+        // todo: maybe it should not be an intrinsic and instead be something along the lines of GEP just for members
+        // todo: it would be reworked to a simple GetMember where just the operator would be passed in and then standard overload resolution, which would also mean there would be no separate GetUnaryOperatorFunction
 
         GetBinaryOperatorFunction(core::BinaryOperator  kind,
                                   Temporary const&      left_type,
@@ -433,25 +437,25 @@ namespace ance::bbt
         virtual void visit(Jump const& jump_link)       = 0;
         virtual void visit(Switch const& switch_link)   = 0;
 
-        virtual void visit(ErrorStatement const& error_statement)           = 0;
-        virtual void visit(Pass const& pass_statement)                      = 0;
-        virtual void visit(Assert const& assert_statement)                  = 0;
-        virtual void visit(Store const& store)                              = 0;
-        virtual void visit(Access const& access)                            = 0;
-        virtual void visit(Temporary const& temporary)                      = 0;
-        virtual void visit(Dereference const& dereference)                  = 0;
-        virtual void visit(Intrinsic const& intrinsic)                      = 0;
-        virtual void visit(Call const& call)                                = 0;
-        virtual void visit(FunctionConstructor const& function_constructor) = 0;
-        virtual void visit(Constant const& constant)                        = 0;
-        virtual void visit(Default const& default_value)                    = 0;
-        virtual void visit(CurrentScope const& current_scope)               = 0;
-        virtual void visit(UnaryOperation const& unary_operation)           = 0;
+        virtual void visit(ErrorStatement const& error_statement)                         = 0;
+        virtual void visit(Pass const& pass_statement)                                    = 0;
+        virtual void visit(Assert const& assert_statement)                                = 0;
+        virtual void visit(Store const& store)                                            = 0;
+        virtual void visit(Access const& access)                                          = 0;
+        virtual void visit(Temporary const& temporary)                                    = 0;
+        virtual void visit(Dereference const& dereference)                                = 0;
+        virtual void visit(Intrinsic const& intrinsic)                                    = 0;
+        virtual void visit(Call const& call)                                              = 0;
+        virtual void visit(FunctionConstructor const& function_constructor)               = 0;
+        virtual void visit(Constant const& constant)                                      = 0;
+        virtual void visit(Default const& default_value)                                  = 0;
+        virtual void visit(CurrentScope const& current_scope)                             = 0;
+        virtual void visit(GetUnaryOperatorFunction const& get_unary_operator_function)   = 0;
         virtual void visit(GetBinaryOperatorFunction const& get_binary_operator_function) = 0;
-        virtual void visit(TypeOf const& type_of)                           = 0;
-        virtual void visit(OrderedScopeEnter const& scope_enter)            = 0;
-        virtual void visit(OrderedScopeExit const& scope_exit)              = 0;
-        virtual void visit(SetReturnValue const& set_return_value)          = 0;
+        virtual void visit(TypeOf const& type_of)                                         = 0;
+        virtual void visit(OrderedScopeEnter const& scope_enter)                          = 0;
+        virtual void visit(OrderedScopeExit const& scope_exit)                            = 0;
+        virtual void visit(SetReturnValue const& set_return_value)                        = 0;
 
         virtual void visit(SwitchCase const& switch_case) = 0;
 

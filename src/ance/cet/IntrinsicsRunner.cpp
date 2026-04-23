@@ -79,6 +79,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::FQ_2_STR:
                 runAny2Str();
                 break;
+            case core::Intrinsic::BOOL_NOT:
+                runBoolNot();
+                break;
             case core::Intrinsic::INCLUDE:
                 runInclude();
                 break;
@@ -277,6 +280,12 @@ struct ance::cet::IntrinsicsRunner::Implementation
     void runAny2Str()
     {
         setResult(bbt::String::make(state_.arguments->at(0)->toString(), type_context_));
+    }
+
+    void runBoolNot()
+    {
+        bool const value = state_.arguments->at(0)->as<bbt::Bool>().value();
+        setResult(bbt::Bool::make(!value, type_context_));
     }
 
     void runInclude()

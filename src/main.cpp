@@ -118,12 +118,8 @@ namespace ance
 
         return exit_code;
 
-        // todo: get current code to work, commit as AMMENDMEND
-        // todo: add something to print numbers, test
-
         // todo: WHEN WORKING ON TYPES: TYPES SHOULD DEFINE THEIR OPS USING SOURCE CODE (HARDCODED IN C++), just like the core functions, using intrinsics
 
-        // todo: do the current unary ops with the same way that binary ops are done for types
         // todo: unary ops (for floats and maybe others)
         // todo: relational and equality ops (for string, size, bool, floats and maybe others)
 

@@ -1274,7 +1274,24 @@ struct ance::bbt::Segmenter::Implementation
             auto& operand_tmp = builder.addTemporary("UnaryOperation_Operand", unary_operation.operand->location);
             builder.addSegmented(*unary_operation.operand, operand_tmp);
 
-            builder.addStatement<UnaryOperation>(unary_operation.op, operand_tmp, destination(), unary_operation.location);
+            auto& operand_dereferenced_tmp = builder.addTemporary("UnaryOperation_Operand_Dereferenced", unary_operation.operand->location);
+            builder.addStatement<Dereference>(operand_tmp, operand_dereferenced_tmp, unary_operation.operand->location);
+
+            auto& operand_type_tmp = builder.addTemporary("UnaryOperation_Operand_Type", unary_operation.location);
+            {
+                utility::List<std::reference_wrapper<Temporary const>> type_args;
+                type_args.emplace_back(operand_dereferenced_tmp);
+                builder.addStatement<TypeOf>(std::move(type_args), operand_type_tmp, unary_operation.location);
+            }
+
+            auto& operator_function_tmp = builder.addTemporary("UnaryOperation_OperatorFunction", unary_operation.location);
+            builder.addStatement<GetUnaryOperatorFunction>(unary_operation.op, operand_type_tmp, operator_function_tmp, unary_operation.location);
+
+            {
+                utility::List<std::reference_wrapper<Temporary const>> call_args;
+                call_args.emplace_back(operand_dereferenced_tmp);
+                builder.addStatement<Call>(operator_function_tmp, std::move(call_args), destination(), unary_operation.location);
+            }
 
             setResult(builder.take());
         }

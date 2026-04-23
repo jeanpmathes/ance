@@ -96,6 +96,14 @@ namespace ance::core
             /// It returns the string representation of the float.
             FQ_2_STR,// todo: implement as core function
 
+            /// Computes logical negation of a boolean value.
+            ///
+            /// This intrinsic takes the following parameters:
+            /// - The boolean to negate.
+            ///
+            /// It returns the negated boolean.
+            BOOL_NOT,
+
             /// Logs a string message as compiler output.
             ///
             /// This intrinsic takes the following parameters:
