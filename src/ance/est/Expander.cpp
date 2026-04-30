@@ -12,6 +12,11 @@
 
 #include <llvm/IR/Instruction.h>
 
+namespace
+{
+    auto prefix = "expander";
+}
+
 struct ance::est::Expander::Implementation
 {
     explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
@@ -338,6 +343,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::File const& file) override
         {
+            trace("File", file.location) << ", count(declarations)=" << file.declarations.size();
+
             utility::List<utility::Owned<Declaration>> declarations;
 
             for (auto const& declaration : file.declarations)
@@ -350,16 +357,25 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::ErrorDeclaration const& error) override
         {
+            trace("ErrorDeclaration", error.location);
+
             result_.setDeclaration(utility::makeOwned<RunnableDeclaration>(utility::makeOwned<ErrorStatement>(error.location), error.location));
         }
 
         void visit(ast::RunnableDeclaration const& runnable) override
         {
+            trace("RunnableDeclaration", runnable.location);
+
             result_.setDeclaration(utility::makeOwned<RunnableDeclaration>(wrap(expand(*runnable.body)), runnable.location));
         }
 
         void visit(ast::VariableDeclaration const& variable_declaration) override
         {
+            trace("VariableDeclaration", variable_declaration.location)
+                << ", access=" << variable_declaration.access_modifier << ", execution=" << variable_declaration.execution_modifier
+                << ", identifier=" << variable_declaration.identifier << ", assigner=" << variable_declaration.assigner << ", has_value=" << std::boolalpha
+                << variable_declaration.value.hasValue();
+
             utility::Owned<Expression> type = expand(*variable_declaration.type);
 
             utility::Optional<utility::Owned<Expression>> value = std::nullopt;
@@ -379,6 +395,11 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::FunctionDeclaration const& function_declaration) override
         {
+            trace("FunctionDeclaration", function_declaration.location)
+                << ", access=" << function_declaration.access_modifier << ", execution=" << function_declaration.execution_modifier
+                << ", identifier=" << function_declaration.identifier << ", count(parameters)=" << function_declaration.parameters.size()
+                << ", has_return_type=" << std::boolalpha << function_declaration.return_type.hasValue();
+
             utility::List<Parameter> parameters;
             for (auto const& parameter : function_declaration.parameters)
             {
@@ -418,11 +439,15 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::ErrorStatement const& error_statement) override
         {
+            trace("ErrorStatement", error_statement.location);
+
             result_.setStatements(utility::makeOwned<ErrorStatement>(error_statement.location));
         }
 
         void visit(ast::Block const& block) override
         {
+            trace("Block", block.location) << ", count(statements)=" << block.statements.size();
+
             SBuilder builder(*this);
 
             for (auto& statement : block.statements)
@@ -435,6 +460,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Independent const& independent) override
         {
+            trace("Independent", independent.location);
+
             SBuilder builder(*this);
 
             builder.pushIndependentExpansion(*independent.expression);
@@ -444,6 +471,9 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Let const& let) override
         {
+            trace("Let", let.location) << ", identifier=" << let.identifier << ", assigner=" << let.assigner << ", has_value=" << std::boolalpha
+                                       << let.value.hasValue();
+
             SBuilder builder(*this);
 
             utility::Owned<Expression> type = expand(*let.type);
@@ -461,6 +491,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Assignment const& assignment) override
         {
+            trace("Assignment", assignment.location) << ", assigner=" << assignment.assigner;
+
             SBuilder builder(*this);
 
             utility::Owned<Expression> assignee = expand(*assignment.assignee);
@@ -473,6 +505,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::If const& if_statement) override
         {
+            trace("If", if_statement.location) << ", has_false_part=" << std::boolalpha << if_statement.false_part.hasValue();
+
             SBuilder builder(*this);
 
             utility::Owned<Expression> condition = expand(*if_statement.condition);
@@ -488,21 +522,29 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Loop const& loop) override
         {
+            trace("Loop", loop.location);
+
             result_.setStatements(utility::makeOwned<Loop>(wrap(expand(*loop.body)), loop.location));
         }
 
         void visit(ast::Break const& break_statement) override
         {
+            trace("Break", break_statement.location);
+
             result_.setStatements(utility::makeOwned<Break>(break_statement.location));
         }
 
         void visit(ast::Continue const& continue_statement) override
         {
+            trace("Continue", continue_statement.location);
+
             result_.setStatements(utility::makeOwned<Continue>(continue_statement.location));
         }
 
         void visit(ast::Return const& return_statement) override
         {
+            trace("Return", return_statement.location) << ", has_value=" << std::boolalpha << return_statement.value.hasValue();
+
             SBuilder builder(*this);
 
             utility::Optional<utility::Owned<Expression>> return_value = std::nullopt;
@@ -519,6 +561,7 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::While const& while_statement) override
         {
+            trace("While", while_statement.location);
             SBuilder builder(*this);
 
             utility::Owned<Expression> condition = expand(*while_statement.condition);
@@ -536,6 +579,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Match const& match_statement) override
         {
+            trace("Match", match_statement.location) << ", count(cases)=" << match_statement.cases.size();
+
             SBuilder builder(*this);
 
             utility::Owned<Expression> condition = expand(*match_statement.condition);
@@ -553,21 +598,29 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Erase const& erase) override
         {
+            trace("Erase", erase.location) << ", identifier=" << erase.identifier;
+
             result_.setStatements(utility::makeOwned<Erase>(erase.identifier, erase.location));
         }
 
         void visit(ast::Assert const& assert) override
         {
+            trace("Assert", assert.location);
+
             result_.setStatements(utility::makeOwned<Assert>(expand(*assert.condition), assert.location));
         }
 
         void visit(ast::ErrorExpression const& error_expression) override
         {
+            trace("ErrorExpression", error_expression.location);
+
             result_.setExpression(utility::makeOwned<ErrorExpression>(error_expression.location));
         }
 
         void visit(ast::And const& and_expression) override
         {
+            trace("And", and_expression.location) << ", negated=" << std::boolalpha << and_expression.negated;
+
             EBuilder builder(*this, and_expression.location);
 
             // todo: assigners should be move assignments as soon as supported
@@ -594,6 +647,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Or const& or_expression) override
         {
+            trace("Or", or_expression.location) << ", negated=" << std::boolalpha << or_expression.negated;
+
             EBuilder builder(*this, or_expression.location);
 
             // todo: assigners should be move assignments as soon as supported
@@ -620,6 +675,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Call const& call) override
         {
+            trace("Call", call.location) << ", count(arguments)=" << call.arguments.size();
+
             utility::Owned<Expression> callee = expand(*call.callee);
 
             utility::List<utility::Owned<Expression>> arguments;
@@ -633,6 +690,10 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Lambda const& lambda) override
         {
+            trace("Lambda", lambda.location) << ", count(parameters)=" << lambda.parameters.size() << ", has_return_type=" << std::boolalpha
+                                             << lambda.return_type.hasValue() << ", has_expression_body=" << std::boolalpha << lambda.expression_body.hasValue()
+                                             << ", has_statement_body=" << std::boolalpha << lambda.statement_body.hasValue();
+
             utility::List<Parameter> parameters;
             for (auto& parameter : lambda.parameters)
             {
@@ -677,6 +738,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Intrinsic const& intrinsic_expression) override
         {
+            trace("Intrinsic", intrinsic_expression.location) << ", count(arguments)=" << intrinsic_expression.arguments.size();
+
             utility::Owned<Expression> name = expand(*intrinsic_expression.name);
 
             utility::List<utility::Owned<Expression>> arguments;
@@ -690,6 +753,9 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::BlockExpression const& block_expression) override
         {
+            trace("BlockExpression", block_expression.location)
+                << ", count(statements)=" << block_expression.statements.size() << ", has_result" << std::boolalpha << block_expression.result.hasValue();
+
             SBuilder builder(*this);
 
             for (auto& statement : block_expression.statements)
@@ -712,42 +778,59 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::Access const& access) override
         {
+            trace("Access", access.location) << ", identifier=" << access.identifier;
+
             result_.setExpression(utility::makeOwned<Access>(access.identifier, access.location));
         }
 
         void visit(ast::Here const& here) override
         {
+            trace("Here", here.location);
+
             result_.setExpression(utility::makeOwned<Here>(here.location));
         }
 
         void visit(ast::UnitLiteral const& unit_literal) override
         {
+            trace("UnitLiteral", unit_literal.location);
+
             result_.setExpression(utility::makeOwned<UnitLiteral>(unit_literal.location));
         }
 
         void visit(ast::SizeLiteral const& size_literal) override
         {
+            trace("SizeLiteral", size_literal.location) << ", value=" << size_literal.value;
+
             result_.setExpression(utility::makeOwned<SizeLiteral>(size_literal.value, size_literal.location));
         }
 
         void visit(ast::FloatingPointLiteral const& floating_point_literal) override
         {
+            trace("FloatingPointLiteral", floating_point_literal.location)
+                << ", precision=" << floating_point_literal.precision << ", value=" << floating_point_literal.value;
+
             result_.setExpression(
                 utility::makeOwned<FloatingPointLiteral>(floating_point_literal.precision, floating_point_literal.value, floating_point_literal.location));
         }
 
         void visit(ast::StringLiteral const& string_literal) override
         {
+            trace("StringLiteral", string_literal.location) << ", value=" << string_literal.value;
+
             result_.setExpression(utility::makeOwned<StringLiteral>(string_literal.value, string_literal.location));
         }
 
         void visit(ast::BoolLiteral const& bool_literal) override
         {
+            trace("BoolLiteral", bool_literal.location) << ", value=" << bool_literal.value;
+
             result_.setExpression(utility::makeOwned<BoolLiteral>(bool_literal.value, bool_literal.location));
         }
 
         void visit(ast::IfExpression const& if_expression) override
         {
+            trace("IfExpression", if_expression.location) << ", has_else=" << std::boolalpha << if_expression.else_expression.hasValue();
+
             EBuilder builder(*this, if_expression.location);
 
             utility::List<utility::Owned<Expression>> typeof_parameters;
@@ -785,6 +868,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::MatchExpression const& match_expression) override
         {
+            trace("MatchExpression", match_expression.location) << ", count(cases)=" << match_expression.cases.size();
+
             EBuilder builder(*this, match_expression.location);
 
             utility::List<utility::Owned<Expression>> typeof_parameters;
@@ -818,11 +903,15 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::UnaryOperation const& unary_operation) override
         {
+            trace("UnaryOperation", unary_operation.location) << ", op=" << unary_operation.op.toString();
+
             result_.setExpression(utility::makeOwned<UnaryOperation>(unary_operation.op, expand(*unary_operation.operand), unary_operation.location));
         }
 
         void visit(ast::BinaryOperation const& binary_operation) override
         {
+            trace("BinaryOperation", binary_operation.location) << ", op=" << binary_operation.op.toString();
+
             result_.setExpression(utility::makeOwned<BinaryOperation>(expand(*binary_operation.left),
                                                                       binary_operation.op,
                                                                       expand(*binary_operation.right),
@@ -831,6 +920,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::TypeOf const& type_of) override
         {
+            trace("TypeOf", type_of.location) << ", count(expressions)=" << type_of.expressions.size();
+
             utility::List<utility::Owned<Expression>> expressions;
             for (auto const& expression : type_of.expressions)
             {
@@ -842,6 +933,8 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::MatchCase const& match_case) override
         {
+            trace("MatchCase", match_case.location) << ", count(patterns)=" << match_case.patterns.size();
+
             utility::List<utility::Owned<Expression>> patterns;
             for (auto& pattern : match_case.patterns)
             {
@@ -853,14 +946,22 @@ struct ance::est::Expander::Implementation
             result_.setMatchCase(utility::makeOwned<MatchCase>(std::move(patterns), match_case.default_pattern_location, std::move(body), match_case.location));
         }
 
-        void visit(ast::MatchExpressionCase const& match_case) override
+        void visit(ast::MatchExpressionCase const&) override
         {
             // This is handled inside visit(ast::MatchExpression)
-            (void) match_case;
+
             assert(false);
         }
 
       private:
+        // ReSharper disable once CppMemberFunctionMayBeConst
+        core::Reporter::MessageBuilder trace(std::string_view const node_name, core::Location const& location)
+        {
+            auto msg = reporter_.trace(prefix, core::Location::project());
+            msg << "visit " << node_name << " " << location;
+            return msg;
+        }
+
         core::Reporter& reporter_;
         Result          result_;
 
@@ -870,10 +971,18 @@ struct ance::est::Expander::Implementation
 
     utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (template)
     {
+        reporter_.trace(prefix, core::Location::project()) << "expand ordered file enter {file=" << file.string() << "}";
+
         (void) source_tree_;//todo: use or remove
 
         utility::Optional<utility::Owned<ast::Statement>> parsed = parser_.parseOrderedFile(file);
-        if (!parsed.hasValue()) return std::nullopt;
+
+        if (!parsed.hasValue())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "expand ordered file exit {file=" << file.string() << ", status=no-parse}";
+
+            return std::nullopt;
+        }
 
         utility::Owned<AST> ast        = utility::makeOwned<AST>(reporter_);
         Statements          statements = ast->expand(**parsed);
@@ -882,37 +991,72 @@ struct ance::est::Expander::Implementation
 
         context_.print<Printer>(*block, "est", file);
 
-        if (reporter_.isFailed()) return std::nullopt;
+        if (reporter_.isFailed())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "expand ordered file exit {file=" << file.string() << ", status=fail}";
+
+            return std::nullopt;
+        }
+
+        reporter_.trace(prefix, core::Location::project()) << "expand ordered file exit {file=" << file.string() << ", status=ok}";
 
         return block;
     }
 
     utility::Optional<utility::Owned<File>> expandUnorderedFile(std::filesystem::path const& file)
     {
+        reporter_.trace(prefix, core::Location::project()) << "expand unordered file enter {file=" << file.string() << "}";
+
         utility::Optional<utility::Owned<ast::File>> parsed = parser_.parseUnorderedFile(file);
-        if (!parsed.hasValue()) return std::nullopt;
+        if (!parsed.hasValue())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "expand unordered file exit {file=" << file.string() << ", status=no-parse}";
+
+            return std::nullopt;
+        }
 
         utility::Owned<AST>  ast = utility::makeOwned<AST>(reporter_);
         utility::Owned<File> est = ast->expand(**parsed);
 
         context_.print<Printer>(*est, "est", file);
 
-        if (reporter_.isFailed()) return std::nullopt;
+        if (reporter_.isFailed())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "expand unordered file exit {file=" << file.string() << ", status=fail}";
+
+            return std::nullopt;
+        }
+
+        reporter_.trace(prefix, core::Location::project()) << "expand unordered file exit {file=" << file.string() << ", status=ok}";
 
         return est;
     }
 
     utility::Optional<utility::Owned<Declaration>> expandDeclaration(std::string const& code, std::string const& id)
     {
+        reporter_.trace(prefix, core::Location::project()) << "expand declaration enter {id=" << id << ", code_size=" << code.size() << "}";
+
         utility::Optional<utility::Owned<ast::Declaration>> parsed = parser_.parseDeclaration(code, id);
-        if (!parsed.hasValue()) return std::nullopt;
+        if (!parsed.hasValue())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "expand declaration exit {id=" < < < < ", status=no-parse}";
+
+            return std::nullopt;
+        }
 
         utility::Owned<AST>         ast         = utility::makeOwned<AST>(reporter_);
         utility::Owned<Declaration> declaration = ast->expand(**parsed);
 
         context_.print<Printer>(*declaration, "est", std::filesystem::path("core") / id);
 
-        if (reporter_.isFailed()) return std::nullopt;
+        if (reporter_.isFailed())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "expand declaration exit {id=" << id << ", status=fail}";
+
+            return std::nullopt;
+        }
+
+        reporter_.trace(prefix, core::Location::project()) << "expand declaration exit {id=" << id << ", status=ok}";
 
         return declaration;
     }

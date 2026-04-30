@@ -452,6 +452,7 @@ struct ance::cet::Runner::Implementation
             return TemporaryOutput {this, temporary};
         }
 
+        // ReSharper disable once CppMemberFunctionMayBeConst
         core::Reporter::MessageBuilder trace(std::string_view const link_name, bbt::Link const& link)
         {
             auto msg = reporter_.trace(prefix, core::Location::project());
@@ -460,6 +461,7 @@ struct ance::cet::Runner::Implementation
             return msg;
         }
 
+        // ReSharper disable once CppMemberFunctionMayBeConst
         core::Reporter::MessageBuilder trace(std::string_view const statement_name, bbt::Statement const& statement)
         {
             auto msg = reporter_.trace(prefix, core::Location::project());
