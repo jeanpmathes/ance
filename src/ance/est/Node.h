@@ -423,7 +423,7 @@ namespace ance::est
         utility::List<utility::Owned<Expression>> expressions;
     };
 
-    /// Auxiliary nodes which are used as parts of expressions and statements.
+    /// Auxiliary nodes, which are used as parts of expressions and statements.
     struct Auxiliary
         : virtual Node
         , virtual utility::AbstractNode<Visitor>

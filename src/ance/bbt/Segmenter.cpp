@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include <stack>
+#include <string_view>
 #include <vector>
 
 #include "ance/est/Expander.h"
@@ -16,6 +17,11 @@
 #include "Type.h"
 #include "Value.h"
 #include "ance/ast/Node.h"
+
+namespace
+{
+    auto prefix = "segmenter";
+}
 
 struct ance::bbt::Segmenter::Implementation
 {
@@ -365,6 +371,58 @@ struct ance::bbt::Segmenter::Implementation
         RET(core::Reporter& reporter, TypeContext& type_context) : reporter_(reporter), type_context_(type_context) {}
         ~RET() override = default;
 
+        struct BlockOutput
+        {
+            BaseBB const& block;
+
+            friend std::ostream& operator<<(std::ostream& os, BlockOutput const& self)
+            {
+                os << "BB{";
+
+                if (self.block.isCreated())
+                {
+                    os << "index=" << self.block.index();
+                }
+                else
+                {
+                    os << "index=uncreated";
+                }
+
+                os << ", has_code=" << self.block.hasCode() << "}";
+
+                return os;
+            }
+        };
+
+        [[nodiscard]] static BlockOutput block(BaseBB const& base_bb)
+        {
+            return {base_bb};
+        }
+
+        // ReSharper disable once CppMemberFunctionMayBeConst
+        core::Reporter::MessageBuilder trace(std::string_view const declaration_name, est::Declaration const& declaration)
+        {
+            auto msg = reporter_.trace(prefix, core::Location::nowhere());
+            msg << "visit declaration " << declaration_name << " " << declaration.location;
+            return msg;
+        }
+
+        // ReSharper disable once CppMemberFunctionMayBeConst
+        core::Reporter::MessageBuilder trace(std::string_view const statement_name, est::Statement const& statement)
+        {
+            auto msg = reporter_.trace(prefix, core::Location::nowhere());
+            msg << "visit statement " << statement_name << " " << statement.location;
+            return msg;
+        }
+
+        // ReSharper disable once CppMemberFunctionMayBeConst
+        core::Reporter::MessageBuilder trace(std::string_view const expression_name, est::Expression const& expression)
+        {
+            auto msg = reporter_.trace(prefix, core::Location::nowhere());
+            msg << "visit expression " << expression_name << " " << expression.location;
+            return msg;
+        }
+
         struct Result
         {
             utility::List<utility::Owned<BaseBB>> blocks = {};
@@ -500,6 +558,8 @@ struct ance::bbt::Segmenter::Implementation
         template<typename Segmentable>
         utility::Owned<Flow> apply(Segmentable const& segmentable, bool is_function, std::string id)
         {
+            reporter_.trace(prefix, core::Location::nowhere()) << "apply enter {id=" << id << ", is_function=" << is_function << "}";
+
             FlowState previous_state = std::move(state_);
 
             state_ = {};
@@ -539,6 +599,8 @@ struct ance::bbt::Segmenter::Implementation
                 basic_blocks.emplace_back(current.createBlock(basic_blocks.size() + 1));
                 converted.emplace_back(current);
 
+                reporter_.trace(prefix, core::Location::nowhere()) << "apply create block " << block(current);
+
                 for (auto& next : current.next())
                 {
                     if (!next->isCreated())
@@ -554,6 +616,8 @@ struct ance::bbt::Segmenter::Implementation
 
                 utility::Owned<Link> link = current.createLink(basic_blocks);
                 basic_blocks[index]->link = std::move(link);
+
+                reporter_.trace(prefix, core::Location::nowhere()) << "apply create link " << block(current);
             }
 
             BasicBlock& first_block = *basic_blocks[current_entry.get().index()];
@@ -565,11 +629,15 @@ struct ance::bbt::Segmenter::Implementation
 
             utility::Owned<Flow> flow = utility::makeOwned<Flow>(std::move(basic_blocks), first_block, std::move(flow_id), segmentable.location);
 
+            reporter_.trace(prefix, core::Location::nowhere()) << "apply exit {flow_id=" << flow->id() << ", count(block)=" << flow->blocks.size() << "}";
+
             return flow;
         }
 
         std::reference_wrapper<BaseBB> simplify(std::reference_wrapper<BaseBB> entry)
         {
+            reporter_.trace(prefix, core::Location::nowhere()) << "simplify enter {entry=" << block(entry) << "}";
+
             for (auto& block : state_.bbs)
             {
                 block.get()->prune();
@@ -590,6 +658,9 @@ struct ance::bbt::Segmenter::Implementation
                 simplified.insert(&current);
 
                 auto [result, next] = current.simplify();
+
+                reporter_.trace(prefix, core::Location::nowhere())
+                    << "simplify block {current=" << block(current) << ", result=" << block(*result) << ", next_count=" << next.size() << "}";
 
                 if (&current == &current_entry.get())
                 {
@@ -621,6 +692,9 @@ struct ance::bbt::Segmenter::Implementation
             {
                 reporter_.warning(first_unreachable_location) << "Unreachable code";
             }
+
+            reporter_.trace(prefix, core::Location::nowhere())
+                << "simplify exit {entry=" << block(current_entry) << ", count(reachable_blocks)=" << simplified.size() << "}";
 
             return current_entry;
         }
@@ -729,6 +803,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::RunnableDeclaration const& runnable) override
         {
+            trace("RunnableDeclaration", runnable);
+
             Builder builder(*this);
             builder.addSegmented(*runnable.body);
             setResult(builder.take());
@@ -736,6 +812,11 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::VariableDeclaration const& variable_declaration) override
         {
+            trace("VariableDeclaration", variable_declaration)
+                << ", access=" << variable_declaration.access_modifier << ", execution=" << variable_declaration.execution_modifier
+                << ", identifier=" << variable_declaration.identifier << ", assigner=" << variable_declaration.assigner << ", has_value=" << std::boolalpha
+                << variable_declaration.value.hasValue();
+
             Builder builder(*this);
 
             auto& type_tmp = builder.addTemporary("VariableDeclaration_Type", variable_declaration.type->location);
@@ -779,6 +860,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::ErrorStatement const& error_statement) override
         {
+            trace("ErrorStatement", error_statement);
+
             Builder builder(*this);
 
             builder.addStatement<ErrorStatement>(error_statement.location);
@@ -788,6 +871,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Pass const& pass_statement) override
         {
+            trace("Pass", pass_statement);
+
             Builder builder(*this);
 
             builder.addStatement<Pass>(pass_statement.location);
@@ -813,6 +898,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Block const& block) override
         {
+            trace("Block", block) << ", count(statements)=" << block.statements.size();
+
             setResultInOrderedScope(block, [](Builder& builder, est::Block const& node) {
                 for (auto& statement : node.statements)
                 {
@@ -823,6 +910,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Independent const& independent) override
         {
+            trace("Independent", independent);
+
             Builder builder(*this);
 
             auto& value_tmp = builder.addTemporary("Independent", independent.location);
@@ -833,6 +922,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Assignment const& assignment) override
         {
+            trace("Assignment", assignment) << ", assigner=" << assignment.assigner;
+
             Builder builder(*this);
 
             auto& target_tmp = builder.addTemporary("Assignment_Target", assignment.assignee->location);
@@ -848,6 +939,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::If const& if_statement) override
         {
+            trace("If", if_statement);
+
             Builder builder(*this);
 
             auto& condition_tmp = builder.addTemporary("If_Condition", if_statement.condition->location);
@@ -866,6 +959,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Loop const& loop) override
         {
+            trace("Loop", loop);
+
             Builder builder(*this);
 
             builder.addDisconnectedBlock();
@@ -887,6 +982,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Break const& break_statement) override
         {
+            trace("Break", break_statement);
+
             if (state_.loops.empty())
             {
                 reporter_.error(break_statement.location) << "Break statement outside of loop";
@@ -913,6 +1010,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Continue const& continue_statement) override
         {
+            trace("Continue", continue_statement);
+
             if (state_.loops.empty())
             {
                 reporter_.error(continue_statement.location) << "Continue statement outside of loop";
@@ -939,6 +1038,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Match const& match) override
         {
+            trace("Match", match) << ", count(cases)=" << match.cases.size();
+
             Builder builder(*this);
 
             auto& value_tmp = builder.addTemporary("Match_Value", match.value->location);
@@ -980,6 +1081,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Return const& return_statement) override
         {
+            trace("Return", return_statement) << ", has_value=" << std::boolalpha << return_statement.value.hasValue();
+
             if (!state_.is_function)
             {
                 reporter_.error(return_statement.location) << "Return statement outside of function";
@@ -1007,6 +1110,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Let const& let) override
         {
+            trace("Let", let) << ", identifier=" << let.identifier << ", assigner=" << let.assigner << ", has_value=" << std::boolalpha << let.value.hasValue();
+
             Builder builder(*this);
 
             auto& type_tmp = builder.addTemporary("Let_Type", let.type->location);
@@ -1050,6 +1155,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Erase const& erase) override
         {
+            trace("Erase", erase) << ", identifier=" << erase.identifier;
+
             Builder builder(*this);
 
             auto& identifier_tmp = builder.addTemporary("Erase_Identifier", erase.location);
@@ -1072,6 +1179,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Assert const& assert) override
         {
+            trace("Assert", assert);
+
             Builder builder(*this);
 
             auto& condition_tmp = builder.addTemporary("Assert_Condition", assert.condition->location);
@@ -1084,6 +1193,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::ErrorExpression const& error) override
         {
+            trace("ErrorExpression", error);
+
             Builder builder(*this);
 
             builder.addStatement<ErrorStatement>(error.location);
@@ -1093,6 +1204,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Intrinsic const& intrinsic) override
         {
+            trace("Intrinsic", intrinsic) << ", count(arguments)=" << intrinsic.arguments.size();
+
             Builder builder(*this);
 
             auto& name_tmp = builder.addTemporary("Intrinsic_Name", intrinsic.name->location);
@@ -1116,6 +1229,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::BlockExpression const& block_expression) override
         {
+            trace("BlockExpression", block_expression) << ", count(statements)=" << block_expression.statements.size();
+
             setResultInOrderedScope(block_expression, [this](Builder& builder, est::BlockExpression const& node) {
                 for (auto& statement : node.statements)
                 {
@@ -1130,6 +1245,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Access const& access) override
         {
+            trace("Access", access) << ", identifier=" << access.identifier;
+
             Builder builder(*this);
 
             auto& scope_tmp = builder.addTemporary("Access_Scope", access.location);
@@ -1153,6 +1270,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Call const& call) override
         {
+            trace("Call", call) << ", count(arguments)=" << call.arguments.size();
+
             Builder builder(*this);
 
             auto& callee_tmp = builder.addTemporary("Call_Callee", call.callee->location);
@@ -1174,6 +1293,9 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::FunctionConstructor const& function_constructor) override
         {
+            trace("FunctionConstructor", function_constructor)
+                << ", name=" << function_constructor.name << ", count(parameters)=" << function_constructor.parameters.size();
+
             Builder builder(*this);
 
             utility::List<Parameter> parameters;
@@ -1201,6 +1323,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::UnitLiteral const& unit_literal) override
         {
+            trace("UnitLiteral", unit_literal);
+
             Builder builder(*this);
 
             builder.addStatement<Constant>(Unit::make(type_context_), destination(), unit_literal.location);
@@ -1210,6 +1334,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::SizeLiteral const& size_literal) override
         {
+            trace("SizeLiteral", size_literal) << ", value=" << size_literal.value;
+
             Builder builder(*this);
 
             builder.addStatement<Constant>(Size::make(size_literal.value, type_context_), destination(), size_literal.location);
@@ -1219,6 +1345,9 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::FloatingPointLiteral const& floating_point_literal) override
         {
+            trace("FloatingPointLiteral", floating_point_literal)
+                << ", precision=" << floating_point_literal.precision << ", value=" << floating_point_literal.value;
+
             Builder builder(*this);
 
             builder.addStatement<Constant>(Float::make(floating_point_literal.value, floating_point_literal.precision, type_context_),
@@ -1230,6 +1359,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::StringLiteral const& string_literal) override
         {
+            trace("StringLiteral", string_literal) << ", value=" << string_literal.value;
+
             Builder builder(*this);
 
             builder.addStatement<Constant>(String::make(string_literal.value, type_context_), destination(), string_literal.location);
@@ -1239,6 +1370,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::BoolLiteral const& bool_literal) override
         {
+            trace("BoolLiteral", bool_literal) << ", value=" << std::boolalpha << bool_literal.value;
+
             Builder builder(*this);
 
             builder.addStatement<Constant>(Bool::make(bool_literal.value, type_context_), destination(), bool_literal.location);
@@ -1248,6 +1381,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Default const& default_value) override
         {
+            trace("Default", default_value);
+
             Builder builder(*this);
 
             auto& type = builder.addTemporary("Default_Type", default_value.type->location);
@@ -1260,6 +1395,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::Here const& here) override
         {
+            trace("Here", here);
+
             Builder builder(*this);
 
             builder.addStatement<Constant>(Location::make(here.location, type_context_), destination(), here.location);
@@ -1269,6 +1406,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::UnaryOperation const& unary_operation) override
         {
+            trace("UnaryOperation", unary_operation) << ", op=" << unary_operation.op;
+
             Builder builder(*this);
 
             auto& operand_tmp = builder.addTemporary("UnaryOperation_Operand", unary_operation.operand->location);
@@ -1298,6 +1437,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::BinaryOperation const& binary_operation) override
         {
+            trace("BinaryOperation", binary_operation) << ", op=" << binary_operation.op;
+
             Builder builder(*this);
 
             auto& left_tmp = builder.addTemporary("BinaryOperation_Left", binary_operation.left->location);
@@ -1345,6 +1486,8 @@ struct ance::bbt::Segmenter::Implementation
 
         void visit(est::TypeOf const& type_of) override
         {
+            trace("TypeOf", type_of);
+
             Builder builder(*this);
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
@@ -1412,10 +1555,17 @@ struct ance::bbt::Segmenter::Implementation
 
     utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (templates)
     {
+        reporter_.trace(prefix, core::Location::project()) << "segment ordered file enter {file='" << file.string() << "'}";
+
         (void) source_tree_;// todo: use or remove
 
         utility::Optional<utility::Owned<est::Statement>> expanded = expander_.expandOrderedFile(file);
-        if (!expanded.hasValue()) return std::nullopt;
+        if (!expanded.hasValue())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "segment ordered file exit {file='" << file.string() << "', status=no-expand}";
+
+            return std::nullopt;
+        }
 
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
 
@@ -1424,15 +1574,29 @@ struct ance::bbt::Segmenter::Implementation
         context_.print<Printer>(*flow, "bbt", file);
         context_.graph<Grapher>(*flow, "bbt", file);
 
-        if (reporter_.isFailed()) return std::nullopt;
+        if (reporter_.isFailed())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "segment ordered file exit {file='" << file.string() << "', status=fail}";
+
+            return std::nullopt;
+        }
+
+        reporter_.trace(prefix, core::Location::project()) << "segment ordered file exit {file='" << file.string() << "', status=ok}";
 
         return flow;
     }
 
     utility::Optional<utility::Owned<Flows>> segmentUnorderedFile(std::filesystem::path const& file)
     {
+        reporter_.trace(prefix, core::Location::project()) << "segment unordered file enter {file='" << file.string() << "'}";
+
         utility::Optional<utility::Owned<est::File>> expanded = expander_.expandUnorderedFile(file);
-        if (!expanded.hasValue()) return std::nullopt;
+        if (!expanded.hasValue())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "segment unordered file exit {file='" << file.string() << "', status=no-expand}";
+
+            return std::nullopt;
+        }
 
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
 
@@ -1441,15 +1605,29 @@ struct ance::bbt::Segmenter::Implementation
         context_.print<Printer>(*flows, "bbt", file);
         context_.graph<Grapher>(*flows, "bbt", file);
 
-        if (reporter_.isFailed()) return std::nullopt;
+        if (reporter_.isFailed())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "segment unordered file exit {file='" << file.string() << "', status=fail}";
+
+            return std::nullopt;
+        }
+
+        reporter_.trace(prefix, core::Location::project()) << "segment unordered file exit {file='" << file.string() << "', status=ok}";
 
         return flows;
     }
 
     utility::Optional<utility::Owned<Flow>> segmentDeclaration(std::string const& code, std::string const& id)
     {
+        reporter_.trace(prefix, core::Location::project()) << "segment declaration enter {id=" << id << "}";
+
         utility::Optional<utility::Owned<est::Declaration>> expanded = expander_.expandDeclaration(code, id);
-        if (!expanded.hasValue()) return std::nullopt;
+        if (!expanded.hasValue())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "segment declaration exit {id=" << id << ", status=no-expand}";
+
+            return std::nullopt;
+        }
 
         utility::Owned<RET> ret = utility::makeOwned<RET>(reporter_, type_context_);
 
@@ -1459,7 +1637,14 @@ struct ance::bbt::Segmenter::Implementation
         context_.print<Printer>(*flow, "bbt", path);
         context_.graph<Grapher>(*flow, "bbt", path);
 
-        if (reporter_.isFailed()) return std::nullopt;
+        if (reporter_.isFailed())
+        {
+            reporter_.trace(prefix, core::Location::project()) << "segment declaration exit {id=" << id << ", status=fail}";
+
+            return std::nullopt;
+        }
+
+        reporter_.trace(prefix, core::Location::project()) << "segment declaration exit {id=" << id << ", status=ok}";
 
         return flow;
     }
