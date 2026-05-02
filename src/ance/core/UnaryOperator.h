@@ -16,7 +16,13 @@ namespace ance::core
 
             /// The logical not operator.
             NOT,
-        };
+
+          /// The bitwise not operator.
+          BITWISE_NOT,
+
+          /// The arithmetic negation operator.
+          NEGATION,
+      };
 
         UnaryOperator() = default;
         constexpr UnaryOperator(Value const val) : value_(val) {}// NOLINT(google-explicit-constructor)

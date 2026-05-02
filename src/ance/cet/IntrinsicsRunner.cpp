@@ -104,6 +104,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::SIZE_REM:
                 runSizeRem();
                 break;
+            case core::Intrinsic::SIZE_BITNOT:
+                runSizeBitNot();
+                break;
 
             case core::Intrinsic::HALF_ADD:
                 runFloatAdd(core::Precision::HALF);
@@ -119,6 +122,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
                 break;
             case core::Intrinsic::HALF_REM:
                 runFloatRem(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_NEG:
+                runFloatNeg(core::Precision::HALF);
                 break;
 
             case core::Intrinsic::SINGLE_ADD:
@@ -136,6 +142,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::SINGLE_REM:
                 runFloatRem(core::Precision::SINGLE);
                 break;
+            case core::Intrinsic::SINGLE_NEG:
+                runFloatNeg(core::Precision::SINGLE);
+                break;
 
             case core::Intrinsic::DOUBLE_ADD:
                 runFloatAdd(core::Precision::DOUBLE);
@@ -152,6 +161,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::DOUBLE_REM:
                 runFloatRem(core::Precision::DOUBLE);
                 break;
+            case core::Intrinsic::DOUBLE_NEG:
+                runFloatNeg(core::Precision::DOUBLE);
+                break;
 
             case core::Intrinsic::QUAD_ADD:
                 runFloatAdd(core::Precision::QUAD);
@@ -167,6 +179,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
                 break;
             case core::Intrinsic::QUAD_REM:
                 runFloatRem(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_NEG:
+                runFloatNeg(core::Precision::QUAD);
                 break;
         }
 
@@ -385,6 +400,12 @@ struct ance::cet::IntrinsicsRunner::Implementation
         setResult(bbt::Size::make(lhs % rhs, type_context_));
     }
 
+    void runSizeBitNot()
+    {
+        size_t const value = state_.arguments->at(0)->as<bbt::Size>().value();
+        setResult(bbt::Size::make(~value, type_context_));
+    }
+
     void runFloatAdd(core::Precision const)
     {
         llvm::APFloat lhs = state_.arguments->at(0)->as<bbt::Float>().value();
@@ -423,6 +444,13 @@ struct ance::cet::IntrinsicsRunner::Implementation
         llvm::APFloat rhs = state_.arguments->at(1)->as<bbt::Float>().value();
         lhs.remainder(rhs);
         setResult(bbt::Float::make(std::move(lhs), type_context_));
+    }
+
+    void runFloatNeg(core::Precision const)
+    {
+        llvm::APFloat value = state_.arguments->at(0)->as<bbt::Float>().value();
+        value.changeSign();
+        setResult(bbt::Float::make(std::move(value), type_context_));
     }
 
     void setResult(utility::Shared<bbt::Value> value)

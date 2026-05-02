@@ -120,7 +120,6 @@ namespace ance
 
         // todo: WHEN WORKING ON TYPES: TYPES SHOULD DEFINE THEIR OPS USING SOURCE CODE (HARDCODED IN C++), just like the core functions, using intrinsics
 
-        // todo: unary ops (for floats and maybe others)
         // todo: relational and equality ops (for string, size, bool, floats and maybe others)
 
         // todo: parenthesis expression

@@ -95,6 +95,8 @@ parameter
 
 unaryOperator
     : NOT # UnaryNot
+    | '<not>' # UnaryBitwiseNot
+    | '-' # UnaryNegation
     ;
 
 binaryOperatorMultiplicative

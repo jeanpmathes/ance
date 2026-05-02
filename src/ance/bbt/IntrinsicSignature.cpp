@@ -12,6 +12,12 @@ namespace ance::bbt
         return {std::move(signature), type};
     }
 
+    static std::tuple<Signature, utility::Shared<Type>> makeUnarySignature(core::Intrinsic const intrinsic, utility::Shared<Type> type)
+    {
+        Signature signature = Signature::makeAndNameParameters(intrinsic.identifier(), type);
+        return {std::move(signature), type};
+    }
+
     std::tuple<Signature, utility::Shared<Type>> getIntrinsicSignature(core::Intrinsic intrinsic, TypeContext& type_context)
     {
         utility::Optional<Signature>             signature;
@@ -136,6 +142,11 @@ namespace ance::bbt
                 std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getSize());
                 break;
             }
+            case core::Intrinsic::SIZE_BITNOT:
+            {
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getSize());
+                break;
+            }
 
             case core::Intrinsic::HALF_ADD:
             case core::Intrinsic::HALF_SUB:
@@ -144,6 +155,11 @@ namespace ance::bbt
             case core::Intrinsic::HALF_REM:
             {
                 std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::HALF));
+                break;
+            }
+            case core::Intrinsic::HALF_NEG:
+            {
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getFloat(core::Precision::HALF));
                 break;
             }
 
@@ -156,6 +172,11 @@ namespace ance::bbt
                 std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::SINGLE));
                 break;
             }
+            case core::Intrinsic::SINGLE_NEG:
+            {
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getFloat(core::Precision::SINGLE));
+                break;
+            }
 
             case core::Intrinsic::DOUBLE_ADD:
             case core::Intrinsic::DOUBLE_SUB:
@@ -166,6 +187,11 @@ namespace ance::bbt
                 std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::DOUBLE));
                 break;
             }
+            case core::Intrinsic::DOUBLE_NEG:
+            {
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getFloat(core::Precision::DOUBLE));
+                break;
+            }
 
             case core::Intrinsic::QUAD_ADD:
             case core::Intrinsic::QUAD_SUB:
@@ -174,6 +200,11 @@ namespace ance::bbt
             case core::Intrinsic::QUAD_REM:
             {
                 std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::QUAD));
+                break;
+            }
+            case core::Intrinsic::QUAD_NEG:
+            {
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getFloat(core::Precision::QUAD));
                 break;
             }
         }

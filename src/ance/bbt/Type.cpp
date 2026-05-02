@@ -408,7 +408,10 @@ namespace ance::bbt
                 implementation_->ensureReadiness(type);
                 implementation_->ensureReadiness(getFunction());
 
-                implementation_->addArithmeticOperators(*type, "s");
+                std::string const type_prefix = "s";
+
+                implementation_->addArithmeticOperators(*type, type_prefix);
+                implementation_->addUnaryOperator(*type, type_prefix, core::UnaryOperator::BITWISE_NOT);
             });
     }
 
@@ -423,6 +426,7 @@ namespace ance::bbt
                     implementation_->ensureReadiness(getFunction());
 
                     implementation_->addArithmeticOperators(*type, type_prefix);
+                    implementation_->addUnaryOperator(*type, type_prefix, core::UnaryOperator::NEGATION);
                 });
         };
 

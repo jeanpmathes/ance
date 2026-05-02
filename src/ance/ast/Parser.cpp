@@ -926,6 +926,22 @@ namespace ance::ast
             return op;
         }
 
+        std::any visitUnaryBitwiseNot(grammar::anceParser::UnaryBitwiseNotContext* context) override
+        {
+            trace("UnaryBitwiseNot", context);
+
+            core::UnaryOperator op = core::UnaryOperator::BITWISE_NOT;
+            return op;
+        }
+
+        std::any visitUnaryNegation(grammar::anceParser::UnaryNegationContext* context) override
+        {
+            trace("UnaryNegation", context);
+
+            core::UnaryOperator op = core::UnaryOperator::NEGATION;
+            return op;
+        }
+
         std::any visitMultiplication(grammar::anceParser::MultiplicationContext* context) override
         {
             trace("Multiplication", context);

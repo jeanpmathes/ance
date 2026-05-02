@@ -137,30 +137,35 @@ namespace ance::core
             SIZE_MUL,
             SIZE_DIV,
             SIZE_REM,
+            SIZE_BITNOT,
 
             HALF_ADD,// todo: maybe these can be made generic in the same way that integer ops are, just not over bit size but precisions
             HALF_SUB,
             HALF_MUL,
             HALF_DIV,
             HALF_REM,
+            HALF_NEG,
 
             SINGLE_ADD,
             SINGLE_SUB,
             SINGLE_MUL,
             SINGLE_DIV,
             SINGLE_REM,
+            SINGLE_NEG,
 
             DOUBLE_ADD,
             DOUBLE_SUB,
             DOUBLE_MUL,
             DOUBLE_DIV,
             DOUBLE_REM,
+            DOUBLE_NEG,
 
             QUAD_ADD,
             QUAD_SUB,
             QUAD_MUL,
             QUAD_DIV,
-            QUAD_REM
+            QUAD_REM,
+            QUAD_NEG
         };
 
         Intrinsic() = default;

@@ -23,14 +23,19 @@ static std::pair<ance::core::Intrinsic::Value, char const*> const intrinsics[] =
     {ance::core::Intrinsic::INCLUDE, "include"},       {ance::core::Intrinsic::CALL_INTRINSIC, "call_intrinsic"},
     {ance::core::Intrinsic::SIZE_ADD, "s_add"},        {ance::core::Intrinsic::SIZE_SUB, "s_sub"},
     {ance::core::Intrinsic::SIZE_MUL, "s_mul"},        {ance::core::Intrinsic::SIZE_DIV, "s_div"},
+    {ance::core::Intrinsic::SIZE_REM, "s_rem"},        {ance::core::Intrinsic::SIZE_BITNOT, "s_bitnot"},
     {ance::core::Intrinsic::HALF_ADD, "fh_add"},       {ance::core::Intrinsic::HALF_SUB, "fh_sub"},
     {ance::core::Intrinsic::HALF_MUL, "fh_mul"},       {ance::core::Intrinsic::HALF_DIV, "fh_div"},
+    {ance::core::Intrinsic::HALF_REM, "fh_rem"},       {ance::core::Intrinsic::HALF_NEG, "fh_neg"},
     {ance::core::Intrinsic::SINGLE_ADD, "fs_add"},     {ance::core::Intrinsic::SINGLE_SUB, "fs_sub"},
     {ance::core::Intrinsic::SINGLE_MUL, "fs_mul"},     {ance::core::Intrinsic::SINGLE_DIV, "fs_div"},
+    {ance::core::Intrinsic::SINGLE_REM, "fs_rem"},     {ance::core::Intrinsic::SINGLE_NEG, "fs_neg"},
     {ance::core::Intrinsic::DOUBLE_ADD, "fd_add"},     {ance::core::Intrinsic::DOUBLE_SUB, "fd_sub"},
     {ance::core::Intrinsic::DOUBLE_MUL, "fd_mul"},     {ance::core::Intrinsic::DOUBLE_DIV, "fd_div"},
+    {ance::core::Intrinsic::DOUBLE_REM, "fd_rem"},     {ance::core::Intrinsic::DOUBLE_NEG, "fd_neg"},
     {ance::core::Intrinsic::QUAD_ADD, "fq_add"},       {ance::core::Intrinsic::QUAD_SUB, "fq_sub"},
     {ance::core::Intrinsic::QUAD_MUL, "fq_mul"},       {ance::core::Intrinsic::QUAD_DIV, "fq_div"},
+    {ance::core::Intrinsic::QUAD_REM, "fq_rem"},       {ance::core::Intrinsic::QUAD_NEG, "fq_neg"},
 };
 
 std::string ance::core::Intrinsic::toString() const
