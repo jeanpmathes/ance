@@ -24,6 +24,11 @@
 #include "Node.h"
 #include "Printer.h"
 
+namespace
+{
+    auto prefix = "parser";
+}
+
 namespace ance::ast
 {
     static size_t getUtf32Length(std::string const& utf8)
@@ -285,6 +290,14 @@ namespace ance::ast
             return core::Identifier::make(terminal_node->getText(), location(terminal_node));
         }
 
+        // ReSharper disable once CppMemberFunctionMayBeConst
+        core::Reporter::MessageBuilder trace(std::string_view const node_name, antlr4::ParserRuleContext const* context)
+        {
+            auto msg = reporter_.trace(prefix, core::Location::nowhere());
+            msg << "visit node " << node_name << " " << location(context);
+            return msg;
+        }
+
       public:
         utility::Owned<File> expectFile(grammar::anceParser::UnorderedScopeFileContext* context)
         {
@@ -402,6 +415,8 @@ namespace ance::ast
 
         std::any visitUnorderedScopeFile(grammar::anceParser::UnorderedScopeFileContext* context) override
         {
+            trace("UnorderedScopeFile", context);
+
             utility::List<utility::Owned<Declaration>> declarations;
 
             for (grammar::anceParser::DeclarationContext* declaration : context->declaration())
@@ -415,11 +430,15 @@ namespace ance::ast
 
         std::any visitOrderedScopeFile(grammar::anceParser::OrderedScopeFileContext* context) override
         {
+            trace("OrderedScopeFile", context);
+
             return visit(context->statement());
         }
 
         std::any visitRunnableDeclaration(grammar::anceParser::RunnableDeclarationContext* context) override
         {
+            trace("RunnableDeclaration", context);
+
             utility::Owned<Statement> body = expectStatement(context->statement());
 
             Declaration* declaration = new RunnableDeclaration(std::move(body), location(context));
@@ -428,6 +447,8 @@ namespace ance::ast
 
         std::any visitVariableDeclaration(grammar::anceParser::VariableDeclarationContext* context) override
         {
+            trace("VariableDeclaration", context);
+
             core::AccessModifier const access_modifier    = expectAccessModifier(context->accessModifier());
             core::ExecutionModifier    execution_modifier = expectExecutionModifier(context->executionMode());
             core::Identifier const     name               = identifier(context->IDENTIFIER());
@@ -459,6 +480,8 @@ namespace ance::ast
 
         std::any visitFunctionDeclaration(grammar::anceParser::FunctionDeclarationContext* context) override
         {
+            trace("FunctionDeclaration", context);
+
             core::AccessModifier const access_modifier    = expectAccessModifier(context->accessModifier());
             core::ExecutionModifier    execution_modifier = expectExecutionModifier(context->executionMode());
             core::Identifier const     name               = identifier(context->IDENTIFIER());
@@ -492,12 +515,16 @@ namespace ance::ast
 
         std::any visitBlockStatement(grammar::anceParser::BlockStatementContext* context) override
         {
+            trace("BlockStatement", context);
+
             Statement* statement = createBlockStatement(context->statement(), location(context));
             return statement;
         }
 
         std::any visitExpressionStatement(grammar::anceParser::ExpressionStatementContext* context) override
         {
+            trace("ExpressionStatement", context);
+
             utility::Owned<Expression> expression = expectExpression(context->expression());
 
             Statement* statement = new Independent(std::move(expression), location(context));
@@ -506,6 +533,8 @@ namespace ance::ast
 
         std::any visitLetStatement(grammar::anceParser::LetStatementContext* context) override
         {
+            trace("LetStatement", context);
+
             core::Identifier const     name = identifier(context->IDENTIFIER());
             utility::Owned<Expression> type = expectExpression(context->varType);
 
@@ -523,6 +552,8 @@ namespace ance::ast
 
         std::any visitAssignmentStatement(grammar::anceParser::AssignmentStatementContext* context) override
         {
+            trace("AssignmentStatement", context);
+
             utility::Owned<Expression> assignee = expectExpression(context->assignee);
             core::Assigner const       assigner = expectAssigner(context->assigner());
             utility::Owned<Expression> assigned = expectExpression(context->assgined);
@@ -538,6 +569,8 @@ namespace ance::ast
 
         std::any visitIfStatement(grammar::anceParser::IfStatementContext* context) override
         {
+            trace("IfStatement", context);
+
             utility::Owned<Expression> condition = expectExpression(context->expression());
             utility::Owned<Statement>  true_part = expectStatement(context->trueBlock);
 
@@ -553,6 +586,8 @@ namespace ance::ast
 
         std::any visitLoopStatement(grammar::anceParser::LoopStatementContext* context) override
         {
+            trace("LoopStatement", context);
+
             utility::Owned<Statement> body = expectStatement(context->statement());
 
             Statement* statement = new Loop(std::move(body), location(context));
@@ -561,18 +596,24 @@ namespace ance::ast
 
         std::any visitBreakStatement(grammar::anceParser::BreakStatementContext* context) override
         {
+            trace("BreakStatement", context);
+
             Statement* statement = new Break(location(context));
             return statement;
         }
 
         std::any visitContinueStatement(grammar::anceParser::ContinueStatementContext* context) override
         {
+            trace("ContinueStatement", context);
+
             Statement* statement = new Continue(location(context));
             return statement;
         }
 
         std::any visitReturnStatement(grammar::anceParser::ReturnStatementContext* context) override
         {
+            trace("ReturnStatement", context);
+
             utility::Optional<utility::Owned<Expression>> value = {};
             if (context->expression() != nullptr) value = expectExpression(context->expression());
 
@@ -582,6 +623,8 @@ namespace ance::ast
 
         std::any visitWhileStatement(grammar::anceParser::WhileStatementContext* context) override
         {
+            trace("WhileStatement", context);
+
             utility::Owned<Expression> condition = expectExpression(context->expression());
             utility::Owned<Statement>  body      = expectStatement(context->statement());
 
@@ -591,6 +634,8 @@ namespace ance::ast
 
         std::any visitMatchStatement(grammar::anceParser::MatchStatementContext* context) override
         {
+            trace("MatchStatement", context);
+
             utility::Owned<Expression> value = expectExpression(context->expression());
 
             utility::List<utility::Owned<MatchCase>> cases;
@@ -609,6 +654,8 @@ namespace ance::ast
 
         std::any visitExpressionMatchCase(grammar::anceParser::ExpressionMatchCaseContext* context) override
         {
+            trace("ExpressionMatchCase", context);
+
             utility::List<utility::Owned<Expression>> patterns;
             for (grammar::anceParser::ExpressionContext* pattern_context : context->expression())
             {
@@ -622,11 +669,15 @@ namespace ance::ast
 
         std::any visitDefaultMatchCase(grammar::anceParser::DefaultMatchCaseContext* context) override
         {
+            trace("DefaultMatchCase", context);
+
             return new MatchCase({}, location(context->DEFAULT()), expectStatement(context->statement()), location(context));
         }
 
         std::any visitEraseStatement(grammar::anceParser::EraseStatementContext* context) override
         {
+            trace("EraseStatement", context);
+
             core::Identifier const name = identifier(context->IDENTIFIER());
 
             Statement* statement = new Erase(name, location(context));
@@ -635,6 +686,8 @@ namespace ance::ast
 
         std::any visitAssertStatement(grammar::anceParser::AssertStatementContext* context) override
         {
+            trace("AssertStatement", context);
+
             utility::Owned<Expression> expression = expectExpression(context->expression());
 
             Statement* statement = new Assert(std::move(expression), location(context));
@@ -643,6 +696,8 @@ namespace ance::ast
 
         std::any visitAnd(grammar::anceParser::AndContext* context) override
         {
+            trace("And", context);
+
             utility::Owned<Expression> left  = expectExpression(context->left);
             utility::Owned<Expression> right = expectExpression(context->right);
 
@@ -654,6 +709,8 @@ namespace ance::ast
 
         std::any visitOr(grammar::anceParser::OrContext* context) override
         {
+            trace("Or", context);
+
             utility::Owned<Expression> left  = expectExpression(context->left);
             utility::Owned<Expression> right = expectExpression(context->right);
 
@@ -665,6 +722,8 @@ namespace ance::ast
 
         std::any visitBinaryOperationExpression(grammar::anceParser::BinaryOperationExpressionContext* context) override
         {
+            trace("BinaryOperationExpression", context);
+
             utility::Owned<Expression> left  = expectExpression(context->left);
             utility::Owned<Expression> right = expectExpression(context->right);
 
@@ -678,6 +737,8 @@ namespace ance::ast
 
         std::any visitUnaryOperationExpression(grammar::anceParser::UnaryOperationExpressionContext* context) override
         {
+            trace("UnaryOperationExpression", context);
+
             core::UnaryOperator const  op      = expectUnaryOperator(context->unaryOperator());
             utility::Owned<Expression> operand = expectExpression(context->target);
 
@@ -687,6 +748,8 @@ namespace ance::ast
 
         std::any visitCallExpression(grammar::anceParser::CallExpressionContext* context) override
         {
+            trace("CallExpression", context);
+
             utility::Owned<Expression> callee = expectExpression(context->callee);
 
             utility::List<utility::Owned<Expression>> arguments;
@@ -698,6 +761,8 @@ namespace ance::ast
 
         std::any visitLambdaExpression(grammar::anceParser::LambdaExpressionContext* context) override
         {
+            trace("LambdaExpression", context);
+
             utility::List<Parameter> parameters;
             for (grammar::anceParser::ParameterContext* parameter_context : context->parameter()) parameters.push_back(expectParameter(parameter_context));
 
@@ -725,6 +790,8 @@ namespace ance::ast
 
         std::any visitIntrinsicExpression(grammar::anceParser::IntrinsicExpressionContext* context) override
         {
+            trace("IntrinsicExpression", context);
+
             utility::Owned<Expression> name = expectExpression(context->name);
 
             utility::List<utility::Owned<Expression>> arguments;
@@ -741,6 +808,8 @@ namespace ance::ast
 
         std::any visitTypeOfExpression(grammar::anceParser::TypeOfExpressionContext* context) override
         {
+            trace("TypeOfExpression", context);
+
             utility::List<utility::Owned<Expression>> expressions;
             for (grammar::anceParser::ExpressionContext* expression : context->expression())
             {
@@ -753,6 +822,8 @@ namespace ance::ast
 
         std::any visitIfExpression(grammar::anceParser::IfExpressionContext* context) override
         {
+            trace("IfExpression", context);
+
             utility::Owned<Expression> condition  = expectExpression(context->condition);
             utility::Owned<Expression> true_block = expectExpression(context->trueBlock);
 
@@ -768,6 +839,8 @@ namespace ance::ast
 
         std::any visitMatchExpression(grammar::anceParser::MatchExpressionContext* context) override
         {
+            trace("MatchExpression", context);
+
             utility::Owned<Expression> condition = expectExpression(context->condition);
 
             utility::List<utility::Owned<MatchExpressionCase>> cases;
@@ -786,6 +859,8 @@ namespace ance::ast
 
         std::any visitExpressionMatchExpressionCase(grammar::anceParser::ExpressionMatchExpressionCaseContext* context) override
         {
+            trace("ExpressionMatchExpressionCase", context);
+
             utility::List<utility::Owned<Expression>> patterns;
             for (grammar::anceParser::ExpressionContext* pattern_context : context->expression())
             {
@@ -800,11 +875,15 @@ namespace ance::ast
 
         std::any visitDefaultMatchExpressionCase(grammar::anceParser::DefaultMatchExpressionCaseContext* context) override
         {
+            trace("DefaultMatchExpressionCase", context);
+
             return new MatchExpressionCase({}, location(context->DEFAULT()), expectExpression(context->expression()), location(context));
         }
 
         std::any visitBlockExpression(grammar::anceParser::BlockExpressionContext* context) override
         {
+            trace("BlockExpression", context);
+
             utility::List<utility::Owned<Statement>> statements;
             for (grammar::anceParser::StatementContext* statement : context->statement())
             {
@@ -823,6 +902,8 @@ namespace ance::ast
 
         std::any visitAccessExpression(grammar::anceParser::AccessExpressionContext* context) override
         {
+            trace("AccessExpression", context);
+
             core::Identifier const accessed = identifier(context->IDENTIFIER());
 
             Expression* expression = new Access(accessed, location(context));
@@ -831,60 +912,80 @@ namespace ance::ast
 
         std::any visitHereExpression(grammar::anceParser::HereExpressionContext* context) override
         {
+            trace("HereExpression", context);
+
             Expression* expression = new Here(location(context));
             return expression;
         }
 
-        std::any visitUnaryNot(grammar::anceParser::UnaryNotContext*) override
+        std::any visitUnaryNot(grammar::anceParser::UnaryNotContext* context) override
         {
+            trace("UnaryNot", context);
+
             core::UnaryOperator op = core::UnaryOperator::NOT;
             return op;
         }
 
-        std::any visitMultiplication(grammar::anceParser::MultiplicationContext*) override
+        std::any visitMultiplication(grammar::anceParser::MultiplicationContext* context) override
         {
+            trace("Multiplication", context);
+
             core::BinaryOperator op = core::BinaryOperator::MULTIPLICATION;
             return op;
         }
 
-        std::any visitDivision(grammar::anceParser::DivisionContext*) override
+        std::any visitDivision(grammar::anceParser::DivisionContext* context) override
         {
+            trace("Division", context);
+
             core::BinaryOperator op = core::BinaryOperator::DIVISION;
             return op;
         }
 
-        std::any visitRemainder(grammar::anceParser::RemainderContext*) override
+        std::any visitRemainder(grammar::anceParser::RemainderContext* context) override
         {
+            trace("Remainder", context);
+
             core::BinaryOperator op = core::BinaryOperator::REMAINDER;
             return op;
         }
 
-        std::any visitAddition(grammar::anceParser::AdditionContext*) override
+        std::any visitAddition(grammar::anceParser::AdditionContext* context) override
         {
+            trace("Addition", context);
+
             core::BinaryOperator op = core::BinaryOperator::ADDITION;
             return op;
         }
 
-        std::any visitSubtraction(grammar::anceParser::SubtractionContext*) override
+        std::any visitSubtraction(grammar::anceParser::SubtractionContext* context) override
         {
+            trace("Subtraction", context);
+
             core::BinaryOperator op = core::BinaryOperator::SUBTRACTION;
             return op;
         }
 
         std::any visitTrue(grammar::anceParser::TrueContext* context) override
         {
+            trace("True", context);
+
             Expression* expression = new BoolLiteral(true, location(context));
             return expression;
         }
 
         std::any visitFalse(grammar::anceParser::FalseContext* context) override
         {
+            trace("False", context);
+
             Expression* expression = new BoolLiteral(false, location(context));
             return expression;
         }
 
         std::any visitSizeLiteral(grammar::anceParser::SizeLiteralContext* context) override
         {
+            trace("SizeLiteral", context);
+
             // todo: use llvm::APInt instead of size_t
             // todo: do all the validation of integer literals and stuff like whether they actually fit into their type
 
@@ -894,6 +995,8 @@ namespace ance::ast
 
         std::any visitHalfLiteral(grammar::anceParser::HalfLiteralContext* context) override
         {
+            trace("HalfLiteral", context);
+
             std::string text = context->getText();
             text             = text.substr(0, text.size() - 1);// Remove type suffix.
 
@@ -903,6 +1006,8 @@ namespace ance::ast
 
         std::any visitSingleLiteral(grammar::anceParser::SingleLiteralContext* context) override
         {
+            trace("SingleLiteral", context);
+
             std::string text = context->getText();
             text             = text.substr(0, text.size() - 1);// Remove type suffix.
 
@@ -912,6 +1017,8 @@ namespace ance::ast
 
         std::any visitDoubleLiteral(grammar::anceParser::DoubleLiteralContext* context) override
         {
+            trace("DoubleLiteral", context);
+
             std::string text = context->getText();
             text             = text.substr(0, text.size() - 1);// Remove type suffix.
 
@@ -921,6 +1028,8 @@ namespace ance::ast
 
         std::any visitQuadLiteral(grammar::anceParser::QuadLiteralContext* context) override
         {
+            trace("QuadLiteral", context);
+
             std::string text = context->getText();
             text             = text.substr(0, text.size() - 1);// Remove type suffix.
 
@@ -930,12 +1039,16 @@ namespace ance::ast
 
         std::any visitUnitLiteral(grammar::anceParser::UnitLiteralContext* context) override
         {
+            trace("UnitLiteral", context);
+
             Expression* expression = new UnitLiteral(location(context));
             return expression;
         }
 
         std::any visitStringLiteral(grammar::anceParser::StringLiteralContext* context) override
         {
+            trace("StringLiteral", context);
+
             std::string text = context->getText();
             text             = text.substr(1, text.size() - 2);// Remove quotes.
 
@@ -943,44 +1056,58 @@ namespace ance::ast
             return expression;
         }
 
-        std::any visitCopyAssigner(grammar::anceParser::CopyAssignerContext*) override
+        std::any visitCopyAssigner(grammar::anceParser::CopyAssignerContext* context) override
         {
+            trace("CopyAssigner", context);
+
             core::Assigner assigner = core::Assigner::COPY_ASSIGNMENT;
             return assigner;
         }
 
-        std::any visitFinalCopyAssigner(grammar::anceParser::FinalCopyAssignerContext*) override
+        std::any visitFinalCopyAssigner(grammar::anceParser::FinalCopyAssignerContext* context) override
         {
+            trace("FinalCopyAssigner", context);
+
             core::Assigner assigner = core::Assigner::FINAL_COPY_ASSIGNMENT;
             return assigner;
         }
 
-        std::any visitPublic(grammar::anceParser::PublicContext*) override
+        std::any visitPublic(grammar::anceParser::PublicContext* context) override
         {
+            trace("Public", context);
+
             core::AccessModifier access_modifier = core::AccessModifier::PUBLIC_ACCESS;
             return access_modifier;
         }
 
-        std::any visitPrivate(grammar::anceParser::PrivateContext*) override
+        std::any visitPrivate(grammar::anceParser::PrivateContext* context) override
         {
+            trace("Private", context);
+
             core::AccessModifier access_modifier = core::AccessModifier::PRIVATE_ACCESS;
             return access_modifier;
         }
 
-        std::any visitExtern(grammar::anceParser::ExternContext*) override
+        std::any visitExtern(grammar::anceParser::ExternContext* context) override
         {
+            trace("Extern", context);
+
             core::AccessModifier access_modifier = core::AccessModifier::EXTERN_ACCESS;
             return access_modifier;
         }
 
-        std::any visitCompileTime(grammar::anceParser::CompileTimeContext*) override
+        std::any visitCompileTime(grammar::anceParser::CompileTimeContext* context) override
         {
+            trace("CompileTime", context);
+
             core::ExecutionModifier execution_modifier = core::ExecutionModifier::COMPILETIME_EXECUTION;
             return execution_modifier;
         }
 
-        std::any visitRuntime(grammar::anceParser::RuntimeContext*) override
+        std::any visitRuntime(grammar::anceParser::RuntimeContext* context) override
         {
+            trace("Runtime", context);
+
             core::ExecutionModifier execution_modifier = core::ExecutionModifier::RUNTIME_EXECUTION;
             return execution_modifier;
         }
@@ -1021,6 +1148,8 @@ struct ance::ast::Parser::Implementation
     template<typename Target, typename Code, typename Reader>
     utility::Optional<utility::Owned<Target>> parse(sources::SourceFile* source_file, std::string const& id, Code&& code, Reader&& reader)
     {
+        reporter_.trace(prefix, core::Location::nowhere()) << "parse enter {id=" << id << "}";
+
         utility::Optional<utility::Owned<Target>> result;
 
         if (source_file == nullptr || source_file->isOk())
@@ -1059,7 +1188,14 @@ struct ance::ast::Parser::Implementation
 
         context_.print<Printer>(**result, "ast", file_path);
 
-        if (reporter_.isFailed()) return std::nullopt;
+        if (reporter_.isFailed())
+        {
+            reporter_.trace(prefix, core::Location::nowhere()) << "parse exit {id=" << id << ", status=fail}";
+
+            return std::nullopt;
+        }
+
+        reporter_.trace(prefix, core::Location::nowhere()) << "parse exit {id=" << id << ", status=ok}";
 
         return result;
     }
