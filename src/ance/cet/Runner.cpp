@@ -230,7 +230,7 @@ struct ance::cet::Runner::Implementation
 
             run_point->clearBlocker();
 
-            reporter_.trace(prefix, core::Location::project())
+            reporter_.trace(prefix, core::Location::nowhere())
                 << "execute run point enter {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null")
                 << ", statement_index=" << state_.current_statement_index << "}";
 
@@ -247,7 +247,7 @@ struct ance::cet::Runner::Implementation
             ExecutionResult const       result       = state_.execution_result.valueOr(ExecutionResult::Completed);
             utility::Shared<bbt::Value> return_value = state_.return_value.valueOr(bbt::Unit::make(type_context_));
 
-            reporter_.trace(prefix, core::Location::project()) << "execute run point exit {result=" << result << ", return_value=" << return_value->toString()
+            reporter_.trace(prefix, core::Location::nowhere()) << "execute run point exit {result=" << result << ", return_value=" << return_value->toString()
                                                                << ", return_type=" << return_value->type()->name() << "}";
 
             state_ = std::move(previous_state);
@@ -455,7 +455,7 @@ struct ance::cet::Runner::Implementation
         // ReSharper disable once CppMemberFunctionMayBeConst
         core::Reporter::MessageBuilder trace(std::string_view const link_name, bbt::Link const& link)
         {
-            auto msg = reporter_.trace(prefix, core::Location::project());
+            auto msg = reporter_.trace(prefix, core::Location::nowhere());
             msg << "visit link " << link_name << " " << link.location << " {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null")
                 << "}";
             return msg;
@@ -464,7 +464,7 @@ struct ance::cet::Runner::Implementation
         // ReSharper disable once CppMemberFunctionMayBeConst
         core::Reporter::MessageBuilder trace(std::string_view const statement_name, bbt::Statement const& statement)
         {
-            auto msg = reporter_.trace(prefix, core::Location::project());
+            auto msg = reporter_.trace(prefix, core::Location::nowhere());
             msg << "visit statement " << statement_name << " " << statement.location
                 << " {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null") << ", statement_index=" << state_.current_statement_index
                 << "}";
@@ -473,7 +473,7 @@ struct ance::cet::Runner::Implementation
 
         void abort()
         {
-            reporter_.trace(prefix, core::Location::project()) << "abort execution";
+            reporter_.trace(prefix, core::Location::nowhere()) << "abort execution";
 
             state_.execution_result = ExecutionResult::Error;
 
@@ -482,7 +482,7 @@ struct ance::cet::Runner::Implementation
 
         void block(PendingResolution const& blocker)
         {
-            reporter_.trace(prefix, core::Location::project()) << "block execution pending on " << blocker.identifier;
+            reporter_.trace(prefix, core::Location::nowhere()) << "block execution pending on " << blocker.identifier;
 
             state_.execution_result = ExecutionResult::Pending;
 
@@ -491,7 +491,7 @@ struct ance::cet::Runner::Implementation
 
         void yield()
         {
-            reporter_.trace(prefix, core::Location::project()) << "yield";
+            reporter_.trace(prefix, core::Location::nowhere()) << "yield";
 
             state_.execution_result = ExecutionResult::Yield;
 
@@ -1321,21 +1321,38 @@ struct ance::cet::Runner::Implementation
 
     utility::Optional<utility::Owned<Unit>> runProjectFile(std::filesystem::path const& file)
     {
+        reporter_.trace(prefix, core::Location::nowhere()) << "run project file enter {file='" << file.string() << "'}";
+
         utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentOrderedFile(file);
-        if (!flow.hasValue()) return std::nullopt;
+        if (!flow.hasValue())
+        {
+            reporter_.trace(prefix, core::Location::nowhere()) << "run project file exit {file='" << file.string() << "', status=no-segment}";
+
+            return std::nullopt;
+        }
 
         bbt_->schedule(**flow, nullptr);
 
         bool const ok = run(*bbt_);
 
-        if (!ok) return std::nullopt;
+        if (!ok)
+        {
+            reporter_.trace(prefix, core::Location::nowhere()) << "run project file exit {file='" << file.string() << "', status=fail-run}";
+
+            return std::nullopt;
+        }
 
         utility::Owned<Unit> unit = utility::makeOwned<Unit>();
 
         context_.print<Printer>(*unit, "cet", file);
         context_.graph<Grapher>(*unit, "cet", file);
 
-        if (reporter_.isFailed()) return std::nullopt;
+        if (reporter_.isFailed())
+        {
+            reporter_.trace(prefix, core::Location::nowhere()) << "run project file exit {file='" << file.string() << "', status=fail-validate}";
+
+            return std::nullopt;
+        }
 
         return unit;
     }
@@ -1357,15 +1374,29 @@ struct ance::cet::Runner::Implementation
 
     void declareCore(std::string const& code, std::string const& id)
     {
+        reporter_.trace(prefix, core::Location::nowhere()) << "declare core enter {id=" << id << "}";
+
         utility::Optional<utility::Owned<bbt::Flow>> flow = segmenter_.segmentDeclaration(code, id);
 
-        if (!flow.hasValue()) throw std::logic_error("Failed to parse core code");
+        if (!flow.hasValue())
+        {
+            reporter_.trace(prefix, core::Location::nowhere()) << "declare core exit {id=" << id << ", status=no-segment}";
+
+            throw std::logic_error("Failed to parse core code");
+        }
 
         bbt_->scheduleCore(std::move(flow.value()));
 
         bool const ok = run(*bbt_);
 
-        if (!ok) throw std::logic_error("Failed to run core code");
+        if (!ok)
+        {
+            reporter_.trace(prefix, core::Location::nowhere()) << "declare core exit {id=" << id << ", status=fail}";
+
+            throw std::logic_error("Failed to run core code");
+        }
+
+        reporter_.trace(prefix, core::Location::nowhere()) << "declare core exit {id=" << id << ", status=ok}";
     }
 
     bbt::TypeContext& getTypeContext()

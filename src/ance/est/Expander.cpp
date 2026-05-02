@@ -957,7 +957,7 @@ struct ance::est::Expander::Implementation
         // ReSharper disable once CppMemberFunctionMayBeConst
         core::Reporter::MessageBuilder trace(std::string_view const node_name, core::Location const& location)
         {
-            auto msg = reporter_.trace(prefix, core::Location::project());
+            auto msg = reporter_.trace(prefix, core::Location::nowhere());
             msg << "visit " << node_name << " " << location;
             return msg;
         }
@@ -971,7 +971,7 @@ struct ance::est::Expander::Implementation
 
     utility::Optional<utility::Owned<Statement>> expandOrderedFile(std::filesystem::path const& file)// todo: reduce duplication with below (template)
     {
-        reporter_.trace(prefix, core::Location::project()) << "expand ordered file enter {file=" << file.string() << "}";
+        reporter_.trace(prefix, core::Location::nowhere()) << "expand ordered file enter {file='" << file.string() << "'}";
 
         (void) source_tree_;//todo: use or remove
 
@@ -979,7 +979,7 @@ struct ance::est::Expander::Implementation
 
         if (!parsed.hasValue())
         {
-            reporter_.trace(prefix, core::Location::project()) << "expand ordered file exit {file=" << file.string() << ", status=no-parse}";
+            reporter_.trace(prefix, core::Location::nowhere()) << "expand ordered file exit {file='" << file.string() << "', status=no-parse}";
 
             return std::nullopt;
         }
@@ -993,24 +993,24 @@ struct ance::est::Expander::Implementation
 
         if (reporter_.isFailed())
         {
-            reporter_.trace(prefix, core::Location::project()) << "expand ordered file exit {file=" << file.string() << ", status=fail}";
+            reporter_.trace(prefix, core::Location::nowhere()) << "expand ordered file exit {file='" << file.string() << "', status=fail}";
 
             return std::nullopt;
         }
 
-        reporter_.trace(prefix, core::Location::project()) << "expand ordered file exit {file=" << file.string() << ", status=ok}";
+        reporter_.trace(prefix, core::Location::nowhere()) << "expand ordered file exit {file='" << file.string() << "', status=ok}";
 
         return block;
     }
 
     utility::Optional<utility::Owned<File>> expandUnorderedFile(std::filesystem::path const& file)
     {
-        reporter_.trace(prefix, core::Location::project()) << "expand unordered file enter {file=" << file.string() << "}";
+        reporter_.trace(prefix, core::Location::nowhere()) << "expand unordered file enter {file='" << file.string() << "'}";
 
         utility::Optional<utility::Owned<ast::File>> parsed = parser_.parseUnorderedFile(file);
         if (!parsed.hasValue())
         {
-            reporter_.trace(prefix, core::Location::project()) << "expand unordered file exit {file=" << file.string() << ", status=no-parse}";
+            reporter_.trace(prefix, core::Location::nowhere()) << "expand unordered file exit {file='" << file.string() << "', status=no-parse}";
 
             return std::nullopt;
         }
@@ -1022,24 +1022,24 @@ struct ance::est::Expander::Implementation
 
         if (reporter_.isFailed())
         {
-            reporter_.trace(prefix, core::Location::project()) << "expand unordered file exit {file=" << file.string() << ", status=fail}";
+            reporter_.trace(prefix, core::Location::nowhere()) << "expand unordered file exit {file='" << file.string() << "', status=fail}";
 
             return std::nullopt;
         }
 
-        reporter_.trace(prefix, core::Location::project()) << "expand unordered file exit {file=" << file.string() << ", status=ok}";
+        reporter_.trace(prefix, core::Location::nowhere()) << "expand unordered file exit {file='" << file.string() << "', status=ok}";
 
         return est;
     }
 
     utility::Optional<utility::Owned<Declaration>> expandDeclaration(std::string const& code, std::string const& id)
     {
-        reporter_.trace(prefix, core::Location::project()) << "expand declaration enter {id=" << id << ", code_size=" << code.size() << "}";
+        reporter_.trace(prefix, core::Location::nowhere()) << "expand declaration enter {id=" << id << ", code_size=" << code.size() << "}";
 
         utility::Optional<utility::Owned<ast::Declaration>> parsed = parser_.parseDeclaration(code, id);
         if (!parsed.hasValue())
         {
-            reporter_.trace(prefix, core::Location::project()) << "expand declaration exit {id=" < < < < ", status=no-parse}";
+            reporter_.trace(prefix, core::Location::nowhere()) << "expand declaration exit {id=" << id << ", status=no-parse}";
 
             return std::nullopt;
         }
@@ -1051,12 +1051,12 @@ struct ance::est::Expander::Implementation
 
         if (reporter_.isFailed())
         {
-            reporter_.trace(prefix, core::Location::project()) << "expand declaration exit {id=" << id << ", status=fail}";
+            reporter_.trace(prefix, core::Location::nowhere()) << "expand declaration exit {id=" << id << ", status=fail}";
 
             return std::nullopt;
         }
 
-        reporter_.trace(prefix, core::Location::project()) << "expand declaration exit {id=" << id << ", status=ok}";
+        reporter_.trace(prefix, core::Location::nowhere()) << "expand declaration exit {id=" << id << ", status=ok}";
 
         return declaration;
     }

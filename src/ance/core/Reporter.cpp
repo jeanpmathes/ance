@@ -102,11 +102,15 @@ struct ance::core::Reporter::Implementation
         return ansi::ColorReset;
     }
 
-    bool outputAnnotation(Location const& location, std::string const& message, Level const level, bool const indent, size_t max_line_digits) const
+    [[nodiscard]] bool outputAnnotation(Location const&    location,
+                                        std::string const& message,
+                                        Level const        level,
+                                        bool const         indent,
+                                        size_t             max_line_digits) const
     {
         if (indent) out_ << "  ";
 
-        if (location.isProject())
+        if (location.isProject() || location.isNowhere())
         {
             out_ << message << std::endl;
             return false;

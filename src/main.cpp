@@ -129,7 +129,7 @@ namespace ance
 
         // todo: constructors as callable types
 
-        // todo: integer type, integer literals (need type expressions for them, e.g. Int{32}, UInt{64}, etc.)
+        // todo: integer type, integer literals (need type expressions for them, e.g. Integer{32}, UnsignedInteger{64}, etc.)
         // todo: ops for all integer types
         // todo: for intrinsics for integers, use a single intrinsic for the operations, e.g. "int_add" and change how intrinsics do type checks
         // todo: pretend that the intrinsics are generic and take generic parameters, e.g. intrinsic "int_add" {N} (a, b)
