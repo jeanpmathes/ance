@@ -106,6 +106,22 @@ struct ance::cet::Runner::Implementation
                 return stack().empty();
             }
 
+            [[nodiscard]] bool isExecuting() const
+            {
+                return getExecutableRunPoint().executing_;
+            }
+
+            void enter()
+            {
+                executing_ = true;
+                blocker_   = std::nullopt;
+            }
+
+            void exit()
+            {
+                executing_ = false;
+            }
+
             void popLevel(utility::Shared<bbt::Value> lower_return_value)
             {
                 stack().pop_back();
@@ -131,11 +147,6 @@ struct ance::cet::Runner::Implementation
                 return getExecutableRunPoint().blocker_;
             }
 
-            void clearBlocker()
-            {
-                blocker_ = std::nullopt;
-            }
-
             void setBlocker(PendingResolution const& blocker)
             {
                 blocker_ = blocker;
@@ -147,10 +158,13 @@ struct ance::cet::Runner::Implementation
                 return *target_stack_;
             }
 
+            // todo: the self-referential nature of this is ugly, split into two types
+
             std::list<RunPoint>  stack_;
             std::list<RunPoint>* target_stack_ = &stack_;
 
             utility::Optional<PendingResolution> blocker_ = std::nullopt;
+            bool                                 executing_ = false;
         };
 
         BBT(sources::SourceTree&                                                                       source_tree,
@@ -181,9 +195,9 @@ struct ance::cet::Runner::Implementation
             schedule(flow_ref, core_language_scope_.get());
         }
 
-        [[nodiscard]] bool hasRunPoints() const
+        [[nodiscard]] bool hasExecutableRunPoints() const
         {
-            return !run_points_.empty();
+            return std::ranges::any_of(run_points_, [](RunPoint const& run_point) { return !run_point.isExecuting(); });
         }
 
         std::list<RunPoint>::iterator getRunPointBegin()
@@ -228,7 +242,7 @@ struct ance::cet::Runner::Implementation
             State previous_state = std::move(state_);
             state_               = State(run_point->scope, run_point, run_point->statement_index, run_point->block);
 
-            run_point->clearBlocker();
+            run_point->enter();
 
             reporter_.trace(prefix, core::Location::nowhere())
                 << "execute run point enter {block=" << (state_.next != nullptr ? std::to_string(state_.next->id) : "null")
@@ -239,6 +253,8 @@ struct ance::cet::Runner::Implementation
                 run_point->block = state_.next;
                 visit(*state_.next);
             }
+
+            run_point->exit();
 
             run_point->scope           = state_.current_scope;
             run_point->block           = state_.next;
@@ -476,8 +492,6 @@ struct ance::cet::Runner::Implementation
             reporter_.trace(prefix, core::Location::nowhere()) << "abort execution";
 
             state_.execution_result = ExecutionResult::Error;
-
-            state_.current_run_point->clearBlocker();
         }
 
         void block(PendingResolution const& blocker)
@@ -494,8 +508,6 @@ struct ance::cet::Runner::Implementation
             reporter_.trace(prefix, core::Location::nowhere()) << "yield";
 
             state_.execution_result = ExecutionResult::Yield;
-
-            state_.current_run_point->clearBlocker();
         }
 
         [[nodiscard]] Scope& scope()
@@ -1268,13 +1280,21 @@ struct ance::cet::Runner::Implementation
 
     bool run(BBT& bbt)
     {
-        while (bbt.hasRunPoints())
+        while (bbt.hasExecutableRunPoints())
         {
             bool progress = false;
 
             for (auto iterator = bbt.getRunPointBegin(); iterator != bbt.getRunPointEnd();)
             {
                 BBT::RunPoint&             run_point = *iterator;
+
+                if (run_point.isExecuting())
+                {
+                    iterator = std::next(iterator);
+
+                    continue;
+                }
+
                 BBT::ExecutionResult const result    = bbt.execute(run_point);
 
                 if (result == BBT::ExecutionResult::Completed)
@@ -1308,7 +1328,7 @@ struct ance::cet::Runner::Implementation
                 }
             }
 
-            if (!progress && bbt.hasRunPoints())
+            if (!progress && bbt.hasExecutableRunPoints())
             {
                 bbt.reportBlockers();
 

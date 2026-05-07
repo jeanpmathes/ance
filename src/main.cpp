@@ -121,7 +121,10 @@ namespace ance
         // todo: get the current relational and equality ops to work, test them, also check operator precedence math in first.nc
         // todo: commit as amend
 
-        // todo: check why throw/assert failure right after trace prevent trace from printing, maybe we need to flush
+        // todo: check if/why throw/assert failure right after trace prevent trace from printing, maybe we need to flush
+
+        // todo: rework core declarations - declareCore should not immediatly run it, simply add the runpoint (schedule only), it will be run later anyways
+        // todo: to check, inspect trace, also trace schedule of flows and execution of flows
 
         // todo: parenthesis expression
 

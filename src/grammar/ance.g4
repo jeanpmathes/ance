@@ -40,12 +40,12 @@ expression
 
 infixExpression
     : unaryExpression # UnaryExpressionExpression
-    | left=infixExpression binaryOperatorMultiplicative right=unaryExpression # BinaryOperationExpression
-    | left=infixExpression binaryOperatorAdditive right=unaryExpression # BinaryOperationExpression
-    | left=infixExpression binaryOperatorRelational right=unaryExpression # BinaryOperationExpression
-    | left=infixExpression binaryOperatorEquality right=unaryExpression # BinaryOperationExpression
-    | left=infixExpression ( NOT )? 'and' right=unaryExpression # And
     | left=infixExpression ( NOT )? 'or' right=unaryExpression # Or
+    | left=infixExpression ( NOT )? 'and' right=unaryExpression # And
+    | left=infixExpression binaryOperatorEquality right=unaryExpression # BinaryOperationExpression
+    | left=infixExpression binaryOperatorRelational right=unaryExpression # BinaryOperationExpression
+    | left=infixExpression binaryOperatorAdditive right=unaryExpression # BinaryOperationExpression
+    | left=infixExpression binaryOperatorMultiplicative right=unaryExpression # BinaryOperationExpression
     ;
 
 unaryExpression
