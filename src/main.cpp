@@ -118,15 +118,17 @@ namespace ance
 
         return exit_code;
 
-        // todo: WHEN WORKING ON TYPES: TYPES SHOULD DEFINE THEIR OPS USING SOURCE CODE (HARDCODED IN C++), just like the core functions, using intrinsics
+        // todo: get the current relational and equality ops to work, test them, also check operator precedence math in first.nc
+        // todo: commit as amend
 
-        // todo: relational and equality ops (for string, size, bool, floats and maybe others)
+        // todo: check why throw/assert failure right after trace prevent trace from printing, maybe we need to flush
 
         // todo: parenthesis expression
 
-        // todo: function overloading / function groups
+        // todo: constructors as callable types, make call more of an operator as well
 
-        // todo: constructors as callable types
+        // todo: function overloading / function groups
+        // todo: function groups are also callable
 
         // todo: integer type, integer literals (need type expressions for them, e.g. Integer{32}, UnsignedInteger{64}, etc.)
         // todo: ops for all integer types

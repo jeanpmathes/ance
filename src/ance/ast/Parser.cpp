@@ -386,6 +386,24 @@ namespace ance::ast
             return core::BinaryOperator::UNSPECIFIED;
         }
 
+        core::BinaryOperator expectBinaryOperator(grammar::anceParser::BinaryOperatorRelationalContext* context)
+        {
+            if (context == nullptr) return core::BinaryOperator::UNSPECIFIED;
+
+            if (std::any const result = visit(context); result.has_value()) return std::any_cast<core::BinaryOperator>(result);
+
+            return core::BinaryOperator::UNSPECIFIED;
+        }
+
+        core::BinaryOperator expectBinaryOperator(grammar::anceParser::BinaryOperatorEqualityContext* context)
+        {
+            if (context == nullptr) return core::BinaryOperator::UNSPECIFIED;
+
+            if (std::any const result = visit(context); result.has_value()) return std::any_cast<core::BinaryOperator>(result);
+
+            return core::BinaryOperator::UNSPECIFIED;
+        }
+
         core::Assigner expectAssigner(grammar::anceParser::AssignerContext* context)
         {
             if (context == nullptr) return core::Assigner::UNSPECIFIED;
@@ -730,6 +748,8 @@ namespace ance::ast
             core::BinaryOperator op = core::BinaryOperator::UNSPECIFIED;
             if (context->binaryOperatorMultiplicative() != nullptr) op = expectBinaryOperator(context->binaryOperatorMultiplicative());
             if (context->binaryOperatorAdditive() != nullptr) op = expectBinaryOperator(context->binaryOperatorAdditive());
+            if (context->binaryOperatorRelational() != nullptr) op = expectBinaryOperator(context->binaryOperatorRelational());
+            if (context->binaryOperatorEquality() != nullptr) op = expectBinaryOperator(context->binaryOperatorEquality());
 
             Expression* expression = new BinaryOperation(std::move(left), op, std::move(right), location(context));
             return expression;
@@ -979,6 +999,54 @@ namespace ance::ast
             trace("Subtraction", context);
 
             core::BinaryOperator op = core::BinaryOperator::SUBTRACTION;
+            return op;
+        }
+
+        std::any visitLessThan(grammar::anceParser::LessThanContext* context) override
+        {
+            trace("LessThan", context);
+
+            core::BinaryOperator op = core::BinaryOperator::LESS_THAN;
+            return op;
+        }
+
+        std::any visitLessThanOrEqual(grammar::anceParser::LessThanOrEqualContext* context) override
+        {
+            trace("LessThanOrEqual", context);
+
+            core::BinaryOperator op = core::BinaryOperator::LESS_THAN_OR_EQUAL;
+            return op;
+        }
+
+        std::any visitGreaterThan(grammar::anceParser::GreaterThanContext* context) override
+        {
+            trace("GreaterThan", context);
+
+            core::BinaryOperator op = core::BinaryOperator::GREATER_THAN;
+            return op;
+        }
+
+        std::any visitGreaterThanOrEqual(grammar::anceParser::GreaterThanOrEqualContext* context) override
+        {
+            trace("GreaterThanOrEqual", context);
+
+            core::BinaryOperator op = core::BinaryOperator::GREATER_THAN_OR_EQUAL;
+            return op;
+        }
+
+        std::any visitEqual(grammar::anceParser::EqualContext* context) override
+        {
+            trace("Equal", context);
+
+            core::BinaryOperator op = core::BinaryOperator::EQUAL;
+            return op;
+        }
+
+        std::any visitNotEqual(grammar::anceParser::NotEqualContext* context) override
+        {
+            trace("NotEqual", context);
+
+            core::BinaryOperator op = core::BinaryOperator::NOT_EQUAL;
             return op;
         }
 

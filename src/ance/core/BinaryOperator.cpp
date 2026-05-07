@@ -28,6 +28,24 @@ std::string ance::core::BinaryOperator::toString() const
 
         case REMAINDER:
             return "%";
+
+        case LESS_THAN:
+            return "<";
+
+        case LESS_THAN_OR_EQUAL:
+            return "<=";
+
+        case GREATER_THAN:
+            return ">";
+
+        case GREATER_THAN_OR_EQUAL:
+            return ">=";
+
+        case EQUAL:
+            return "==";
+
+        case NOT_EQUAL:
+            return "/=";
     }
 
     throw std::logic_error("Invalid binary operator");
@@ -54,6 +72,24 @@ std::string ance::core::BinaryOperator::toShortName() const
 
         case REMAINDER:
             return "rem";
+
+        case LESS_THAN:
+            return "lt";
+
+        case LESS_THAN_OR_EQUAL:
+            return "le";
+
+        case GREATER_THAN:
+            return "gt";
+
+        case GREATER_THAN_OR_EQUAL:
+            return "ge";
+
+        case EQUAL:
+            return "eq";
+
+        case NOT_EQUAL:
+            return "ne";
     }
 
     throw std::logic_error("Invalid binary operator");

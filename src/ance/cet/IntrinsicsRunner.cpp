@@ -107,6 +107,24 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::SIZE_BITNOT:
                 runSizeBitNot();
                 break;
+            case core::Intrinsic::SIZE_LT:
+                runSizeLt();
+                break;
+            case core::Intrinsic::SIZE_LE:
+                runSizeLe();
+                break;
+            case core::Intrinsic::SIZE_GT:
+                runSizeGt();
+                break;
+            case core::Intrinsic::SIZE_GE:
+                runSizeGe();
+                break;
+            case core::Intrinsic::SIZE_EQ:
+                runSizeEq();
+                break;
+            case core::Intrinsic::SIZE_NE:
+                runSizeNe();
+                break;
 
             case core::Intrinsic::HALF_ADD:
                 runFloatAdd(core::Precision::HALF);
@@ -125,6 +143,24 @@ struct ance::cet::IntrinsicsRunner::Implementation
                 break;
             case core::Intrinsic::HALF_NEG:
                 runFloatNeg(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_LT:
+                runFloatLt(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_LE:
+                runFloatLe(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_GT:
+                runFloatGt(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_GE:
+                runFloatGe(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_EQ:
+                runFloatEq(core::Precision::HALF);
+                break;
+            case core::Intrinsic::HALF_NE:
+                runFloatNe(core::Precision::HALF);
                 break;
 
             case core::Intrinsic::SINGLE_ADD:
@@ -145,6 +181,24 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::SINGLE_NEG:
                 runFloatNeg(core::Precision::SINGLE);
                 break;
+            case core::Intrinsic::SINGLE_LT:
+                runFloatLt(core::Precision::SINGLE);
+                break;
+            case core::Intrinsic::SINGLE_LE:
+                runFloatLe(core::Precision::SINGLE);
+                break;
+            case core::Intrinsic::SINGLE_GT:
+                runFloatGt(core::Precision::SINGLE);
+                break;
+            case core::Intrinsic::SINGLE_GE:
+                runFloatGe(core::Precision::SINGLE);
+                break;
+            case core::Intrinsic::SINGLE_EQ:
+                runFloatEq(core::Precision::SINGLE);
+                break;
+            case core::Intrinsic::SINGLE_NE:
+                runFloatNe(core::Precision::SINGLE);
+                break;
 
             case core::Intrinsic::DOUBLE_ADD:
                 runFloatAdd(core::Precision::DOUBLE);
@@ -164,6 +218,24 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::DOUBLE_NEG:
                 runFloatNeg(core::Precision::DOUBLE);
                 break;
+            case core::Intrinsic::DOUBLE_LT:
+                runFloatLt(core::Precision::DOUBLE);
+                break;
+            case core::Intrinsic::DOUBLE_LE:
+                runFloatLe(core::Precision::DOUBLE);
+                break;
+            case core::Intrinsic::DOUBLE_GT:
+                runFloatGt(core::Precision::DOUBLE);
+                break;
+            case core::Intrinsic::DOUBLE_GE:
+                runFloatGe(core::Precision::DOUBLE);
+                break;
+            case core::Intrinsic::DOUBLE_EQ:
+                runFloatEq(core::Precision::DOUBLE);
+                break;
+            case core::Intrinsic::DOUBLE_NE:
+                runFloatNe(core::Precision::DOUBLE);
+                break;
 
             case core::Intrinsic::QUAD_ADD:
                 runFloatAdd(core::Precision::QUAD);
@@ -182,6 +254,39 @@ struct ance::cet::IntrinsicsRunner::Implementation
                 break;
             case core::Intrinsic::QUAD_NEG:
                 runFloatNeg(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_LT:
+                runFloatLt(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_LE:
+                runFloatLe(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_GT:
+                runFloatGt(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_GE:
+                runFloatGe(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_EQ:
+                runFloatEq(core::Precision::QUAD);
+                break;
+            case core::Intrinsic::QUAD_NE:
+                runFloatNe(core::Precision::QUAD);
+                break;
+
+            case core::Intrinsic::BOOL_EQ:
+            case core::Intrinsic::UNIT_EQ:
+            case core::Intrinsic::STRING_EQ:
+            case core::Intrinsic::IDENTIFIER_EQ:
+            case core::Intrinsic::LOCATION_EQ:
+                runValueEquality(false);
+                break;
+            case core::Intrinsic::BOOL_NE:
+            case core::Intrinsic::UNIT_NE:
+            case core::Intrinsic::STRING_NE:
+            case core::Intrinsic::IDENTIFIER_NE:
+            case core::Intrinsic::LOCATION_NE:
+                runValueEquality(true);
                 break;
         }
 
@@ -277,7 +382,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
 
     void runLog()
     {
-        std::string const&    value = state_.arguments->at(0)->as<bbt::String>().value();
+        std::string const&    value    = state_.arguments->at(0)->as<bbt::String>().value();
         core::Location const& location = state_.arguments->at(1)->as<bbt::Location>().value();
 
         reporter_.info(location) << value;
@@ -406,6 +511,48 @@ struct ance::cet::IntrinsicsRunner::Implementation
         setResult(bbt::Size::make(~value, type_context_));
     }
 
+    void runSizeLt()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+        setResult(bbt::Bool::make(lhs < rhs, type_context_));
+    }
+
+    void runSizeLe()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+        setResult(bbt::Bool::make(lhs <= rhs, type_context_));
+    }
+
+    void runSizeGt()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+        setResult(bbt::Bool::make(lhs > rhs, type_context_));
+    }
+
+    void runSizeGe()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+        setResult(bbt::Bool::make(lhs >= rhs, type_context_));
+    }
+
+    void runSizeEq()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+        setResult(bbt::Bool::make(lhs == rhs, type_context_));
+    }
+
+    void runSizeNe()
+    {
+        size_t const lhs = state_.arguments->at(0)->as<bbt::Size>().value();
+        size_t const rhs = state_.arguments->at(1)->as<bbt::Size>().value();
+        setResult(bbt::Bool::make(lhs != rhs, type_context_));
+    }
+
     void runFloatAdd(core::Precision const)
     {
         llvm::APFloat lhs = state_.arguments->at(0)->as<bbt::Float>().value();
@@ -451,6 +598,61 @@ struct ance::cet::IntrinsicsRunner::Implementation
         llvm::APFloat value = state_.arguments->at(0)->as<bbt::Float>().value();
         value.changeSign();
         setResult(bbt::Float::make(std::move(value), type_context_));
+    }
+
+    void runFloatLt(core::Precision const)
+    {
+        llvm::APFloat const lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const rhs = state_.arguments->at(1)->as<bbt::Float>().value();
+        setResult(bbt::Bool::make(lhs.compare(rhs) == llvm::APFloat::cmpLessThan, type_context_));
+    }
+
+    void runFloatLe(core::Precision const)
+    {
+        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
+        setResult(bbt::Bool::make(comparison == llvm::APFloat::cmpLessThan || comparison == llvm::APFloat::cmpEqual, type_context_));
+    }
+
+    void runFloatGt(core::Precision const)
+    {
+        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
+        setResult(bbt::Bool::make(comparison == llvm::APFloat::cmpGreaterThan, type_context_));
+    }
+
+    void runFloatGe(core::Precision const)
+    {
+        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
+        setResult(bbt::Bool::make(comparison == llvm::APFloat::cmpGreaterThan || comparison == llvm::APFloat::cmpEqual, type_context_));
+    }
+
+    void runFloatEq(core::Precision const)
+    {
+        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
+        setResult(bbt::Bool::make(comparison == llvm::APFloat::cmpEqual, type_context_));
+    }
+
+    void runFloatNe(core::Precision const)
+    {
+        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
+        setResult(bbt::Bool::make(comparison != llvm::APFloat::cmpEqual, type_context_));
+    }
+
+    void runValueEquality(bool const negated)
+    {
+        utility::Shared<bbt::Value> lhs        = state_.arguments->at(0);
+        utility::Shared<bbt::Value> rhs        = state_.arguments->at(1);
+        bool const                  comparison = lhs->equals(*rhs);
+        setResult(bbt::Bool::make(negated ? !comparison : comparison, type_context_));
     }
 
     void setResult(utility::Shared<bbt::Value> value)

@@ -40,10 +40,12 @@ expression
 
 infixExpression
     : unaryExpression # UnaryExpressionExpression
-    | left=infixExpression ( NOT )? 'and' right=unaryExpression # And
-    | left=infixExpression ( NOT )? 'or' right=unaryExpression # Or
     | left=infixExpression binaryOperatorMultiplicative right=unaryExpression # BinaryOperationExpression
     | left=infixExpression binaryOperatorAdditive right=unaryExpression # BinaryOperationExpression
+    | left=infixExpression binaryOperatorRelational right=unaryExpression # BinaryOperationExpression
+    | left=infixExpression binaryOperatorEquality right=unaryExpression # BinaryOperationExpression
+    | left=infixExpression ( NOT )? 'and' right=unaryExpression # And
+    | left=infixExpression ( NOT )? 'or' right=unaryExpression # Or
     ;
 
 unaryExpression
@@ -113,6 +115,18 @@ binaryOperatorAdditive
 assigner
     : '<:' # CopyAssigner
     | ':=' # FinalCopyAssigner
+    ;
+
+binaryOperatorRelational
+    : '<' # LessThan
+    | '<=' # LessThanOrEqual
+    | '>' # GreaterThan
+    | '>=' # GreaterThanOrEqual
+    ;
+
+binaryOperatorEquality
+    : '==' # Equal
+    | '/=' # NotEqual
     ;
 
 accessModifier

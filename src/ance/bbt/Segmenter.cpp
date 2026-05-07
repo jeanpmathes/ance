@@ -659,9 +659,6 @@ struct ance::bbt::Segmenter::Implementation
 
                 auto [result, next] = current.simplify();
 
-                reporter_.trace(prefix, core::Location::nowhere())
-                    << "simplify block {current=" << block(current) << ", result=" << block(*result) << ", next_count=" << next.size() << "}";
-
                 if (&current == &current_entry.get())
                 {
                     current_entry = *result;

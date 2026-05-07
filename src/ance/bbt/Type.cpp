@@ -111,8 +111,7 @@ namespace ance::bbt
 
         void addBinaryOperatorFunction(core::BinaryOperator const binary_operator, Type const& rhs_type, utility::Shared<Value> function)
         {
-            auto const key = std::make_pair(binary_operator, &rhs_type);
-            binary_operator_map_.emplace(key, function);
+            binary_operator_map_.emplace(std::make_pair(binary_operator, &rhs_type), function);
         }
 
         [[nodiscard]] bool isUnaryOperatorDefined(core::UnaryOperator const unary_operator) const
@@ -297,7 +296,8 @@ namespace ance::bbt
 
         [[nodiscard]] utility::Shared<Value> declareBinaryOperatorFunction(std::string const&         type_name,
                                                                            std::string const&         type_prefix,
-                                                                           core::BinaryOperator const binary_operator) const
+                                                                           core::BinaryOperator const binary_operator,
+                                                                           Type const&                return_type) const
         {
             std::string const short_name     = binary_operator.toShortName();
             std::string const function_name  = std::format("__core_{}_op_{}", type_name, short_name);
@@ -310,7 +310,7 @@ namespace ance::bbt
                                                  function_name,
                                                  type_name,
                                                  type_name,
-                                                 type_name,
+                                                 return_type.name().text(),
                                                  intrinsic_name);
 
             runner_.declareCore(code, function_name);
@@ -344,7 +344,14 @@ namespace ance::bbt
         {
             type.implementation_->addBinaryOperatorFunction(binary_operator,
                                                             type,
-                                                            declareBinaryOperatorFunction(type.toString(), type_prefix, binary_operator));
+                                                            declareBinaryOperatorFunction(type.toString(), type_prefix, binary_operator, type));
+        }
+
+        void addBinaryOperator(Type& type, std::string const& type_prefix, core::BinaryOperator const binary_operator, Type const& return_type) const
+        {
+            type.implementation_->addBinaryOperatorFunction(binary_operator,
+                                                            type,
+                                                            declareBinaryOperatorFunction(type.toString(), type_prefix, binary_operator, return_type));
         }
 
         void addArithmeticOperators(Type& type, std::string const& type_prefix) const
@@ -356,6 +363,25 @@ namespace ance::bbt
                                   core::BinaryOperator::REMAINDER})
             {
                 addBinaryOperator(type, type_prefix, op);
+            }
+        }
+
+        void addRelationalOperators(Type& type, std::string const& type_prefix, Type const& return_type) const
+        {
+            for (auto const op : {core::BinaryOperator::LESS_THAN,
+                                  core::BinaryOperator::LESS_THAN_OR_EQUAL,
+                                  core::BinaryOperator::GREATER_THAN,
+                                  core::BinaryOperator::GREATER_THAN_OR_EQUAL})
+            {
+                addBinaryOperator(type, type_prefix, op, return_type);
+            }
+        }
+
+        void addEqualityOperators(Type& type, std::string const& type_prefix, Type const& return_type) const
+        {
+            for (auto const op : {core::BinaryOperator::EQUAL, core::BinaryOperator::NOT_EQUAL})
+            {
+                addBinaryOperator(type, type_prefix, op, return_type);
             }
         }
 
@@ -388,15 +414,26 @@ namespace ance::bbt
                 implementation_->ensureReadiness(type);
                 implementation_->ensureReadiness(getFunction());
 
-                implementation_->addUnaryOperator(*type, "b", core::UnaryOperator::NOT);
+                std::string const type_prefix = "b";
+
+                implementation_->addUnaryOperator(*type, type_prefix, core::UnaryOperator::NOT);
+                implementation_->addEqualityOperators(*type, type_prefix, *type);
             });
     }
 
     utility::Shared<Type> TypeContext::getUnit()
     {
-        return Implementation::getOrCreate(implementation_->unit_type, [&] {
-            return utility::makeShared<Type>(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), *this);
-        });
+        return Implementation::getOrCreate(
+            implementation_->unit_type,
+            [&] { return utility::makeShared<Type>(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), *this); },
+            [&](utility::Shared<Type> type) {
+                implementation_->ensureReadiness(type);
+                implementation_->ensureReadiness(getFunction());
+
+                std::string const type_prefix = "u";
+
+                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+            });
     }
 
     utility::Shared<Type> TypeContext::getSize()
@@ -411,6 +448,8 @@ namespace ance::bbt
                 std::string const type_prefix = "s";
 
                 implementation_->addArithmeticOperators(*type, type_prefix);
+                implementation_->addRelationalOperators(*type, type_prefix, *getBool());
+                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
                 implementation_->addUnaryOperator(*type, type_prefix, core::UnaryOperator::BITWISE_NOT);
             });
     }
@@ -426,6 +465,8 @@ namespace ance::bbt
                     implementation_->ensureReadiness(getFunction());
 
                     implementation_->addArithmeticOperators(*type, type_prefix);
+                    implementation_->addRelationalOperators(*type, type_prefix, *getBool());
+                    implementation_->addEqualityOperators(*type, type_prefix, *getBool());
                     implementation_->addUnaryOperator(*type, type_prefix, core::UnaryOperator::NEGATION);
                 });
         };
@@ -450,8 +491,17 @@ namespace ance::bbt
 
     utility::Shared<Type> TypeContext::getString()
     {
-        return Implementation::getOrCreate(implementation_->string_type,
-                                           [&] { return utility::makeShared<Type>(core::Identifier::make("String", core::Location::core()), *this); });
+        return Implementation::getOrCreate(
+            implementation_->string_type,
+            [&] { return utility::makeShared<Type>(core::Identifier::make("String", core::Location::core()), *this); },
+            [&](utility::Shared<Type> type) {
+                implementation_->ensureReadiness(type);
+                implementation_->ensureReadiness(getFunction());
+
+                std::string const type_prefix = "str";
+
+                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+            });
     }
 
     utility::Shared<Type> TypeContext::getVariableRef()
@@ -468,8 +518,17 @@ namespace ance::bbt
 
     utility::Shared<Type> TypeContext::getIdentifier()
     {
-        return Implementation::getOrCreate(implementation_->identifier_type,
-                                           [&] { return utility::makeShared<Type>(core::Identifier::make("Identifier", core::Location::core()), *this); });
+        return Implementation::getOrCreate(
+            implementation_->identifier_type,
+            [&] { return utility::makeShared<Type>(core::Identifier::make("Identifier", core::Location::core()), *this); },
+            [&](utility::Shared<Type> type) {
+                implementation_->ensureReadiness(type);
+                implementation_->ensureReadiness(getFunction());
+
+                std::string const type_prefix = "id";
+
+                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+            });
     }
 
     utility::Shared<Type> TypeContext::getFunction()
@@ -493,7 +552,16 @@ namespace ance::bbt
 
     utility::Shared<Type> TypeContext::getLocation()
     {
-        return Implementation::getOrCreate(implementation_->location_type,
-                                           [&] { return utility::makeShared<Type>(core::Identifier::make("Location", core::Location::core()), *this); });
+        return Implementation::getOrCreate(
+            implementation_->location_type,
+            [&] { return utility::makeShared<Type>(core::Identifier::make("Location", core::Location::core()), *this); },
+            [&](utility::Shared<Type> type) {
+                implementation_->ensureReadiness(type);
+                implementation_->ensureReadiness(getFunction());
+
+                std::string const type_prefix = "loc";
+
+                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+            });
     }
 }

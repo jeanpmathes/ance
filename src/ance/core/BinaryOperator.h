@@ -27,10 +27,28 @@ namespace ance::core
             DIVISION,
 
           /// The remainder operator.
-          REMAINDER
+          REMAINDER,
+
+          /// The less-than relational operator.
+          LESS_THAN,
+
+          /// The less-than-or-equal relational operator.
+          LESS_THAN_OR_EQUAL,
+
+          /// The greater-than relational operator.
+          GREATER_THAN,
+
+          /// The greater-than-or-equal relational operator.
+          GREATER_THAN_OR_EQUAL,
+
+          /// The equality operator.
+          EQUAL,
+
+          /// The inequality operator.
+          NOT_EQUAL
       };
 
-        BinaryOperator() = default;
+      BinaryOperator() = default;
         constexpr BinaryOperator(Value const value) : value_(value) {}// NOLINT(google-explicit-constructor)
 
         operator Value() const;// NOLINT(google-explicit-constructor)
