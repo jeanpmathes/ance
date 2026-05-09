@@ -315,7 +315,7 @@ struct ance::ast::Printer::Implementation
         {
             print("intrinsic ");
             visit(*intrinsic_expression.name);
-            print(" (");
+            print(" args (");
 
             for (size_t index = 0; index < intrinsic_expression.arguments.size(); index++)
             {

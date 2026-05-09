@@ -118,12 +118,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: test the new comparison operators and equality operators in first.ance
-
-        // todo: change intrinsic to be intrinsic <expr> args ()
-
-        // todo: check if/why throw/assert failure right after trace prevent trace from printing, maybe we need to flush
-
         // todo: rework core declarations - declareCore should not immediatly run it, simply add the runpoint (schedule only), it will be run later anyways
         // todo: to check, inspect trace, also trace schedule of flows and execution of flows
 

@@ -82,7 +82,7 @@ postfixExpression
 
 primaryExpression
     : '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
-    | 'intrinsic' name=expression '(' (expression (',' expression)* )? ')' # IntrinsicExpression
+    | 'intrinsic' name=expression 'args' '(' (expression (',' expression)* )? ')' # IntrinsicExpression
     | 'typeof' '(' expression (',' expression)* ')' # TypeOfExpression // todo: looks like a function, which is not ideal, but one might be able to make it a core function especially with inference, maybe it could then be typeof(#expr)
     | 'if' condition=expression 'then' trueBlock=expression ( 'else' falseBlock=expression )? # IfExpression
     | 'match' condition=expression 'with' '{' ( matchExpressionCase ( ',' matchExpressionCase )* )? '}' # MatchExpression

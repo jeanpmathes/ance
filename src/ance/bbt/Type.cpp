@@ -305,7 +305,7 @@ namespace ance::bbt
 
             std::string const code = std::format("public {} (lhs: {}, rhs: {}) : {}\n"
                                                  "{{\n"
-                                                 "    return intrinsic \"{}\" (lhs, rhs);\n"
+                                                 "    return intrinsic \"{}\" args (lhs, rhs);\n"
                                                  "}}\n",
                                                  function_name,
                                                  type_name,
@@ -328,7 +328,7 @@ namespace ance::bbt
 
             std::string const code = std::format("public {} (operand: {}) : {}\n"
                                                  "{{\n"
-                                                 "    return intrinsic \"{}\" (operand);\n"
+                                                 "    return intrinsic \"{}\" args (operand);\n"
                                                  "}}\n",
                                                  function_name,
                                                  type_name,

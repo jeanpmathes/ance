@@ -218,7 +218,7 @@ struct ance::est::Printer::Implementation
         {
             print("intrinsic ");
             visit(*intrinsic.name);
-            print(" (");
+            print(" args (");
             for (size_t index = 0; index < intrinsic.arguments.size(); index++)
             {
                 visit(*intrinsic.arguments[index]);

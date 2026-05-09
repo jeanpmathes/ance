@@ -47,38 +47,38 @@ namespace
         runner.declareCore(R"CODE(
 public log1b (value: Bool)
 {
-    let string_value: String := intrinsic "b_2_str" (value);
-    intrinsic "log" (string_value, nowhere);
+    let string_value: String := intrinsic "b_2_str" args (value);
+    intrinsic "log" args (string_value, nowhere);
 }
 )CODE", "log1b");
 
         runner.declareCore(R"CODE(
 public log2b (value: Bool, location: Location)
 {
-    let string_value: String := intrinsic "b_2_str" (value);
-    intrinsic "log" (string_value, location);
+    let string_value: String := intrinsic "b_2_str" args (value);
+    intrinsic "log" args (string_value, location);
 }
 )CODE", "log2b");
 
         runner.declareCore(R"CODE(
 public log1s (value: String)
 {
-    intrinsic "log" (value, nowhere);
+    intrinsic "log" args (value, nowhere);
 }
 )CODE", "log1s");
 
         runner.declareCore(R"CODE(
 public log2s (value: String, location: Location)
 {
-    intrinsic "log" (value, location);
+    intrinsic "log" args (value, location);
 }
 )CODE","log2s");
 
         runner.declareCore(R"CODE(
 public log1fh (value: Half)
 {
-    let string_value: String := intrinsic "fh_2_str" (value);
-    intrinsic "log" (string_value, nowhere);
+    let string_value: String := intrinsic "fh_2_str" args (value);
+    intrinsic "log" args (string_value, nowhere);
 }
 )CODE",
                            "log1fh");
@@ -86,8 +86,8 @@ public log1fh (value: Half)
         runner.declareCore(R"CODE(
 public log1fs (value: Single)
 {
-    let string_value: String := intrinsic "fs_2_str" (value);
-    intrinsic "log" (string_value, nowhere);
+    let string_value: String := intrinsic "fs_2_str" args (value);
+    intrinsic "log" args (string_value, nowhere);
 }
 )CODE",
                            "log1fs");
@@ -95,8 +95,8 @@ public log1fs (value: Single)
         runner.declareCore(R"CODE(
 public log1fd (value: Double)
 {
-    let string_value: String := intrinsic "fd_2_str" (value);
-    intrinsic "log" (string_value, nowhere);
+    let string_value: String := intrinsic "fd_2_str" args (value);
+    intrinsic "log" args (string_value, nowhere);
 }
 )CODE",
                            "log1fd");
@@ -104,8 +104,8 @@ public log1fd (value: Double)
         runner.declareCore(R"CODE(
 public log1fq (value: Quad)
 {
-    let string_value: String := intrinsic "fq_2_str" (value);
-    intrinsic "log" (string_value, nowhere);
+    let string_value: String := intrinsic "fq_2_str" args (value);
+    intrinsic "log" args (string_value, nowhere);
 }
 )CODE",
                            "log1fq");
@@ -113,7 +113,7 @@ public log1fq (value: Quad)
         runner.declareCore(R"CODE(
 public include (file: String, location: Location)
 {
-    intrinsic "include" (file, location);
+    intrinsic "include" args (file, location);
 }
 )CODE", "include");
     }
