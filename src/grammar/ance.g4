@@ -35,17 +35,39 @@ matchCase
     ;
 
 expression
-    : infixExpression
+    : orExpression
     ;
 
-infixExpression
-    : unaryExpression # UnaryExpressionExpression
-    | left=infixExpression ( NOT )? 'or' right=unaryExpression # Or
-    | left=infixExpression ( NOT )? 'and' right=unaryExpression # And
-    | left=infixExpression binaryOperatorEquality right=unaryExpression # BinaryOperationExpression
-    | left=infixExpression binaryOperatorRelational right=unaryExpression # BinaryOperationExpression
-    | left=infixExpression binaryOperatorAdditive right=unaryExpression # BinaryOperationExpression
-    | left=infixExpression binaryOperatorMultiplicative right=unaryExpression # BinaryOperationExpression
+orExpression
+    : andExpression ( orOperator andExpression )*
+    ;
+
+orOperator
+    : (NOT)? 'or'
+    ;
+
+andExpression
+    : equalityExpression ( andOperator equalityExpression )*
+    ;
+
+andOperator
+    : ( NOT )? 'and'
+    ;
+
+equalityExpression
+    : relationalExpression ( binaryOperatorEquality relationalExpression )*
+    ;
+
+relationalExpression
+    : additiveExpression ( binaryOperatorRelational additiveExpression )*
+    ;
+
+additiveExpression
+    : multiplicativeExpression ( binaryOperatorAdditive multiplicativeExpression )*
+    ;
+
+multiplicativeExpression
+    : unaryExpression ( binaryOperatorMultiplicative unaryExpression )*
     ;
 
 unaryExpression

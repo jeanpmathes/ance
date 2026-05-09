@@ -712,46 +712,123 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitAnd(grammar::anceParser::AndContext* context) override
+        std::any visitOrExpression(grammar::anceParser::OrExpressionContext* context) override
         {
-            trace("And", context);
+            trace("OrExpression", context) << ", count(expression)=" << context->andExpression().size();
 
-            utility::Owned<Expression> left  = expectExpression(context->left);
-            utility::Owned<Expression> right = expectExpression(context->right);
+            utility::Owned<Expression> left = expectExpression(context->andExpression(0));
 
-            bool const negated = context->NOT() != nullptr;
+            core::Location location = left->location;
+            for (size_t index = 1; index < context->andExpression().size(); index++)
+            {
+                bool const                 negated = context->orOperator(index - 1)->NOT() != nullptr;
+                utility::Owned<Expression> right   = expectExpression(context->andExpression(index));
 
-            Expression* expression = new And(std::move(left), negated, std::move(right), location(context));
+                location.extend(right->location);
+                left = utility::makeOwned<Or>(std::move(left), negated, std::move(right), location);
+            }
+
+            Expression* expression = utility::unwrap(std::move(left));
             return expression;
         }
 
-        std::any visitOr(grammar::anceParser::OrContext* context) override
+        std::any visitAndExpression(grammar::anceParser::AndExpressionContext* context) override
         {
-            trace("Or", context);
+            trace("AndExpression", context) << ", count(expression)=" << context->equalityExpression().size();
 
-            utility::Owned<Expression> left  = expectExpression(context->left);
-            utility::Owned<Expression> right = expectExpression(context->right);
+            utility::Owned<Expression> left = expectExpression(context->equalityExpression(0));
 
-            bool const negated = context->NOT() != nullptr;
+            core::Location location = left->location;
+            for (size_t index = 1; index < context->equalityExpression().size(); index++)
+            {
+                bool const                 negated = context->andOperator(index - 1)->NOT() != nullptr;
+                utility::Owned<Expression> right   = expectExpression(context->equalityExpression(index));
 
-            Expression* expression = new Or(std::move(left), negated, std::move(right), location(context));
+                location.extend(right->location);
+                left = utility::makeOwned<And>(std::move(left), negated, std::move(right), location);
+            }
+
+            Expression* expression = utility::unwrap(std::move(left));
             return expression;
         }
 
-        std::any visitBinaryOperationExpression(grammar::anceParser::BinaryOperationExpressionContext* context) override
+        std::any visitEqualityExpression(grammar::anceParser::EqualityExpressionContext* context) override
         {
-            trace("BinaryOperationExpression", context);
+            trace("EqualityExpression", context) << ", count(expression)=" << context->relationalExpression().size();
 
-            utility::Owned<Expression> left  = expectExpression(context->left);
-            utility::Owned<Expression> right = expectExpression(context->right);
+            utility::Owned<Expression> left = expectExpression(context->relationalExpression(0));
 
-            core::BinaryOperator op = core::BinaryOperator::UNSPECIFIED;
-            if (context->binaryOperatorMultiplicative() != nullptr) op = expectBinaryOperator(context->binaryOperatorMultiplicative());
-            if (context->binaryOperatorAdditive() != nullptr) op = expectBinaryOperator(context->binaryOperatorAdditive());
-            if (context->binaryOperatorRelational() != nullptr) op = expectBinaryOperator(context->binaryOperatorRelational());
-            if (context->binaryOperatorEquality() != nullptr) op = expectBinaryOperator(context->binaryOperatorEquality());
+            core::Location location = left->location;
+            for (size_t index = 1; index < context->relationalExpression().size(); index++)
+            {
+                core::BinaryOperator const op    = expectBinaryOperator(context->binaryOperatorEquality(index - 1));
+                utility::Owned<Expression> right = expectExpression(context->relationalExpression(index));
 
-            Expression* expression = new BinaryOperation(std::move(left), op, std::move(right), location(context));
+                location.extend(right->location);
+                left = utility::makeOwned<BinaryOperation>(std::move(left), op, std::move(right), location);
+            }
+
+            Expression* expression = utility::unwrap(std::move(left));
+            return expression;
+        }
+
+        std::any visitRelationalExpression(grammar::anceParser::RelationalExpressionContext* context) override
+        {
+            trace("RelationalExpression", context) << ", count(expression)=" << context->additiveExpression().size();
+
+            utility::Owned<Expression> left = expectExpression(context->additiveExpression(0));
+
+            core::Location location = left->location;
+            for (size_t index = 1; index < context->additiveExpression().size(); index++)
+            {
+                core::BinaryOperator const op    = expectBinaryOperator(context->binaryOperatorRelational(index - 1));
+                utility::Owned<Expression> right = expectExpression(context->additiveExpression(index));
+
+                location.extend(right->location);
+                left = utility::makeOwned<BinaryOperation>(std::move(left), op, std::move(right), location);
+            }
+
+            Expression* expression = utility::unwrap(std::move(left));
+            return expression;
+        }
+
+        std::any visitAdditiveExpression(grammar::anceParser::AdditiveExpressionContext* context) override
+        {
+            trace("AdditiveExpression", context) << ", count(expression)=" << context->multiplicativeExpression().size();
+
+            utility::Owned<Expression> left = expectExpression(context->multiplicativeExpression(0));
+
+            core::Location location = left->location;
+            for (size_t index = 1; index < context->multiplicativeExpression().size(); index++)
+            {
+                core::BinaryOperator const op    = expectBinaryOperator(context->binaryOperatorAdditive(index - 1));
+                utility::Owned<Expression> right = expectExpression(context->multiplicativeExpression(index));
+
+                location.extend(right->location);
+                left = utility::makeOwned<BinaryOperation>(std::move(left), op, std::move(right), location);
+            }
+
+            Expression* expression = utility::unwrap(std::move(left));
+            return expression;
+        }
+
+        std::any visitMultiplicativeExpression(grammar::anceParser::MultiplicativeExpressionContext* context) override
+        {
+            trace("MultiplicativeExpression", context) << ", count(expression)=" << context->unaryExpression().size();
+
+            utility::Owned<Expression> left = expectExpression(context->unaryExpression(0));
+
+            core::Location location = left->location;
+            for (size_t index = 1; index < context->unaryExpression().size(); index++)
+            {
+                core::BinaryOperator const op    = expectBinaryOperator(context->binaryOperatorMultiplicative(index - 1));
+                utility::Owned<Expression> right = expectExpression(context->unaryExpression(index));
+
+                location.extend(right->location);
+                left = utility::makeOwned<BinaryOperation>(std::move(left), op, std::move(right), location);
+            }
+
+            Expression* expression = utility::unwrap(std::move(left));
             return expression;
         }
 

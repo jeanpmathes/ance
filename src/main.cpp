@@ -118,8 +118,9 @@ namespace ance
 
         return exit_code;
 
-        // todo: get the current relational and equality ops to work, test them, also check operator precedence math in first.nc
-        // todo: commit as amend
+        // todo: test the new comparison operators and equality operators in first.ance
+
+        // todo: change intrinsic to be intrinsic <expr> args ()
 
         // todo: check if/why throw/assert failure right after trace prevent trace from printing, maybe we need to flush
 
@@ -151,7 +152,7 @@ namespace ance
 
         // todo: go through all TODOs in the other code, check if completable now or soon or maybe already completed, potentially move them here
 
-        // todo: check grammar for ambiguity, repeat this step later
+        // todo: check grammar for ambiguity and context sensitivity, repeat this step later
 
         // todo: rework SourceFile class to read into single string buffer, then use string views instead of line-by-line reading
 
