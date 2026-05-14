@@ -71,14 +71,18 @@ namespace ance::bbt
         /// Returns true if this type has a unary operator function for the given operator.
         [[nodiscard]] bool isUnaryOperatorDefined(core::UnaryOperator unary_operator) const;
 
-        /// Returns the unary operator function for the given operator, if defined.
-        [[nodiscard]] utility::Optional<utility::Shared<Value>> getUnaryOperatorFunction(core::UnaryOperator unary_operator);
+        /// Returns the identifier of the unary operator function for the given operator, if defined.
+        [[nodiscard]] utility::Optional<core::Identifier> getUnaryOperatorFunctionIdentifier(
+            core::UnaryOperator
+                unary_operator);// todo: when reworking how ops are defined, this should be removed because retrieval would ideally not be name based
 
         /// Returns true if this type has a binary operator function for the given operator and right-hand type.
         [[nodiscard]] bool isBinaryOperatorDefined(core::BinaryOperator binary_operator, Type const& rhs_type) const;
 
         /// Returns the binary operator function for the given operator and right-hand type, if defined.
-        [[nodiscard]] utility::Optional<utility::Shared<Value>> getBinaryOperatorFunction(core::BinaryOperator binary_operator, Type const& rhs_type);
+        [[nodiscard]] utility::Optional<core::Identifier> getBinaryOperatorFunctionIdentifier(
+            core::BinaryOperator binary_operator,
+            Type const&          rhs_type);// todo: when reworking how ops are defined, this should be removed because retrieval would ideally not be name based
 
       private:
         friend class TypeContext;

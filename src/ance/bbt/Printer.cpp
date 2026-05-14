@@ -286,29 +286,29 @@ struct ance::bbt::Printer::Implementation
             print(" scope;");
         }
 
-        void visit(GetUnaryOperatorFunction const& get_unary_operator_function) override
+        void visit(GetUnaryOperatorFunctionIdentifier const& get_unary_operator_function_identifier) override
         {
-            print(get_unary_operator_function.destination.id());
+            print(get_unary_operator_function_identifier.destination.id());
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
-            print(" get_unary_op_fn ");
-            print(get_unary_operator_function.op.toString());
+            print(" get_unary_op_fn_id ");
+            print(get_unary_operator_function_identifier.op.toString());
             print(" (");
-            print(get_unary_operator_function.type.id());
+            print(get_unary_operator_function_identifier.type.id());
             print(");");
         }
 
-        void visit(GetBinaryOperatorFunction const& get_binary_operator_function) override
+        void visit(GetBinaryOperatorFunctionIdentifier const& get_binary_operator_function_identifier) override
         {
-            print(get_binary_operator_function.destination.id());
+            print(get_binary_operator_function_identifier.destination.id());
             print(" ");
             print(core::Assigner::MOVE_ASSIGNMENT);
-            print(" get_binary_op_fn ");
-            print(get_binary_operator_function.op.toString());
+            print(" get_binary_op_fn_id ");
+            print(get_binary_operator_function_identifier.op.toString());
             print(" (");
-            print(get_binary_operator_function.left_type.id());
+            print(get_binary_operator_function_identifier.left_type.id());
             print(", ");
-            print(get_binary_operator_function.right_type.id());
+            print(get_binary_operator_function_identifier.right_type.id());
             print(");");
         }
 

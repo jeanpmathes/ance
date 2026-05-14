@@ -149,10 +149,10 @@ ance::bbt::Default::Default(Temporary const& t, Temporary const& result, core::L
 ance::bbt::CurrentScope::CurrentScope(Temporary const& result, core::Location const& source_location) : Node(source_location), Statement(), destination(result)
 {}
 
-ance::bbt::GetUnaryOperatorFunction::GetUnaryOperatorFunction(core::UnaryOperator const kind,
-                                                              Temporary const&          operand_type,
-                                                              Temporary const&          result,
-                                                              core::Location const&     source_location)
+ance::bbt::GetUnaryOperatorFunctionIdentifier::GetUnaryOperatorFunctionIdentifier(core::UnaryOperator const kind,
+                                                                                  Temporary const&          operand_type,
+                                                                                  Temporary const&          result,
+                                                                                  core::Location const&     source_location)
     : Node(source_location)
     , Statement()
     , op(kind)
@@ -160,11 +160,11 @@ ance::bbt::GetUnaryOperatorFunction::GetUnaryOperatorFunction(core::UnaryOperato
     , destination(result)
 {}
 
-ance::bbt::GetBinaryOperatorFunction::GetBinaryOperatorFunction(core::BinaryOperator  kind,
-                                                                Temporary const&      left_type_param,
-                                                                Temporary const&      right_type_param,
-                                                                Temporary const&      result,
-                                                                core::Location const& source_location)
+ance::bbt::GetBinaryOperatorFunctionIdentifier::GetBinaryOperatorFunctionIdentifier(core::BinaryOperator  kind,
+                                                                                    Temporary const&      left_type_param,
+                                                                                    Temporary const&      right_type_param,
+                                                                                    Temporary const&      result,
+                                                                                    core::Location const& source_location)
     : Node(source_location)
     , Statement()
     , op(kind)

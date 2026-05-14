@@ -104,14 +104,14 @@ namespace ance::bbt
             return *constructing_types_.at(index);
         }
 
-        void addUnaryOperatorFunction(core::UnaryOperator const unary_operator, utility::Shared<Value> function)
+        void addUnaryOperatorFunction(core::UnaryOperator const unary_operator, core::Identifier function_identifier)
         {
-            unary_operator_map_.emplace(unary_operator, function);
+            unary_operator_map_.emplace(unary_operator, function_identifier);
         }
 
-        void addBinaryOperatorFunction(core::BinaryOperator const binary_operator, Type const& rhs_type, utility::Shared<Value> function)
+        void addBinaryOperatorFunction(core::BinaryOperator const binary_operator, Type const& rhs_type, core::Identifier function_identifier)
         {
-            binary_operator_map_.emplace(std::make_pair(binary_operator, &rhs_type), function);
+            binary_operator_map_.emplace(std::make_pair(binary_operator, &rhs_type), function_identifier);
         }
 
         [[nodiscard]] bool isUnaryOperatorDefined(core::UnaryOperator const unary_operator) const
@@ -119,7 +119,7 @@ namespace ance::bbt
             return unary_operator_map_.contains(unary_operator);
         }
 
-        utility::Optional<utility::Shared<Value>> getUnaryOperatorFunction(core::UnaryOperator const unary_operator)
+        utility::Optional<core::Identifier> getUnaryOperatorFunctionIdentifier(core::UnaryOperator const unary_operator)
         {
             auto const iterator = unary_operator_map_.find(unary_operator);
 
@@ -137,7 +137,7 @@ namespace ance::bbt
             return binary_operator_map_.contains(key);
         }
 
-        utility::Optional<utility::Shared<Value>> getBinaryOperatorFunction(core::BinaryOperator const binary_operator, Type const& rhs_type)
+        utility::Optional<core::Identifier> getBinaryOperatorFunctionIdentifier(core::BinaryOperator const binary_operator, Type const& rhs_type)
         {
             auto const key      = std::make_pair(binary_operator, &rhs_type);
             auto const iterator = binary_operator_map_.find(key);
@@ -153,8 +153,8 @@ namespace ance::bbt
       private:
         core::Identifier                                                               identifier_;
         utility::List<utility::Shared<Type>>                                           constructing_types_  = {};
-        std::map<core::UnaryOperator, utility::Shared<Value>>                          unary_operator_map_  = {};
-        std::map<std::pair<core::BinaryOperator, Type const*>, utility::Shared<Value>> binary_operator_map_ = {};
+        std::map<core::UnaryOperator, core::Identifier>                                unary_operator_map_  = {};
+        std::map<std::pair<core::BinaryOperator, Type const*>, core::Identifier>       binary_operator_map_ = {};
     };
 
     Type::Type(core::Identifier const& identifier, TypeContext& type_context)
@@ -222,9 +222,9 @@ namespace ance::bbt
         return implementation_->isUnaryOperatorDefined(unary_operator);
     }
 
-    utility::Optional<utility::Shared<Value>> Type::getUnaryOperatorFunction(core::UnaryOperator const unary_operator)
+    utility::Optional<core::Identifier> Type::getUnaryOperatorFunctionIdentifier(core::UnaryOperator const unary_operator)
     {
-        return implementation_->getUnaryOperatorFunction(unary_operator);
+        return implementation_->getUnaryOperatorFunctionIdentifier(unary_operator);
     }
 
     bool Type::isBinaryOperatorDefined(core::BinaryOperator const binary_operator, Type const& rhs_type) const
@@ -232,9 +232,9 @@ namespace ance::bbt
         return implementation_->isBinaryOperatorDefined(binary_operator, rhs_type);
     }
 
-    utility::Optional<utility::Shared<Value>> Type::getBinaryOperatorFunction(core::BinaryOperator const binary_operator, Type const& rhs_type)
+    utility::Optional<core::Identifier> Type::getBinaryOperatorFunctionIdentifier(core::BinaryOperator const binary_operator, Type const& rhs_type)
     {
-        return implementation_->getBinaryOperatorFunction(binary_operator, rhs_type);
+        return implementation_->getBinaryOperatorFunctionIdentifier(binary_operator, rhs_type);
     }
 
     LReferenceType::LReferenceType(utility::Shared<Type> referenced_type, TypeContext& type_context)
@@ -294,8 +294,8 @@ namespace ance::bbt
             return type_slot.value();
         }
 
-        [[nodiscard]] utility::Shared<Value> declareBinaryOperatorFunction(std::string const&         type_name,
-                                                                           std::string const&         type_prefix,
+        [[nodiscard]] core::Identifier declareBinaryOperatorFunction(std::string const&         type_name,
+                                                                     std::string const&         type_prefix,
                                                                            core::BinaryOperator const binary_operator,
                                                                            Type const&                return_type) const
         {
@@ -315,11 +315,11 @@ namespace ance::bbt
 
             runner_.declareCore(code, function_name);
 
-            return runner_.getCoreVariableValue(core::Identifier::make(function_name, core::Location::core()));
+            return core::Identifier::make(function_name, core::Location::core());
         }
 
-        [[nodiscard]] utility::Shared<Value> declareUnaryOperatorFunction(std::string const&        type_name,
-                                                                          std::string const&        type_prefix,
+        [[nodiscard]] core::Identifier declareUnaryOperatorFunction(std::string const&        type_name,
+                                                                    std::string const&        type_prefix,
                                                                           core::UnaryOperator const unary_operator) const
         {
             std::string const short_name     = unary_operator.toShortName();
@@ -337,7 +337,7 @@ namespace ance::bbt
 
             runner_.declareCore(code, function_name);
 
-            return runner_.getCoreVariableValue(core::Identifier::make(function_name, core::Location::core()));
+            return core::Identifier::make(function_name, core::Location::core());
         }
 
         void addBinaryOperator(Type& type, std::string const& type_prefix, core::BinaryOperator const binary_operator) const

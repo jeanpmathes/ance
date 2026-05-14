@@ -118,9 +118,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: rework core declarations - declareCore should not immediatly run it, simply add the runpoint (schedule only), it will be run later anyways
-        // todo: to check, inspect trace, also trace schedule of flows and execution of flows
-
         // todo: parenthesis expression
 
         // todo: constructors as callable types, make call more of an operator as well

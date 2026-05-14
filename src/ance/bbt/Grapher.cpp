@@ -154,9 +154,9 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(CurrentScope const&) override {}
 
-        void visit(GetUnaryOperatorFunction const&) override {}
+        void visit(GetUnaryOperatorFunctionIdentifier const&) override {}
 
-        void visit(GetBinaryOperatorFunction const&) override {}
+        void visit(GetBinaryOperatorFunctionIdentifier const&) override {}
 
         void visit(TypeOf const&) override {}
 

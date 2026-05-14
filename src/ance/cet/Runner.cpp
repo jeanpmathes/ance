@@ -183,7 +183,10 @@ struct ance::cet::Runner::Implementation
 
         void schedule(bbt::Flow const& flow, Scope* scope)
         {
-            run_points_.emplace_back(flow.entry, scope != nullptr ? scope : &project_scope_);
+            reporter_.trace(prefix, core::Location::nowhere()) << "schedule flow {id=" << flow.id() << "}";
+
+            scope = scope != nullptr ? scope : &project_scope_;
+            run_points_.emplace_back(flow.entry, scope);
         }
 
         void scheduleCore(utility::Owned<bbt::Flow> flow)
@@ -1060,48 +1063,54 @@ struct ance::cet::Runner::Implementation
             scope().getTemporary(current_scope.destination).write(ScopeRef::make(scope(), type_context_));
         }
 
-        void visit(bbt::GetUnaryOperatorFunction const& get_unary_operator_function) override
+        void visit(bbt::GetUnaryOperatorFunctionIdentifier const& get_unary_operator_function_identifier) override
         {
-            trace("GetUnaryOperatorFunction", get_unary_operator_function)
-                << ", op=" << get_unary_operator_function.op.toString() << ", type=" << get_unary_operator_function.type.id()
-                << ", destination=" << get_unary_operator_function.destination.id();
+            trace("GetUnaryOperatorFunctionIdentifier", get_unary_operator_function_identifier)
+                << ", op=" << get_unary_operator_function_identifier.op.toString() << ", type=" << get_unary_operator_function_identifier.type.id()
+                << ", destination=" << get_unary_operator_function_identifier.destination.id();
 
-            utility::Shared<bbt::Type> type = scope().getTemporary(get_unary_operator_function.type).read().cast<bbt::Type>();
+            utility::Shared<bbt::Type> type = scope().getTemporary(get_unary_operator_function_identifier.type).read().cast<bbt::Type>();
 
-            utility::Optional<utility::Shared<bbt::Value>> operator_function = type->getUnaryOperatorFunction(get_unary_operator_function.op);
+            utility::Optional<core::Identifier> operator_function_identifier =
+                type->getUnaryOperatorFunctionIdentifier(get_unary_operator_function_identifier.op);
 
-            if (!operator_function.hasValue())
+            if (!operator_function_identifier.hasValue())
             {
-                reporter_.error(get_unary_operator_function.location)
-                    << "Operator '" << get_unary_operator_function.op.toString() << "' is not defined for type " << type->annotated();
+                reporter_.error(get_unary_operator_function_identifier.location)
+                    << "Operator '" << get_unary_operator_function_identifier.op.toString() << "' is not defined for type " << type->annotated();
                 abort();
                 return;
             }
 
-            scope().getTemporary(get_unary_operator_function.destination).write(operator_function.value());
+            scope()
+                .getTemporary(get_unary_operator_function_identifier.destination)
+                .write(bbt::Identifier::make(operator_function_identifier.value(), type_context_));
         }
 
-        void visit(bbt::GetBinaryOperatorFunction const& get_binary_operator_function) override
+        void visit(bbt::GetBinaryOperatorFunctionIdentifier const& get_binary_operator_function_identifier) override
         {
-            trace("GetBinaryOperatorFunction", get_binary_operator_function)
-                << ", op=" << get_binary_operator_function.op.toString() << ", left_type=" << get_binary_operator_function.left_type.id()
-                << ", right_type=" << get_binary_operator_function.right_type.id() << ", destination=" << get_binary_operator_function.destination.id();
+            trace("GetBinaryOperatorFunctionIdentifier", get_binary_operator_function_identifier)
+                << ", op=" << get_binary_operator_function_identifier.op.toString() << ", left_type=" << get_binary_operator_function_identifier.left_type.id()
+                << ", right_type=" << get_binary_operator_function_identifier.right_type.id()
+                << ", destination=" << get_binary_operator_function_identifier.destination.id();
 
-            utility::Shared<bbt::Type> left_type  = scope().getTemporary(get_binary_operator_function.left_type).read().cast<bbt::Type>();
-            utility::Shared<bbt::Type> right_type = scope().getTemporary(get_binary_operator_function.right_type).read().cast<bbt::Type>();
+            utility::Shared<bbt::Type> left_type  = scope().getTemporary(get_binary_operator_function_identifier.left_type).read().cast<bbt::Type>();
+            utility::Shared<bbt::Type> right_type = scope().getTemporary(get_binary_operator_function_identifier.right_type).read().cast<bbt::Type>();
 
-            utility::Optional<utility::Shared<bbt::Value>> operator_function =
-                left_type->getBinaryOperatorFunction(get_binary_operator_function.op, *right_type);
+            utility::Optional<core::Identifier> operator_function_identifier =
+                left_type->getBinaryOperatorFunctionIdentifier(get_binary_operator_function_identifier.op, *right_type);
 
-            if (!operator_function.hasValue())
+            if (!operator_function_identifier.hasValue())
             {
-                reporter_.error(get_binary_operator_function.location)
-                    << "Operator '" << get_binary_operator_function.op.toString() << "' is not defined for type " << left_type->annotated();
+                reporter_.error(get_binary_operator_function_identifier.location)
+                    << "Operator '" << get_binary_operator_function_identifier.op.toString() << "' is not defined for type " << left_type->annotated();
                 abort();
                 return;
             }
 
-            scope().getTemporary(get_binary_operator_function.destination).write(operator_function.value());
+            scope()
+                .getTemporary(get_binary_operator_function_identifier.destination)
+                .write(bbt::Identifier::make(operator_function_identifier.value(), type_context_));
         }
 
         void visit(bbt::TypeOf const& type_of) override
@@ -1280,6 +1289,8 @@ struct ance::cet::Runner::Implementation
 
     bool run(BBT& bbt)
     {
+        reporter_.trace(prefix, core::Location::project()) << "enter run";
+
         while (bbt.hasExecutableRunPoints())
         {
             bool progress = false;
@@ -1324,6 +1335,8 @@ struct ance::cet::Runner::Implementation
 
                 if (result == BBT::ExecutionResult::Error)
                 {
+                    reporter_.trace(prefix, core::Location::project()) << "exit run {status=error}";
+
                     return false;
                 }
             }
@@ -1332,9 +1345,13 @@ struct ance::cet::Runner::Implementation
             {
                 bbt.reportBlockers();
 
+                reporter_.trace(prefix, core::Location::project()) << "exit run {status=blocked}";
+
                 return false;
             }
         }
+
+        reporter_.trace(prefix, core::Location::project()) << "exit run {status=complete}";
 
         return true;
     }
@@ -1406,15 +1423,6 @@ struct ance::cet::Runner::Implementation
         }
 
         bbt_->scheduleCore(std::move(flow.value()));
-
-        bool const ok = run(*bbt_);
-
-        if (!ok)
-        {
-            reporter_.trace(prefix, core::Location::nowhere()) << "declare core exit {id=" << id << ", status=fail}";
-
-            throw std::logic_error("Failed to run core code");
-        }
 
         reporter_.trace(prefix, core::Location::nowhere()) << "declare core exit {id=" << id << ", status=ok}";
     }

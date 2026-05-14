@@ -1420,8 +1420,25 @@ struct ance::bbt::Segmenter::Implementation
                 builder.addStatement<TypeOf>(std::move(type_args), operand_type_tmp, unary_operation.location);
             }
 
+            auto& operator_function_identifier_tmp = builder.addTemporary("UnaryOperation_OperatorFunctionIdentifier", unary_operation.location);
+            builder.addStatement<GetUnaryOperatorFunctionIdentifier>(unary_operation.op,
+                                                                     operand_type_tmp,
+                                                                     operator_function_identifier_tmp,
+                                                                     unary_operation.location);
+
+            auto& operator_scope_tmp = builder.addTemporary("UnaryOperation_OperatorScope", unary_operation.location);
+            builder.addStatement<CurrentScope>(operator_scope_tmp, unary_operation.location);
+
+            auto& operator_resolved_tmp = builder.addTemporary("UnaryOperation_OperatorResolved", unary_operation.location);
+            {
+                utility::List<std::reference_wrapper<Temporary const>> resolve_args;
+                resolve_args.emplace_back(operator_scope_tmp);
+                resolve_args.emplace_back(operator_function_identifier_tmp);
+                builder.addStatement<Intrinsic>(core::Intrinsic::RESOLVE, std::move(resolve_args), operator_resolved_tmp, unary_operation.location);
+            }
+
             auto& operator_function_tmp = builder.addTemporary("UnaryOperation_OperatorFunction", unary_operation.location);
-            builder.addStatement<GetUnaryOperatorFunction>(unary_operation.op, operand_type_tmp, operator_function_tmp, unary_operation.location);
+            builder.addStatement<Access>(operator_resolved_tmp, operator_function_tmp, unary_operation.location);
 
             {
                 utility::List<std::reference_wrapper<Temporary const>> call_args;
@@ -1464,12 +1481,26 @@ struct ance::bbt::Segmenter::Implementation
                 builder.addStatement<TypeOf>(std::move(type_args), right_type_tmp, binary_operation.location);
             }
 
+            auto& operator_function_identifier_tmp = builder.addTemporary("BinaryOperation_OperatorFunctionIdentifier", binary_operation.location);
+            builder.addStatement<GetBinaryOperatorFunctionIdentifier>(binary_operation.op,
+                                                                      left_type_tmp,
+                                                                      right_type_tmp,
+                                                                      operator_function_identifier_tmp,
+                                                                      binary_operation.location);
+
+            auto& operator_scope_tmp = builder.addTemporary("BinaryOperation_OperatorScope", binary_operation.location);
+            builder.addStatement<CurrentScope>(operator_scope_tmp, binary_operation.location);
+
+            auto& operator_resolved_tmp = builder.addTemporary("BinaryOperation_OperatorResolved", binary_operation.location);
+            {
+                utility::List<std::reference_wrapper<Temporary const>> resolve_args;
+                resolve_args.emplace_back(operator_scope_tmp);
+                resolve_args.emplace_back(operator_function_identifier_tmp);
+                builder.addStatement<Intrinsic>(core::Intrinsic::RESOLVE, std::move(resolve_args), operator_resolved_tmp, binary_operation.location);
+            }
+
             auto& operator_function_tmp = builder.addTemporary("BinaryOperation_OperatorFunction", binary_operation.location);
-            builder.addStatement<GetBinaryOperatorFunction>(binary_operation.op,
-                                                            left_type_tmp,
-                                                            right_type_tmp,
-                                                            operator_function_tmp,
-                                                            binary_operation.location);
+            builder.addStatement<Access>(operator_resolved_tmp, operator_function_tmp, binary_operation.location);
 
             {
                 utility::List<std::reference_wrapper<Temporary const>> call_args;
