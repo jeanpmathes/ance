@@ -362,6 +362,13 @@ struct ance::ast::Printer::Implementation
             print("})");
         }
 
+        void visit(Parenthesis const& parenthesis) override
+        {
+            print("(");
+            visit(*parenthesis.contained);
+            print(")");
+        }
+
         void visit(Access const& access) override
         {
             print(access.identifier);

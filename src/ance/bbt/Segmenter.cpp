@@ -1240,6 +1240,17 @@ struct ance::bbt::Segmenter::Implementation
             });
         }
 
+        void visit(est::Parenthesis const& parenthesis) override
+        {
+            trace("Parenthesis", parenthesis);
+
+            Builder builder(*this);
+
+            builder.addSegmented(*parenthesis.contained, destination());
+
+            setResult(builder.take());
+        }
+
         void visit(est::Access const& access) override
         {
             trace("Access", access) << ", identifier=" << access.identifier;

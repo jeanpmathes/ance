@@ -439,6 +439,16 @@ namespace ance::ast
         utility::Optional<utility::Owned<Expression>> result;
     };
 
+    /// An expression wrapped in parentheses.
+    struct Parenthesis final
+        : Expression
+        , utility::ConcreteNode<Parenthesis, Visitor>
+    {
+        Parenthesis(utility::Owned<Expression> expression, core::Location const& source_location);
+
+        utility::Owned<Expression> contained;
+    };
+
     /// An expression that resolves to its own source location.
     struct Here final
         : Expression
@@ -586,6 +596,7 @@ namespace ance::ast
         virtual void visit(Intrinsic const& intrinsic)                         = 0;
         virtual void visit(TypeOf const& type_of)                              = 0;
         virtual void visit(BlockExpression const& block_expression)            = 0;
+        virtual void visit(Parenthesis const& parenthesis)                     = 0;
         virtual void visit(Lambda const& lambda)                               = 0;
         virtual void visit(Access const& access)                               = 0;
         virtual void visit(UnitLiteral const& unit_literal)                    = 0;

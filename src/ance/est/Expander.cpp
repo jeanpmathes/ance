@@ -776,6 +776,13 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<BlockExpression>(builder.take(), std::move(result.value()), block_expression.location));
         }
 
+        void visit(ast::Parenthesis const& parenthesis) override
+        {
+            trace("Parenthesis", parenthesis.location);
+
+            result_.setExpression(utility::makeOwned<Parenthesis>(expand(*parenthesis.contained), parenthesis.location));
+        }
+
         void visit(ast::Access const& access) override
         {
             trace("Access", access.location) << ", identifier=" << access.identifier;

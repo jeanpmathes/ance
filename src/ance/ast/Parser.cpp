@@ -997,6 +997,14 @@ namespace ance::ast
             return block_expression;
         }
 
+        std::any visitParenthesisExpression(grammar::anceParser::ParenthesisExpressionContext* context) override
+        {
+            trace("ParenthesisExpression", context);
+
+            Expression* expression = new Parenthesis(expectExpression(context->expression()), location(context));
+            return expression;
+        }
+
         std::any visitAccessExpression(grammar::anceParser::AccessExpressionContext* context) override
         {
             trace("AccessExpression", context);

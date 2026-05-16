@@ -244,6 +244,13 @@ struct ance::est::Printer::Implementation
             print("})");
         }
 
+        void visit(Parenthesis const& parenthesis) override
+        {
+            print("(");
+            visit(*parenthesis.contained);
+            print(")");
+        }
+
         void visit(Call const& call) override
         {
             visit(*call.callee);

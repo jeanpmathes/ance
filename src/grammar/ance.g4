@@ -87,6 +87,7 @@ primaryExpression
     | 'if' condition=expression 'then' trueBlock=expression ( 'else' falseBlock=expression )? # IfExpression
     | 'match' condition=expression 'with' '{' ( matchExpressionCase ( ',' matchExpressionCase )* )? '}' # MatchExpression
     | '({' ( statement )* ( '=>' expression )? '})' # BlockExpression
+    | '(' expression ')' # ParenthesisExpression
     | IDENTIFIER # AccessExpression
     | literal # LiteralExpression
     | 'here' # HereExpression

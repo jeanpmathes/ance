@@ -154,6 +154,12 @@ ance::est::BlockExpression::BlockExpression(utility::List<utility::Owned<Stateme
     , result(std::move(expression))
 {}
 
+ance::est::Parenthesis::Parenthesis(utility::Owned<Expression> expression, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , contained(std::move(expression))
+{}
+
 ance::est::Call::Call(utility::Owned<Expression> callable, utility::List<utility::Owned<Expression>> expressions, core::Location const& source_location)
     : Node(source_location)
     , Expression()
