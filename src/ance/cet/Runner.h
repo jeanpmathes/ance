@@ -31,9 +31,16 @@ namespace ance::cet
     class Variable;
 }
 
+/// The compile-able entity tree (CET) namespace.
 namespace ance::cet
 {
-    /// Runs code in basic-block form (BBT) at compile-time, producing CETs.
+    /// \brief Runs code in basic-block form (BBT) at compile-time, producing CETs.
+    ///
+    /// Evaluation of BBTs is a compile-time dynamically typed interpretation of a BBT.
+    /// It uses run points, which are haltable points of evaluation in the set of BBTs.
+    /// All flows of statements within an unordered scope have no guaranteed order of execution.
+    /// This allows the evaluation to stop within one flow, begin evaluating another flow, and then return to the previous flow.
+    /// If, for example, a name is not yet defined, evaluation can mark it as pending and first evaluate other parts of the program which might contain that missing definition.
     class Runner
     {
       public:

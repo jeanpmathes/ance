@@ -130,6 +130,8 @@ namespace ance::cet
         std::map<core::Identifier, utility::Owned<Variable>> variables_ = {};
     };
 
+    /// An ordered scope defines an order of evalution for the flow contained within.
+    /// It is valid to define a name multiple times within an ordered scope, the most recent definition is used.
     class OrderedScope final : public Scope
     {
       public:
@@ -154,6 +156,8 @@ namespace ance::cet
         std::map<core::Identifier, core::Location>                   erased_variables_  = {};
     };
 
+    /// An unordered scope contains flows with no required order of evaluation.
+    /// This allows evaluation to be suspended and resumed to ensure definitions occur before usage.
     class UnorderedScope final : public Scope
     {
       public:

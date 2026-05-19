@@ -22,8 +22,9 @@ The current compiler is designed as a staged pipeline:
 
 1. `AST` (`src/ance/ast`): Consume source files, parse them and create the abstract syntax tree (`AST`).
 2. `EST` (`src/ance/est`): Remove all syntactic sugar from the AST and expand it into the expanded syntax tree (`EST`).
+   This is a purely syntactic transformation.
 3. `BBT` (`src/ance/bbt`): Lower EST into linear (not nested) statements forming control flow graphs as part of the
-   basic block tree (`BBT`).
+   basic block tree (`BBT`). From this point onwards, no expressions exist anymore, only statements.
 4. `CET` (`src/ance/cet`): Run the BBT at compile time to produce the compilable element tree (`CET`).
 5. `build` (`src/ance/build`): Build the CET into the final output, using LLVM.
 

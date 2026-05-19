@@ -21,6 +21,7 @@ namespace ance::bbt
     class TypeContext;
 
     /// Represents a type.
+    /// A type is a value of itself as the type, and each value has a type.
     class Type : public ValueBase<Type>
     {
       public:

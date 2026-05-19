@@ -10,9 +10,10 @@ namespace ance::cet
     struct Unit;
 }
 
+/// The build namespace.
 namespace ance::build
 {
-    /// Compiles projects into binaries.
+    /// \brief Compiles the CET into a binary.
     class Compiler
     {
       public:

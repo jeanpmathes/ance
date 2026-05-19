@@ -14,8 +14,6 @@
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
-/// The expanded syntax tree (EST) namespace.
-/// The EST is similar to the AST, but without syntactic sugar.
 namespace ance::est
 {
     class Visitor;

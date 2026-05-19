@@ -18,9 +18,12 @@ namespace ance::ast
     struct Statement;
 }
 
+/// The abstract syntax tree (AST) namespace.
 namespace ance::ast
 {
-    /// Parses files into ASTs.
+    /// \brief Parses files into ASTs.
+    ///
+    /// This class consumes a source file or code and produces an abstract syntax tree (AST).
     class Parser
     {
       public:

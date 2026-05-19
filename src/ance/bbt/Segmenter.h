@@ -14,12 +14,19 @@ namespace ance::sources
     class SourceTree;
 }
 
+/// The basic-block tree (BBT) namespace.
 namespace ance::bbt
 {
     struct Flow;
     struct Flows;
 
-    /// Segments RETs into BBTs.
+    /// \brief Segments ESTs into BBTs.
+    ///
+    /// Segments an expanded syntax tree (EST) into a basic block tree (BBT).
+    /// A BBT is linear / flat, which means that within each basic block, all statements contain no testing.
+    /// This also means that no expressions exist anymore.
+    ///
+    /// Segmentation also converts many operations to use compiler intrinsics instead of specific statements or language features.
     class Segmenter
     {
       public:

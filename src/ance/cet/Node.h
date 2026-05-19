@@ -5,8 +5,6 @@
 
 #include "ance/utility/Node.h"
 
-
-/// The compile-able entity tree (CET) namespace.
 namespace ance::cet
 {
     class Visitor;

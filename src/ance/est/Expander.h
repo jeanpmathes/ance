@@ -12,13 +12,19 @@ namespace ance::sources
     class SourceTree;
 }
 
+/// The expanded syntax tree (EST) namespace.
+/// The EST is similar to the AST, but without syntactic sugar.
 namespace ance::est
 {
     struct Declaration;
     struct File;
     struct Statement;
 
-    /// Expands ASTs into ESTs.
+    /// \brief Expands ASTs into ESTs.
+    ///
+    /// Expands a provided abstract syntax tree (AST) into an expanded syntax tree (EST).
+    /// This removes all syntactic sugar.
+    /// The transformation itself is purely syntactical.
     class Expander
     {
       public:

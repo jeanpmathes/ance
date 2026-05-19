@@ -16,7 +16,6 @@
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
-/// The abstract syntax tree (AST) namespace.
 namespace ance::ast
 {
     class Visitor;

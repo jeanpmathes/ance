@@ -11,7 +11,6 @@
 #include "ance/utility/Node.h"
 #include "ance/utility/Owners.h"
 
-/// The basic-block tree (BBT) namespace.
 namespace ance::bbt
 {
     class Value;

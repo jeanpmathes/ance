@@ -118,9 +118,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: enhance documentation comments, write a bit about architectural decisions
-        // for example: that language defs are written in the language, that it is interpretation first, something to the types and why they are used, something more for the intrinsics and operators and such
-
         // todo: instead of the large visitor files, maybe move each visit method into an individual file
 
         // todo: make call more of an operator as well, for now only functions support it
