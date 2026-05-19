@@ -33,5 +33,7 @@ means.
 For example, the compiler always only runs a single file; to include more files in a compilation, the include function
 is used.
 
+The definitions of the language itself are defined using the ance language itself as much as possible.
+
 Note: `src_old/` contains the legacy compiler implementation, is currently not used and will be removed in the future.
 

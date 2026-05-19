@@ -182,7 +182,7 @@ ance::cet::DeclarationCheckResult ance::cet::OrderedScope::canDeclare(core::Iden
 
 void ance::cet::OrderedScope::onDeclare(utility::Owned<Variable> variable)
 {
-    active_variables_.emplace(variable->name(), std::ref(*variable));
+    active_variables_.insert_or_assign(variable->name(), std::ref(*variable));
     all_variables_.emplace_back(std::move(variable));
 }
 

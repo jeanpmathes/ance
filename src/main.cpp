@@ -118,21 +118,26 @@ namespace ance
 
         return exit_code;
 
-        // todo: parenthesis expression
+        // todo: enhance documentation comments, write a bit about architectural decisions
+        // for example: that language defs are written in the language, that it is interpretation first, something to the types and why they are used, something more for the intrinsics and operators and such
 
         // todo: instead of the large visitor files, maybe move each visit method into an individual file
 
         // todo: make call more of an operator as well, for now only functions support it
+        // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: constructors as callable types (the type type is callable, add utilities to define constructors)
         // todo: also simplify default / combine it with default constructors, could even be removed
+        // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: function overloading / function groups
         // todo: function groups are also callable
+        // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: look into the calendar note again, steamline, remove changed things, keep up to date
 
         // todo: rethink intrinsic as an enum, maybe go back to inheritance but also do not use visitor but something else?
+        // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: integer type, integer literals (need type expressions for them, e.g. Integer{32}, UnsignedInteger{64}, etc.)
         // todo: ops for all integer types
@@ -140,8 +145,10 @@ namespace ance
         // todo: pretend that the intrinsics are generic and take generic parameters, e.g. intrinsic "int_add" {N} (a, b)
         // todo: to do this, add a GenericIntrinsicSignature class which is used by IntrinsicSignature, getIntrinsicSignature would take the generic parameters
         // todo: the int types can then simply use string manipulation to put the right N there
+        // todo: do not forget to write more documentation comments on this matter
 
         // todo: bitwise binary ops and shifts
+        // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: array type, array literals
         // todo: subscript operator
@@ -170,11 +177,13 @@ namespace ance
         // todo:    for temporaries, they need to be statement scoped, as such the segmenter must add a scope enter and scope exit on every statement (add a is_statement_scope = true for diagnostics)
         // todo: do not forget destructors of global variables - should have reversed order of creation
         // todo: add assertion that when variable or temporary is destroyed in C++, the isDestructed flag is set to true to catch missing destructor calls
+        // todo: write some good documentation on this
 
         // todo: add first runtime code and do actual compilation, maybe have a Lowerer visitor that works in tandem with the runner
         // todo: build a very minimal CET that heavily relies and uses intrinsics, should be close to LLVM IR in capability and nodes
         // todo: might need its own value type (defined in CET namespace), do not use the one from BBT or LLVM
         // todo: the lowering visitor should be eager to evaluation, which means that if compile time evaluation is possible, it will be done
+        //       (maybe three visitors would be used: Typer, EagerEvaluator, Lowerer)
         // todo: for this, the CET value type stores whether it is available at compile time (isConstant(), Constant class) and if yes, lowerer delegates to the runner
         // todo: some handling of runner state would be needed so runner would need to be initialized and kept up to date by lowerer when entering functions and maybe scopes and such
         // todo: in a similar fashion, when the runner encounters something that is needed to be runtime, it gives control back to the lowerer, so decide which one is the better entry point
@@ -183,19 +192,23 @@ namespace ance
         // todo: also add loads of tests for all the new things, e.g. lambdas, better cmp, different types, etc.
         // todo: do runtime library calls through an intrinsic, e.g. runtime_library_call, the intrinsic would check whether lib is available, would take string (from list of constants), the intrinsic itself would be a compiletime intrinsic that returns a runtime function
         // todo: if a good amount of tests is working, plan to merge into main, put all remaining TODOs into the normal planning, adapt calendar note to be used again
+        // todo: write some good documentation on these decisions and ideas
 
         // todo: time to go back to tests, run them and such (add a mechanism to ignore tests through a file, maybe remove that later again)
         // todo: add more texts to tests, make them a bit more specification-like
+        // todo: also write some documentation for each test, and some documentation to the test system in general
 
         // todo: begin with static typesafety, for now for runtime only, typechecking is done during lowering
         // todo: add utilities to do unification, so inference and stuff like that might also work
         // todo: thanks to eager evaluation, this should actually work easily
+        // todo: write some good documentation on these decisions and ideas
 
         // todo: fully support the compiletime and runtime keywords
         // todo: some statements are only allowed in functions marked as compiletime and some only in runtime
         // todo: think about do-blocks, maybe they should also be markable, or maybe only one of them makes sense for them
         // todo: do not forget to also print those markers in later states, currently they are AST only
         // todo: THINK MORE ABOUT THIS: non-marked can be called from all, runtime only from runtime, compiletime only from compiletime and runtime
+        // todo: write some good documentation on these decisions and ideas
 
         // todo: all the pointer and allocation stuff would only work with runtime code for now
 
@@ -236,6 +249,7 @@ namespace ance
         // todo: one idea: unmarked functions use SCE, compiletime functions use SCE except when annotated with dynamic
         // todo: alternative would be for now to always require the model used for compiletime (so either static compiletime or dynamic compiletime)
         // todo: then analyze what is actually useful and common, dynamic compiletime could also be called generator
+        // todo: write some good documentation on these decisions and ideas
 
         // todo: some functionality would be DCE only, such as conditional fields, resolve, ...
 
