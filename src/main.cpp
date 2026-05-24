@@ -118,25 +118,25 @@ namespace ance
 
         return exit_code;
 
-        // todo: instead of the large visitor files, maybe move each visit method into an individual file
-
-        // todo: make call more of an operator as well, for now only functions support it
+        // todo: array type, array constructors (where called literals previously)
+        // todo: subscript operator
+        // todo: write some more documentation for all other operators
         // todo: write some related documentation for this, repeat this note for the next step
 
-        // todo: constructors as callable types (the type type is callable, add utilities to define constructors)
-        // todo: also simplify default / combine it with default constructors, could even be removed
+        // todo: no vector types, instead array types support all operators of their element type and perform them element-wise
+        // todo: no vectors yet because that has HW and alignment implications, should not be first class language element
         // todo: write some related documentation for this, repeat this note for the next step
 
-        // todo: function overloading / function groups
-        // todo: function groups are also callable
-        // todo: write some related documentation for this, repeat this note for the next step
-
-        // todo: look into the calendar note again, steamline, remove changed things, keep up to date
+        // todo: look into the calendar note again, streamline, remove changed things, keep up to date
 
         // todo: rethink intrinsic as an enum, maybe go back to inheritance but also do not use visitor but something else?
         // todo: write some related documentation for this, repeat this note for the next step
 
-        // todo: integer type, integer literals (need type expressions for them, e.g. Integer{32}, UnsignedInteger{64}, etc.)
+        // todo: think about how functions and members and methods make sense for the language
+        // todo: maybe also think about doing some form of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar only already
+        // todo: finally, think about doing compilation in very basic form first, so we can merge again and go back to the tests
+
+        // todo: integer type, integer literals (need type expressions for them, e.g. Integer(32), UnsignedInteger(64), etc.)
         // todo: ops for all integer types
         // todo: for intrinsics for integers, use a single intrinsic for the operations, e.g. "int_add" and change how intrinsics do type checks
         // todo: pretend that the intrinsics are generic and take generic parameters, e.g. intrinsic "int_add" {N} (a, b)
@@ -147,11 +147,6 @@ namespace ance
         // todo: bitwise binary ops and shifts
         // todo: write some related documentation for this, repeat this note for the next step
 
-        // todo: array type, array literals
-        // todo: subscript operator
-
-        // todo: vector type, vector literals
-
         // todo: reduce duplication between temporary and variable
 
         // todo: go through all TODOs in the other code, check if completable now or soon or maybe already completed, potentially move them here
@@ -161,11 +156,12 @@ namespace ance
         // todo: rework SourceFile class to read into single string buffer, then use string views instead of line-by-line reading
 
         // todo: struct types
+        // todo: think of a nice syntax to create structs and classes, no T{} because that would already have other meanings, and also not T()
 
         // todo: better reporting: all reports should have an ID (decide whether number or string [!] ), and if possible parameters (maybe they can be extracted from the message builder stream interface, skipping char* and potentially string)
         // todo: reporter then can suppress identical reports, if already reported, using only ID, location and params for check - hash that
         // todo: trace should never be suppressed if identical
-        // todo: later, when going back to the tests, they should also assert specific IDs (find
+        // todo: later, when going back to the tests, they should also assert specific IDs
 
         // todo: all variants of char and string types and literals, check that char might need to be called codepoint
 
@@ -185,8 +181,8 @@ namespace ance
         // todo: some handling of runner state would be needed so runner would need to be initialized and kept up to date by lowerer when entering functions and maybe scopes and such
         // todo: in a similar fashion, when the runner encounters something that is needed to be runtime, it gives control back to the lowerer, so decide which one is the better entry point
         // todo: this model makes resolving easy - resolving of identifiers always possible at compile time so eager evaluation makes special handling unnecessary
-        // todo: this is the point where the tests should be brought back in, maybe deactivate those that certainly won't work yet and maybe prioritize them, add TODOs to bring them back
-        // todo: also add loads of tests for all the new things, e.g. lambdas, better cmp, different types, etc.
+        // todo: this is the point where the tests should be brought back in, maybe deactivate those that certainly won't work yet and maybe prioritize them, add TODOs to bring them back, also improve the documentation and explanation in each working test
+        // todo: also add loads of tests for all the new things, e.g. lambdas, better cmp, different types, etc. (see readme as well)
         // todo: do runtime library calls through an intrinsic, e.g. runtime_library_call, the intrinsic would check whether lib is available, would take string (from list of constants), the intrinsic itself would be a compiletime intrinsic that returns a runtime function
         // todo: if a good amount of tests is working, plan to merge into main, put all remaining TODOs into the normal planning, adapt calendar note to be used again
         // todo: write some good documentation on these decisions and ideas
@@ -254,6 +250,8 @@ namespace ance
 
         // todo: rethink typeof if it is still an issue, it might be something that is not allowed in DCE mode, should be disallowed with error
         // todo: current usage of typeof in expansion (if expression, match expression) should be replaced with variable inference, in DCE it simply creates an un-allocated, untyped variable so handling that is easy
+
+        // todo: most of the old constructors in ance would become functions / static functions
 
         // todo: with references, add very basic safety checks in the case of erase of variable which has references to it, e.g. counting them, or so
     }
