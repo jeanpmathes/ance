@@ -354,7 +354,8 @@ namespace ance::bbt
         Temporary const&                                       destination;
     };
 
-    /// Creates an array type from an element type and length.
+    /// An expression that retrieves an array type, meaning repeated calls with the same arguments provide the same type.
+    /// The array type has a fixed length and element type.
     struct CreateArrayType final
         : Statement
         , utility::ConcreteNode<CreateArrayType, Visitor>
@@ -367,6 +368,7 @@ namespace ance::bbt
     };
 
     /// Creates an array value from an optional element type and elements.
+    /// Could also be called an array literal.
     struct ArrayConstructor final
         : Statement
         , utility::ConcreteNode<ArrayConstructor, Visitor>

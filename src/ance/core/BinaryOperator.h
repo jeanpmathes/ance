@@ -14,37 +14,44 @@ namespace ance::core
             /// Any unspecified operator, used as a default value for error handling and such.
             UNSPECIFIED,
 
-            /// The addition operator.
+            /// The addition operator, adding two (numerical) values.
             ADDITION,
 
-            /// The subtraction operator.
+            /// The subtraction operator, subtracting one (numerical) value from another.
             SUBTRACTION,
 
-            /// The multiplication operator.
+            /// The multiplication operator, multiplying two (numerical) values.
             MULTIPLICATION,
 
-            /// The division operator.
+            /// The division operator, dividing one (numerical) value by another.
             DIVISION,
 
-            /// The remainder operator.
+            /// The remainder operator, returning the remainder of a division.
+            /// Note that this is different from the modulus.
             REMAINDER,
 
             /// The less-than relational operator.
+            /// All four relational operators and the equality and inequality operator fulfill a common contract.
             LESS_THAN,
 
             /// The less-than-or-equal relational operator.
+            /// All four relational operators and the equality and inequality operator fulfill a common contract.
             LESS_THAN_OR_EQUAL,
 
             /// The greater-than relational operator.
+            /// All four relational operators and the equality and inequality operator fulfill a common contract.
             GREATER_THAN,
 
             /// The greater-than-or-equal relational operator.
+            /// All four relational operators and the equality and inequality operator fulfill a common contract.
             GREATER_THAN_OR_EQUAL,
 
             /// The equality operator.
+            /// All four relational operators and the equality and inequality operator fulfill a common contract.
             EQUAL,
 
             /// The inequality operator.
+            /// All four relational operators and the equality and inequality operator fulfill a common contract.
             NOT_EQUAL
         };
 

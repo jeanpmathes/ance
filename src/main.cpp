@@ -118,9 +118,7 @@ namespace ance
 
         return exit_code;
 
-        // todo: array type, array constructors (where called literals previously)
-        // todo: subscript operator
-        // todo: write some more documentation for all other operators
+        // todo: subscript operator, should work on arrays
         // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: no vector types, instead array types support all operators of their element type and perform them element-wise
@@ -134,6 +132,7 @@ namespace ance
 
         // todo: think about how functions and members and methods make sense for the language
         // todo: maybe also think about doing some form of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar only already
+        // todo: but these generics would have the issue of creating a new type every time ??, so either all type creation things need to not do that, or there needs to be a keyword that says that a function is cached (maybe pure, with some constraints?, or maybe all functions should be pure if not said otherwise)
         // todo: finally, think about doing compilation in very basic form first, so we can merge again and go back to the tests
 
         // todo: integer type, integer literals (need type expressions for them, e.g. Integer(32), UnsignedInteger(64), etc.)
