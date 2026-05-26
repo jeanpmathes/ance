@@ -5,6 +5,7 @@
 
 #include <llvm/ADT/APFloat.h>
 
+#include "ance/utility/Containers.h"
 #include "ance/utility/Owners.h"
 
 #include "ance/core/Identifier.h"
@@ -188,6 +189,26 @@ namespace ance::bbt
 
       private:
         std::string value_;
+    };
+
+    class Array final : public ValueBase<Array>
+    {
+      public:
+        Array(utility::Shared<Type> array_type, utility::List<utility::Shared<Value>> element_list, TypeContext& type_context);
+
+        static utility::Shared<Array> make(utility::Shared<Type> array_type, utility::List<utility::Shared<Value>> element_list, TypeContext& type_context);
+
+        ~Array() override = default;
+
+        [[nodiscard]] std::string                                  toString() const override;
+        [[nodiscard]] utility::List<utility::Shared<Value>> const& elements() const;
+        [[nodiscard]] bool                                         equals(Array const& other) const override;
+
+        [[nodiscard]] bool   isEmpty() const;
+        [[nodiscard]] size_t length() const;
+
+      private:
+        utility::List<utility::Shared<Value>> elements_;
     };
 }
 

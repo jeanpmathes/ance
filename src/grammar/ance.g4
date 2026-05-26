@@ -84,6 +84,8 @@ primaryExpression
     : '\\' ( '[' ']' )? '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? ( ( '=>' body=expression ) | ( '{' ( statement )* '}' ) ) # LambdaExpression
     | 'intrinsic' name=expression 'args' '(' (expression (',' expression)* )? ')' # IntrinsicExpression
     | 'typeof' '(' expression (',' expression)* ')' # TypeOfExpression // todo: looks like a function, which is not ideal, but one might be able to make it a core function especially with inference, maybe it could then be typeof(#expr)
+    | '[' type=expression ';' length=expression ']' # ArrayTypeExpression
+    | '[' ( type=expression '|' )? expression ( ',' expression )* ']' # ArrayConstructorExpression
     | 'if' condition=expression 'then' trueBlock=expression ( 'else' falseBlock=expression )? # IfExpression
     | 'match' condition=expression 'with' '{' ( matchExpressionCase ( ',' matchExpressionCase )* )? '}' # MatchExpression
     | '({' ( statement )* ( '=>' expression )? '})' # BlockExpression
@@ -167,10 +169,11 @@ NOT : 'not' ;
 
 DEFAULT : 'default' ;
 
+INTEGER : [0-9]+ ;
+
 IDENTIFIER : ( [_]* [\p{Alpha}\p{General_Category=Other_Letter}] [_\p{Alnum}\p{General_Category=Other_Letter}]* )
            | [\p{Emoji}] ;
 
-INTEGER : [0-9]+ ;
 STRING : '"' .*? '"' ; // todo: handle escape sequences (see old grammar) - needs code changes to preserve printing and do correct escaping
 
 HALF : DECIMAL 'h' ;

@@ -354,6 +354,33 @@ namespace ance::bbt
         Temporary const&                                       destination;
     };
 
+    /// Creates an array type from an element type and length.
+    struct CreateArrayType final
+        : Statement
+        , utility::ConcreteNode<CreateArrayType, Visitor>
+    {
+        CreateArrayType(Temporary const& type, Temporary const& length_value, Temporary const& result, core::Location const& source_location);
+
+        Temporary const& element_type;
+        Temporary const& length;
+        Temporary const& destination;
+    };
+
+    /// Creates an array value from an optional element type and elements.
+    struct ArrayConstructor final
+        : Statement
+        , utility::ConcreteNode<ArrayConstructor, Visitor>
+    {
+        ArrayConstructor(Temporary const*                                       type,
+                         utility::List<std::reference_wrapper<Temporary const>> expression_list,
+                         Temporary const&                                       result,
+                         core::Location const&                                  source_location);
+
+        Temporary const*                                       element_type;
+        utility::List<std::reference_wrapper<Temporary const>> elements;
+        Temporary const&                                       destination;
+    };
+
     /// Enters an ordered scope, which is used to manage variable lifetimes and visibility.
     struct OrderedScopeEnter final
         : Statement
@@ -455,6 +482,8 @@ namespace ance::bbt
         virtual void visit(GetUnaryOperatorFunctionIdentifier const& get_unary_operator_function_identifier)   = 0;
         virtual void visit(GetBinaryOperatorFunctionIdentifier const& get_binary_operator_function_identifier) = 0;
         virtual void visit(TypeOf const& type_of)                                         = 0;
+        virtual void visit(CreateArrayType const& create_array_type)                                           = 0;
+        virtual void visit(ArrayConstructor const& array_constructor)                                          = 0;
         virtual void visit(OrderedScopeEnter const& scope_enter)                          = 0;
         virtual void visit(OrderedScopeExit const& scope_exit)                            = 0;
         virtual void visit(SetReturnValue const& set_return_value)                        = 0;

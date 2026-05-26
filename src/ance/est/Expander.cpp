@@ -938,6 +938,33 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<TypeOf>(std::move(expressions), type_of.location));
         }
 
+        void visit(ast::ArrayType const& array_type) override
+        {
+            trace("ArrayType", array_type.location);
+
+            result_.setExpression(utility::makeOwned<ArrayType>(expand(*array_type.element_type), expand(*array_type.length), array_type.location));
+        }
+
+        void visit(ast::ArrayConstructor const& array_constructor) override
+        {
+            trace("ArrayConstructor", array_constructor.location)
+                << ", has_type=" << std::boolalpha << array_constructor.element_type.hasValue() << ", count(elements)=" << array_constructor.elements.size();
+
+            utility::Optional<utility::Owned<Expression>> element_type;
+            if (array_constructor.element_type.hasValue())
+            {
+                element_type = expand(**array_constructor.element_type);
+            }
+
+            utility::List<utility::Owned<Expression>> elements;
+            for (auto const& element : array_constructor.elements)
+            {
+                elements.emplace_back(expand(*element));
+            }
+
+            result_.setExpression(utility::makeOwned<ArrayConstructor>(std::move(element_type), std::move(elements), array_constructor.location));
+        }
+
         void visit(ast::MatchCase const& match_case) override
         {
             trace("MatchCase", match_case.location) << ", count(patterns)=" << match_case.patterns.size();

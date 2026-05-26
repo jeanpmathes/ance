@@ -56,6 +56,7 @@ namespace ance::bbt
         // todo: add a function stripped() that removes all l-refs, e.g. &T -> T, &&T -> T, &&&T -> T, etc.
 
         [[nodiscard]] virtual bool isLReference() const;
+        [[nodiscard]] virtual bool isArray() const;
 
         /// Gets the number of types used to construct this type.
         /// Note that member types (e.g., for structs) are not considered constructing types.
@@ -107,6 +108,25 @@ namespace ance::bbt
         utility::Shared<Type> referenced_type_;
     };
 
+    /// Represents a fixed-size array type.
+    class ArrayType : public Type
+    {
+      public:
+        /// Creates a new array type.
+        /// \param element_type The type of each array element.
+        /// \param length The number of elements in the array.
+        /// \param type_context The type context in which this type is created.
+        ArrayType(utility::Shared<Type> element_type, size_t length, TypeContext& type_context);
+
+        [[nodiscard]] bool                  isArray() const override;
+        [[nodiscard]] utility::Shared<Type> elementType();
+        [[nodiscard]] Type const&           elementType() const;
+        [[nodiscard]] size_t                length() const;
+
+      private:
+        size_t length_;
+    };
+
     /// Context providing access to all built-in types.
     class TypeContext
     {
@@ -135,6 +155,11 @@ namespace ance::bbt
         /// Get the untyped l-value reference type.
         /// \param referenced_type The type being referenced.
         utility::Shared<Type> getLRef(utility::Shared<Type> referenced_type);
+
+        /// Get a fixed-size array type.
+        /// \param element_type The type of each array element.
+        /// \param length The number of elements in the array.
+        utility::Shared<Type> getArray(utility::Shared<Type> element_type, size_t length);
 
         /// Get the identifier type, which is the type of all identifiers.
         utility::Shared<Type> getIdentifier();

@@ -431,6 +431,30 @@ namespace ance::est
         utility::List<utility::Owned<Expression>> expressions;
     };
 
+    /// An expression that creates an array type.
+    struct ArrayType final
+        : Expression
+        , utility::ConcreteNode<ArrayType, Visitor>
+    {
+        ArrayType(utility::Owned<Expression> type, utility::Owned<Expression> length_expression, core::Location const& source_location);
+
+        utility::Owned<Expression> element_type;
+        utility::Owned<Expression> length;
+    };
+
+    /// An expression that creates an array value.
+    struct ArrayConstructor final
+        : Expression
+        , utility::ConcreteNode<ArrayConstructor, Visitor>
+    {
+        ArrayConstructor(utility::Optional<utility::Owned<Expression>> type,
+                         utility::List<utility::Owned<Expression>>     expression_list,
+                         core::Location const&                         source_location);
+
+        utility::Optional<utility::Owned<Expression>> element_type;
+        utility::List<utility::Owned<Expression>>     elements;
+    };
+
     /// Auxiliary nodes, which are used as parts of expressions and statements.
     struct Auxiliary
         : virtual Node
@@ -507,6 +531,8 @@ namespace ance::est
         virtual void visit(UnaryOperation const& unary_operation)              = 0;
         virtual void visit(BinaryOperation const& binary_operation)            = 0;
         virtual void visit(TypeOf const& type_of)                              = 0;
+        virtual void visit(ArrayType const& array_type)                        = 0;
+        virtual void visit(ArrayConstructor const& array_constructor)          = 0;
 
         virtual void visit(MatchCase const& match_case) = 0;
     };

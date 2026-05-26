@@ -225,6 +225,23 @@ ance::est::TypeOf::TypeOf(utility::List<utility::Owned<Expression>> expression_l
     , Expression()
     , expressions(std::move(expression_list))
 {}
+
+ance::est::ArrayType::ArrayType(utility::Owned<Expression> type, utility::Owned<Expression> length_expression, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , element_type(std::move(type))
+    , length(std::move(length_expression))
+{}
+
+ance::est::ArrayConstructor::ArrayConstructor(utility::Optional<utility::Owned<Expression>> type,
+                                              utility::List<utility::Owned<Expression>>     expression_list,
+                                              core::Location const&                         source_location)
+    : Node(source_location)
+    , Expression()
+    , element_type(std::move(type))
+    , elements(std::move(expression_list))
+{}
+
 ance::est::MatchCase::MatchCase(utility::List<utility::Owned<Expression>> pattern_list,
                                 core::Location const&                     default_location,
                                 utility::Owned<Statement>                 code,

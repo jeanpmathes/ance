@@ -1036,23 +1036,40 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            auto get_default_value = [&](bbt::Type const& type) -> utility::Shared<bbt::Value> {
+            std::function<utility::Shared<bbt::Value>(utility::Shared<bbt::Type>)> get_default_value =
+                [&](utility::Shared<bbt::Type> type) -> utility::Shared<bbt::Value> {
                 // todo: should become default constructor call at some point
 
-                if (type == *type_context_.getBool()) return bbt::Bool::make(false, type_context_);
-                if (type == *type_context_.getUnit()) return bbt::Unit::make(type_context_);
-                if (type == *type_context_.getSize()) return bbt::Size::make(0, type_context_);
-                if (type == *type_context_.getLocation()) return bbt::Location::make(core::Location::project(), type_context_);
-                if (type == *type_context_.getString()) return bbt::String::make("", type_context_);
+                if (*type == *type_context_.getBool()) return bbt::Bool::make(false, type_context_);
+                if (*type == *type_context_.getUnit()) return bbt::Unit::make(type_context_);
+                if (*type == *type_context_.getSize()) return bbt::Size::make(0, type_context_);
+                if (*type == *type_context_.getLocation()) return bbt::Location::make(core::Location::project(), type_context_);
+                if (*type == *type_context_.getString()) return bbt::String::make("", type_context_);
+
+                if (type->isArray())
+                {
+                    auto const& array_type   = type->as<bbt::ArrayType>();
+                    auto        element_type = type->getConstructingType(0);
+
+                    utility::List<utility::Shared<bbt::Value>> elements;
+                    elements.reserve(array_type.length());
+
+                    for (size_t index = 0; index < array_type.length(); index++)
+                    {
+                        elements.emplace_back(get_default_value(element_type));
+                    }
+
+                    return bbt::Array::make(std::move(type), std::move(elements), type_context_);
+                }
 
                 // todo: float types
 
-                reporter_.error(default_value.type.location) << "Cannot create default value for type " << type.annotated();
+                reporter_.error(default_value.type.location) << "Cannot create default value for type " << type->annotated();
 
                 return bbt::Unit::make(type_context_);
             };
 
-            utility::Shared<bbt::Value> value = get_default_value(*type_value.cast<bbt::Type>());
+            utility::Shared<bbt::Value> value = get_default_value(type_value.cast<bbt::Type>());
             scope().getTemporary(default_value.destination).write(value);
         }
 
@@ -1147,6 +1164,107 @@ struct ance::cet::Runner::Implementation
             {
                 abort();
             }
+        }
+
+        void visit(bbt::CreateArrayType const& array_type) override
+        {
+            trace("ArrayType", array_type) << ", element_type=" << temp(array_type.element_type) << ", length=" << temp(array_type.length)
+                                           << ", destination=" << array_type.destination.id();
+
+            utility::Shared<bbt::Value> element_type_value = scope().getTemporary(array_type.element_type).read();
+            if (!expectType(*type_context_.getType(), *element_type_value->type(), array_type.element_type.location))
+            {
+                abort();
+                return;
+            }
+
+            utility::Shared<bbt::Value> length_value = scope().getTemporary(array_type.length).read();
+            if (!expectType(*type_context_.getSize(), *length_value->type(), array_type.length.location))
+            {
+                abort();
+                return;
+            }
+
+            utility::Shared<bbt::Type> element_type = element_type_value.cast<bbt::Type>();
+            size_t const               length       = deLReference<bbt::Size>(length_value).value();
+
+            scope().getTemporary(array_type.destination).write(type_context_.getArray(std::move(element_type), length));
+        }
+
+        void visit(bbt::ArrayConstructor const& array_constructor) override
+        {
+            if (reporter_.isTraceEnabled())
+            {
+                auto msg = trace("ArrayConstructor", array_constructor);
+                msg << ", element_type=";
+
+                if (array_constructor.element_type != nullptr) msg << temp(*array_constructor.element_type);
+                else msg << "inferred";
+
+                msg << ", elements={";
+
+                bool first = true;
+                for (auto element : array_constructor.elements)
+                {
+                    if (!first) msg << ", ";
+                    else first = false;
+
+                    msg << temp(element);
+                }
+
+                msg << "}, destination=" << array_constructor.destination.id();
+            }
+
+            if (array_constructor.elements.empty())
+            {
+                reporter_.error(array_constructor.location) << "Array constructor has no elements";
+                abort();
+                return;
+            }
+
+            utility::Optional<utility::Shared<bbt::Type>> element_type;
+            if (array_constructor.element_type != nullptr)
+            {
+                utility::Shared<bbt::Value> element_type_value = scope().getTemporary(*array_constructor.element_type).read();
+                if (!expectType(*type_context_.getType(), *element_type_value->type(), array_constructor.element_type->location))
+                {
+                    abort();
+                    return;
+                }
+
+                element_type = element_type_value.cast<bbt::Type>();
+            }
+
+            utility::List<utility::Shared<bbt::Value>> elements;
+            utility::List<utility::Shared<bbt::Type>>  element_types;
+
+            for (auto const& element : array_constructor.elements)
+            {
+                utility::Shared<bbt::Value> value = deLReference(scope().getTemporary(element.get()).read());
+
+                elements.emplace_back(value);
+                element_types.emplace_back(value->type());
+            }
+
+            if (!element_type.hasValue() && !expectCommonType(element_types, &element_type, array_constructor.location))
+            {
+                abort();
+                return;
+            }
+
+            assert(element_type.hasValue());
+
+            for (size_t index = 0; index < elements.size(); index++)
+            {
+                if (!expectType(*element_type.value(), *elements[index]->type(), array_constructor.elements[index].get().location))
+                {
+                    abort();
+                    return;
+                }
+            }
+
+            utility::Shared<bbt::Type> array_type = type_context_.getArray(element_type.value(), elements.size());
+            scope().getTemporary(array_constructor.destination).write(bbt::Array::make(std::move(array_type), std::move(elements), type_context_));
         }
 
         void visit(bbt::OrderedScopeEnter const& scope_enter) override

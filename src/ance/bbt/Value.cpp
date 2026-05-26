@@ -199,6 +199,58 @@ namespace ance::bbt
     {
         return value_ == other.value_;
     }
+
+    Array::Array(utility::Shared<Type> array_type, utility::List<utility::Shared<Value>> element_list, TypeContext& type_context)
+        : ValueBase(std::move(array_type), type_context)
+        , elements_(std::move(element_list))
+    {}
+
+    utility::Shared<Array> Array::make(utility::Shared<Type> array_type, utility::List<utility::Shared<Value>> element_list, TypeContext& type_context)
+    {
+        return utility::makeShared<Array>(std::move(array_type), std::move(element_list), type_context);
+    }
+
+    std::string Array::toString() const
+    {
+        std::string result = "[";
+
+        for (size_t index = 0; index < elements_.size(); index++)
+        {
+            if (index > 0) result += ", ";
+            result += elements_[index]->toString();
+        }
+
+        result += "]";
+        return result;
+    }
+
+    utility::List<utility::Shared<Value>> const& Array::elements() const
+    {
+        return elements_;
+    }
+
+    bool Array::equals(Array const& other) const
+    {
+        if (type() != other.type()) return false;
+        if (elements_.size() != other.elements_.size()) return false;
+
+        for (size_t index = 0; index < elements_.size(); index++)
+        {
+            if (!elements_[index]->equals(*other.elements_[index])) return false;
+        }
+
+        return true;
+    }
+
+    bool Array::isEmpty() const
+    {
+        return elements_.empty();
+    }
+
+    size_t Array::length() const
+    {
+        return elements_.size();
+    }
 }
 
 std::ostream& operator<<(std::ostream& out, ance::bbt::Value const& value)

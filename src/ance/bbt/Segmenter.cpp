@@ -1542,6 +1542,50 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
+        void visit(est::ArrayType const& array_type) override
+        {
+            trace("ArrayType", array_type);
+
+            Builder builder(*this);
+
+            auto& element_type_tmp = builder.addTemporary("ArrayType_ElementType", array_type.element_type->location);
+            builder.addSegmented(*array_type.element_type, element_type_tmp);
+
+            auto& length_tmp = builder.addTemporary("ArrayType_Length", array_type.length->location);
+            builder.addSegmented(*array_type.length, length_tmp);
+
+            builder.addStatement<CreateArrayType>(element_type_tmp, length_tmp, destination(), array_type.location);
+
+            setResult(builder.take());
+        }
+
+        void visit(est::ArrayConstructor const& array_constructor) override
+        {
+            trace("ArrayConstructor", array_constructor)
+                << ", has_type=" << std::boolalpha << array_constructor.element_type.hasValue() << ", count(elements)=" << array_constructor.elements.size();
+
+            Builder builder(*this);
+
+            Temporary const* element_type_tmp = nullptr;
+            if (array_constructor.element_type.hasValue())
+            {
+                element_type_tmp = &builder.addTemporary("ArrayConstructor_ElementType", array_constructor.element_type.value()->location);
+                builder.addSegmented(**array_constructor.element_type, *element_type_tmp);
+            }
+
+            utility::List<std::reference_wrapper<Temporary const>> elements;
+            for (size_t index = 0; index < array_constructor.elements.size(); index++)
+            {
+                auto& element_tmp = builder.addTemporary(std::format("ArrayConstructor_Element{}", index), array_constructor.elements[index]->location);
+                builder.addSegmented(*array_constructor.elements[index], element_tmp);
+                elements.emplace_back(element_tmp);
+            }
+
+            builder.addStatement<ArrayConstructor>(element_type_tmp, std::move(elements), destination(), array_constructor.location);
+
+            setResult(builder.take());
+        }
+
         void visit(est::MatchCase const&) override
         {
             // Cases are also handled in the match visit method; therefore, this method is intentionally empty.

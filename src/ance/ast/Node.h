@@ -425,6 +425,30 @@ namespace ance::ast
         utility::List<utility::Owned<Expression>> expressions;
     };
 
+    /// An expression that creates an array type.
+    struct ArrayType final
+        : Expression
+        , utility::ConcreteNode<ArrayType, Visitor>
+    {
+        ArrayType(utility::Owned<Expression> type, utility::Owned<Expression> length_expression, core::Location const& source_location);
+
+        utility::Owned<Expression> element_type;
+        utility::Owned<Expression> length;
+    };
+
+    /// An expression that creates an array value.
+    struct ArrayConstructor final
+        : Expression
+        , utility::ConcreteNode<ArrayConstructor, Visitor>
+    {
+        ArrayConstructor(utility::Optional<utility::Owned<Expression>> type,
+                         utility::List<utility::Owned<Expression>>     expression_list,
+                         core::Location const&                         source_location);
+
+        utility::Optional<utility::Owned<Expression>> element_type;
+        utility::List<utility::Owned<Expression>>     elements;
+    };
+
     /// An expression that combines a sequence of statements with a final expression inside an ordered scope.
     struct BlockExpression final
         : Expression
@@ -594,6 +618,8 @@ namespace ance::ast
         virtual void visit(Call const& call)                                   = 0;
         virtual void visit(Intrinsic const& intrinsic)                         = 0;
         virtual void visit(TypeOf const& type_of)                              = 0;
+        virtual void visit(ArrayType const& array_type)                        = 0;
+        virtual void visit(ArrayConstructor const& array_constructor)          = 0;
         virtual void visit(BlockExpression const& block_expression)            = 0;
         virtual void visit(Parenthesis const& parenthesis)                     = 0;
         virtual void visit(Lambda const& lambda)                               = 0;

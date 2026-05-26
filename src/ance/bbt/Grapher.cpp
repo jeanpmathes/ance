@@ -160,6 +160,10 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(TypeOf const&) override {}
 
+        void visit(CreateArrayType const&) override {}
+
+        void visit(ArrayConstructor const&) override {}
+
         void visit(OrderedScopeEnter const&) override {}
 
         void visit(OrderedScopeExit const&) override {}

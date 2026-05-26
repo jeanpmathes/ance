@@ -917,6 +917,39 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitArrayTypeExpression(grammar::anceParser::ArrayTypeExpressionContext* context) override
+        {
+            trace("ArrayTypeExpression", context);
+
+            utility::Owned<Expression> element_type = expectExpression(context->type);
+            utility::Owned<Expression> length       = expectExpression(context->length);
+
+            Expression* expression = new ArrayType(std::move(element_type), std::move(length), location(context));
+            return expression;
+        }
+
+        std::any visitArrayConstructorExpression(grammar::anceParser::ArrayConstructorExpressionContext* context) override
+        {
+            trace("ArrayConstructorExpression", context);
+
+            utility::Optional<utility::Owned<Expression>> element_type;
+            if (context->type != nullptr)
+            {
+                element_type = expectExpression(context->type);
+            }
+
+            utility::List<utility::Owned<Expression>> elements;
+            for (grammar::anceParser::ExpressionContext* expression_context : context->expression())
+            {
+                if (expression_context == context->type) continue;
+
+                elements.push_back(expectExpression(expression_context));
+            }
+
+            Expression* expression = new ArrayConstructor(std::move(element_type), std::move(elements), location(context));
+            return expression;
+        }
+
         std::any visitIfExpression(grammar::anceParser::IfExpressionContext* context) override
         {
             trace("IfExpression", context);

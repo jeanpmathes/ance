@@ -180,6 +180,28 @@ ance::bbt::TypeOf::TypeOf(utility::List<std::reference_wrapper<Temporary const>>
     , destination(result)
 {}
 
+ance::bbt::CreateArrayType::CreateArrayType(Temporary const&      type,
+                                            Temporary const&      length_value,
+                                            Temporary const&      result,
+                                            core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , element_type(type)
+    , length(length_value)
+    , destination(result)
+{}
+
+ance::bbt::ArrayConstructor::ArrayConstructor(Temporary const*                                       type,
+                                              utility::List<std::reference_wrapper<Temporary const>> expression_list,
+                                              Temporary const&                                       result,
+                                              core::Location const&                                  source_location)
+    : Node(source_location)
+    , Statement()
+    , element_type(type)
+    , elements(std::move(expression_list))
+    , destination(result)
+{}
+
 ance::bbt::OrderedScopeEnter::OrderedScopeEnter(core::Location const& source_location) : Node(source_location), Statement() {}
 
 bool ance::bbt::OrderedScopeEnter::isRelevantForReachability() const

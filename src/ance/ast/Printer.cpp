@@ -339,6 +339,34 @@ struct ance::ast::Printer::Implementation
             print(")");
         }
 
+        void visit(ArrayType const& array_type) override
+        {
+            print("[");
+            visit(*array_type.element_type);
+            print("; ");
+            visit(*array_type.length);
+            print("]");
+        }
+
+        void visit(ArrayConstructor const& array_constructor) override
+        {
+            print("[");
+
+            if (array_constructor.element_type.hasValue())
+            {
+                visit(**array_constructor.element_type);
+                print(" | ");
+            }
+
+            for (size_t index = 0; index < array_constructor.elements.size(); index++)
+            {
+                visit(*array_constructor.elements[index]);
+                if (index + 1 < array_constructor.elements.size()) print(", ");
+            }
+
+            print("]");
+        }
+
         void visit(BlockExpression const& block_expression) override
         {
             print("({");

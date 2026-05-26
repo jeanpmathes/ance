@@ -192,6 +192,11 @@ namespace ance::bbt
         return false;
     }
 
+    bool Type::isArray() const
+    {
+        return false;
+    }
+
     size_t Type::getConstructingTypeCount() const
     {
         return implementation_->getConstructingTypeCount();
@@ -247,6 +252,33 @@ namespace ance::bbt
         return true;
     }
 
+    ArrayType::ArrayType(utility::Shared<Type> element_type, size_t const length, TypeContext& type_context)
+        : Type(core::Identifier::make(std::format("[{}; {}]", element_type->name().text(), length), core::Location::core()),
+               bundleTypes(element_type),
+               type_context)
+        , length_(length)
+    {}
+
+    bool ArrayType::isArray() const
+    {
+        return true;
+    }
+
+    utility::Shared<Type> ArrayType::elementType()
+    {
+        return getConstructingType(0);
+    }
+
+    Type const& ArrayType::elementType() const
+    {
+        return getConstructingType(0);
+    }
+
+    size_t ArrayType::length() const
+    {
+        return length_;
+    }
+
     struct TypeContext::Implementation
     {
         explicit Implementation(cet::Runner& runner) : runner_(runner) {}
@@ -270,6 +302,7 @@ namespace ance::bbt
         utility::Optional<utility::Shared<Type>> float_quad_type;
 
         TypeDictionary<> lref_types;
+        TypeDictionary<size_t> array_types;
 
         template<typename Factory>
         static utility::Shared<Type> getOrCreate(utility::Optional<utility::Shared<Type>>& type_slot, Factory factory)
@@ -514,6 +547,13 @@ namespace ance::bbt
     {
         return implementation_->lref_types.getOrCreate(bundleTypes(referenced_type),
                                                        [&] { return utility::makeShared<LReferenceType>(referenced_type, *this); });
+    }
+
+    utility::Shared<Type> TypeContext::getArray(utility::Shared<Type> element_type, size_t const length)
+    {
+        return implementation_->array_types.getOrCreate(bundleTypes(element_type), length, [&] {
+            return utility::makeShared<ArrayType>(element_type, length, *this);
+        });
     }
 
     utility::Shared<Type> TypeContext::getIdentifier()

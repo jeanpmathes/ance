@@ -328,6 +328,40 @@ struct ance::bbt::Printer::Implementation
             print(");");
         }
 
+        void visit(CreateArrayType const& create_array_type) override
+        {
+            print(create_array_type.destination.id());
+            print(" ");
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" [");
+            print(create_array_type.element_type.id());
+            print("; ");
+            print(create_array_type.length.id());
+            print("];");
+        }
+
+        void visit(ArrayConstructor const& array_constructor) override
+        {
+            print(array_constructor.destination.id());
+            print(" ");
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" [");
+
+            if (array_constructor.element_type != nullptr)
+            {
+                print(array_constructor.element_type->id());
+                print(" | ");
+            }
+
+            for (size_t index = 0; index < array_constructor.elements.size(); index++)
+            {
+                print(array_constructor.elements[index].get().id());
+                if (index + 1 < array_constructor.elements.size()) print(", ");
+            }
+
+            print("];");
+        }
+
         void visit(OrderedScopeEnter const&) override
         {
             print("scope enter");
