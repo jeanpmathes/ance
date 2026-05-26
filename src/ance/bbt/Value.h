@@ -17,11 +17,11 @@ namespace ance::bbt
     class Type;
     class TypeContext;
 
-    /// Represents a value.
+    /// Represents a value. This class is immutable and all of its implementations must be immutable as well.
     class Value
     {
       protected:
-        /// The concrete value class must supply its type, except when the type is "Type" when nullopt must be used to prevent infinite recursion.
+        /// The concrete value class must supply its type, except when the type is "Type"; then \c nullopt must be used to prevent infinite recursion.
         explicit Value(utility::Optional<utility::Shared<Type>> type, TypeContext& type_context);
 
       public:
@@ -35,7 +35,7 @@ namespace ance::bbt
         [[nodiscard]] virtual bool equals(Value const& other) const = 0;
 
         template<typename T>
-        bool is() const
+        [[nodiscard]] bool is() const
         {
             return dynamic_cast<T const*>(this) != nullptr;
         }

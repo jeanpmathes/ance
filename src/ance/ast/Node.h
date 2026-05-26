@@ -425,7 +425,8 @@ namespace ance::ast
         utility::List<utility::Owned<Expression>> expressions;
     };
 
-    /// An expression that creates an array type.
+    /// An expression that retrieves an array type, meaning repeated calls with the same arguments provide the same type.
+    /// The array type has a fixed length and element type.
     struct ArrayType final
         : Expression
         , utility::ConcreteNode<ArrayType, Visitor>
@@ -437,6 +438,7 @@ namespace ance::ast
     };
 
     /// An expression that creates an array value.
+    /// Could also be called an array literal.
     struct ArrayConstructor final
         : Expression
         , utility::ConcreteNode<ArrayConstructor, Visitor>
