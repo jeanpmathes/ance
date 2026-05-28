@@ -19,6 +19,13 @@ namespace ance::bbt
         return type_.hasValue() ? *type_.value() : *type_context_.getType();
     }
 
+    utility::Optional<utility::Shared<Value>> Value::access(size_t, utility::Shared<Value>*, TypeContext&)
+    {
+        // By default, access is not supported.
+
+        return std::nullopt;
+    }
+
     Unit::Unit(TypeContext& type_context) : ValueBase(type_context.getUnit(), type_context) {}
 
     utility::Shared<Unit> Unit::make(TypeContext& type_context)
@@ -222,6 +229,26 @@ namespace ance::bbt
 
         result += "]";
         return result;
+    }
+
+    utility::Optional<utility::Shared<Value>> Array::access(size_t const index, utility::Shared<Value>* replacement, TypeContext& type_context)
+    {
+        if (index >= elements_.size())
+        {
+            return std::nullopt;
+        }
+
+        if (replacement == nullptr)
+        {
+            return elements_[index];
+        }
+
+        utility::List<utility::Shared<Value>> elements_copy = elements_;
+
+        assert((*replacement)->type() == type()->getConstructingType(0));
+        elements_copy[index] = *replacement;
+
+        return make(type(), std::move(elements_copy), type_context);
     }
 
     utility::List<utility::Shared<Value>> const& Array::elements() const

@@ -232,6 +232,18 @@ struct ance::bbt::Printer::Implementation
             print(");");
         }
 
+        void visit(Subscript const& subscript) override
+        {
+            print(subscript.destination.id());
+            print(" ");
+            print(core::Assigner::MOVE_ASSIGNMENT);
+            print(" subscript ");
+            print(subscript.indexed.id());
+            print("[");
+            print(subscript.index.id());
+            print("];");
+        }
+
         void visit(FunctionConstructor const& function_constructor) override
         {
             print(function_constructor.destination.id());

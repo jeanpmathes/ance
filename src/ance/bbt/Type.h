@@ -86,6 +86,18 @@ namespace ance::bbt
             core::BinaryOperator binary_operator,
             Type const&          rhs_type);// todo: when reworking how ops are defined, this should be removed because retrieval would ideally not be name based
 
+        /// Returns true if this type supports subscript access.
+        /// If this is overridden and returns true, the corresponding value class needs to provide an implementation for \c access .
+        [[nodiscard]] virtual bool isSubscriptDefined() const;
+
+        /// Returns the element type accessed by the subscript operation.
+        /// Only valid to call if \c isSubscriptDefined returns true.
+        [[nodiscard]] virtual utility::Shared<Type> getSubscriptType();
+
+        /// Returns true if a given subscript index is within bounds.
+        /// Only valid to call if \c isSubscriptDefined returns true.
+        [[nodiscard]] virtual bool isSubscriptInBounds(size_t index) const;
+
       private:
         friend class TypeContext;
 
@@ -122,6 +134,10 @@ namespace ance::bbt
         [[nodiscard]] utility::Shared<Type> elementType();
         [[nodiscard]] Type const&           elementType() const;
         [[nodiscard]] size_t                length() const;
+
+        [[nodiscard]] bool                  isSubscriptDefined() const override;
+        [[nodiscard]] utility::Shared<Type> getSubscriptType() override;
+        [[nodiscard]] bool                  isSubscriptInBounds(size_t index) const override;
 
       private:
         size_t length_;

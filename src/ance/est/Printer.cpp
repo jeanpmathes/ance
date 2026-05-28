@@ -263,6 +263,14 @@ struct ance::est::Printer::Implementation
             print(")");
         }
 
+        void visit(Subscript const& subscript) override
+        {
+            visit(*subscript.indexed);
+            print("[");
+            visit(*subscript.index);
+            print("]");
+        }
+
         void visit(FunctionConstructor const& function_constructor) override
         {
             print("Function(Signature(#");

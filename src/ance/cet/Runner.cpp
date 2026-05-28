@@ -163,7 +163,7 @@ struct ance::cet::Runner::Implementation
             std::list<RunPoint>  stack_;
             std::list<RunPoint>* target_stack_ = &stack_;
 
-            utility::Optional<PendingResolution> blocker_ = std::nullopt;
+            utility::Optional<PendingResolution> blocker_   = std::nullopt;
             bool                                 executing_ = false;
         };
 
@@ -967,6 +967,50 @@ struct ance::cet::Runner::Implementation
             yield();
         }
 
+        void visit(bbt::Subscript const& subscript) override
+        {
+            trace("Subscript", subscript) << ", indexed=" << temp(subscript.indexed) << ", index=" << temp(subscript.index)
+                                          << ", destination=" << subscript.destination.id();
+
+            utility::Shared<bbt::Value> indexed_value = scope().getTemporary(subscript.indexed).read();
+            if (!indexed_value->type()->isLReference())
+            {
+                reporter_.error(subscript.indexed.location) << "Cannot subscript non-l-value";
+                abort();
+                return;
+            }
+
+            utility::Shared<bbt::Value> index_value = scope().getTemporary(subscript.index).read();
+            if (!expectType(*type_context_.getSize(), *index_value->type(), subscript.index.location))
+            {
+                abort();
+                return;
+            }
+
+            auto const& reference = indexed_value->as<LReference>();
+
+            utility::Shared<bbt::Type> indexed_type = indexed_value->type()->getConstructingType(0);
+            if (!indexed_type->isSubscriptDefined())
+            {
+                reporter_.error(subscript.indexed.location) << "Cannot subscript value of type " << indexed_type->annotated();
+                abort();
+                return;
+            }
+
+            size_t const index = deLReference<bbt::Size>(index_value).value();
+
+            if (!indexed_type->isSubscriptInBounds(index))
+            {
+                reporter_.error(subscript.index.location) << "Subscript index " << index << " is out of bounds";
+                abort();
+                return;
+            }
+
+            scope()
+                .getTemporary(subscript.destination)
+                .write(LReference::make(reference.address().subscript(index), indexed_type->getSubscriptType(), type_context_));
+        }
+
         void visit(bbt::FunctionConstructor const& function_constructor) override
         {
             if (reporter_.isTraceEnabled())
@@ -1415,7 +1459,7 @@ struct ance::cet::Runner::Implementation
 
             for (auto iterator = bbt.getRunPointBegin(); iterator != bbt.getRunPointEnd();)
             {
-                BBT::RunPoint&             run_point = *iterator;
+                BBT::RunPoint& run_point = *iterator;
 
                 if (run_point.isExecuting())
                 {
@@ -1424,7 +1468,7 @@ struct ance::cet::Runner::Implementation
                     continue;
                 }
 
-                BBT::ExecutionResult const result    = bbt.execute(run_point);
+                BBT::ExecutionResult const result = bbt.execute(run_point);
 
                 if (result == BBT::ExecutionResult::Completed)
                 {

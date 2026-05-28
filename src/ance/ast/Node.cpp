@@ -172,6 +172,13 @@ ance::ast::Call::Call(utility::Owned<Expression> called, utility::List<utility::
     , arguments(std::move(expressions))
 {}
 
+ance::ast::Subscript::Subscript(utility::Owned<Expression> indexed_value, utility::Owned<Expression> index_value, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , indexed(std::move(indexed_value))
+    , index(std::move(index_value))
+{}
+
 ance::ast::Intrinsic::Intrinsic(utility::Owned<Expression>                intrinsic_name,
                                 utility::List<utility::Owned<Expression>> args,
                                 core::Location const&                     source_location)

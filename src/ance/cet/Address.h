@@ -8,7 +8,10 @@
 
 namespace ance::cet
 {
-    /// Refers to a location within memory.
+    /// \brief Refers to a location within simulated compile-time memory.
+    ///
+    /// This address type only simulates addressing behavior and is only usable for BBT-based compile-time evaluation.
+    /// Translating it to a machine address would not be trivial.
     class Address
     {
     public:
@@ -16,7 +19,10 @@ namespace ance::cet
 
         [[nodiscard]] Memory&                     memory() const;
         [[nodiscard]] std::vector<size_t> const&  indices() const;
-        void                                      append(std::vector<size_t> const& indices);
+
+        /// Create an address which represents subscript-based access into this address.
+        /// Note that this does not perform any validation whether the concerned values and types would support such an access.
+        [[nodiscard]] Address subscript(size_t index) const;
 
         /// Read the value at the addressed location.
         [[nodiscard]] utility::Shared<bbt::Value> read() const;

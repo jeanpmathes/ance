@@ -16,16 +16,24 @@ ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::access()
 
 ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::vector<size_t> const& indices)
 {
-    assert(indices.empty());
+    auto result = readAt(value_, indices, type_context_);
+    assert(result.hasValue());
 
-    return value_;
+    return result.value();
 }
 
 void ance::cet::Temporary::write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices)
 {
-    assert(indices.empty());
+    if (indices.empty())
+    {
+        value_ = std::move(value);
+        return;
+    }
 
-    value_ = std::move(value);
+    auto result = writeAt(value_, indices, std::move(value), type_context_);
+    assert(result.hasValue());
+
+    value_ = result.value();
 }
 
 ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read()

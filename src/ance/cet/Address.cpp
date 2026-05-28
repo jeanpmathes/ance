@@ -18,9 +18,13 @@ namespace ance::cet
         return indices_;
     }
 
-    void Address::append(std::vector<size_t> const& indices)
+    Address Address::subscript(size_t const index) const
     {
-        indices_.insert(indices_.end(), indices.begin(), indices.end());
+        std::vector<size_t> indices_copy = indices_;
+
+        indices_copy.emplace_back(index);
+
+        return Address(memory_.get(), std::move(indices_copy));
     }
 
     utility::Shared<bbt::Value> Address::read() const

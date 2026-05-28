@@ -302,6 +302,17 @@ namespace ance::est
         utility::List<utility::Owned<Expression>> arguments;
     };
 
+    /// A subscript expression accesses an element using an index.
+    struct Subscript final
+        : Expression
+        , utility::ConcreteNode<Subscript, Visitor>
+    {
+        Subscript(utility::Owned<Expression> indexed_value, utility::Owned<Expression> index_value, core::Location const& source_location);
+
+        utility::Owned<Expression> indexed;
+        utility::Owned<Expression> index;
+    };
+
     struct Parameter;
 
     /// Creates a function.
@@ -521,6 +532,7 @@ namespace ance::est
         virtual void visit(BlockExpression const& block_expression)            = 0;
         virtual void visit(Parenthesis const& parenthesis)                     = 0;
         virtual void visit(Call const& call)                                   = 0;
+        virtual void visit(Subscript const& subscript)                         = 0;
         virtual void visit(FunctionConstructor const& function_constructor)    = 0;
         virtual void visit(Access const& access)                               = 0;
         virtual void visit(UnitLiteral const& unit_literal)                    = 0;

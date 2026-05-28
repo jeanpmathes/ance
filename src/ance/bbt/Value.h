@@ -31,6 +31,15 @@ namespace ance::bbt
         [[nodiscard]] Type const&         type() const;
         [[nodiscard]] virtual std::string toString() const = 0;
 
+        /// \brief Access this value using an index.
+        /// Access can either be performed in load or replace mode.
+        /// Invalid access is allowed and simply returns \c std::nullopt .
+        /// \param index The index of the element to access.
+        /// \param replacement If this is null, the value at the index is loaded and returned. If this is not null, a copy of this value is returned with the indexed element replaced. If passed, it must be of a valid type.
+        /// \param type_context The type context.
+        /// \return Depending on the mode, either the loaded element or the modified copy. If the access is out of bounds or not supported at all, \c std::nullopt is returned.
+        [[nodiscard]] virtual utility::Optional<utility::Shared<Value>> access(size_t index, utility::Shared<Value>* replacement, TypeContext& type_context);
+
         /// Checks whether this value is equal to another value.
         [[nodiscard]] virtual bool equals(Value const& other) const = 0;
 
@@ -201,6 +210,7 @@ namespace ance::bbt
         ~Array() override = default;
 
         [[nodiscard]] std::string                                  toString() const override;
+        [[nodiscard]] utility::Optional<utility::Shared<Value>> access(size_t index, utility::Shared<Value>* replacement, TypeContext& type_context) override;
         [[nodiscard]] utility::List<utility::Shared<Value>> const& elements() const;
         [[nodiscard]] bool                                         equals(Array const& other) const override;
 

@@ -328,6 +328,17 @@ namespace ance::ast
         utility::List<utility::Owned<Expression>> arguments;
     };
 
+    /// A subscript expression accesses an element using an index.
+    struct Subscript final
+        : Expression
+        , utility::ConcreteNode<Subscript, Visitor>
+    {
+        Subscript(utility::Owned<Expression> indexed_value, utility::Owned<Expression> index_value, core::Location const& source_location);
+
+        utility::Owned<Expression> indexed;
+        utility::Owned<Expression> index;
+    };
+
     /// A lambda expression creates an anonymous function.
     struct Lambda final
         : Expression
@@ -618,6 +629,7 @@ namespace ance::ast
         virtual void visit(And const& and_expression)                          = 0;
         virtual void visit(Or const& or_expression)                            = 0;
         virtual void visit(Call const& call)                                   = 0;
+        virtual void visit(Subscript const& subscript)                         = 0;
         virtual void visit(Intrinsic const& intrinsic)                         = 0;
         virtual void visit(TypeOf const& type_of)                              = 0;
         virtual void visit(ArrayType const& array_type)                        = 0;

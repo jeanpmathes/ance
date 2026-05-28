@@ -167,6 +167,13 @@ ance::est::Call::Call(utility::Owned<Expression> callable, utility::List<utility
     , arguments(std::move(expressions))
 {}
 
+ance::est::Subscript::Subscript(utility::Owned<Expression> indexed_value, utility::Owned<Expression> index_value, core::Location const& source_location)
+    : Node(source_location)
+    , Expression()
+    , indexed(std::move(indexed_value))
+    , index(std::move(index_value))
+{}
+
 ance::est::FunctionConstructor::FunctionConstructor(core::Identifier const&    identifier,
                                                     utility::List<Parameter>   params,
                                                     utility::Owned<Expression> type,

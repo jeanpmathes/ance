@@ -688,6 +688,13 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<Call>(std::move(callee), std::move(arguments), call.location));
         }
 
+        void visit(ast::Subscript const& subscript) override
+        {
+            trace("Subscript", subscript.location);
+
+            result_.setExpression(utility::makeOwned<Subscript>(expand(*subscript.indexed), expand(*subscript.index), subscript.location));
+        }
+
         void visit(ast::Lambda const& lambda) override
         {
             trace("Lambda", lambda.location) << ", count(parameters)=" << lambda.parameters.size() << ", has_return_type=" << std::boolalpha

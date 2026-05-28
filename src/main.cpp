@@ -119,11 +119,15 @@ namespace ance
         return exit_code;
 
         // todo: subscript operator, should work on arrays
+        // todo: test assigning wrong type, test out-of-bounds
         // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: no vector types, instead array types support all operators of their element type and perform them element-wise
         // todo: no vectors yet because that has HW and alignment implications, should not be first class language element
+        // todo: currently this would work by using string templates, but there should be a TODO to use normal generics as much as possible
         // todo: write some related documentation for this, repeat this note for the next step
+
+        // todo: find more places where ranges could be used (so std::ranges, std::views)
 
         // todo: look into the calendar note again, streamline, remove changed things, keep up to date
 

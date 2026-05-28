@@ -76,7 +76,8 @@ unaryExpression
     ;
 
 postfixExpression
-    : callee=postfixExpression '(' (expression (',' expression)* )? ')' # CallExpression // todo: should become an operator
+    : callee=postfixExpression '(' (expression (',' expression)* )? ')' # CallExpression
+    | indexed=postfixExpression '[' index=expression ']' # SubscriptExpression // todo: should become an operator
     | primaryExpression # PrimaryExpressionExpression
     ;
 

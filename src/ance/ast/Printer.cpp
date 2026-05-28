@@ -280,6 +280,14 @@ struct ance::ast::Printer::Implementation
             print(")");
         }
 
+        void visit(Subscript const& subscript) override
+        {
+            visit(*subscript.indexed);
+            print("[");
+            visit(*subscript.index);
+            print("]");
+        }
+
         void visit(Lambda const& lambda) override
         {
             print("\\[](");

@@ -117,6 +117,14 @@ ance::bbt::Call::Call(Temporary const&                                       fun
     , arguments(std::move(args))
     , destination(result)
 {}
+
+ance::bbt::Subscript::Subscript(Temporary const& indexed_value, Temporary const& index_value, Temporary const& result, core::Location const& source_location)
+    : Node(source_location)
+    , Statement()
+    , indexed(indexed_value)
+    , index(index_value)
+    , destination(result)
+{}
 ance::bbt::FunctionConstructor::FunctionConstructor(core::Identifier const&  identifier,
                                                     utility::List<Parameter> params,
                                                     Temporary const&         returned_type,

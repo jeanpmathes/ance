@@ -57,18 +57,30 @@ namespace ance::cet
     utility::Shared<bbt::Value> Variable::read(std::vector<size_t> const& indices)
     {
         assert(isDefined());
-        assert(indices.empty());
 
-        return value_.value();
+        auto result = readAt(value_.value(), indices, type_context_);
+        assert(result.hasValue());
+
+        return result.value();
     }
 
     void Variable::write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices)
     {
         assert(!is_final_ || !isDefined());
-        assert(value->type() == type_);
-        assert(indices.empty());
 
-        value_ = std::move(value);
+        if (indices.empty())
+        {
+            assert(value->type() == type_);
+            value_ = std::move(value);
+            return;
+        }
+
+        assert(isDefined());
+
+        auto result = writeAt(value_.value(), indices, std::move(value), type_context_);
+        assert(result.hasValue());
+
+        value_ = result.value();
     }
 
     utility::Shared<bbt::Value> Variable::read()

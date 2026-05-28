@@ -1299,6 +1299,23 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
+        void visit(est::Subscript const& subscript) override
+        {
+            trace("Subscript", subscript);
+
+            Builder builder(*this);
+
+            auto& indexed_tmp = builder.addTemporary("Subscript_Indexed", subscript.indexed->location);
+            builder.addSegmented(*subscript.indexed, indexed_tmp);
+
+            auto& index_tmp = builder.addTemporary("Subscript_Index", subscript.index->location);
+            builder.addSegmented(*subscript.index, index_tmp);
+
+            builder.addStatement<Subscript>(indexed_tmp, index_tmp, destination(), subscript.location);
+
+            setResult(builder.take());
+        }
+
         void visit(est::FunctionConstructor const& function_constructor) override
         {
             trace("FunctionConstructor", function_constructor)

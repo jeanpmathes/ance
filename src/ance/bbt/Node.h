@@ -251,6 +251,18 @@ namespace ance::bbt
         Temporary const&                                       destination;
     };
 
+    /// Accesses a value by a given index.
+    struct Subscript final
+        : Statement
+        , utility::ConcreteNode<Subscript, Visitor>
+    {
+        Subscript(Temporary const& indexed_value, Temporary const& index_value, Temporary const& result, core::Location const& source_location);
+
+        Temporary const& indexed;
+        Temporary const& index;
+        Temporary const& destination;
+    };
+
     struct Parameter;
 
     /// Creates a function.
@@ -468,27 +480,28 @@ namespace ance::bbt
         virtual void visit(Jump const& jump_link)       = 0;
         virtual void visit(Switch const& switch_link)   = 0;
 
-        virtual void visit(ErrorStatement const& error_statement)                         = 0;
-        virtual void visit(Pass const& pass_statement)                                    = 0;
-        virtual void visit(Assert const& assert_statement)                                = 0;
-        virtual void visit(Store const& store)                                            = 0;
-        virtual void visit(Access const& access)                                          = 0;
-        virtual void visit(Temporary const& temporary)                                    = 0;
-        virtual void visit(Dereference const& dereference)                                = 0;
-        virtual void visit(Intrinsic const& intrinsic)                                    = 0;
-        virtual void visit(Call const& call)                                              = 0;
-        virtual void visit(FunctionConstructor const& function_constructor)               = 0;
-        virtual void visit(Constant const& constant)                                      = 0;
+        virtual void visit(ErrorStatement const& error_statement)                                              = 0;
+        virtual void visit(Pass const& pass_statement)                                                         = 0;
+        virtual void visit(Assert const& assert_statement)                                                     = 0;
+        virtual void visit(Store const& store)                                                                 = 0;
+        virtual void visit(Access const& access)                                                               = 0;
+        virtual void visit(Temporary const& temporary)                                                         = 0;
+        virtual void visit(Dereference const& dereference)                                                     = 0;
+        virtual void visit(Intrinsic const& intrinsic)                                                         = 0;
+        virtual void visit(Call const& call)                                                                   = 0;
+        virtual void visit(Subscript const& subscript)                                                         = 0;
+        virtual void visit(FunctionConstructor const& function_constructor)                                    = 0;
+        virtual void visit(Constant const& constant)                                                           = 0;
         virtual void visit(Default const& default_value)                                                       = 0;
         virtual void visit(CurrentScope const& current_scope)                                                  = 0;
         virtual void visit(GetUnaryOperatorFunctionIdentifier const& get_unary_operator_function_identifier)   = 0;
         virtual void visit(GetBinaryOperatorFunctionIdentifier const& get_binary_operator_function_identifier) = 0;
-        virtual void visit(TypeOf const& type_of)                                         = 0;
+        virtual void visit(TypeOf const& type_of)                                                              = 0;
         virtual void visit(CreateArrayType const& create_array_type)                                           = 0;
         virtual void visit(ArrayConstructor const& array_constructor)                                          = 0;
-        virtual void visit(OrderedScopeEnter const& scope_enter)                          = 0;
-        virtual void visit(OrderedScopeExit const& scope_exit)                            = 0;
-        virtual void visit(SetReturnValue const& set_return_value)                        = 0;
+        virtual void visit(OrderedScopeEnter const& scope_enter)                                               = 0;
+        virtual void visit(OrderedScopeExit const& scope_exit)                                                 = 0;
+        virtual void visit(SetReturnValue const& set_return_value)                                             = 0;
 
         virtual void visit(SwitchCase const& switch_case) = 0;
 

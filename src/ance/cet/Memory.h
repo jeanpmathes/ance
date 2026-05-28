@@ -1,12 +1,14 @@
 #ifndef ANCE_CET_MEMORY_H
 #define ANCE_CET_MEMORY_H
 
+#include <span>
 #include <vector>
 
 #include "ance/utility/Owners.h"
 
 namespace ance::bbt
 {
+    class TypeContext;
     class Value;
 }
 
@@ -32,6 +34,16 @@ namespace ance::cet
 
         /// Check whether the memory currently stores a value.
         [[nodiscard]] virtual bool isDefined() const = 0;
+
+      protected:
+        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value>> readAt(utility::Shared<bbt::Value> value,
+                                                                                   std::span<size_t const>     indices,
+                                                                                   bbt::TypeContext&           type_context);
+
+        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value>> writeAt(utility::Shared<bbt::Value> value,
+                                                                                    std::span<size_t const>     indices,
+                                                                                    utility::Shared<bbt::Value> replacement,
+                                                                                    bbt::TypeContext&           type_context);
     };
 }
 

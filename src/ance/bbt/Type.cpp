@@ -242,6 +242,21 @@ namespace ance::bbt
         return implementation_->getBinaryOperatorFunctionIdentifier(binary_operator, rhs_type);
     }
 
+    bool Type::isSubscriptDefined() const
+    {
+        return false;
+    }
+
+    utility::Shared<Type> Type::getSubscriptType()
+    {
+        throw std::logic_error("Not supported.");
+    }
+
+    bool Type::isSubscriptInBounds(size_t) const
+    {
+        throw std::logic_error("Not supported.");
+    }
+
     LReferenceType::LReferenceType(utility::Shared<Type> referenced_type, TypeContext& type_context)
         : Type(core::Identifier::make("&" + std::string(referenced_type->name().text()), core::Location::core()), bundleTypes(referenced_type), type_context)
         , referenced_type_(referenced_type)
@@ -277,6 +292,21 @@ namespace ance::bbt
     size_t ArrayType::length() const
     {
         return length_;
+    }
+
+    bool ArrayType::isSubscriptDefined() const
+    {
+        return true;
+    }
+
+    utility::Shared<Type> ArrayType::getSubscriptType()
+    {
+        return elementType();
+    }
+
+    bool ArrayType::isSubscriptInBounds(size_t const index) const
+    {
+        return index < length_;
     }
 
     struct TypeContext::Implementation

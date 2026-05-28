@@ -856,6 +856,17 @@ namespace ance::ast
             return expression;
         }
 
+        std::any visitSubscriptExpression(grammar::anceParser::SubscriptExpressionContext* context) override
+        {
+            trace("SubscriptExpression", context);
+
+            utility::Owned<Expression> indexed = expectExpression(context->indexed);
+            utility::Owned<Expression> index   = expectExpression(context->index);
+
+            Expression* expression = new Subscript(std::move(indexed), std::move(index), location(context));
+            return expression;
+        }
+
         std::any visitLambdaExpression(grammar::anceParser::LambdaExpressionContext* context) override
         {
             trace("LambdaExpression", context);
