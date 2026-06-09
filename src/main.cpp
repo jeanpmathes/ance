@@ -118,13 +118,8 @@ namespace ance
 
         return exit_code;
 
-        // todo: change L-ref into ref, it should have a variability enum (so either var, or invariable (default, not printed), meaning & and &var)
-        // todo: assignment of course needs &var, but subscript would work with & as well, which would fix one of the two currently commented out parts in the first.ance
-        // todo: search for any mentions of l-ref, rename stuff
-        // todo: write some related documentation for this, repeat this note for the next step
-        // todo: also take a look at the code in runner and maybe add comments there, make it a bit better looking, at least at one place explain more for deref
-
         // todo: remove any mention of final in code and comments, replace <: with := and remove the other assigner
+        // todo: search for any mentions of l-ref, rename stuff
         // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: add the let and var thing

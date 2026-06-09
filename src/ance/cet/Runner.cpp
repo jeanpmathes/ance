@@ -396,9 +396,7 @@ struct ance::cet::Runner::Implementation
         /// If not, a reference to the memory location is created.
         static utility::Shared<Reference> asReference(Memory& memory)
         {
-            if (memory.type().isReference()) return memory.read({}).as<Reference>();
-
-            return memory.access().as<Reference>();
+            return (memory.type().isReference() ? memory.read({}) : memory.access()).as<Reference>();
         }
 
         utility::Optional<utility::Shared<bbt::Type>> getCommonType(utility::List<utility::Shared<bbt::Type>>& types)
