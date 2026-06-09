@@ -9,6 +9,7 @@
 namespace ance::bbt
 {
     class TypeContext;
+    class Type;
     class Value;
 }
 
@@ -20,8 +21,8 @@ namespace ance::cet
     public:
         virtual ~Memory() = default;
 
-        /// Access the memory. This will generally return a reference to it.
-        [[nodiscard]] virtual utility::Shared<bbt::Value> access() = 0;
+      /// Access the memory, returning a reference to it.
+      [[nodiscard]] virtual utility::Shared<bbt::Value> access() = 0;
 
         /// Read a value from the addressed memory location.
         /// \param indices Indices describing the target position inside the memory.
@@ -35,13 +36,29 @@ namespace ance::cet
         /// Check whether the memory currently stores a value.
         [[nodiscard]] virtual bool isDefined() const = 0;
 
+        /// The type of the value stored in the memory location.
+        [[nodiscard]] virtual bbt::Type const& type() const = 0;
+
       protected:
-        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value>> readAt(utility::Shared<bbt::Value> value,
-                                                                                   std::span<size_t const>     indices,
+        /// \brief Load a value using a chain of indices.
+        /// Read a value directly, or one of its elements or sub-elements as directed by a chain of indices.
+        /// \param value The value to load from.
+        /// \param indices The chain of indices to use.
+        /// \param type_context The current type context.
+        /// \returns The loaded value, or \c std::nullopt if any of the access operations failed.
+        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value>> load(utility::Shared<bbt::Value> value,
+                                                                                 std::span<size_t const>     indices,
                                                                                    bbt::TypeContext&           type_context);
 
-        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value>> writeAt(utility::Shared<bbt::Value> value,
-                                                                                    std::span<size_t const>     indices,
+        /// \brief Store a replacement value within another value, creating a modified value.
+        /// Replace a value directly, or one of its elements or sub-elements as directed by a chain of indices.
+        /// \param value The value to replace directly or partially.
+        /// \param indices The chain of indices to use.
+        /// \param replacement The replacing value, it must have the correct type.
+        /// \param type_context The current type context.
+        /// \returns The replaced value, or \c std::nullopt if any of the access operations failed.
+        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value>> store(utility::Shared<bbt::Value> value,
+                                                                                  std::span<size_t const>     indices,
                                                                                     utility::Shared<bbt::Value> replacement,
                                                                                     bbt::TypeContext&           type_context);
     };

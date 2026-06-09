@@ -46,19 +46,21 @@ namespace ance::cet
 
     utility::Shared<bbt::Value> Variable::access()
     {
+        core::VariabilityModifier variability = core::VariabilityModifier::VARIABLE;
+
         if (is_final_ && isDefined())
         {
-            return value_.value();
+            variability = core::VariabilityModifier::INVARIABLE;
         }
 
-        return LReference::make(Address(*this), type_, type_context_);
+        return Reference::make(Address(*this), type_, variability, type_context_);
     }
 
     utility::Shared<bbt::Value> Variable::read(std::vector<size_t> const& indices)
     {
         assert(isDefined());
 
-        auto result = readAt(value_.value(), indices, type_context_);
+        auto result = load(value_.value(), indices, type_context_);
         assert(result.hasValue());
 
         return result.value();
@@ -77,7 +79,7 @@ namespace ance::cet
 
         assert(isDefined());
 
-        auto result = writeAt(value_.value(), indices, std::move(value), type_context_);
+        auto result = store(value_.value(), indices, std::move(value), type_context_);
         assert(result.hasValue());
 
         value_ = result.value();

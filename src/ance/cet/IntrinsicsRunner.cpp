@@ -309,7 +309,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
         Scope&                     scope      = state_.arguments->at(0)->as<ScopeRef>().value();
         core::Identifier const&    identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
         bool const                 is_final   = state_.arguments->at(2)->as<bbt::Bool>().value();
-        utility::Shared<bbt::Type> type       = state_.arguments->at(3).cast<bbt::Type>();
+        utility::Shared<bbt::Type> type       = state_.arguments->at(3).as<bbt::Type>();
 
         auto variable = scope.declare(identifier, type, is_final, state_.location, reporter_);
 

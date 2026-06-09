@@ -175,7 +175,7 @@ namespace ance::bbt
         Temporary const& condition;
     };
 
-    /// Stores a value to an l-reference.
+    /// Stores a value to a variable reference.
     struct Store final
         : Statement
         , utility::ConcreteNode<Store, Visitor>
@@ -186,7 +186,7 @@ namespace ance::bbt
         Temporary const& value;
     };
 
-    /// Provides the value of or an l-ref to a variable.
+    /// Provides a reference to a variable.
     struct Access final
         : Statement
         , utility::ConcreteNode<Access, Visitor>
@@ -210,7 +210,7 @@ namespace ance::bbt
         std::string identifier;
     };
 
-    /// Dereferences a value, unwrapping every l-ref until a concrete value is reached.
+    /// Dereferences a value, unwrapping every reference until a concrete value is reached.
     struct Dereference final
         : Statement
         , utility::ConcreteNode<Dereference, Visitor>

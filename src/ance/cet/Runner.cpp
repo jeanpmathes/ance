@@ -291,7 +291,7 @@ struct ance::cet::Runner::Implementation
         {
             bool ok = true;
 
-            bbt::Type const& actual_dereferenced = deLReferenceType(actual);
+            bbt::Type const& actual_dereferenced = deReferenceType(actual);
 
             if (actual_dereferenced != expected)
             {
@@ -354,33 +354,14 @@ struct ance::cet::Runner::Implementation
             return ok;
         }
 
-        [[nodiscard]] static utility::Shared<bbt::Type> deLReferenceType(utility::Shared<bbt::Type> type)
+        /// Given a value, give a dereferenced value.
+        /// If the value is a reference, the referenced value is accessed repeatedly until it is not a reference.
+        /// If the value is not a reference, it is returned directly.
+        [[nodiscard]] static utility::Shared<bbt::Value> deReference(utility::Shared<bbt::Value> value)
         {
-            while (type->isLReference())
+            while (value->type()->isReference())
             {
-                type = type->getConstructingType(0);
-            }
-
-            return type;
-        }
-
-        [[nodiscard]] static bbt::Type const& deLReferenceType(bbt::Type const& type)
-        {
-            bbt::Type const* current = &type;
-
-            while (current->isLReference())
-            {
-                current = &current->getConstructingType(0);
-            }
-
-            return *current;
-        }
-
-        [[nodiscard]] static utility::Shared<bbt::Value> deLReference(utility::Shared<bbt::Value> value)
-        {
-            while (value->type()->isLReference())
-            {
-                auto const&    reference = value->as<LReference>();
+                auto const&    reference = value->as<Reference>();
                 Address const& address   = reference.address();
 
                 value = address.read();
@@ -389,10 +370,35 @@ struct ance::cet::Runner::Implementation
             return value;
         }
 
-        template<typename T>
-        static T const& deLReference(utility::Shared<bbt::Value> value)
+        /// The semantics match that of \c deReference , returning the type the method would return given the type of the passed in value.
+        /// Essentially, it strips all reference parts around a type.
+        [[nodiscard]] static bbt::Type const& deReferenceType(bbt::Type const& type)
         {
-            return deLReference(value)->as<T>();
+            bbt::Type const* current = &type;
+
+            while (current->isReference())
+            {
+                current = &current->getConstructingType(0);
+            }
+
+            return *current;
+        }
+
+        /// Dereference and cast a value in one step.
+        template<typename T>
+        static T const& deReference(utility::Shared<bbt::Value> value)
+        {
+            return deReference(value)->as<T>();
+        }
+
+        /// Get a memory location as a reference.
+        /// If the memory location already stores a reference, that is returned.
+        /// If not, a reference to the memory location is created.
+        static utility::Shared<Reference> asReference(Memory& memory)
+        {
+            if (memory.type().isReference()) return memory.read({}).as<Reference>();
+
+            return memory.access().as<Reference>();
         }
 
         utility::Optional<utility::Shared<bbt::Type>> getCommonType(utility::List<utility::Shared<bbt::Type>>& types)
@@ -586,15 +592,14 @@ struct ance::cet::Runner::Implementation
             trace("Branch", branch_link) << ", true_branch=" << branch_link.true_branch.id << ", false_branch=" << branch_link.false_branch.id
                                          << ", condition=" << temp(branch_link.condition);
 
-            utility::Shared<bbt::Value> condition = scope().getTemporary(branch_link.condition).read();
-
+            utility::Shared<bbt::Value> condition = deReference(scope().getTemporary(branch_link.condition).read());
             if (!expectType(*type_context_.getBool(), *condition->type(), branch_link.condition.location))
             {
                 abort();
                 return;
             }
 
-            if (deLReference<bbt::Bool>(condition).value())
+            if (deReference<bbt::Bool>(condition).value())
             {
                 state_.next = &branch_link.true_branch;
             }
@@ -629,8 +634,7 @@ struct ance::cet::Runner::Implementation
                     break;
                 }
 
-                utility::Shared<bbt::Value> value = scope().getTemporary(*current_case->pattern).read();
-
+                utility::Shared<bbt::Value> value = deReference(scope().getTemporary(*current_case->pattern).read());
                 if (!expectType(*condition_type, *value->type(), current_case->pattern->location))
                 {
                     has_invalid_case = true;
@@ -740,15 +744,14 @@ struct ance::cet::Runner::Implementation
             // todo: in runtime, it would call the corresponding function of the language runtime, using a runtime_library_call intrinsic
             // todo: to select the right variant, one could have overloads that just differ in execution mode
 
-            utility::Shared<bbt::Value> condition = scope().getTemporary(assert_statement.condition).read();
-
+            utility::Shared<bbt::Value> condition = deReference(scope().getTemporary(assert_statement.condition).read());
             if (!expectType(*type_context_.getBool(), *condition->type(), assert_statement.condition.location))
             {
                 abort();
                 return;
             }
 
-            if (!deLReference<bbt::Bool>(condition).value())
+            if (!deReference<bbt::Bool>(condition).value())
             {
                 reporter_.error(assert_statement.location) << "Assertion failed";
                 abort();
@@ -762,16 +765,16 @@ struct ance::cet::Runner::Implementation
             utility::Shared<bbt::Value> target = scope().getTemporary(store.target).read();
             utility::Shared<bbt::Value> value  = scope().getTemporary(store.value).read();
 
-            if (!target->type()->isLReference())
+            if (!target->type()->isReference() || !target->type()->variability().isVariable())
             {
-                reporter_.error(store.target.location) << "Cannot store to non-l-value";
+                reporter_.error(store.target.location) << "Can only store to variable reference values";
                 abort();
                 return;
             }
 
             // todo: this is not ideal with final variables, technically we could get an l-ref to it when it is not defined yet but then write twice to it through the same l-ref
 
-            utility::Shared<LReference> reference = target.cast<LReference>();
+            utility::Shared<Reference> reference = target.as<Reference>();
 
             if (!expectType(*target->type()->getConstructingType(0), *value->type(), store.value.location))
             {
@@ -779,14 +782,14 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            reference->address().write(deLReference(value));
+            reference->address().write(deReference(value));
         }
 
         void visit(bbt::Access const& access) override
         {
             trace("Access", access) << ", variable=" << access.variable.id() << ", destination=" << access.destination.id();
 
-            utility::Shared<bbt::Value> target = scope().getTemporary(access.variable).read();
+            utility::Shared<bbt::Value> target = deReference(scope().getTemporary(access.variable).read());
 
             if (!expectType(*type_context_.getVariableRef(), *target->type(), access.variable.location))
             {
@@ -816,7 +819,7 @@ struct ance::cet::Runner::Implementation
             trace("Dereference", dereference) << ", target=" << temp(dereference.target) << ", destination=" << dereference.destination.id();
 
             utility::Shared<bbt::Value> value = scope().getTemporary(dereference.target).read();
-            scope().getTemporary(dereference.destination).write(deLReference(value));
+            scope().getTemporary(dereference.destination).write(deReference(value));
         }
 
         void visit(bbt::Intrinsic const& intrinsic) override
@@ -861,7 +864,7 @@ struct ance::cet::Runner::Implementation
             for (auto argument : intrinsic.arguments)
             {
                 utility::Shared<bbt::Value> value = scope().getTemporary(argument.get()).read();
-                arguments.emplace_back(deLReference(value));
+                arguments.emplace_back(deReference(value));
             }
 
             auto result = intrinsics_.run(intrinsic.intrinsic, arguments, intrinsic.location);
@@ -876,7 +879,7 @@ struct ance::cet::Runner::Implementation
             }
             else
             {
-                scope().getTemporary(intrinsic.destination).write(deLReference(result.getResult()));
+                scope().getTemporary(intrinsic.destination).write(deReference(result.getResult()));
             }
         }
 
@@ -903,14 +906,14 @@ struct ance::cet::Runner::Implementation
 
             if (run_point.return_value.hasValue())
             {
-                scope().getTemporary(call.destination).write(deLReference(run_point.return_value.value()));
+                scope().getTemporary(call.destination).write(deReference(run_point.return_value.value()));
 
                 run_point.return_value = std::nullopt;
 
                 return;
             }
 
-            utility::Shared<bbt::Value> called = scope().getTemporary(call.called).read();
+            utility::Shared<bbt::Value> called = deReference(scope().getTemporary(call.called).read());
 
             if (!expectType(*type_context_.getFunction(), *called->type(), call.called.location))
             {
@@ -918,7 +921,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::Shared<bbt::Function> function  = called.cast<bbt::Function>();
+            utility::Shared<bbt::Function> function  = called.as<bbt::Function>();
             bbt::Signature                 signature = function->signature();
 
             utility::List<std::reference_wrapper<bbt::Type const>> argument_types     = {};
@@ -959,7 +962,7 @@ struct ance::cet::Runner::Implementation
                     return;
                 }
 
-                (*variable)->as<VariableRef>().value().write(deLReference(argument));
+                (*variable)->as<VariableRef>().value().write(deReference(argument));
             }
 
             run_point.pushLevel(function->body().entry, function_scope);
@@ -972,24 +975,16 @@ struct ance::cet::Runner::Implementation
             trace("Subscript", subscript) << ", indexed=" << temp(subscript.indexed) << ", index=" << temp(subscript.index)
                                           << ", destination=" << subscript.destination.id();
 
-            utility::Shared<bbt::Value> indexed_value = scope().getTemporary(subscript.indexed).read();
-            if (!indexed_value->type()->isLReference())
-            {
-                reporter_.error(subscript.indexed.location) << "Cannot subscript non-l-value";
-                abort();
-                return;
-            }
+            utility::Shared<Reference> indexed_reference = asReference(scope().getTemporary(subscript.indexed));
 
-            utility::Shared<bbt::Value> index_value = scope().getTemporary(subscript.index).read();
+            utility::Shared<bbt::Value> index_value = deReference(scope().getTemporary(subscript.index).read());
             if (!expectType(*type_context_.getSize(), *index_value->type(), subscript.index.location))
             {
                 abort();
                 return;
             }
 
-            auto const& reference = indexed_value->as<LReference>();
-
-            utility::Shared<bbt::Type> indexed_type = indexed_value->type()->getConstructingType(0);
+            utility::Shared<bbt::Type> indexed_type = indexed_reference->type()->getConstructingType(0);
             if (!indexed_type->isSubscriptDefined())
             {
                 reporter_.error(subscript.indexed.location) << "Cannot subscript value of type " << indexed_type->annotated();
@@ -997,7 +992,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            size_t const index = deLReference<bbt::Size>(index_value).value();
+            size_t const index = deReference<bbt::Size>(index_value).value();
 
             if (!indexed_type->isSubscriptInBounds(index))
             {
@@ -1008,7 +1003,10 @@ struct ance::cet::Runner::Implementation
 
             scope()
                 .getTemporary(subscript.destination)
-                .write(LReference::make(reference.address().subscript(index), indexed_type->getSubscriptType(), type_context_));
+                .write(Reference::make(indexed_reference->address().subscript(index),
+                                       indexed_type->getSubscriptType(),
+                                       indexed_reference->type()->variability(),
+                                       type_context_));
         }
 
         void visit(bbt::FunctionConstructor const& function_constructor) override
@@ -1033,18 +1031,18 @@ struct ance::cet::Runner::Implementation
             utility::List<bbt::Signature::Parameter> parameters = {};
             for (auto const& param : function_constructor.parameters)
             {
-                utility::Shared<bbt::Value> type_value = scope().getTemporary(param.type).read();
+                utility::Shared<bbt::Value> type_value = deReference(scope().getTemporary(param.type).read());
                 if (!expectType(*type_context_.getType(), *type_value->type(), param.type.location))
                 {
                     abort();
                     return;
                 }
-                parameters.emplace_back(param.identifier, type_value.cast<bbt::Type>());
+                parameters.emplace_back(param.identifier, type_value.as<bbt::Type>());
             }
 
             bbt::Signature const signature = bbt::Signature(function_constructor.name, std::move(parameters));
 
-            utility::Shared<bbt::Value> return_type = scope().getTemporary(function_constructor.return_type).read();
+            utility::Shared<bbt::Value> return_type = deReference(scope().getTemporary(function_constructor.return_type).read());
             if (!expectType(*type_context_.getType(), *return_type->type(), function_constructor.return_type.location))
             {
                 abort();
@@ -1052,7 +1050,7 @@ struct ance::cet::Runner::Implementation
             }
 
             utility::Shared<bbt::Function> function =
-                utility::makeShared<bbt::Function>(signature, return_type.cast<bbt::Type>(), *function_constructor.body, type_context_);
+                utility::makeShared<bbt::Function>(signature, return_type.as<bbt::Type>(), *function_constructor.body, type_context_);
 
             scope().getTemporary(function_constructor.destination).write(function);
         }
@@ -1072,8 +1070,7 @@ struct ance::cet::Runner::Implementation
         {
             trace("Default", default_value) << ", type=" << temp(default_value.type) << ", destination=" << default_value.destination.id();
 
-            utility::Shared<bbt::Value> type_value = scope().getTemporary(default_value.type).read();
-
+            utility::Shared<bbt::Value> type_value = deReference(scope().getTemporary(default_value.type).read());
             if (!expectType(*type_context_.getType(), *type_value->type(), default_value.type.location))
             {
                 abort();
@@ -1113,7 +1110,7 @@ struct ance::cet::Runner::Implementation
                 return bbt::Unit::make(type_context_);
             };
 
-            utility::Shared<bbt::Value> value = get_default_value(type_value.cast<bbt::Type>());
+            utility::Shared<bbt::Value> value = get_default_value(type_value.as<bbt::Type>());
             scope().getTemporary(default_value.destination).write(value);
         }
 
@@ -1130,7 +1127,7 @@ struct ance::cet::Runner::Implementation
                 << ", op=" << get_unary_operator_function_identifier.op.toString() << ", type=" << get_unary_operator_function_identifier.type.id()
                 << ", destination=" << get_unary_operator_function_identifier.destination.id();
 
-            utility::Shared<bbt::Type> type = scope().getTemporary(get_unary_operator_function_identifier.type).read().cast<bbt::Type>();
+            utility::Shared<bbt::Type> type = scope().getTemporary(get_unary_operator_function_identifier.type).read().as<bbt::Type>();
 
             utility::Optional<core::Identifier> operator_function_identifier =
                 type->getUnaryOperatorFunctionIdentifier(get_unary_operator_function_identifier.op);
@@ -1155,8 +1152,8 @@ struct ance::cet::Runner::Implementation
                 << ", right_type=" << get_binary_operator_function_identifier.right_type.id()
                 << ", destination=" << get_binary_operator_function_identifier.destination.id();
 
-            utility::Shared<bbt::Type> left_type  = scope().getTemporary(get_binary_operator_function_identifier.left_type).read().cast<bbt::Type>();
-            utility::Shared<bbt::Type> right_type = scope().getTemporary(get_binary_operator_function_identifier.right_type).read().cast<bbt::Type>();
+            utility::Shared<bbt::Type> left_type  = scope().getTemporary(get_binary_operator_function_identifier.left_type).read().as<bbt::Type>();
+            utility::Shared<bbt::Type> right_type = scope().getTemporary(get_binary_operator_function_identifier.right_type).read().as<bbt::Type>();
 
             utility::Optional<core::Identifier> operator_function_identifier =
                 left_type->getBinaryOperatorFunctionIdentifier(get_binary_operator_function_identifier.op, *right_type);
@@ -1215,22 +1212,22 @@ struct ance::cet::Runner::Implementation
             trace("ArrayType", array_type) << ", element_type=" << temp(array_type.element_type) << ", length=" << temp(array_type.length)
                                            << ", destination=" << array_type.destination.id();
 
-            utility::Shared<bbt::Value> element_type_value = scope().getTemporary(array_type.element_type).read();
+            utility::Shared<bbt::Value> element_type_value = deReference(scope().getTemporary(array_type.element_type).read());
             if (!expectType(*type_context_.getType(), *element_type_value->type(), array_type.element_type.location))
             {
                 abort();
                 return;
             }
 
-            utility::Shared<bbt::Value> length_value = scope().getTemporary(array_type.length).read();
+            utility::Shared<bbt::Value> length_value = deReference(scope().getTemporary(array_type.length).read());
             if (!expectType(*type_context_.getSize(), *length_value->type(), array_type.length.location))
             {
                 abort();
                 return;
             }
 
-            utility::Shared<bbt::Type> element_type = element_type_value.cast<bbt::Type>();
-            size_t const               length       = deLReference<bbt::Size>(length_value).value();
+            utility::Shared<bbt::Type> element_type = element_type_value.as<bbt::Type>();
+            size_t const               length       = deReference<bbt::Size>(length_value).value();
 
             scope().getTemporary(array_type.destination).write(type_context_.getArray(std::move(element_type), length));
         }
@@ -1269,14 +1266,14 @@ struct ance::cet::Runner::Implementation
             utility::Optional<utility::Shared<bbt::Type>> element_type;
             if (array_constructor.element_type != nullptr)
             {
-                utility::Shared<bbt::Value> element_type_value = scope().getTemporary(*array_constructor.element_type).read();
+                utility::Shared<bbt::Value> element_type_value = deReference(scope().getTemporary(*array_constructor.element_type).read());
                 if (!expectType(*type_context_.getType(), *element_type_value->type(), array_constructor.element_type->location))
                 {
                     abort();
                     return;
                 }
 
-                element_type = element_type_value.cast<bbt::Type>();
+                element_type = element_type_value.as<bbt::Type>();
             }
 
             utility::List<utility::Shared<bbt::Value>> elements;
@@ -1284,7 +1281,7 @@ struct ance::cet::Runner::Implementation
 
             for (auto const& element : array_constructor.elements)
             {
-                utility::Shared<bbt::Value> value = deLReference(scope().getTemporary(element.get()).read());
+                utility::Shared<bbt::Value> value = deReference(scope().getTemporary(element.get()).read());
 
                 elements.emplace_back(value);
                 element_types.emplace_back(value->type());
@@ -1336,12 +1333,12 @@ struct ance::cet::Runner::Implementation
 
             assert(!state_.return_value.hasValue());
 
-            state_.return_value = deLReference(scope().getTemporary(set_return_value.value).read());
+            state_.return_value = deReference(scope().getTemporary(set_return_value.value).read());
         }
 
         void declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value> value)
         {
-            value = deLReference(std::move(value));
+            value = deReference(std::move(value));
 
             FindResult const result = core_language_scope_->find(name);
             if (result.status == FindResult::Status::FOUND && result.value.hasValue())
@@ -1364,7 +1361,7 @@ struct ance::cet::Runner::Implementation
                 throw std::logic_error("Failed to find core variable '" + std::string(name.text()) + "'");
             }
 
-            return deLReference(result.value.value()->as<VariableRef>().value().read());
+            return deReference(result.value.value()->as<VariableRef>().value().read());
         }
 
       private:

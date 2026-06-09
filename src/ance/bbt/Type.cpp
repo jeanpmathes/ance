@@ -35,6 +35,7 @@ namespace ance::bbt
         TypeDictionary& operator=(TypeDictionary const&) = default;
 
         template<typename Factory>
+            requires(!std::same_as<OtherKey, utility::Empty>)
         TypeHandle getOrCreate(InnerTypes const& inner_types, OtherKey const& other_key, Factory factory)
         {
             // todo: find a way to optimize this lookup, e.g. a simple map
@@ -58,6 +59,7 @@ namespace ance::bbt
         }
 
         template<typename Factory>
+            requires std::same_as<OtherKey, utility::Empty>
         TypeHandle getOrCreate(InnerTypes const& inner_types, Factory factory)
         {
             return getOrCreate(inner_types, {}, factory);
@@ -187,7 +189,7 @@ namespace ance::bbt
         return !(*this == other);
     }
 
-    bool Type::isLReference() const
+    bool Type::isReference() const
     {
         return false;
     }
@@ -195,6 +197,11 @@ namespace ance::bbt
     bool Type::isArray() const
     {
         return false;
+    }
+
+    core::VariabilityModifier Type::variability() const
+    {
+        return core::VariabilityModifier::INVARIABLE;
     }
 
     size_t Type::getConstructingTypeCount() const
@@ -257,14 +264,35 @@ namespace ance::bbt
         throw std::logic_error("Not supported.");
     }
 
-    LReferenceType::LReferenceType(utility::Shared<Type> referenced_type, TypeContext& type_context)
-        : Type(core::Identifier::make("&" + std::string(referenced_type->name().text()), core::Location::core()), bundleTypes(referenced_type), type_context)
+    namespace
+    {
+        std::string createReferenceTypeName(utility::Shared<Type> referenced_type, core::VariabilityModifier variability)
+        {
+            std::string const type_representation(referenced_type->name().text());
+            std::string const variability_representation = variability.toString();
+
+            if (variability_representation.empty()) return std::format("&{}", type_representation);
+
+            return std::format("&{} {}", variability_representation, type_representation);
+        }
+    }
+
+    ReferenceType::ReferenceType(utility::Shared<Type> referenced_type, core::VariabilityModifier const variability, TypeContext& type_context)
+        : Type(core::Identifier::make(createReferenceTypeName(referenced_type, variability), core::Location::core()),
+               bundleTypes(referenced_type),
+               type_context)
         , referenced_type_(referenced_type)
+        , variability_(variability)
     {}
 
-    bool LReferenceType::isLReference() const
+    bool ReferenceType::isReference() const
     {
         return true;
+    }
+
+    core::VariabilityModifier ReferenceType::variability() const
+    {
+        return variability_;
     }
 
     ArrayType::ArrayType(utility::Shared<Type> element_type, size_t const length, TypeContext& type_context)
@@ -331,7 +359,7 @@ namespace ance::bbt
         utility::Optional<utility::Shared<Type>> float_double_type;
         utility::Optional<utility::Shared<Type>> float_quad_type;
 
-        TypeDictionary<> lref_types;
+        TypeDictionary<core::VariabilityModifier> reference_types;
         TypeDictionary<size_t> array_types;
 
         template<typename Factory>
@@ -573,10 +601,11 @@ namespace ance::bbt
                                            [&] { return utility::makeShared<Type>(core::Identifier::make(".Variable", core::Location::core()), *this); });
     }
 
-    utility::Shared<Type> TypeContext::getLRef(utility::Shared<Type> referenced_type)
+    utility::Shared<Type> TypeContext::getReference(utility::Shared<Type> referenced_type, core::VariabilityModifier variability)
     {
-        return implementation_->lref_types.getOrCreate(bundleTypes(referenced_type),
-                                                       [&] { return utility::makeShared<LReferenceType>(referenced_type, *this); });
+        return implementation_->reference_types.getOrCreate(bundleTypes(referenced_type), variability, [&] {
+            return utility::makeShared<ReferenceType>(referenced_type, variability, *this);
+        });
     }
 
     utility::Shared<Type> TypeContext::getArray(utility::Shared<Type> element_type, size_t const length)

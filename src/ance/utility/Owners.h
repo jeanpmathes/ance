@@ -141,10 +141,10 @@ namespace ance::utility
         friend Shared<TargetT> makeShared(Args&&... args);
 
         template<typename OtherT>
-        Shared<OtherT> cast();
+        Shared<OtherT> as();
 
         template<typename OtherT>
-        OtherT const& cast() const;
+        OtherT const& as() const;
 
         template<typename OtherT>
         [[nodiscard]] bool is() const;

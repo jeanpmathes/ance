@@ -1,6 +1,8 @@
 #ifndef ANCE_CET_VALUEEXTENSIONS_H
 #define ANCE_CET_VALUEEXTENSIONS_H
 
+#include "ance/core/VariabilityModifier.h"
+
 #include "ance/bbt/Value.h"
 
 #include "ance/cet/Address.h"
@@ -42,18 +44,21 @@ namespace ance::cet
         Variable& variable_;
     };
 
-    class LReference final : public bbt::ValueBase<LReference>
+    class Reference final : public bbt::ValueBase<Reference>
     {
       public:
-        LReference(Address address, utility::Shared<bbt::Type> referenced_type, bbt::TypeContext& type_context);
+        Reference(Address address, utility::Shared<bbt::Type> referenced_type, core::VariabilityModifier variability, bbt::TypeContext& type_context);
 
-        static utility::Shared<LReference> make(Address address, utility::Shared<bbt::Type> referenced_type, bbt::TypeContext& type_context);
+        static utility::Shared<Reference> make(Address                    address,
+                                               utility::Shared<bbt::Type> referenced_type,
+                                               core::VariabilityModifier  variability,
+                                               bbt::TypeContext&          type_context);
 
-        ~LReference() override = default;
+        ~Reference() override = default;
 
         [[nodiscard]] std::string    toString() const override;
         [[nodiscard]] Address const& address() const;
-        [[nodiscard]] bool           equals(LReference const& other) const override;
+        [[nodiscard]] bool           equals(Reference const& other) const override;
 
       private:
         Address address_;

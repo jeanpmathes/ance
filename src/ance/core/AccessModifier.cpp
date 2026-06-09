@@ -1,5 +1,7 @@
 #include "AccessModifier.h"
 
+#include <stdexcept>
+
 ance::core::AccessModifier::operator Value() const
 {
     return value_;
@@ -19,5 +21,5 @@ std::string ance::core::AccessModifier::toString() const
             return "extern";
     }
 
-    return "unknown";
+    throw std::logic_error("Invalid access modifier");
 }

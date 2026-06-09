@@ -4,8 +4,8 @@
 
 #include "ance/bbt/Value.h"
 
-ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Memory::readAt(utility::Shared<bbt::Value>   value,
-                                                                                           std::span<size_t const> const indices,
+ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Memory::load(utility::Shared<bbt::Value>   value,
+                                                                                         std::span<size_t const> const indices,
                                                                                            bbt::TypeContext&             type_context)
 {
     for (size_t const index : indices)
@@ -22,8 +22,8 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Memo
     return value;
 }
 
-ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Memory::writeAt(utility::Shared<bbt::Value>   value,
-                                                                                            std::span<size_t const> const indices,
+ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Memory::store(utility::Shared<bbt::Value>   value,
+                                                                                          std::span<size_t const> const indices,
                                                                                             utility::Shared<bbt::Value>   replacement,
                                                                                             bbt::TypeContext&             type_context)
 {

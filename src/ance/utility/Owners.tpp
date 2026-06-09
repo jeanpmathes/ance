@@ -176,7 +176,7 @@ T const* ance::utility::Shared<T>::operator->() const
 
 template<typename T>
 template<typename OtherT>
-ance::utility::Shared<OtherT> ance::utility::Shared<T>::cast()
+ance::utility::Shared<OtherT> ance::utility::Shared<T>::as()
 {
     auto casted = std::dynamic_pointer_cast<OtherT>(value_);
 
@@ -187,7 +187,7 @@ ance::utility::Shared<OtherT> ance::utility::Shared<T>::cast()
 
 template<typename T>
 template<typename OtherT>
-OtherT const& ance::utility::Shared<T>::cast() const
+OtherT const& ance::utility::Shared<T>::as() const
 {
     auto const* casted = dynamic_cast<OtherT const*>(value_.get());
 

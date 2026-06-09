@@ -118,8 +118,16 @@ namespace ance
 
         return exit_code;
 
-        // todo: subscript operator, should work on arrays
-        // todo: test assigning wrong type, test out-of-bounds
+        // todo: change L-ref into ref, it should have a variability enum (so either var, or invariable (default, not printed), meaning & and &var)
+        // todo: assignment of course needs &var, but subscript would work with & as well, which would fix one of the two currently commented out parts in the first.ance
+        // todo: search for any mentions of l-ref, rename stuff
+        // todo: write some related documentation for this, repeat this note for the next step
+        // todo: also take a look at the code in runner and maybe add comments there, make it a bit better looking, at least at one place explain more for deref
+
+        // todo: remove any mention of final in code and comments, replace <: with := and remove the other assigner
+        // todo: write some related documentation for this, repeat this note for the next step
+
+        // todo: add the let and var thing
         // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: no vector types, instead array types support all operators of their element type and perform them element-wise
@@ -258,7 +266,13 @@ namespace ance
 
         // todo: most of the old constructors in ance would become functions / static functions
 
+        // todo: references need more thought, for example there was the idea of reference_wrapper-like references, but they would then need to be something different than the current refs
+        // todo: essentially non-null pointers, type was .T, assignment would be .x <: (where just assign to x would assign other ref)
+        // todo: the current ref type maybe should not have a literal to write the type, or maybe it would be useful (e.g. r-ref in C++)
+        // todo: but also, how would one call these different ref types
+
         // todo: with references, add very basic safety checks in the case of erase of variable which has references to it, e.g. counting them, or so
+        // todo: inform about affine/linear types, think about bringing back final, something like &once T maybe
     }
 }
 

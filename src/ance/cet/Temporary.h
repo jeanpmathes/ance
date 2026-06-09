@@ -21,6 +21,7 @@ namespace ance::cet
     {
       public:
         explicit Temporary(bbt::TypeContext& type_context);
+        ~Temporary() override = default;
 
         [[nodiscard]] utility::Shared<bbt::Value> access() override;
 
@@ -31,6 +32,7 @@ namespace ance::cet
         void                        write(utility::Shared<bbt::Value> value);
 
         [[nodiscard]] bool isDefined() const override;
+        [[nodiscard]] bbt::Type const& type() const override;
 
       private:
         utility::Shared<bbt::Value> value_;

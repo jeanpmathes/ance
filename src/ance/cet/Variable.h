@@ -24,15 +24,18 @@ namespace ance::cet
         /// \param type The type of the variable.
         /// \param is_final Whether the variable is final or not.
         /// \param location The location where the variable was defined.
+        /// \param type_context The type context.
         Variable(core::Identifier const&    identifier,
                  utility::Shared<bbt::Type> type,
                  bool                       is_final,
                  core::Location const&      location,
                  bbt::TypeContext&          type_context);
 
+        ~Variable() override = default;
+
         [[nodiscard]] core::Identifier const&    name() const;
         [[nodiscard]] utility::Shared<bbt::Type> type();
-        [[nodiscard]] bbt::Type const&           type() const;
+        [[nodiscard]] bbt::Type const&           type() const override;
         [[nodiscard]] bool                       isFinal() const;
         [[nodiscard]] core::Location const&      location() const;
 

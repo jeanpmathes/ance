@@ -23,8 +23,8 @@ namespace ance::core
           MOVE_ASSIGNMENT,
 
           /// An unspecified assignment. The actual assignment can be inferred from the used types.
-          UNSPECIFIED
-        };
+          UNSPECIFIED// todo: remove, replace with optional in AST/EST
+      };
 
         Assigner() = default;
         constexpr Assigner(Value const val) : value_(val) {}// NOLINT(google-explicit-constructor)

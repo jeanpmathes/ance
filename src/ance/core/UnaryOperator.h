@@ -12,7 +12,7 @@ namespace ance::core
         enum Value
         {
             /// Any unspecified operator, used as a default value for error handling and such.
-            UNSPECIFIED,
+            UNSPECIFIED,// todo: remove, replace with optional in AST/EST
 
             /// The logical not operator. Inverts a boolean value.
             NOT,

@@ -6,6 +6,8 @@
 #include "ance/core/BinaryOperator.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/UnaryOperator.h"
+#include "ance/core/VariabilityModifier.h"
+
 #include "ance/utility/Containers.h"
 #include "ance/utility/Optional.h"
 
@@ -55,8 +57,11 @@ namespace ance::bbt
 
         // todo: add a function stripped() that removes all l-refs, e.g. &T -> T, &&T -> T, &&&T -> T, etc.
 
-        [[nodiscard]] virtual bool isLReference() const;
+        [[nodiscard]] virtual bool isReference() const;
         [[nodiscard]] virtual bool isArray() const;
+
+        /// The variability of this type.
+        [[nodiscard]] virtual core::VariabilityModifier variability() const;
 
         /// Gets the number of types used to construct this type.
         /// Note that member types (e.g., for structs) are not considered constructing types.
@@ -105,19 +110,24 @@ namespace ance::bbt
         utility::Owned<Implementation> implementation_;
     };
 
-    /// Represents an assignable reference type.
-    class LReferenceType : public Type
+    /// Represents a reference type.
+    class ReferenceType : public Type// todo: think about this type vs. reference wrapper, maybe this should have refernce-wrapper like behavior
     {
       public:
-        /// Creates a new l-value reference type.
+        /// Creates a new reference type.
         /// \param referenced_type The type being referenced.
+        /// \param variability The variability of the reference.
         /// \param type_context The type context in which this type is created.
-        LReferenceType(utility::Shared<Type> referenced_type, TypeContext& type_context);
+        ReferenceType(utility::Shared<Type> referenced_type, core::VariabilityModifier variability, TypeContext& type_context);
 
-        [[nodiscard]] bool isLReference() const override;
+        [[nodiscard]] bool isReference() const override;
+
+        /// The variability of this type.
+        [[nodiscard]] core::VariabilityModifier variability() const override;
 
       private:
-        utility::Shared<Type> referenced_type_;
+        utility::Shared<Type>     referenced_type_;
+        core::VariabilityModifier variability_;
     };
 
     /// Represents a fixed-size array type.
@@ -168,9 +178,10 @@ namespace ance::bbt
         /// Get the variable reference type, which is used to refer to variables.
         utility::Shared<Type> getVariableRef();// todo: should be split into variable type and reference type (not lref), variable type should be parameterized
 
-        /// Get the untyped l-value reference type.
+        /// Get a reference type.
         /// \param referenced_type The type being referenced.
-        utility::Shared<Type> getLRef(utility::Shared<Type> referenced_type);
+        /// \param variability The variability of the referenced value.
+        utility::Shared<Type> getReference(utility::Shared<Type> referenced_type, core::VariabilityModifier variability);
 
         /// Get a fixed-size array type.
         /// \param element_type The type of each array element.

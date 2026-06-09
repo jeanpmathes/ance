@@ -53,29 +53,35 @@ namespace ance::cet
         return &variable_ == &other.variable_;
     }
 
-    LReference::LReference(Address address, utility::Shared<bbt::Type> referenced_type, bbt::TypeContext& type_context)
-        : ValueBase(type_context.getLRef(std::move(referenced_type)), type_context)
+    Reference::Reference(Address                         address,
+                         utility::Shared<bbt::Type>      referenced_type,
+                         core::VariabilityModifier const variability,
+                         bbt::TypeContext&               type_context)
+        : ValueBase(type_context.getReference(std::move(referenced_type), variability), type_context)
         , address_(std::move(address))
     {}
 
-    utility::Shared<LReference> LReference::make(Address address, utility::Shared<bbt::Type> referenced_type, bbt::TypeContext& type_context)
+    utility::Shared<Reference> Reference::make(Address                    address,
+                                               utility::Shared<bbt::Type> referenced_type,
+                                               core::VariabilityModifier  variability,
+                                               bbt::TypeContext&          type_context)
     {
-        return utility::makeShared<LReference>(std::move(address), referenced_type, type_context);
+        return utility::makeShared<Reference>(std::move(address), referenced_type, variability, type_context);
     }
 
-    std::string LReference::toString() const
+    std::string Reference::toString() const
     {
         if (!address().isDefined()) return "<undefined l-ref>";
 
         return address().read()->toString();
     }
 
-    Address const& LReference::address() const
+    Address const& Reference::address() const
     {
         return address_;
     }
 
-    bool LReference::equals(LReference const& other) const
+    bool Reference::equals(Reference const& other) const
     {
         return address_.read()->equals(*other.address_.read());
     }
