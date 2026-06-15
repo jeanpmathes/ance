@@ -835,15 +835,15 @@ struct ance::bbt::Segmenter::Implementation
             auto& identifier_tmp = builder.addTemporary("VariableDeclaration_Identifier", variable_declaration.location);
             builder.addStatement<Constant>(Identifier::make(variable_declaration.identifier, type_context_), identifier_tmp, variable_declaration.location);
 
-            auto& is_final_tmp = builder.addTemporary("VariableDeclaration_IsFinal", variable_declaration.location);
-            builder.addStatement<Constant>(Bool::make(variable_declaration.assigner.isFinal(), type_context_), is_final_tmp, variable_declaration.location);
+            auto& is_variable_tmp = builder.addTemporary("VariableDeclaration_IsVariable", variable_declaration.location);
+            builder.addStatement<Constant>(Bool::make(false, type_context_), is_variable_tmp, variable_declaration.location);
 
             auto& declared_tmp = builder.addTemporary("VariableDeclaration_Declared", variable_declaration.location);
             {
                 utility::List<std::reference_wrapper<Temporary const>> args;
                 args.emplace_back(scope_tmp);
                 args.emplace_back(identifier_tmp);
-                args.emplace_back(is_final_tmp);
+                args.emplace_back(is_variable_tmp);
                 args.emplace_back(type_tmp);
                 builder.addStatement<Intrinsic>(core::Intrinsic::DECLARE, std::move(args), declared_tmp, variable_declaration.location);
             }
@@ -1105,47 +1105,48 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
-        void visit(est::Let const& let) override
+        void visit(est::Bind const& bind) override
         {
-            trace("Let", let) << ", identifier=" << let.identifier << ", assigner=" << let.assigner << ", has_value=" << std::boolalpha << let.value.hasValue();
+            trace("Bind", bind) << ", identifier=" << bind.identifier << ", assigner=" << bind.assigner << ", has_value=" << std::boolalpha
+                                << bind.value.hasValue();
 
             Builder builder(*this);
 
-            auto& type_tmp = builder.addTemporary("Let_Type", let.type->location);
-            builder.addSegmented(*let.type, type_tmp);
+            auto& type_tmp = builder.addTemporary("Bind_Type", bind.type->location);
+            builder.addSegmented(*bind.type, type_tmp);
 
-            auto& value_tmp = builder.addTemporary("Let_Value", let.location);
-            if (let.value.hasValue())
+            auto& value_tmp = builder.addTemporary("Bind_Value", bind.location);
+            if (bind.value.hasValue())
             {
-                builder.addSegmented(**let.value, value_tmp);
+                builder.addSegmented(**bind.value, value_tmp);
             }
             else
             {
-                builder.addStatement<Default>(type_tmp, value_tmp, let.location);
+                builder.addStatement<Default>(type_tmp, value_tmp, bind.location);
             }
 
-            auto& scope_tmp = builder.addTemporary("Let_Scope", let.location);
-            builder.addStatement<CurrentScope>(scope_tmp, let.location);
+            auto& scope_tmp = builder.addTemporary("Bind_Scope", bind.location);
+            builder.addStatement<CurrentScope>(scope_tmp, bind.location);
 
-            auto& identifier_tmp = builder.addTemporary("Let_Identifier", let.location);
-            builder.addStatement<Constant>(Identifier::make(let.identifier, type_context_), identifier_tmp, let.location);
+            auto& identifier_tmp = builder.addTemporary("Bind_Identifier", bind.location);
+            builder.addStatement<Constant>(Identifier::make(bind.identifier, type_context_), identifier_tmp, bind.location);
 
-            auto& is_final_tmp = builder.addTemporary("Let_IsFinal", let.location);
-            builder.addStatement<Constant>(Bool::make(let.assigner.isFinal(), type_context_), is_final_tmp, let.location);
+            auto& is_final_tmp = builder.addTemporary("Bind_IsVariable", bind.location);
+            builder.addStatement<Constant>(Bool::make(bind.variability.isVariable(), type_context_), is_final_tmp, bind.location);
 
-            auto& declared_tmp = builder.addTemporary("Let_Declared", let.location);
+            auto& declared_tmp = builder.addTemporary("Bind_Declared", bind.location);
             {
                 utility::List<std::reference_wrapper<Temporary const>> args;
                 args.emplace_back(scope_tmp);
                 args.emplace_back(identifier_tmp);
                 args.emplace_back(is_final_tmp);
                 args.emplace_back(type_tmp);
-                builder.addStatement<Intrinsic>(core::Intrinsic::DECLARE, std::move(args), declared_tmp, let.location);
+                builder.addStatement<Intrinsic>(core::Intrinsic::DECLARE, std::move(args), declared_tmp, bind.location);
             }
 
-            auto& ref_tmp = builder.addTemporary("Let_Ref", let.location);
-            builder.addStatement<Access>(declared_tmp, ref_tmp, let.location);
-            builder.addStatement<Store>(ref_tmp, value_tmp, let.location);
+            auto& ref_tmp = builder.addTemporary("Bind_Ref", bind.location);
+            builder.addStatement<Access>(declared_tmp, ref_tmp, bind.location);
+            builder.addStatement<Store>(ref_tmp, value_tmp, bind.location);
 
             setResult(builder.take());
         }

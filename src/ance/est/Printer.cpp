@@ -167,31 +167,36 @@ struct ance::est::Printer::Implementation
         void visit(Return const& return_statement) override
         {
             print("return");
+
             if (return_statement.value.hasValue())
             {
                 print(" ");
                 visit(**return_statement.value);
             }
+
             print(";");
         }
 
-        void visit(Let const& let) override
+        void visit(Bind const& bind) override
         {
-            print("let ");
-            print(let.identifier);
+            print(bind.variability.toBindingKeyword());
+            print(" ");
+            print(bind.identifier);
             print(": ");
-            visit(*let.type);
+            visit(*bind.type);
             print(" ");
-            print(let.assigner);
+            print(bind.assigner);
             print(" ");
-            if (let.value.hasValue())
+
+            if (bind.value.hasValue())
             {
-                visit(**let.value);
+                visit(**bind.value);
             }
             else
             {
                 print("default");
             }
+
             print(";");
         }
 

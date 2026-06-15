@@ -74,15 +74,17 @@ ance::ast::Independent::Independent(utility::Owned<Expression> independent_expre
     , expression(std::move(independent_expression))
 {}
 
-ance::ast::Let::Let(core::Identifier const&                       name,
-                    utility::Owned<Expression>                    t,
-                    core::Assigner                                assignment,
-                    utility::Optional<utility::Owned<Expression>> definition,
-                    core::Location const&                         source_location)
+ance::ast::Bind::Bind(core::Identifier const&                       name,
+                      core::VariabilityModifier const               variability_modifier,
+                      utility::Owned<Expression>                    type_expression,
+                      core::Assigner const                          assignment,
+                      utility::Optional<utility::Owned<Expression>> definition,
+                      core::Location const&                         source_location)
     : Node(source_location)
     , Statement()
     , identifier(name)
-    , type(std::move(t))
+    , variability(variability_modifier)
+    , type(std::move(type_expression))
     , assigner(assignment)
     , value(std::move(definition))
 {}

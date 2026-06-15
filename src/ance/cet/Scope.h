@@ -78,7 +78,7 @@ namespace ance::cet
 
         [[nodiscard]] utility::Optional<utility::Shared<bbt::Value>> declare(core::Identifier const&    identifier,
                                                                              utility::Shared<bbt::Type> type,
-                                                                             bool                       is_final,
+                                                                             bool                       is_variable,
                                                                              core::Location const&      location,
                                                                              core::Reporter&            reporter);
 

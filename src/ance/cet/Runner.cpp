@@ -770,7 +770,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            // todo: this is not ideal with final variables, technically we could get an l-ref to it when it is not defined yet but then write twice to it through the same l-ref
+            // todo: this is not ideal with final variables, technically we could get a ref to it when it is not defined yet but then write twice to it through the same ref
 
             utility::Shared<Reference> reference = target.as<Reference>();
 

@@ -133,16 +133,17 @@ struct ance::est::Expander::Implementation
                 statements_.emplace_back(utility::makeOwned<Independent>(std::move(expression), expression->location));
             }
 
-            /// Creates an anonymous local variable and returns its identifier.
-            /// When using this, do not forget to wrap the expansion in a block so the variable is cleaned up after use.
-            core::Identifier pushAnonymousLet(utility::Owned<Expression>                    type,
-                                              core::Assigner                                assigner,
-                                              utility::Optional<utility::Owned<Expression>> definition,
-                                              core::Location const&                         location)
+            /// Creates an anonymous local name and returns its identifier.
+            /// When using this, remember to wrap the expansion in a block so the name is cleaned up after use.
+            core::Identifier pushAnonymousBind(utility::Owned<Expression>                    type,
+                                               core::VariabilityModifier const               variability,
+                                               core::Assigner                                assigner,
+                                               utility::Optional<utility::Owned<Expression>> definition,
+                                               core::Location const&                         location)
             {
                 core::Identifier const identifier = ast_.getAnonymousIdentifier(location);
 
-                statements_.emplace_back(utility::makeOwned<Let>(identifier, std::move(type), assigner, std::move(definition), location));
+                statements_.emplace_back(utility::makeOwned<Bind>(identifier, variability, std::move(type), assigner, std::move(definition), location));
 
                 return identifier;
             }
@@ -168,22 +169,24 @@ struct ance::est::Expander::Implementation
           public:
             explicit EBuilder(AST& ast, core::Location const& location) : ast_(ast), location_(location) {}
 
-            core::Identifier pushAnonymousLet(utility::Owned<Expression>                    type,
-                                              core::Assigner const                          assigner,
-                                              utility::Optional<utility::Owned<Expression>> definition)
+            core::Identifier pushAnonymousBind(utility::Owned<Expression>                    type,
+                                               core::VariabilityModifier const               variability,
+                                               core::Assigner const                          assigner,
+                                               utility::Optional<utility::Owned<Expression>> definition)
             {
                 core::Identifier const identifier = ast_.getAnonymousIdentifier(location_);
 
-                statements_.emplace_back(utility::makeOwned<Let>(identifier, std::move(type), assigner, std::move(definition), location_));
+                statements_.emplace_back(utility::makeOwned<Bind>(identifier, variability, std::move(type), assigner, std::move(definition), location_));
 
                 return identifier;
             }
 
-            void pushAnonymousLetAndSetAsResult(utility::Owned<Expression>                    type,
-                                                core::Assigner const                          assigner,
-                                                utility::Optional<utility::Owned<Expression>> definition)
+            void pushAnonymousBindAndSetAsResult(utility::Owned<Expression>                    type,
+                                                 core::VariabilityModifier const               variability,
+                                                 core::Assigner const                          assigner,
+                                                 utility::Optional<utility::Owned<Expression>> definition)
             {
-                core::Identifier const identifier = pushAnonymousLet(std::move(type), assigner, std::move(definition));
+                core::Identifier const identifier = pushAnonymousBind(std::move(type), variability, assigner, std::move(definition));
 
                 result_ = identifier;
             }
@@ -432,7 +435,7 @@ struct ance::est::Expander::Implementation
                                                                            function_declaration.execution_modifier,
                                                                            function_declaration.identifier,
                                                                            std::move(function_type),
-                                                                           core::Assigner::FINAL_COPY_ASSIGNMENT,// todo: should be final move
+                                                                           core::Assigner::COPY_ASSIGNMENT,// todo: should be move
                                                                            std::move(function_value),
                                                                            function_declaration.location));
         }
@@ -469,22 +472,22 @@ struct ance::est::Expander::Implementation
             result_.setStatements(builder.take());
         }
 
-        void visit(ast::Let const& let) override
+        void visit(ast::Bind const& bind) override
         {
-            trace("Let", let.location) << ", identifier=" << let.identifier << ", assigner=" << let.assigner << ", has_value=" << std::boolalpha
-                                       << let.value.hasValue();
+            trace("Bind", bind.location) << ", identifier=" << bind.identifier << ", variability=" << bind.variability << ", assigner=" << bind.assigner
+                                         << ", has_value=" << std::boolalpha << bind.value.hasValue();
 
             SBuilder builder(*this);
 
-            utility::Owned<Expression> type = expand(*let.type);
+            utility::Owned<Expression> type = expand(*bind.type);
 
             utility::Optional<utility::Owned<Expression>> value = std::nullopt;
-            if (let.value.hasValue())
+            if (bind.value.hasValue())
             {
-                value = expand(**let.value);
+                value = expand(**bind.value);
             }
 
-            builder.pushStatement(utility::makeOwned<Let>(let.identifier, std::move(type), let.assigner, std::move(value), let.location));
+            builder.pushStatement(utility::makeOwned<Bind>(bind.identifier, bind.variability, std::move(type), bind.assigner, std::move(value), bind.location));
 
             result_.setStatements(builder.take());
         }
@@ -625,8 +628,9 @@ struct ance::est::Expander::Implementation
 
             // todo: assigners should be move assignments as soon as supported
 
-            builder.pushAnonymousLetAndSetAsResult(
+            builder.pushAnonymousBindAndSetAsResult(
                 utility::makeOwned<Access>(core::Identifier::make(core::BOOL_TYPE_NAME, core::Location::core()), and_expression.location),
+                core::VariabilityModifier::VARIABLE,
                 core::Assigner::COPY_ASSIGNMENT,
                 expand(*and_expression.left));
 
@@ -653,8 +657,9 @@ struct ance::est::Expander::Implementation
 
             // todo: assigners should be move assignments as soon as supported
 
-            builder.pushAnonymousLetAndSetAsResult(
+            builder.pushAnonymousBindAndSetAsResult(
                 utility::makeOwned<Access>(core::Identifier::make(core::BOOL_TYPE_NAME, core::Location::core()), or_expression.location),
+                core::VariabilityModifier::VARIABLE,
                 core::Assigner::COPY_ASSIGNMENT,
                 expand(*or_expression.left));
 
@@ -860,7 +865,7 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> common_type = utility::makeOwned<TypeOf>(std::move(typeof_parameters), if_expression.location);
 
             // todo: semantics are actually not correctly implemented because typeof currently evaluates the expressions
-            builder.pushAnonymousLetAndSetAsResult(std::move(common_type), core::Assigner::COPY_ASSIGNMENT, std::nullopt);
+            builder.pushAnonymousBindAndSetAsResult(std::move(common_type), core::VariabilityModifier::VARIABLE, core::Assigner::COPY_ASSIGNMENT, std::nullopt);
 
             utility::Owned<Statement> then_part = builder.createExpansionAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, *if_expression.then_expression);
             utility::Optional<utility::Owned<Statement>> else_part;
@@ -894,7 +899,7 @@ struct ance::est::Expander::Implementation
             utility::Owned<Expression> common_type = utility::makeOwned<TypeOf>(std::move(typeof_parameters), match_expression.location);
 
             // todo: semantics are actually not correctly implemented because typeof currently evaluates the expressions
-            builder.pushAnonymousLetAndSetAsResult(std::move(common_type), core::Assigner::MOVE_ASSIGNMENT, std::nullopt);
+            builder.pushAnonymousBindAndSetAsResult(std::move(common_type), core::VariabilityModifier::VARIABLE, core::Assigner::MOVE_ASSIGNMENT, std::nullopt);
 
             utility::List<utility::Owned<MatchCase>> cases;
             for (auto const& match_case : match_expression.cases)

@@ -22,12 +22,12 @@ namespace ance::cet
         /// Creates a new variable.
         /// \param identifier The identifier of the variable.
         /// \param type The type of the variable.
-        /// \param is_final Whether the variable is final or not.
+        /// \param is_variable Whether the variable is variable (the value can be changed).
         /// \param location The location where the variable was defined.
         /// \param type_context The type context.
         Variable(core::Identifier const&    identifier,
                  utility::Shared<bbt::Type> type,
-                 bool                       is_final,
+                 bool                       is_variable,
                  core::Location const&      location,
                  bbt::TypeContext&          type_context);
 
@@ -36,7 +36,8 @@ namespace ance::cet
         [[nodiscard]] core::Identifier const&    name() const;
         [[nodiscard]] utility::Shared<bbt::Type> type();
         [[nodiscard]] bbt::Type const&           type() const override;
-        [[nodiscard]] bool                       isFinal() const;
+        [[nodiscard]] bool                       isVariable() const;
+        [[nodiscard]] bool                       isConstant() const;
         [[nodiscard]] core::Location const&      location() const;
 
         [[nodiscard]] utility::Shared<bbt::Value> access() override;
@@ -52,7 +53,7 @@ namespace ance::cet
       private:
         core::Identifier           identifier_;
         utility::Shared<bbt::Type> type_;
-        bool                       is_final_;
+        bool                       is_variable_;
         core::Location             location_;
 
         bbt::TypeContext& type_context_;

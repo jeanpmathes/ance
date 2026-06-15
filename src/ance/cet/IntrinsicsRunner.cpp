@@ -306,12 +306,12 @@ struct ance::cet::IntrinsicsRunner::Implementation
 
     void runDeclare()
     {
-        Scope&                     scope      = state_.arguments->at(0)->as<ScopeRef>().value();
-        core::Identifier const&    identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
-        bool const                 is_final   = state_.arguments->at(2)->as<bbt::Bool>().value();
-        utility::Shared<bbt::Type> type       = state_.arguments->at(3).as<bbt::Type>();
+        Scope&                     scope       = state_.arguments->at(0)->as<ScopeRef>().value();
+        core::Identifier const&    identifier  = state_.arguments->at(1)->as<bbt::Identifier>().value();
+        bool const                 is_variable = state_.arguments->at(2)->as<bbt::Bool>().value();
+        utility::Shared<bbt::Type> type        = state_.arguments->at(3).as<bbt::Type>();
 
-        auto variable = scope.declare(identifier, type, is_final, state_.location, reporter_);
+        auto variable = scope.declare(identifier, type, is_variable, state_.location, reporter_);
 
         if (variable.hasValue())
         {

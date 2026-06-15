@@ -118,19 +118,13 @@ namespace ance
 
         return exit_code;
 
-        // todo: remove any mention of final in code and comments, replace <: with := and remove the other assigner
-        // todo: search for any mentions of l-ref, rename stuff
-        // todo: write some related documentation for this, repeat this note for the next step
-
-        // todo: add the let and var thing
-        // todo: write some related documentation for this, repeat this note for the next step
-
         // todo: no vector types, instead array types support all operators of their element type and perform them element-wise
         // todo: no vectors yet because that has HW and alignment implications, should not be first class language element
         // todo: currently this would work by using string templates, but there should be a TODO to use normal generics as much as possible
         // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: find more places where ranges could be used (so std::ranges, std::views)
+        // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: look into the calendar note again, streamline, remove changed things, keep up to date
 
@@ -149,6 +143,9 @@ namespace ance
         // todo: to do this, add a GenericIntrinsicSignature class which is used by IntrinsicSignature, getIntrinsicSignature would take the generic parameters
         // todo: the int types can then simply use string manipulation to put the right N there
         // todo: do not forget to write more documentation comments on this matter
+
+        // todo: the variable class is not always a variable, but can also be a constant
+        // todo: as such, it should be renamed, and all other mentions of Variable as well such as VariableDeclaration
 
         // todo: implicit conversions
 

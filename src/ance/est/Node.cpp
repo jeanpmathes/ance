@@ -113,15 +113,17 @@ ance::est::Return::Return(utility::Optional<utility::Owned<Expression>> expressi
     , value(std::move(expression))
 {}
 
-ance::est::Let::Let(core::Identifier const&                       name,
-                    utility::Owned<Expression>                    t,
-                    core::Assigner                                assignment,
-                    utility::Optional<utility::Owned<Expression>> definition,
-                    core::Location const&                         source_location)
+ance::est::Bind::Bind(core::Identifier const&                       name,
+                      core::VariabilityModifier                     variability_modifier,
+                      utility::Owned<Expression>                    type_expression,
+                      core::Assigner                                assignment,
+                      utility::Optional<utility::Owned<Expression>> definition,
+                      core::Location const&                         source_location)
     : Node(source_location)
     , Statement()
     , identifier(name)
-    , type(std::move(t))
+    , variability(variability_modifier)
+    , type(std::move(type_expression))
     , assigner(assignment)
     , value(std::move(definition))
 {}

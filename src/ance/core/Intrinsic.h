@@ -24,7 +24,7 @@ namespace ance::core
             /// This intrinsic takes the following parameters:
             /// - The scope to declare the variable in.
             /// - The identifier of the variable to declare.
-            /// - Whether the declaration is final.
+            /// - Whether the variable can be varied - if not, it is constant.
             /// - The type of the variable to declare.
             ///
             /// It returns a reference to the declared variable.

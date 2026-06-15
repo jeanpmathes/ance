@@ -5,12 +5,13 @@
 
 #include "ance/core/AccessModifier.h"
 #include "ance/core/Assigner.h"
+#include "ance/core/BinaryOperator.h"
 #include "ance/core/ExecutionModifier.h"
 #include "ance/core/Identifier.h"
 #include "ance/core/Precision.h"
 #include "ance/core/Reporter.h"
-#include "ance/core/BinaryOperator.h"
 #include "ance/core/UnaryOperator.h"
+#include "ance/core/VariabilityModifier.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -153,18 +154,20 @@ namespace ance::ast
         utility::Owned<Expression> expression;
     };
 
-    /// A let statement declares a variable and can also define its value in an ordered scope.
-    struct Let final
+    /// A bind statement binds a value to a name in a local scope as a variable or constant, or simply prepares the binding of a name.
+    struct Bind final
         : Statement
-        , utility::ConcreteNode<Let, Visitor>
+        , utility::ConcreteNode<Bind, Visitor>
     {
-        Let(core::Identifier const&                       name,
-            utility::Owned<Expression>                    t,
-            core::Assigner                                assignment,
-            utility::Optional<utility::Owned<Expression>> definition,
-            core::Location const&                         source_location);
+        Bind(core::Identifier const&                       name,
+             core::VariabilityModifier                     variability_modifier,
+             utility::Owned<Expression>                    type_expression,
+             core::Assigner                                assignment,
+             utility::Optional<utility::Owned<Expression>> definition,
+             core::Location const&                         source_location);
 
         core::Identifier                              identifier;
+        core::VariabilityModifier                     variability;
         utility::Owned<Expression>                    type;
         core::Assigner                                assigner;
         utility::Optional<utility::Owned<Expression>> value;
@@ -539,10 +542,7 @@ namespace ance::ast
         : Expression
         , utility::ConcreteNode<BinaryOperation, Visitor>
     {
-        BinaryOperation(utility::Owned<Expression> lhs,
-                        core::BinaryOperator       kind,
-                        utility::Owned<Expression> rhs,
-                        core::Location const&      source_location);
+        BinaryOperation(utility::Owned<Expression> lhs, core::BinaryOperator kind, utility::Owned<Expression> rhs, core::Location const& source_location);
 
         utility::Owned<Expression> left;
         core::BinaryOperator       op;
@@ -613,7 +613,7 @@ namespace ance::ast
         virtual void visit(ErrorStatement const& error)        = 0;
         virtual void visit(Block const& block)                 = 0;
         virtual void visit(Independent const& independent)     = 0;
-        virtual void visit(Let const& let)                     = 0;
+        virtual void visit(Bind const& bind)                   = 0;
         virtual void visit(Assignment const& assignment)       = 0;
         virtual void visit(If const& if_statement)             = 0;
         virtual void visit(Loop const& loop)                   = 0;

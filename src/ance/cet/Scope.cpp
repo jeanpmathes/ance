@@ -30,7 +30,7 @@ ance::cet::Scope* ance::cet::Scope::parent() const
 
 ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::declare(core::Identifier const&    identifier,
                                                                                            utility::Shared<bbt::Type> type,
-                                                                                           bool                       is_final,
+                                                                                           bool                       is_variable,
                                                                                            core::Location const&      location,
                                                                                            core::Reporter&            reporter)
 {
@@ -48,7 +48,7 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scop
         return std::nullopt;
     }
 
-    utility::Owned<Variable> variable     = utility::makeOwned<Variable>(identifier, type, is_final, location, type_context_);
+    utility::Owned<Variable> variable     = utility::makeOwned<Variable>(identifier, type, is_variable, location, type_context_);
     Variable&                variable_ref = *variable;
 
     onDeclare(std::move(variable));

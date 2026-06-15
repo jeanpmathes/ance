@@ -132,19 +132,20 @@ struct ance::ast::Printer::Implementation
             print(";");
         }
 
-        void visit(Let const& let) override
+        void visit(Bind const& bind) override
         {
-            print("let ");
-            print(let.identifier);
+            print(bind.variability.toBindingKeyword());
+            print(" ");
+            print(bind.identifier);
             print(": ");
-            visit(*let.type);
+            visit(*bind.type);
 
-            if (let.value.hasValue())
+            if (bind.value.hasValue())
             {
                 print(" ");
-                print(let.assigner);
+                print(bind.assigner);
                 print(" ");
-                visit(**let.value);
+                visit(**bind.value);
             }
 
             print(";");

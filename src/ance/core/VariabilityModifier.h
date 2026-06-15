@@ -17,9 +17,9 @@ namespace ance::core
             /// Varying of the value is allowed.
             VARIABLE,
 
-            /// Varying of the value is not allowed.
+            /// Varying of the value is not allowed, it is a constant.
             /// This should be the default.
-            INVARIABLE
+            CONSTANT
         };
 
         VariabilityModifier() = default;
@@ -32,7 +32,12 @@ namespace ance::core
         /// @return The string.
         [[nodiscard]] std::string toString() const;
 
-        bool isVariable() const;
+        /// Get the keyword used as part of a binding to get this variability.
+        /// @return The string.
+        [[nodiscard]] std::string toBindingKeyword() const;
+
+        [[nodiscard]] bool isVariable() const;
+        [[nodiscard]] bool isConstant() const;
 
       private:
         Value value_;

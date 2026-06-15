@@ -15,9 +15,6 @@ namespace ance::core
           /// A simple copy assignment.
           COPY_ASSIGNMENT,
 
-          ///  A final copy assignment.
-          FINAL_COPY_ASSIGNMENT,
-
           /// A move assignment, which is a special assignment that copies and performs additional operations.
           /// It has no obligation to leave the source value in a valid state, allowing an overall cheaper transfer.
           MOVE_ASSIGNMENT,
@@ -31,10 +28,6 @@ namespace ance::core
 
         operator Value() const;// NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
-
-        /// Get whether this assignment is final.
-        /// @return True if this assignment is final.
-        [[nodiscard]] bool isFinal() const;
 
         /// Get whether this assignment is represented by a symbol.
         /// @return True if a symbol exists for this assignment.

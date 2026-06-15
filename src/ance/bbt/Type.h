@@ -55,7 +55,7 @@ namespace ance::bbt
         bool operator==(Type const& other) const;
         bool operator!=(Type const& other) const;
 
-        // todo: add a function stripped() that removes all l-refs, e.g. &T -> T, &&T -> T, &&&T -> T, etc.
+        // todo: add a function stripped() that removes all refs, e.g. &T -> T, &&T -> T, &&&T -> T, etc.
 
         [[nodiscard]] virtual bool isReference() const;
         [[nodiscard]] virtual bool isArray() const;

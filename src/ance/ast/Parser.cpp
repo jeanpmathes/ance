@@ -484,11 +484,6 @@ namespace ance::ast
             {
                 assigner   = expectAssigner(context->assigner());
                 expression = expectExpression(context->assigned);
-
-                if (!assigner.isFinal())
-                {
-                    reporter_.error(location(context->assigner())) << "Unordered scope variable declarations must be final";
-                }
             }
 
             Declaration* declaration =
@@ -549,11 +544,13 @@ namespace ance::ast
             return statement;
         }
 
-        std::any visitLetStatement(grammar::anceParser::LetStatementContext* context) override
+        std::any visitBindStatement(grammar::anceParser::BindStatementContext* context) override
         {
-            trace("LetStatement", context);
+            trace("BindStatement", context);
 
             core::Identifier const     name = identifier(context->IDENTIFIER());
+            core::VariabilityModifier const variability =
+                context->VARIABLE() != nullptr ? core::VariabilityModifier::VARIABLE : core::VariabilityModifier::CONSTANT;
             utility::Owned<Expression> type = expectExpression(context->varType);
 
             core::Assigner                                assigner = core::Assigner::UNSPECIFIED;
@@ -564,7 +561,13 @@ namespace ance::ast
                 expression = expectExpression(context->assigned);
             }
 
-            Statement* statement = new Let(name, std::move(type), assigner, std::move(expression), location(context));
+            if (variability.isConstant() && !expression.hasValue())
+            {
+                reporter_.error(location(context->assigned)) << "Constants must be assigned a value on declaration";
+                expression = expectExpression(context->assigned);
+            }
+
+            Statement* statement = new Bind(name, variability, std::move(type), assigner, std::move(expression), location(context));
             return statement;
         }
 
@@ -575,11 +578,6 @@ namespace ance::ast
             utility::Owned<Expression> assignee = expectExpression(context->assignee);
             core::Assigner const       assigner = expectAssigner(context->assigner());
             utility::Owned<Expression> assigned = expectExpression(context->assgined);
-
-            if (assigner.isFinal())
-            {
-                reporter_.error(location(context->assigner())) << "Assignment to existing variable cannot be final";
-            }
 
             Statement* statement = new Assignment(std::move(assignee), assigner, std::move(assigned), location(context));
             return statement;
@@ -1274,14 +1272,6 @@ namespace ance::ast
             trace("CopyAssigner", context);
 
             core::Assigner assigner = core::Assigner::COPY_ASSIGNMENT;
-            return assigner;
-        }
-
-        std::any visitFinalCopyAssigner(grammar::anceParser::FinalCopyAssignerContext* context) override
-        {
-            trace("FinalCopyAssigner", context);
-
-            core::Assigner assigner = core::Assigner::FINAL_COPY_ASSIGNMENT;
             return assigner;
         }
 

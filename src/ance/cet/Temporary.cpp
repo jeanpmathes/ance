@@ -11,7 +11,7 @@ ance::cet::Temporary::Temporary(bbt::TypeContext& type_context) : value_(bbt::Un
 
 ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::access()
 {
-    return Reference::make(Address(*this), value_->type(), core::VariabilityModifier::INVARIABLE, type_context_);
+    return Reference::make(Address(*this), value_->type(), core::VariabilityModifier::CONSTANT, type_context_);
 }
 
 ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::vector<size_t> const& indices)

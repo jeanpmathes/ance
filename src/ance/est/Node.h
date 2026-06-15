@@ -9,6 +9,7 @@
 #include "ance/core/Precision.h"
 #include "ance/core/Reporter.h"
 #include "ance/core/UnaryOperator.h"
+#include "ance/core/VariabilityModifier.h"
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Node.h"
@@ -207,18 +208,20 @@ namespace ance::est
         utility::Optional<utility::Owned<Expression>> value;
     };
 
-    /// Declares a local variable in an ordered scope.
-    struct Let final
+    /// A bind statement binds a value to a name in a local scope as a variable or constant, or simply prepares the binding of a name.
+    struct Bind final
         : Statement
-        , utility::ConcreteNode<Let, Visitor>
+        , utility::ConcreteNode<Bind, Visitor>
     {
-        Let(core::Identifier const&                       name,
-            utility::Owned<Expression>                    t,
-            core::Assigner                                assignment,
-            utility::Optional<utility::Owned<Expression>> definition,
-            core::Location const&                         source_location);
+        Bind(core::Identifier const&                       name,
+             core::VariabilityModifier                     variability_modifier,
+             utility::Owned<Expression>                    type_expression,
+             core::Assigner                                assignment,
+             utility::Optional<utility::Owned<Expression>> definition,
+             core::Location const&                         source_location);
 
         core::Identifier                              identifier;
+        core::VariabilityModifier                     variability;
         utility::Owned<Expression>                    type;
         core::Assigner                                assigner;
         utility::Optional<utility::Owned<Expression>> value;
@@ -523,7 +526,7 @@ namespace ance::est
         virtual void visit(Continue const& continue_statement) = 0;
         virtual void visit(Match const& match)                 = 0;
         virtual void visit(Return const& return_statement)     = 0;
-        virtual void visit(Let const& let)                     = 0;
+        virtual void visit(Bind const& bind)                   = 0;
         virtual void visit(Erase const& erase)                 = 0;
         virtual void visit(Assert const& assert)               = 0;
 

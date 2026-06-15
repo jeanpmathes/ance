@@ -201,7 +201,7 @@ namespace ance::bbt
 
     core::VariabilityModifier Type::variability() const
     {
-        return core::VariabilityModifier::INVARIABLE;
+        return core::VariabilityModifier::CONSTANT;
     }
 
     size_t Type::getConstructingTypeCount() const

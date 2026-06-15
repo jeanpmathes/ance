@@ -16,7 +16,7 @@ declaration
 statement
     : '{' ( statement )* '}' # BlockStatement
     | expression ';' # ExpressionStatement
-    | 'let' IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # LetStatement // todo: type inference - maybe before doing real type inference just do expansion to typeof(expression) if no type is set
+    | ('let' | VARIABLE) IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # BindStatement // todo: type inference - maybe before doing real type inference just do expansion to typeof(expression) if no type is set
     | assignee=expression assigner assgined=expression ';' # AssignmentStatement
     | 'if' expression 'then' trueBlock=statement ( 'else' falseBlock=statement )? # IfStatement
     | 'loop' statement # LoopStatement
@@ -139,8 +139,7 @@ binaryOperatorAdditive
     ;
 
 assigner
-    : '<:' # CopyAssigner
-    | ':=' # FinalCopyAssigner
+    : ':=' # CopyAssigner
     ;
 
 binaryOperatorRelational
@@ -167,7 +166,7 @@ executionMode
     ;
 
 NOT : 'not' ;
-
+VARIABLE : 'var' ;
 DEFAULT : 'default' ;
 
 INTEGER : [0-9]+ ;

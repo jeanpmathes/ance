@@ -9,12 +9,12 @@ namespace ance::cet
 {
     Variable::Variable(core::Identifier const&    identifier,
                        utility::Shared<bbt::Type> type,
-                       bool                       is_final,
+                       bool const                 is_variable,
                        core::Location const&      location,
                        bbt::TypeContext&          type_context)
         : identifier_(identifier)
         , type_(std::move(type))
-        , is_final_(is_final)
+        , is_variable_(is_variable)
         , location_(location)
         , type_context_(type_context)
     {}
@@ -34,9 +34,14 @@ namespace ance::cet
         return *type_;
     }
 
-    bool Variable::isFinal() const
+    bool Variable::isVariable() const
     {
-        return is_final_;
+        return is_variable_;
+    }
+
+    bool Variable::isConstant() const
+    {
+        return !is_variable_;
     }
 
     core::Location const& Variable::location() const
@@ -48,9 +53,9 @@ namespace ance::cet
     {
         core::VariabilityModifier variability = core::VariabilityModifier::VARIABLE;
 
-        if (is_final_ && isDefined())
+        if (isConstant() && isDefined())// todo: the isDefined() check is a bit ugly and should go at some point
         {
-            variability = core::VariabilityModifier::INVARIABLE;
+            variability = core::VariabilityModifier::CONSTANT;
         }
 
         return Reference::make(Address(*this), type_, variability, type_context_);
@@ -68,7 +73,7 @@ namespace ance::cet
 
     void Variable::write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices)
     {
-        assert(!is_final_ || !isDefined());
+        assert(isVariable() || !isDefined());// todo: the isDefined() check is a bit ugly and should go at some point
 
         if (indices.empty())
         {
