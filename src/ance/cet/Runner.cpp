@@ -770,7 +770,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            // todo: this is not ideal with final variables, technically we could get a ref to it when it is not defined yet but then write twice to it through the same ref
+            // todo: this is not ideal with constants, technically we could get a ref to it when it is not defined yet but then write twice to it through the same ref
 
             utility::Shared<Reference> reference = target.as<Reference>();
 
@@ -800,7 +800,7 @@ struct ance::cet::Runner::Implementation
             // todo: using type inference, we could determine whether we want to later write to it or if not, if yes and final we could output an error here
             // todo: we could also check whether it is already defined if we want to read later, catching reads from undefined variables
 
-            // todo: right now, reading from this lref would be possible even if the variable is not defined
+            // todo: right now, reading from this ref would be possible even if the variable is not defined
 
             scope().getTemporary(access.destination).write(variable.access());
         }
@@ -952,7 +952,7 @@ struct ance::cet::Runner::Implementation
                 utility::Shared<bbt::Value> argument  = arguments[index];
 
                 utility::Optional<utility::Shared<bbt::Value>> variable =
-                    function_scope.declare(parameter.name, parameter.type, true, core::Location::project(), reporter_);
+                    function_scope.declare(parameter.name, parameter.type, false, core::Location::project(), reporter_);
 
                 if (!variable.hasValue())
                 {
@@ -1345,7 +1345,7 @@ struct ance::cet::Runner::Implementation
             }
 
             utility::Optional<utility::Shared<bbt::Value>> declared =
-                core_language_scope_->declare(name, value->type(), true, core::Location::core(), reporter_);
+                core_language_scope_->declare(name, value->type(), false, core::Location::core(), reporter_);
 
             if (declared.hasValue()) (*declared)->as<VariableRef>().value().write(std::move(value));
         }

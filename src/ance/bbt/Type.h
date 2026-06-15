@@ -176,7 +176,8 @@ namespace ance::bbt
         utility::Shared<Type> getString();
 
         /// Get the variable reference type, which is used to refer to variables.
-        utility::Shared<Type> getVariableRef();// todo: should be split into variable type and reference type (not lref), variable type should be parameterized
+        utility::Shared<Type>
+        getVariableRef();// todo: should be split into variable type and reference type (not the current ref), variable type should be parameterized
 
         /// Get a reference type.
         /// \param referenced_type The type being referenced.

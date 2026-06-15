@@ -563,7 +563,7 @@ namespace ance::ast
 
             if (variability.isConstant() && !expression.hasValue())
             {
-                reporter_.error(location(context->assigned)) << "Constants must be assigned a value on declaration";
+                reporter_.error(location(context)) << "Constants must be assigned a value on declaration";
                 expression = expectExpression(context->assigned);
             }
 

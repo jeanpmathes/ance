@@ -1131,15 +1131,15 @@ struct ance::bbt::Segmenter::Implementation
             auto& identifier_tmp = builder.addTemporary("Bind_Identifier", bind.location);
             builder.addStatement<Constant>(Identifier::make(bind.identifier, type_context_), identifier_tmp, bind.location);
 
-            auto& is_final_tmp = builder.addTemporary("Bind_IsVariable", bind.location);
-            builder.addStatement<Constant>(Bool::make(bind.variability.isVariable(), type_context_), is_final_tmp, bind.location);
+            auto& is_variable_tmp = builder.addTemporary("Bind_IsVariable", bind.location);
+            builder.addStatement<Constant>(Bool::make(bind.variability.isVariable(), type_context_), is_variable_tmp, bind.location);
 
             auto& declared_tmp = builder.addTemporary("Bind_Declared", bind.location);
             {
                 utility::List<std::reference_wrapper<Temporary const>> args;
                 args.emplace_back(scope_tmp);
                 args.emplace_back(identifier_tmp);
-                args.emplace_back(is_final_tmp);
+                args.emplace_back(is_variable_tmp);
                 args.emplace_back(type_tmp);
                 builder.addStatement<Intrinsic>(core::Intrinsic::DECLARE, std::move(args), declared_tmp, bind.location);
             }
