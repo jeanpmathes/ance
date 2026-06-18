@@ -120,15 +120,23 @@ namespace ance
 
         return exit_code;
 
-        // todo: look into the calendar note again, streamline, remove changed things, keep up to date
-
-        // todo: rethink intrinsic as an enum, maybe go back to inheritance but also do not use visitor but something else?
+        // todo: type semantics - types should now use value semantics, which means that types would have the == operator, all type constructors (so array, ref, ...) always return new instances
+        // todo: this also means that the type context might no longer be needed, and Value can get a clone() instead of using ugly const casts (function might be an issue here, so maybe make it a value type as well)
+        // todo: functions should be value types so we can use them as keys for native functions, also write something about that in later note
+        // todo: requires intensive testing
         // todo: write some related documentation for this, repeat this note for the next step
 
-        // todo: think about how functions and members and methods make sense for the language
-        // todo: maybe also think about doing some form of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar only already
-        // todo: but these generics would have the issue of creating a new type every time ??, so either all type creation things need to not do that, or there needs to be a keyword that says that a function is cached (maybe pure, with some constraints?, or maybe all functions should be pure if not said otherwise)
+        // todo: code gen - use python to generate the Node files, specifically Node.h and Node.generated.cpp, also integrate well with cmake
+        // todo: use this for all Node trees, add a comment that when writing the compiler in ance it should of course not use python codegen
+        // todo: it should also assist with serialization later, by requiring a stable ID for each Node, generate an enum for each type
+        // todo: also use this to improve tracing by automatically writing the trace, also creating an exit trace if needed (e.g. by allowing to easily access the destination of statements)
+        // todo: write some related documentation for this, repeat this note for the next step
+
+        // todo: think about doing some form of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar already
+        // todo: write some related documentation for this, repeat this note for the next step
+
         // todo: finally, think about doing compilation in very basic form first, so we can merge again and go back to the tests
+        // todo: maybe move all TODOs into the standard planning todoist, as a new note, and begin adapting all later notes
         // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: integer type, integer literals (need type expressions for them, e.g. Integer(32), UnsignedInteger(64), etc.)
@@ -138,6 +146,7 @@ namespace ance
         // todo: to do this, add a GenericIntrinsicSignature class which is used by IntrinsicSignature, getIntrinsicSignature would take the generic parameters
         // todo: the int types can then simply use string manipulation to put the right N there
         // todo: do not forget to write more documentation comments on this matter
+        // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: the variable class is not always a variable, but can also be a constant
         // todo: as such, it should be renamed, and all other mentions of Variable as well such as VariableDeclaration
@@ -155,8 +164,15 @@ namespace ance
 
         // todo: rework SourceFile class to read into single string buffer, then use string views instead of line-by-line reading
 
-        // todo: struct types
+        // todo: struct types, struct types should take a Nominal parameter which makes them nominal types, and the Nominal simply takes a location (only exact same location makes them equal)
+        // todo: there should also be a way to construct struct types without directly assigning them to a variable, might not even have a name in that case (or never?)
         // todo: think of a nice syntax to create structs and classes, no T{} because that would already have other meanings, and also not T()
+
+        // todo: members and methods
+        // todo: there should be a single instruction that provides member and method access
+        // todo: it first checks if there is a instance member, if not it checks if there is a static member
+        // todo: it also places the current 'this' / receiver in a context (or a sort of reference to it in runtime case) so that a call can use it if a function has a this argument
+        // todo: but think about this a bit more
 
         // todo: better reporting: all reports should have an ID (decide whether number or string [!] ), and if possible parameters (maybe they can be extracted from the message builder stream interface, skipping char* and potentially string)
         // todo: reporter then can suppress identical reports, if already reported, using only ID, location and params for check - hash that
@@ -264,6 +280,10 @@ namespace ance
 
         // todo: with references, add very basic safety checks in the case of erase of variable which has references to it, e.g. counting them, or so
         // todo: inform about affine/linear types, think about bringing back final, something like &once T maybe
+
+        // todo: evaluation caching - add a sort of side effect specification / analysis or at least pure/impure
+        // todo: has to consider intrinsic level and what kind of scopes are passed to declare
+        // todo: evaluation could then cache function results
     }
 }
 
