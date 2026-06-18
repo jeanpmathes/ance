@@ -61,7 +61,7 @@ namespace ance::cet
         return Reference::make(Address(*this), type_, variability, type_context_);
     }
 
-    utility::Shared<bbt::Value> Variable::read(std::vector<size_t> const& indices)
+    utility::Shared<bbt::Value> Variable::read(std::span<size_t const> const indices)
     {
         assert(isDefined());
 
@@ -71,7 +71,7 @@ namespace ance::cet
         return result.value();
     }
 
-    void Variable::write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices)
+    void Variable::write(utility::Shared<bbt::Value> value, std::span<size_t const> const indices)
     {
         assert(isVariable() || !isDefined());// todo: the isDefined() check is a bit ugly and should go at some point
 

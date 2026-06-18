@@ -13,7 +13,7 @@ namespace ance::cet
         return memory_.get();
     }
 
-    std::vector<size_t> const& Address::indices() const
+    std::span<size_t const> Address::indices() const
     {
         return indices_;
     }

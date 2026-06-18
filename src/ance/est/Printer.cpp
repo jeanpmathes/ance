@@ -1,5 +1,7 @@
 #include "Printer.h"
 
+#include <ranges>
+
 #include "ance/core/Printer.h"
 #include "ance/est/Node.h"
 
@@ -224,11 +226,13 @@ struct ance::est::Printer::Implementation
             print("intrinsic ");
             visit(*intrinsic.name);
             print(" args (");
-            for (size_t index = 0; index < intrinsic.arguments.size(); index++)
+
+            for (size_t const index : std::views::iota(size_t {0}, intrinsic.arguments.size()))
             {
                 visit(*intrinsic.arguments[index]);
                 if (index + 1 < intrinsic.arguments.size()) print(", ");
             }
+
             print(")");
         }
 
@@ -260,11 +264,13 @@ struct ance::est::Printer::Implementation
         {
             visit(*call.callee);
             print("(");
-            for (size_t index = 0; index < call.arguments.size(); index++)
+
+            for (size_t const index : std::views::iota(size_t {0}, call.arguments.size()))
             {
                 if (index > 0) print(", ");
                 visit(*call.arguments[index]);
             }
+
             print(")");
         }
 
@@ -281,7 +287,8 @@ struct ance::est::Printer::Implementation
             print("Function(Signature(#");
             print(function_constructor.name);
             print(", [");
-            for (size_t index = 0; index < function_constructor.parameters.size(); index++)
+
+            for (size_t const index : std::views::iota(size_t {0}, function_constructor.parameters.size()))
             {
                 if (index > 0) print(", ");
                 print("(");
@@ -290,6 +297,7 @@ struct ance::est::Printer::Implementation
                 print(function_constructor.parameters[index].identifier);
                 print(")");
             }
+
             print("]), ");
             visit(*function_constructor.return_type);
             print(", Capture()");// todo: Capture could take a list of entries, each entry is name + type + (either value or reference)
@@ -361,7 +369,7 @@ struct ance::est::Printer::Implementation
         {
             print("typeof(");
 
-            for (size_t index = 0; index < type_of.expressions.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, type_of.expressions.size()))
             {
                 visit(*type_of.expressions[index]);
                 if (index + 1 < type_of.expressions.size()) print(", ");
@@ -389,7 +397,7 @@ struct ance::est::Printer::Implementation
                 print(" | ");
             }
 
-            for (size_t index = 0; index < array_constructor.elements.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, array_constructor.elements.size()))
             {
                 visit(*array_constructor.elements[index]);
                 if (index + 1 < array_constructor.elements.size()) print(", ");
@@ -402,7 +410,7 @@ struct ance::est::Printer::Implementation
         {
             if (!match_case.patterns.empty())
             {
-                for (size_t index = 0; index < match_case.patterns.size(); index++)
+                for (size_t const index : std::views::iota(size_t {0}, match_case.patterns.size()))
                 {
                     visit(*match_case.patterns[index]);
                     if (index + 1 < match_case.patterns.size()) print(" | ");

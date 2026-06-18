@@ -1,6 +1,7 @@
 #include "Printer.h"
 
 #include <queue>
+#include <ranges>
 #include <set>
 
 #include "ance/core/Printer.h"
@@ -208,11 +209,13 @@ struct ance::bbt::Printer::Implementation
             print(" intrinsic ");
             print(intrinsic.intrinsic);
             print(" (");
-            for (size_t index = 0; index < intrinsic.arguments.size(); index++)
+
+            for (size_t const index : std::views::iota(size_t {0}, intrinsic.arguments.size()))
             {
                 if (index > 0) print(", ");
                 print(intrinsic.arguments[index].get().id());
             }
+
             print(");");
         }
 
@@ -224,11 +227,13 @@ struct ance::bbt::Printer::Implementation
             print(" call ");
             print(call.called.id());
             print(" (");
-            for (size_t index = 0; index < call.arguments.size(); index++)
+
+            for (size_t const index : std::views::iota(size_t {0}, call.arguments.size()))
             {
                 print(call.arguments[index].get().id());
                 if (index + 1 < call.arguments.size()) print(", ");
             }
+
             print(");");
         }
 
@@ -252,7 +257,8 @@ struct ance::bbt::Printer::Implementation
             print(" Function::ctor(Signature::ctor(#");
             print(function_constructor.name);
             print(", [");
-            for (size_t index = 0; index < function_constructor.parameters.size(); index++)
+
+            for (size_t const index : std::views::iota(size_t {0}, function_constructor.parameters.size()))
             {
                 print("(");
                 print(function_constructor.parameters[index].type.id());
@@ -261,6 +267,7 @@ struct ance::bbt::Printer::Implementation
                 print(")");
                 if (index + 1 < function_constructor.parameters.size()) print(", ");
             }
+
             print("]), ");
             print(function_constructor.return_type.id());
             print("), flow ");
@@ -331,7 +338,7 @@ struct ance::bbt::Printer::Implementation
             print(core::Assigner::MOVE_ASSIGNMENT);
             print(" typeof( ");
 
-            for (size_t index = 0; index < type_of.values.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, type_of.values.size()))
             {
                 print(type_of.values[index].get().id());
                 if (index + 1 < type_of.values.size()) print(", ");
@@ -365,7 +372,7 @@ struct ance::bbt::Printer::Implementation
                 print(" | ");
             }
 
-            for (size_t index = 0; index < array_constructor.elements.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, array_constructor.elements.size()))
             {
                 print(array_constructor.elements[index].get().id());
                 if (index + 1 < array_constructor.elements.size()) print(", ");

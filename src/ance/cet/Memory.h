@@ -2,7 +2,6 @@
 #define ANCE_CET_MEMORY_H
 
 #include <span>
-#include <vector>
 
 #include "ance/utility/Owners.h"
 
@@ -25,15 +24,15 @@ namespace ance::cet
       [[nodiscard]] virtual utility::Shared<bbt::Value> access() = 0;
 
         /// Read a value from the addressed memory location.
-        /// \param indices Indices describing the target position inside the memory.
-        [[nodiscard]] virtual utility::Shared<bbt::Value> read(std::vector<size_t> const& indices) = 0;
+      /// \param indices Indices describing the target position inside the memory.
+      [[nodiscard]] virtual utility::Shared<bbt::Value> read(std::span<size_t const> indices) = 0;
 
-        /// Write a value to the addressed memory location.
-        /// \param value The value to write.
-        /// \param indices Indices describing the target position inside the memory.
-        virtual void write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices) = 0;
+      /// Write a value to the addressed memory location.
+      /// \param value The value to write.
+      /// \param indices Indices describing the target position inside the memory.
+        virtual void write(utility::Shared<bbt::Value> value, std::span<size_t const> indices) = 0;
 
-        /// Check whether the memory currently stores a value.
+      /// Check whether the memory currently stores a value.
         [[nodiscard]] virtual bool isDefined() const = 0;
 
         /// The type of the value stored in the memory location.

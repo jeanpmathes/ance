@@ -1,5 +1,7 @@
 #include <filesystem>
 #include <iostream>
+#include <ranges>
+#include <span>
 
 #include <boost/locale.hpp>
 
@@ -27,9 +29,9 @@ namespace ance
     {
         Arguments arguments;
 
-        for (int index = 1; index < argc; index++)
+        for (char const* const argument : std::span(argv, static_cast<size_t>(argc)) | std::views::drop(1))
         {
-            std::string_view const arg(argv[index]);
+            std::string_view const arg(argument);
 
             if (arg == "--version")
             {
@@ -42,17 +44,17 @@ namespace ance
             else if (arg.starts_with("-"))
             {
                 core::Reporter::print(out, "command", "Unknown command line argument: " + std::string(arg));
+                return std::nullopt;
             }
             else
             {
                 if (arguments.input_file.hasValue())
                 {
                     core::Reporter::print(out, "command", "Multiple input files provided");
+                    return std::nullopt;
                 }
-                else
-                {
-                    arguments.input_file = std::filesystem::path(arg);
-                }
+
+                arguments.input_file = std::filesystem::path(arg);
             }
         }
 
@@ -118,14 +120,6 @@ namespace ance
 
         return exit_code;
 
-        // todo: no vector types, instead array types support all operators of their element type and perform them element-wise
-        // todo: no vectors yet because that has HW and alignment implications, should not be first class language element
-        // todo: currently this would work by using string templates, but there should be a TODO to use normal generics as much as possible
-        // todo: write some related documentation for this, repeat this note for the next step
-
-        // todo: find more places where ranges could be used (so std::ranges, std::views)
-        // todo: write some related documentation for this, repeat this note for the next step
-
         // todo: look into the calendar note again, streamline, remove changed things, keep up to date
 
         // todo: rethink intrinsic as an enum, maybe go back to inheritance but also do not use visitor but something else?
@@ -135,6 +129,7 @@ namespace ance
         // todo: maybe also think about doing some form of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar only already
         // todo: but these generics would have the issue of creating a new type every time ??, so either all type creation things need to not do that, or there needs to be a keyword that says that a function is cached (maybe pure, with some constraints?, or maybe all functions should be pure if not said otherwise)
         // todo: finally, think about doing compilation in very basic form first, so we can merge again and go back to the tests
+        // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: integer type, integer literals (need type expressions for them, e.g. Integer(32), UnsignedInteger(64), etc.)
         // todo: ops for all integer types
@@ -207,6 +202,10 @@ namespace ance
         // todo: do not forget to also print those markers in later states, currently they are AST only
         // todo: THINK MORE ABOUT THIS: non-marked can be called from all, runtime only from runtime, compiletime only from compiletime and runtime
         // todo: write some good documentation on these decisions and ideas
+
+        // todo: no vector types, instead array types support all operators of their element type and perform them element-wise
+        // todo: no vectors yet because that has HW and alignment implications, should not be first class language element
+        // todo: this should use generics, something like: op +<T1, T2, N>(a: [T1; N], b: [T2; N]) where exists(+(T1, T2))
 
         // todo: all the pointer and allocation stuff would only work with runtime code for now
 

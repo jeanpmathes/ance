@@ -3,11 +3,14 @@
 #include "Temporary.h"
 #include "Variable.h"
 
+#include <algorithm>
 #include <expected>
 #include <filesystem>
 #include <functional>
 #include <list>
+#include <ranges>
 #include <set>
+#include <span>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -302,10 +305,10 @@ struct ance::cet::Runner::Implementation
             return ok;
         }
 
-        [[nodiscard]] bool expectSignature(bbt::Signature const&                                         signature,
-                                           utility::List<std::reference_wrapper<bbt::Type const>> const& argument_types,
-                                           utility::List<core::Location> const&                          argument_locations,
-                                           core::Location const&                                         location)
+        [[nodiscard]] bool expectSignature(bbt::Signature const&                                          signature,
+                                           std::span<std::reference_wrapper<bbt::Type const> const> const argument_types,
+                                           std::span<core::Location const> const                          argument_locations,
+                                           core::Location const&                                          location) const
         {
             bool ok = true;
 
@@ -321,7 +324,7 @@ struct ance::cet::Runner::Implementation
                     return false;
                 }
 
-                for (size_t index = 0; index < arity; index++)
+                for (size_t const index : std::views::iota(size_t {0}, arity))
                 {
                     bbt::Type const&      parameter_type    = *signature.parameters()[index].type;
                     bbt::Type const&      argument_type     = argument_types[index].get();
@@ -341,7 +344,7 @@ struct ance::cet::Runner::Implementation
 
                 if (!ok) return false;
 
-                for (size_t index = 0; index < argument_count; index++)
+                for (size_t const index : std::views::iota(size_t {0}, argument_count))
                 {
                     bbt::Type const&      parameter_type    = *signature.parameters()[index].type;
                     bbt::Type const&      argument_type     = argument_types[index].get();
@@ -399,20 +402,14 @@ struct ance::cet::Runner::Implementation
             return (memory.type().isReference() ? memory.read({}) : memory.access()).as<Reference>();
         }
 
-        utility::Optional<utility::Shared<bbt::Type>> getCommonType(utility::List<utility::Shared<bbt::Type>>& types)
+        static utility::Optional<utility::Shared<bbt::Type>> getCommonType(std::span<utility::Shared<bbt::Type>> types)
         {
             if (types.empty()) return std::nullopt;
 
             {// Check whether all types are the same type.
                 utility::Shared<bbt::Type> common_type = types[0];
 
-                for (size_t index = 1; index < types.size(); index++)
-                {
-                    if (*types[index] != *common_type)
-                    {
-                        return std::nullopt;
-                    }
-                }
+                if (!std::ranges::all_of(types | std::views::drop(1), [&common_type](auto const& type) { return *type == *common_type; })) return std::nullopt;
 
                 return common_type;
             }
@@ -420,9 +417,9 @@ struct ance::cet::Runner::Implementation
             // todo: also check conversions to find common type
         }
 
-        bool expectCommonType(utility::List<utility::Shared<bbt::Type>>&     types,
+        bool expectCommonType(std::span<utility::Shared<bbt::Type>>          types,
                               utility::Optional<utility::Shared<bbt::Type>>* common_type,
-                              core::Location const&                          location)
+                              core::Location const&                          location) const
         {
             auto result = getCommonType(types);
             if (result.hasValue())
@@ -447,7 +444,7 @@ struct ance::cet::Runner::Implementation
                 auto msg = reporter_.error(location);
                 msg << "Could not find common type for types ";
 
-                for (size_t index = 0; index < unique_types.size(); index++)
+                for (size_t const index : std::views::iota(size_t {0}, unique_types.size()))
                 {
                     if (index == unique_types.size() - 1) msg << " and ";
                     else if (index > 0) msg << ", ";
@@ -661,9 +658,9 @@ struct ance::cet::Runner::Implementation
 
             if (case_patterns.size() + 1 < switch_link.cases.size())
             {
-                for (size_t index = case_patterns.size() + 1; index < switch_link.cases.size(); index++)
+                for (auto const& unreachable_case : switch_link.cases | std::views::drop(case_patterns.size() + 1))
                 {
-                    reporter_.warning(switch_link.cases[index]->pattern_location)
+                    reporter_.warning(unreachable_case->pattern_location)
                         << "Pattern not reachable" << core::Reporter::Annotation(default_pattern_location.value()) << "Covered by preceding default pattern";
                 }
 
@@ -671,11 +668,11 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            for (size_t index = 0; index < case_patterns.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, case_patterns.size()))
             {
                 utility::Shared<bbt::Value> current_pattern = case_patterns[index];
 
-                for (size_t other_index = 0; other_index < index; other_index++)
+                for (size_t const other_index : std::views::iota(size_t {0}, index))
                 {
                     utility::Shared<bbt::Value> other_pattern = case_patterns[other_index];
 
@@ -692,7 +689,7 @@ struct ance::cet::Runner::Implementation
 
             bbt::BasicBlock const* next = nullptr;
 
-            for (size_t index = 0; index < switch_link.cases.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, switch_link.cases.size()))
             {
                 bool const is_default_case = switch_link.cases[index]->pattern == nullptr;
 
@@ -946,7 +943,7 @@ struct ance::cet::Runner::Implementation
 
             Scope& function_scope = project_scope_.addChildScope(utility::makeOwned<OrderedScope>(project_scope_, type_context_));
 
-            for (size_t index = 0; index < signature.arity(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, signature.arity()))
             {
                 bbt::Signature::Parameter&  parameter = signature[index];
                 utility::Shared<bbt::Value> argument  = arguments[index];
@@ -1093,10 +1090,8 @@ struct ance::cet::Runner::Implementation
                     utility::List<utility::Shared<bbt::Value>> elements;
                     elements.reserve(array_type.length());
 
-                    for (size_t index = 0; index < array_type.length(); index++)
-                    {
-                        elements.emplace_back(get_default_value(element_type));
-                    }
+                    std::ranges::for_each(std::views::iota(size_t {0}, array_type.length()),
+                                          [&](size_t) { elements.emplace_back(get_default_value(element_type)); });
 
                     return bbt::Array::make(std::move(type), std::move(elements), type_context_);
                 }
@@ -1293,7 +1288,7 @@ struct ance::cet::Runner::Implementation
 
             assert(element_type.hasValue());
 
-            for (size_t index = 0; index < elements.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, elements.size()))
             {
                 if (!expectType(*element_type.value(), *elements[index]->type(), array_constructor.elements[index].get().location))
                 {

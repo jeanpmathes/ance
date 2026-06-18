@@ -1,6 +1,7 @@
 #ifndef ANCE_BBT_VALUE_H
 #define ANCE_BBT_VALUE_H
 
+#include <span>
 #include <string>
 
 #include <llvm/ADT/APFloat.h>
@@ -211,7 +212,7 @@ namespace ance::bbt
 
         [[nodiscard]] std::string                                  toString() const override;
         [[nodiscard]] utility::Optional<utility::Shared<Value>> access(size_t index, utility::Shared<Value>* replacement, TypeContext& type_context) override;
-        [[nodiscard]] utility::List<utility::Shared<Value>> const& elements() const;
+        [[nodiscard]] std::span<utility::Shared<Value> const>   elements() const;
         [[nodiscard]] bool                                         equals(Array const& other) const override;
 
         [[nodiscard]] bool   isEmpty() const;

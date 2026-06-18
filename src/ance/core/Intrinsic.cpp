@@ -1,6 +1,7 @@
 #include "Intrinsic.h"
 
 #include <algorithm>
+#include <ranges>
 #include <utility>
 
 ance::core::Intrinsic::Value ance::core::Intrinsic::value() const
@@ -63,20 +64,16 @@ static std::pair<ance::core::Intrinsic::Value, char const*> const intrinsics[] =
 
 std::string ance::core::Intrinsic::toString() const
 {
-    for (auto const& [value, name] : intrinsics)
-    {
-        if (value == value_) return name;
-    }
+    auto const intrinsic = std::ranges::find_if(intrinsics, [this](auto const& entry) { return entry.first == value_; });
+    if (intrinsic != std::ranges::end(intrinsics)) return intrinsic->second;
 
     return "";
 }
 
 std::optional<ance::core::Intrinsic> ance::core::Intrinsic::fromString(std::string const& name)
 {
-    for (auto const& [value, intrinsic_name] : intrinsics)
-    {
-        if (name == intrinsic_name) return Intrinsic(value);
-    }
+    auto const intrinsic = std::ranges::find_if(intrinsics, [&name](auto const& entry) { return name == entry.second; });
+    if (intrinsic != std::ranges::end(intrinsics)) return Intrinsic(intrinsic->first);
 
     return std::nullopt;
 }

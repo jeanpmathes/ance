@@ -2,6 +2,7 @@
 #define ANCE_SOURCES_SOURCETREE_H
 
 #include <filesystem>
+#include <ranges>
 
 #include "ance/utility/Containers.h"
 #include "ance/utility/Owners.h"
@@ -30,7 +31,10 @@ namespace ance::sources
 
         /// Get all source files.
         /// \return The source files.
-        std::vector<std::reference_wrapper<SourceFile>> getSourceFiles();
+        [[nodiscard]] auto getSourceFiles()
+        {
+            return source_files_ | std::views::transform([](auto& source_file) -> SourceFile& { return *source_file; });
+        }
 
       private:
         std::filesystem::path                     base_directory_;

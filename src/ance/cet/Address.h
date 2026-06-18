@@ -2,6 +2,7 @@
 #define ANCE_CET_ADDRESS_H
 
 #include <functional>
+#include <span>
 #include <vector>
 
 #include "ance/cet/Memory.h"
@@ -17,11 +18,11 @@ namespace ance::cet
     public:
         explicit Address(Memory& memory, std::vector<size_t> indices = {});
 
-        [[nodiscard]] Memory&                     memory() const;
-        [[nodiscard]] std::vector<size_t> const&  indices() const;
+      [[nodiscard]] Memory&                 memory() const;
+      [[nodiscard]] std::span<size_t const> indices() const;
 
-        /// Create an address which represents subscript-based access into this address.
-        /// Note that this does not perform any validation whether the concerned values and types would support such an access.
+      /// Create an address which represents subscript-based access into this address.
+      /// Note that this does not perform any validation whether the concerned values and types would support such an access.
         [[nodiscard]] Address subscript(size_t index) const;
 
         /// Read the value at the addressed location.

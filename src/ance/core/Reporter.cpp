@@ -1,5 +1,8 @@
 #include "Reporter.h"
 
+#include <algorithm>
+#include <ranges>
+#include <span>
 #include <utility>
 #include <vector>
 
@@ -174,7 +177,7 @@ struct ance::core::Reporter::Implementation
         return true;
     }
 
-    void report(Level level, std::vector<std::tuple<Annotation, std::ostringstream>> const& annotations, std::string const& compiler_location);
+    void report(Level level, std::span<std::tuple<Annotation, std::ostringstream> const> annotations, std::string const& compiler_location);
 
     void clear()
     {
@@ -332,9 +335,9 @@ ance::core::Reporter::Reporter(sources::SourceTree& source_tree, std::ostream& o
     : implementation_(utility::makeOwned<Implementation>(this, source_tree, out, trace_enabled))
 {}
 
-void ance::core::Reporter::Implementation::report(Level const                                                    level,
-                                                  std::vector<std::tuple<Annotation, std::ostringstream>> const& annotations,
-                                                  std::string const&                                             compiler_location)
+void ance::core::Reporter::Implementation::report(Level const                                                 level,
+                                                  std::span<std::tuple<Annotation, std::ostringstream> const> annotations,
+                                                  std::string const&                                          compiler_location)
 {
     if (level == Level::TRACE && !isTraceEnabled()) return;
 
@@ -364,8 +367,8 @@ void ance::core::Reporter::Implementation::report(Level const                   
         out_ << "[" << compiler_location << "] ";
     }
 
-    size_t max_line = 0;
-    for (auto const& [annotation, stream] : annotations) max_line = std::max(max_line, annotation.location().line());
+    auto const   annotation_lines = annotations | std::views::transform([](auto const& entry) { return std::get<0>(entry).location().line(); });
+    size_t const max_line         = annotations.empty() ? 0 : std::ranges::max(annotation_lines);
     auto const max_line_digits = max_line == 0 ? 1uz : static_cast<size_t>(std::log10(max_line) + 1);
 
     bool first            = true;

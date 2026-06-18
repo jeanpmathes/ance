@@ -2,7 +2,9 @@
 
 #include <expected>
 #include <map>
+#include <ranges>
 #include <set>
+#include <span>
 #include <stack>
 #include <string_view>
 #include <vector>
@@ -50,7 +52,7 @@ struct ance::bbt::Segmenter::Implementation
             return utility::makeOwned<BasicBlock>(id, std::move(statements_), utility::makeOwned<ErrorLink>(core::Location::project()), location());
         }
 
-        [[nodiscard]] virtual utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) = 0;
+        [[nodiscard]] virtual utility::Owned<Link> createLink(std::span<utility::Owned<BasicBlock> const> blocks) = 0;
 
         [[nodiscard]] bool isCreated() const
         {
@@ -178,7 +180,7 @@ struct ance::bbt::Segmenter::Implementation
             next.enter(*this);
         }
 
-        [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) override
+        [[nodiscard]] utility::Owned<Link> createLink(std::span<utility::Owned<BasicBlock> const> const blocks) override
         {
             if (next_ == nullptr)
             {
@@ -225,7 +227,7 @@ struct ance::bbt::Segmenter::Implementation
             false_.get().enter(*this);
         }
 
-        [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) override
+        [[nodiscard]] utility::Owned<Link> createLink(std::span<utility::Owned<BasicBlock> const> blocks) override
         {
             return utility::makeOwned<Branch>(condition_, *blocks[true_.get().index()], *blocks[false_.get().index()], source_location_);
         }
@@ -286,7 +288,7 @@ struct ance::bbt::Segmenter::Implementation
             }
         }
 
-        [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const& blocks) override
+        [[nodiscard]] utility::Owned<Link> createLink(std::span<utility::Owned<BasicBlock> const> blocks) override
         {
             utility::List<utility::Owned<SwitchCase>> switch_cases;
             switch_cases.reserve(cases_.size());
@@ -344,7 +346,7 @@ struct ance::bbt::Segmenter::Implementation
 
         explicit ReturnBB(core::Location const& source_location) : source_location_(source_location) {}
 
-        [[nodiscard]] utility::Owned<Link> createLink(utility::List<utility::Owned<BasicBlock>> const&) override
+        [[nodiscard]] utility::Owned<Link> createLink(std::span<utility::Owned<BasicBlock> const>) override
         {
             return utility::makeOwned<Return>(core::Location::project());
         }
@@ -610,7 +612,7 @@ struct ance::bbt::Segmenter::Implementation
                 }
             }
 
-            for (size_t index = 0; index < converted.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, converted.size()))
             {
                 BaseBB& current = converted[index].get();
 
@@ -993,9 +995,9 @@ struct ance::bbt::Segmenter::Implementation
             Builder builder(*this);
 
             size_t const target_depth = state_.loops.back().scope_depth;
-            for (size_t i = state_.scopes.size(); i > target_depth; i--)
+            for (OrderedScopeEnter const* const scope : state_.scopes | std::views::drop(target_depth) | std::views::reverse)
             {
-                builder.addStatement<OrderedScopeExit>(*state_.scopes[i - 1], break_statement.location);
+                builder.addStatement<OrderedScopeExit>(*scope, break_statement.location);
             }
 
             link(builder.getExit(), state_.loops.back().exit);
@@ -1021,9 +1023,9 @@ struct ance::bbt::Segmenter::Implementation
             Builder builder(*this);
 
             size_t const target_depth = state_.loops.back().scope_depth;
-            for (size_t i = state_.scopes.size(); i > target_depth; i--)
+            for (OrderedScopeEnter const* const scope : state_.scopes | std::views::drop(target_depth) | std::views::reverse)
             {
-                builder.addStatement<OrderedScopeExit>(*state_.scopes[i - 1], continue_statement.location);
+                builder.addStatement<OrderedScopeExit>(*scope, continue_statement.location);
             }
 
             link(builder.getExit(), state_.loops.back().entry);
@@ -1095,9 +1097,9 @@ struct ance::bbt::Segmenter::Implementation
                 builder.addStatement<SetReturnValue>(return_value_tmp, return_statement.location);
             }
 
-            for (size_t i = state_.scopes.size(); i > 0; i--)
+            for (OrderedScopeEnter const* const scope : state_.scopes | std::views::reverse)
             {
-                builder.addStatement<OrderedScopeExit>(*state_.scopes[i - 1], return_statement.location);
+                builder.addStatement<OrderedScopeExit>(*scope, return_statement.location);
             }
 
             builder.addSpecialBlock<ReturnBB>(return_statement.location);
@@ -1212,7 +1214,7 @@ struct ance::bbt::Segmenter::Implementation
             utility::List<std::reference_wrapper<Temporary const>> arguments;
             arguments.emplace_back(name_tmp);
 
-            for (size_t index = 0; index < intrinsic.arguments.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, intrinsic.arguments.size()))
             {
                 auto& argument_tmp = builder.addTemporary(std::format("Intrinsic_Argument{}", index), intrinsic.arguments[index]->location);
                 builder.addSegmented(*intrinsic.arguments[index], argument_tmp);
@@ -1287,7 +1289,7 @@ struct ance::bbt::Segmenter::Implementation
             builder.addSegmented(*call.callee, callee_tmp);
 
             utility::List<std::reference_wrapper<Temporary const>> arguments;
-            for (size_t index = 0; index < call.arguments.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, call.arguments.size()))
             {
                 auto& argument_tmp = builder.addTemporary(std::format("Call_Argument{}", index), call.arguments[index]->location);
                 builder.addSegmented(*call.arguments[index], argument_tmp);
@@ -1592,7 +1594,7 @@ struct ance::bbt::Segmenter::Implementation
             }
 
             utility::List<std::reference_wrapper<Temporary const>> elements;
-            for (size_t index = 0; index < array_constructor.elements.size(); index++)
+            for (size_t const index : std::views::iota(size_t {0}, array_constructor.elements.size()))
             {
                 auto& element_tmp = builder.addTemporary(std::format("ArrayConstructor_Element{}", index), array_constructor.elements[index]->location);
                 builder.addSegmented(*array_constructor.elements[index], element_tmp);

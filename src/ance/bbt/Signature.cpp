@@ -37,7 +37,7 @@ namespace ance::bbt
         return parameters_[index];
     }
 
-    utility::List<Signature::Parameter> const& Signature::parameters() const
+    std::span<Signature::Parameter const> Signature::parameters() const
     {
         return parameters_;
     }

@@ -1,5 +1,8 @@
 #include "IntrinsicsRunner.h"
 
+#include <algorithm>
+#include <ranges>
+
 #include "ValueExtensions.h"
 #include "ance/bbt/IntrinsicSignature.h"
 #include "ance/bbt/Type.h"
@@ -42,13 +45,16 @@ struct ance::cet::IntrinsicsRunner::Implementation
         if (signature.isVariadic())
         {
             assert(arguments.size() >= signature.parameters().size());
-            for (size_t index = 0; index < signature.parameters().size(); index++) assert(*arguments[index]->type() == *signature.parameters()[index].type);
         }
         else
         {
             assert(arguments.size() == signature.parameters().size());
-            for (size_t index = 0; index < arguments.size(); index++) assert(*arguments[index]->type() == *signature.parameters()[index].type);
         }
+
+        auto const argument_types  = arguments | std::views::transform([](auto const& argument) -> bbt::Type const& { return argument->type(); });
+        auto const parameter_types = signature.parameters() | std::views::transform([](auto const& parameter) -> bbt::Type const& { return *parameter.type; });
+
+        assert(std::ranges::equal(argument_types | std::views::take(parameter_types.size()), parameter_types));
 
         switch (intrinsic.value())
         {
@@ -433,7 +439,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
         }
 
         utility::List<utility::Shared<bbt::Value>> arguments;
-        for (size_t index = 1; index < state_.arguments->size(); index++) arguments.emplace_back(state_.arguments->at(index));
+        for (auto& argument : *state_.arguments | std::views::drop(1)) arguments.emplace_back(argument);
 
         State  outer_state  = std::move(state_);
         Result inner_result = run(target.value(), arguments, outer_state.location);

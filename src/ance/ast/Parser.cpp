@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <memory>
+#include <ranges>
 
 #include <boost/locale/encoding_utf.hpp>
 
@@ -717,7 +718,7 @@ namespace ance::ast
             utility::Owned<Expression> left = expectExpression(context->andExpression(0));
 
             core::Location location = left->location;
-            for (size_t index = 1; index < context->andExpression().size(); index++)
+            for (size_t const index : std::views::iota(size_t {1}, context->andExpression().size()))
             {
                 bool const                 negated = context->orOperator(index - 1)->NOT() != nullptr;
                 utility::Owned<Expression> right   = expectExpression(context->andExpression(index));
@@ -737,7 +738,7 @@ namespace ance::ast
             utility::Owned<Expression> left = expectExpression(context->equalityExpression(0));
 
             core::Location location = left->location;
-            for (size_t index = 1; index < context->equalityExpression().size(); index++)
+            for (size_t const index : std::views::iota(size_t {1}, context->equalityExpression().size()))
             {
                 bool const                 negated = context->andOperator(index - 1)->NOT() != nullptr;
                 utility::Owned<Expression> right   = expectExpression(context->equalityExpression(index));
@@ -757,7 +758,7 @@ namespace ance::ast
             utility::Owned<Expression> left = expectExpression(context->relationalExpression(0));
 
             core::Location location = left->location;
-            for (size_t index = 1; index < context->relationalExpression().size(); index++)
+            for (size_t const index : std::views::iota(size_t {1}, context->relationalExpression().size()))
             {
                 core::BinaryOperator const op    = expectBinaryOperator(context->binaryOperatorEquality(index - 1));
                 utility::Owned<Expression> right = expectExpression(context->relationalExpression(index));
@@ -777,7 +778,7 @@ namespace ance::ast
             utility::Owned<Expression> left = expectExpression(context->additiveExpression(0));
 
             core::Location location = left->location;
-            for (size_t index = 1; index < context->additiveExpression().size(); index++)
+            for (size_t const index : std::views::iota(size_t {1}, context->additiveExpression().size()))
             {
                 core::BinaryOperator const op    = expectBinaryOperator(context->binaryOperatorRelational(index - 1));
                 utility::Owned<Expression> right = expectExpression(context->additiveExpression(index));
@@ -797,7 +798,7 @@ namespace ance::ast
             utility::Owned<Expression> left = expectExpression(context->multiplicativeExpression(0));
 
             core::Location location = left->location;
-            for (size_t index = 1; index < context->multiplicativeExpression().size(); index++)
+            for (size_t const index : std::views::iota(size_t {1}, context->multiplicativeExpression().size()))
             {
                 core::BinaryOperator const op    = expectBinaryOperator(context->binaryOperatorAdditive(index - 1));
                 utility::Owned<Expression> right = expectExpression(context->multiplicativeExpression(index));
@@ -817,7 +818,7 @@ namespace ance::ast
             utility::Owned<Expression> left = expectExpression(context->unaryExpression(0));
 
             core::Location location = left->location;
-            for (size_t index = 1; index < context->unaryExpression().size(); index++)
+            for (size_t const index : std::views::iota(size_t {1}, context->unaryExpression().size()))
             {
                 core::BinaryOperator const op    = expectBinaryOperator(context->binaryOperatorMultiplicative(index - 1));
                 utility::Owned<Expression> right = expectExpression(context->unaryExpression(index));
@@ -1322,7 +1323,7 @@ namespace ance::ast
             return {};
         }
 
-        Block* createBlockStatement(std::vector<grammar::anceParser::StatementContext*> const& statement_contexts, core::Location const& source_location)
+        Block* createBlockStatement(std::ranges::input_range auto&& statement_contexts, core::Location const& source_location)
         {
             utility::List<utility::Owned<Statement>> statements;
 

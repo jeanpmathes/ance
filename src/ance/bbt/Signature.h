@@ -1,6 +1,8 @@
 #ifndef ANCE_BBT_SIGNATURE_H
 #define ANCE_BBT_SIGNATURE_H
 
+#include <span>
+
 #include "ance/utility/Containers.h"
 #include "ance/utility/Owners.h"
 
@@ -38,7 +40,7 @@ namespace ance::bbt
         [[nodiscard]] Parameter& operator[](size_t index);
 
         /// Get the parameters of the signature.
-        [[nodiscard]] utility::List<Parameter> const& parameters() const;
+        [[nodiscard]] std::span<Parameter const> parameters() const;
 
         /// Whether this signature accepts variadic untyped arguments after the typed parameters.
         /// todo: remove variadic support, instead use a list type for the additional arguments

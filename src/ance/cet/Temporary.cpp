@@ -14,7 +14,7 @@ ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::access()
     return Reference::make(Address(*this), value_->type(), core::VariabilityModifier::CONSTANT, type_context_);
 }
 
-ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::vector<size_t> const& indices)
+ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::span<size_t const> const indices)
 {
     auto result = load(value_, indices, type_context_);
     assert(result.hasValue());
@@ -22,7 +22,7 @@ ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::vector<s
     return result.value();
 }
 
-void ance::cet::Temporary::write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices)
+void ance::cet::Temporary::write(utility::Shared<bbt::Value> value, std::span<size_t const> const indices)
 {
     if (indices.empty())
     {

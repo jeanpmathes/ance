@@ -17,13 +17,3 @@ ance::sources::SourceFile& ance::sources::SourceTree::getFile(size_t const index
 {
     return *source_files_[index];
 }
-
-std::vector<std::reference_wrapper<ance::sources::SourceFile>> ance::sources::SourceTree::getSourceFiles()
-{
-    std::vector<std::reference_wrapper<SourceFile>> result;
-
-    for (auto& source_file : source_files_)
-        result.emplace_back(*source_file);
-
-    return result;
-}

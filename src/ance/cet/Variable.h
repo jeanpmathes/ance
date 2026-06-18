@@ -42,8 +42,8 @@ namespace ance::cet
 
         [[nodiscard]] utility::Shared<bbt::Value> access() override;
 
-        utility::Shared<bbt::Value> read(std::vector<size_t> const& indices) override;
-        void                        write(utility::Shared<bbt::Value> value, std::vector<size_t> const& indices) override;
+        utility::Shared<bbt::Value> read(std::span<size_t const> indices) override;
+        void                        write(utility::Shared<bbt::Value> value, std::span<size_t const> indices) override;
 
         utility::Shared<bbt::Value> read();
         void                        write(utility::Shared<bbt::Value> value);

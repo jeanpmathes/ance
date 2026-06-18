@@ -1,5 +1,7 @@
 #include "Value.h"
 
+#include <algorithm>
+#include <ranges>
 #include <sstream>
 #include <utility>
 
@@ -221,7 +223,7 @@ namespace ance::bbt
     {
         std::string result = "[";
 
-        for (size_t index = 0; index < elements_.size(); index++)
+        for (size_t const index : std::views::iota(size_t {0}, elements_.size()))
         {
             if (index > 0) result += ", ";
             result += elements_[index]->toString();
@@ -251,7 +253,7 @@ namespace ance::bbt
         return make(type(), std::move(elements_copy), type_context);
     }
 
-    utility::List<utility::Shared<Value>> const& Array::elements() const
+    std::span<utility::Shared<Value> const> Array::elements() const
     {
         return elements_;
     }
@@ -261,12 +263,7 @@ namespace ance::bbt
         if (type() != other.type()) return false;
         if (elements_.size() != other.elements_.size()) return false;
 
-        for (size_t index = 0; index < elements_.size(); index++)
-        {
-            if (!elements_[index]->equals(*other.elements_[index])) return false;
-        }
-
-        return true;
+        return std::ranges::equal(elements_, other.elements_, [](auto const& left, auto const& right) { return left->equals(*right); });
     }
 
     bool Array::isEmpty() const
