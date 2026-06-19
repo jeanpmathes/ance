@@ -179,6 +179,13 @@ namespace ance
         // todo: trace should never be suppressed if identical
         // todo: later, when going back to the tests, they should also assert specific IDs
 
+        // todo: rework core functions to not have that strong side effects
+        // todo: especially log and include are issues - make them methods of a compiler object which is provided as a global variable
+        // todo: later, for file IO, an io object would be used or similar (note that down)
+        // todo: loading external functions should not have a keyword, but also use intrinsics in some way and an object, e.g. linker.link("name", Size -> Size)
+        // todo:    but also think about this a bit more
+        // todo: also add a compiler setting whether intrinsics are allowed to be used in user code (compiler arg), maybe an --unsafe option
+
         // todo: all variants of char and string types and literals, check that char might need to be called codepoint
 
         // todo: when adding destructors, do not forget that break/continue can also cause them to be called - scope information has to be carried over to bbt and cet
