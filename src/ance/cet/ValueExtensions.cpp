@@ -8,7 +8,7 @@
 
 namespace ance::cet
 {
-    ScopeRef::ScopeRef(Scope& scope, bbt::TypeContext& type_context) : ValueBase(type_context.getScopeRef(), type_context), scope_(scope) {}
+    ScopeRef::ScopeRef(Scope& scope, bbt::TypeContext& type_context) : Value(type_context.getScopeRef(), type_context), ValueBase(), scope_(scope) {}
 
     utility::Shared<ScopeRef> ScopeRef::make(Scope& scope, bbt::TypeContext& type_context)
     {
@@ -30,7 +30,10 @@ namespace ance::cet
         return &scope_ == &other.scope_;
     }
 
-    VariableRef::VariableRef(Variable& variable, bbt::TypeContext& type_context) : ValueBase(type_context.getVariableRef(), type_context), variable_(variable)
+    VariableRef::VariableRef(Variable& variable, bbt::TypeContext& type_context)
+        : Value(type_context.getVariableRef(), type_context)
+        , ValueBase()
+        , variable_(variable)
     {}
 
     utility::Shared<VariableRef> VariableRef::make(Variable& variable, bbt::TypeContext& type_context)
@@ -57,7 +60,7 @@ namespace ance::cet
                          utility::Shared<bbt::Type>      referenced_type,
                          core::VariabilityModifier const variability,
                          bbt::TypeContext&               type_context)
-        : ValueBase(type_context.getReference(std::move(referenced_type), variability), type_context)
+        : Value(type_context.getReference(std::move(referenced_type), variability), type_context), ValueBase()
         , address_(std::move(address))
     {}
 

@@ -123,6 +123,9 @@ namespace ance
         // todo: type semantics - types should now use value semantics, which means that types would have the == operator, all type constructors (so array, ref, ...) always return new instances
         // todo: this also means that the type context might no longer be needed, and Value can get a clone() instead of using ugly const casts (function might be an issue here, so maybe make it a value type as well)
         // todo: functions should be value types so we can use them as keys for native functions, also write something about that in later note
+        // todo: also rename the type constructors to actually contain Constructor in the name
+        // todo: go through all Value const& and Type const&, evaluate if Shared would be appropriate
+        // todo: to through all usage of Value::equals and replace with == and !=
         // todo: requires intensive testing
         // todo: write some related documentation for this, repeat this note for the next step
 
@@ -130,6 +133,7 @@ namespace ance
         // todo: use this for all Node trees, add a comment that when writing the compiler in ance it should of course not use python codegen
         // todo: it should also assist with serialization later, by requiring a stable ID for each Node, generate an enum for each type
         // todo: also use this to improve tracing by automatically writing the trace, also creating an exit trace if needed (e.g. by allowing to easily access the destination of statements)
+        // todo: also give each a clone method that can clone them, use this to refactor Function - it currently keeps a const& to the body, but now function ctor could clone instead so the class can be streamlined
         // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: think about doing some form of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar already

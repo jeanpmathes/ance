@@ -159,14 +159,10 @@ namespace ance::bbt
         std::map<std::pair<core::BinaryOperator, Type const*>, core::Identifier>       binary_operator_map_ = {};
     };
 
-    Type::Type(core::Identifier const& identifier, TypeContext& type_context)
-        : ValueBase(std::nullopt, type_context)
-        , implementation_(utility::makeOwned<Implementation>(identifier))
-    {}
+    Type::Type(core::Identifier const& identifier) : implementation_(utility::makeOwned<Implementation>(identifier)) {}
 
-    Type::Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types, TypeContext& type_context)
-        : ValueBase(std::nullopt, type_context)
-        , implementation_(utility::makeOwned<Implementation>(identifier, std::move(constructing_types)))
+    Type::Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types)
+        : implementation_(utility::makeOwned<Implementation>(identifier, std::move(constructing_types)))
     {}
 
     core::Identifier const& Type::name() const
@@ -177,16 +173,6 @@ namespace ance::bbt
     std::string Type::annotated() const
     {
         return std::format("'{}'", implementation_->identifier().text());
-    }
-
-    bool Type::operator==(Type const& other) const
-    {
-        return &other == this;
-    }
-
-    bool Type::operator!=(Type const& other) const
-    {
-        return !(*this == other);
     }
 
     bool Type::isReference() const
@@ -224,11 +210,6 @@ namespace ance::bbt
         return std::string(implementation_->identifier().text());
     }
 
-    bool Type::equals(Type const& other) const
-    {
-        return other == *this;
-    }
-
     bool Type::isUnaryOperatorDefined(core::UnaryOperator const unary_operator) const
     {
         return implementation_->isUnaryOperatorDefined(unary_operator);
@@ -264,6 +245,14 @@ namespace ance::bbt
         throw std::logic_error("Not supported.");
     }
 
+    BasicType::BasicType(core::Identifier const& identifier, TypeContext& type_context) : Value(std::nullopt, type_context), ValueBase(), Type(identifier, {})
+    {}
+
+    bool BasicType::equals(BasicType const& other) const
+    {
+        return name().text() == other.name().text();
+    }
+
     namespace
     {
         std::string createReferenceTypeName(utility::Shared<Type> referenced_type, core::VariabilityModifier variability)
@@ -278,9 +267,9 @@ namespace ance::bbt
     }
 
     ReferenceType::ReferenceType(utility::Shared<Type> referenced_type, core::VariabilityModifier const variability, TypeContext& type_context)
-        : Type(core::Identifier::make(createReferenceTypeName(referenced_type, variability), core::Location::core()),
-               bundleTypes(referenced_type),
-               type_context)
+        : Value(std::nullopt, type_context)
+        , ValueBase()
+        , Type(core::Identifier::make(createReferenceTypeName(referenced_type, variability), core::Location::core()), bundleTypes(referenced_type))
         , referenced_type_(referenced_type)
         , variability_(variability)
     {}
@@ -295,10 +284,16 @@ namespace ance::bbt
         return variability_;
     }
 
+    bool ReferenceType::equals(ReferenceType const& other) const
+    {
+        return referenced_type_->equals(*other.referenced_type_) && variability_ == other.variability_;
+    }
+
     ArrayType::ArrayType(utility::Shared<Type> element_type, size_t const length, TypeContext& type_context)
-        : Type(core::Identifier::make(std::format("[{}; {}]", element_type->name().text(), length), core::Location::core()),
-               bundleTypes(element_type),
-               type_context)
+        : Value(std::nullopt, type_context)
+        , ValueBase()
+        , Type(core::Identifier::make(std::format("[{}; {}]", element_type->name().text(), length), core::Location::core()), bundleTypes(element_type))
+        , element_type_(element_type)
         , length_(length)
     {}
 
@@ -329,12 +324,17 @@ namespace ance::bbt
 
     utility::Shared<Type> ArrayType::getSubscriptType()
     {
-        return elementType();
+        return element_type_;
     }
 
     bool ArrayType::isSubscriptInBounds(size_t const index) const
     {
         return index < length_;
+    }
+
+    bool ArrayType::equals(ArrayType const& other) const
+    {
+        return element_type_->equals(*other.element_type_) && length_ == other.length_;
     }
 
     struct TypeContext::Implementation
@@ -500,7 +500,7 @@ namespace ance::bbt
     {
         return Implementation::getOrCreate(
             implementation_->bool_type,
-            [&] { return utility::makeShared<Type>(core::Identifier::make(core::BOOL_TYPE_NAME, core::Location::core()), *this); },
+            [&] { return utility::makeShared<BasicType>(core::Identifier::make(core::BOOL_TYPE_NAME, core::Location::core()), *this); },
             [&](utility::Shared<Type> type) {
                 implementation_->ensureReadiness(type);
                 implementation_->ensureReadiness(getFunction());
@@ -516,7 +516,7 @@ namespace ance::bbt
     {
         return Implementation::getOrCreate(
             implementation_->unit_type,
-            [&] { return utility::makeShared<Type>(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), *this); },
+            [&] { return utility::makeShared<BasicType>(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), *this); },
             [&](utility::Shared<Type> type) {
                 implementation_->ensureReadiness(type);
                 implementation_->ensureReadiness(getFunction());
@@ -531,7 +531,7 @@ namespace ance::bbt
     {
         return Implementation::getOrCreate(
             implementation_->size_type,
-            [&] { return utility::makeShared<Type>(core::Identifier::make("Size", core::Location::core()), *this); },
+            [&] { return utility::makeShared<BasicType>(core::Identifier::make("Size", core::Location::core()), *this); },
             [&](utility::Shared<Type> type) {
                 implementation_->ensureReadiness(type);
                 implementation_->ensureReadiness(getFunction());
@@ -550,7 +550,7 @@ namespace ance::bbt
         auto getOrCreateFloatType = [&](utility::Optional<utility::Shared<Type>>& slot, std::string const& type_name, std::string const& type_prefix) {
             return Implementation::getOrCreate(
                 slot,
-                [&] { return utility::makeShared<Type>(core::Identifier::make(type_name, core::Location::core()), *this); },
+                [&] { return utility::makeShared<BasicType>(core::Identifier::make(type_name, core::Location::core()), *this); },
                 [&](utility::Shared<Type> type) {
                     implementation_->ensureReadiness(type);
                     implementation_->ensureReadiness(getFunction());
@@ -584,7 +584,7 @@ namespace ance::bbt
     {
         return Implementation::getOrCreate(
             implementation_->string_type,
-            [&] { return utility::makeShared<Type>(core::Identifier::make("String", core::Location::core()), *this); },
+            [&] { return utility::makeShared<BasicType>(core::Identifier::make("String", core::Location::core()), *this); },
             [&](utility::Shared<Type> type) {
                 implementation_->ensureReadiness(type);
                 implementation_->ensureReadiness(getFunction());
@@ -598,7 +598,7 @@ namespace ance::bbt
     utility::Shared<Type> TypeContext::getVariableRef()
     {
         return Implementation::getOrCreate(implementation_->variable_ref_type,
-                                           [&] { return utility::makeShared<Type>(core::Identifier::make(".Variable", core::Location::core()), *this); });
+                                           [&] { return utility::makeShared<BasicType>(core::Identifier::make(".Variable", core::Location::core()), *this); });
     }
 
     utility::Shared<Type> TypeContext::getReference(utility::Shared<Type> referenced_type, core::VariabilityModifier variability)
@@ -619,7 +619,7 @@ namespace ance::bbt
     {
         return Implementation::getOrCreate(
             implementation_->identifier_type,
-            [&] { return utility::makeShared<Type>(core::Identifier::make("Identifier", core::Location::core()), *this); },
+            [&] { return utility::makeShared<BasicType>(core::Identifier::make("Identifier", core::Location::core()), *this); },
             [&](utility::Shared<Type> type) {
                 implementation_->ensureReadiness(type);
                 implementation_->ensureReadiness(getFunction());
@@ -633,27 +633,27 @@ namespace ance::bbt
     utility::Shared<Type> TypeContext::getFunction()
     {
         return Implementation::getOrCreate(implementation_->function_type, [&] {
-            return utility::makeShared<Type>(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), *this);
+            return utility::makeShared<BasicType>(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), *this);
         });
     }
 
     utility::Shared<Type> TypeContext::getType()
     {
         return Implementation::getOrCreate(implementation_->type_type,
-                                           [&] { return utility::makeShared<Type>(core::Identifier::make("Type", core::Location::core()), *this); });
+                                           [&] { return utility::makeShared<BasicType>(core::Identifier::make("Type", core::Location::core()), *this); });
     }
 
     utility::Shared<Type> TypeContext::getScopeRef()
     {
         return Implementation::getOrCreate(implementation_->scope_ref_type,
-                                           [&] { return utility::makeShared<Type>(core::Identifier::make(".Scope", core::Location::core()), *this); });
+                                           [&] { return utility::makeShared<BasicType>(core::Identifier::make(".Scope", core::Location::core()), *this); });
     }
 
     utility::Shared<Type> TypeContext::getLocation()
     {
         return Implementation::getOrCreate(
             implementation_->location_type,
-            [&] { return utility::makeShared<Type>(core::Identifier::make("Location", core::Location::core()), *this); },
+            [&] { return utility::makeShared<BasicType>(core::Identifier::make("Location", core::Location::core()), *this); },
             [&](utility::Shared<Type> type) {
                 implementation_->ensureReadiness(type);
                 implementation_->ensureReadiness(getFunction());

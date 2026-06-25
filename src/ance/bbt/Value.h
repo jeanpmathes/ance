@@ -44,6 +44,9 @@ namespace ance::bbt
         /// Checks whether this value is equal to another value.
         [[nodiscard]] virtual bool equals(Value const& other) const = 0;
 
+        [[nodiscard]] bool operator==(Value const& other) const;
+        [[nodiscard]] bool operator!=(Value const& other) const;
+
         template<typename T>
         [[nodiscard]] bool is() const
         {
@@ -64,13 +67,12 @@ namespace ance::bbt
     };
 
     template<typename T>
-    class ValueBase : public Value
+    class ValueBase : public virtual Value
     {
       public:
-        ValueBase(utility::Optional<utility::Shared<Type>> type, TypeContext& type_context) : Value(type, type_context) {}
-
         ~ValueBase() override = default;
 
+        // ReSharper disable once CppEnforceOverridingFunctionStyle
         [[nodiscard]] virtual bool equals(T const& other) const = 0;
 
         [[nodiscard]] bool equals(Value const& other) const final

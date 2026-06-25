@@ -24,19 +24,17 @@ namespace ance::bbt
 
     /// Represents a type.
     /// A type is a value of itself as the type, and each value has a type.
-    class Type : public ValueBase<Type>
+    class Type : public virtual Value
     {
       public:
         /// Creates a new type.
         /// \param identifier The identifier of the type.
-        /// \param type_context The type context in which this type is created.
-        Type(core::Identifier const& identifier, TypeContext& type_context);
+        Type(core::Identifier const& identifier);
 
         /// Creates a new numeric type with binary operator functions.
         /// \param identifier The identifier of the type.
         /// \param constructing_types The types used to construct this type.
-        /// \param type_context The type context in which this type is created.
-        Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types, TypeContext& type_context);
+        Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types);
 
         Type(Type const&)            = delete;
         Type& operator=(Type const&) = delete;
@@ -51,9 +49,6 @@ namespace ance::bbt
 
         /// Gets the annotated name of this type, for compiler messages.
         [[nodiscard]] std::string annotated() const;
-
-        bool operator==(Type const& other) const;
-        bool operator!=(Type const& other) const;
 
         // todo: add a function stripped() that removes all refs, e.g. &T -> T, &&T -> T, &&&T -> T, etc.
 
@@ -73,7 +68,6 @@ namespace ance::bbt
         [[nodiscard]] Type const& getConstructingType(size_t index) const;
 
         [[nodiscard]] std::string toString() const override;
-        [[nodiscard]] bool        equals(Type const& other) const override;
 
         /// Returns true if this type has a unary operator function for the given operator.
         [[nodiscard]] bool isUnaryOperatorDefined(core::UnaryOperator unary_operator) const;
@@ -110,8 +104,26 @@ namespace ance::bbt
         utility::Owned<Implementation> implementation_;
     };
 
+    /// Used to represent any basic type.
+    class BasicType
+        : public virtual ValueBase<BasicType>
+        , public Type
+    {
+      public:
+        /// Creates a new basic type.
+        /// \param identifier The identifier of this type. It is also used to determine equality.
+        /// \param type_context The type context in which this type is created.
+        BasicType(core::Identifier const& identifier, TypeContext& type_context);
+
+        using Value::equals;
+
+        [[nodiscard]] bool equals(BasicType const& other) const override;
+    };
+
     /// Represents a reference type.
-    class ReferenceType : public Type// todo: think about this type vs. reference wrapper, maybe this should have refernce-wrapper like behavior
+    class ReferenceType
+        : public virtual ValueBase<ReferenceType>
+        , public Type// todo: think about this type vs. reference wrapper, maybe this should have reference-wrapper like behavior
     {
       public:
         /// Creates a new reference type.
@@ -125,13 +137,18 @@ namespace ance::bbt
         /// The variability of this type.
         [[nodiscard]] core::VariabilityModifier variability() const override;
 
+        using Value::equals;
+
+        [[nodiscard]] bool equals(ReferenceType const& other) const override;
+
       private:
         utility::Shared<Type>     referenced_type_;
         core::VariabilityModifier variability_;
     };
 
     /// Represents a fixed-size array type.
-    class ArrayType : public Type
+    class ArrayType
+        : public virtual ValueBase<ArrayType>, public Type
     {
       public:
         /// Creates a new array type.
@@ -149,7 +166,12 @@ namespace ance::bbt
         [[nodiscard]] utility::Shared<Type> getSubscriptType() override;
         [[nodiscard]] bool                  isSubscriptInBounds(size_t index) const override;
 
+        using Value::equals;
+
+        [[nodiscard]] bool equals(ArrayType const& other) const override;
+
       private:
+        utility::Shared<Type>     element_type_;
         size_t length_;
     };
 
