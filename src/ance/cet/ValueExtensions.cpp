@@ -57,7 +57,7 @@ namespace ance::cet
     }
 
     Reference::Reference(Address                         address,
-                         utility::Shared<bbt::Type>      referenced_type,
+                         utility::Shared<bbt::Type const> referenced_type,
                          core::VariabilityModifier const variability,
                          bbt::TypeContext&               type_context)
         : Value(type_context.getReference(std::move(referenced_type), variability), type_context), ValueBase()
@@ -65,7 +65,7 @@ namespace ance::cet
     {}
 
     utility::Shared<Reference> Reference::make(Address                    address,
-                                               utility::Shared<bbt::Type> referenced_type,
+                                               utility::Shared<bbt::Type const> referenced_type,
                                                core::VariabilityModifier  variability,
                                                bbt::TypeContext&          type_context)
     {

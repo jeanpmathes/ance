@@ -9,12 +9,12 @@
 
 ance::cet::Temporary::Temporary(bbt::TypeContext& type_context) : value_(bbt::Unit::make(type_context)), type_context_(type_context) {}
 
-ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::access()
+ance::utility::Shared<ance::bbt::Value const> ance::cet::Temporary::access()
 {
     return Reference::make(Address(*this), value_->type(), core::VariabilityModifier::CONSTANT, type_context_);
 }
 
-ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::span<size_t const> const indices)
+ance::utility::Shared<ance::bbt::Value const> ance::cet::Temporary::read(std::span<size_t const> const indices)
 {
     auto result = load(value_, indices, type_context_);
     assert(result.hasValue());
@@ -22,7 +22,7 @@ ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read(std::span<siz
     return result.value();
 }
 
-void ance::cet::Temporary::write(utility::Shared<bbt::Value> value, std::span<size_t const> const indices)
+void ance::cet::Temporary::write(utility::Shared<bbt::Value const> value, std::span<size_t const> const indices)
 {
     if (indices.empty())
     {
@@ -36,12 +36,12 @@ void ance::cet::Temporary::write(utility::Shared<bbt::Value> value, std::span<si
     value_ = result.value();
 }
 
-ance::utility::Shared<ance::bbt::Value> ance::cet::Temporary::read()
+ance::utility::Shared<ance::bbt::Value const> ance::cet::Temporary::read()
 {
     return read({});
 }
 
-void ance::cet::Temporary::write(utility::Shared<bbt::Value> value)
+void ance::cet::Temporary::write(utility::Shared<bbt::Value const> value)
 {
     write(std::move(value), {});
 }
@@ -51,7 +51,7 @@ bool ance::cet::Temporary::isDefined() const
     return true;
 }
 
-ance::bbt::Type const& ance::cet::Temporary::type() const
+ance::utility::Shared<ance::bbt::Type const> ance::cet::Temporary::type() const
 {
     return value_->type();
 }

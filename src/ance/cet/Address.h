@@ -26,10 +26,10 @@ namespace ance::cet
         [[nodiscard]] Address subscript(size_t index) const;
 
         /// Read the value at the addressed location.
-        [[nodiscard]] utility::Shared<bbt::Value> read() const;
+        [[nodiscard]] utility::Shared<bbt::Value const> read() const;
 
         /// Write a value to the addressed location.
-        void                                      write(utility::Shared<bbt::Value> value) const;
+        void write(utility::Shared<bbt::Value const> value) const;
 
         /// Check whether the addressed location is defined, i.e. has a value.
         [[nodiscard]] bool                        isDefined() const;

@@ -97,6 +97,12 @@ ance::utility::Shared<T>::Shared(Shared<T>& value) noexcept : value_(value.value
 
 template<typename T>
 template<typename OtherT>
+    requires(std::is_const_v<T> && std::same_as<T, OtherT>)
+ance::utility::Shared<T>::Shared(Shared<OtherT> const& value) noexcept : value_(value.value_)
+{}
+
+template<typename T>
+template<typename OtherT>
     requires ance::utility::MoveConvertible<T*, OtherT*>
 ance::utility::Shared<T>::Shared(Shared<OtherT>&& value) noexcept : value_(std::move(value.value_))
 {}
@@ -105,6 +111,12 @@ template<typename T>
 template<typename OtherT>
     requires ance::utility::CopyConvertible<T*, OtherT*>
 ance::utility::Shared<T>::Shared(Shared<OtherT>& value) noexcept : value_(value.value_)
+{}
+
+template<typename T>
+template<typename OtherT>
+    requires(std::is_const_v<T> && ance::utility::CopyConvertible<T*, OtherT*>)
+ance::utility::Shared<T>::Shared(Shared<OtherT> const& value) noexcept : value_(value.value_)
 {}
 
 template<typename T>
@@ -127,6 +139,15 @@ template<typename T>
 template<typename OtherT>
     requires ance::utility::CopyConvertible<T*, OtherT*>
 ance::utility::Shared<T>& ance::utility::Shared<T>::operator=(Shared<OtherT>& value) noexcept
+{
+    value_ = value.value_;
+    return *this;
+}
+
+template<typename T>
+template<typename OtherT>
+    requires(std::is_const_v<T> && ance::utility::CopyConvertible<T*, OtherT*>)
+ance::utility::Shared<T>& ance::utility::Shared<T>::operator=(Shared<OtherT> const& value) noexcept
 {
     value_ = value.value_;
     return *this;
@@ -176,24 +197,28 @@ T const* ance::utility::Shared<T>::operator->() const
 
 template<typename T>
 template<typename OtherT>
-ance::utility::Shared<OtherT> ance::utility::Shared<T>::as()
+ance::utility::Shared<std::conditional_t<std::is_const_v<T>, std::add_const_t<OtherT>, OtherT>> ance::utility::Shared<T>::as()
 {
-    auto casted = std::dynamic_pointer_cast<OtherT>(value_);
+    using ResultT = std::conditional_t<std::is_const_v<T>, std::add_const_t<OtherT>, OtherT>;
+
+    auto casted = std::dynamic_pointer_cast<ResultT>(value_);
 
     assert(casted);
 
-    return Shared<OtherT>(std::move(casted));
+    return Shared<ResultT>(std::move(casted));
 }
 
 template<typename T>
 template<typename OtherT>
-OtherT const& ance::utility::Shared<T>::as() const
+ance::utility::Shared<std::add_const_t<OtherT>> ance::utility::Shared<T>::as() const
 {
-    auto const* casted = dynamic_cast<OtherT const*>(value_.get());
+    using ResultT = std::add_const_t<OtherT>;
+
+    auto casted = std::dynamic_pointer_cast<ResultT>(value_);
 
     assert(casted);
 
-    return *casted;
+    return Shared<ResultT>(std::move(casted));
 }
 
 template<typename T>

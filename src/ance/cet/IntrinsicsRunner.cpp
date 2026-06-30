@@ -24,15 +24,15 @@ struct ance::cet::IntrinsicsRunner::Implementation
     struct State
     {
         core::Location                                location             = core::Location::project();
-        utility::List<utility::Shared<bbt::Value>>*   arguments            = nullptr;
-        utility::Optional<utility::Shared<bbt::Type>> expected_return_type = std::nullopt;
+        utility::List<utility::Shared<bbt::Value const>>*   arguments            = nullptr;
+        utility::Optional<utility::Shared<bbt::Type const>> expected_return_type = std::nullopt;
 
-        utility::Optional<utility::Shared<bbt::Value>> return_value_      = std::nullopt;
+        utility::Optional<utility::Shared<bbt::Value const>> return_value_      = std::nullopt;
         utility::Optional<PendingResolution>           pending_resolution = std::nullopt;
         bool                                           aborted            = false;
     };
 
-    Result run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<bbt::Value>>& arguments, core::Location const& location)
+    Result run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<bbt::Value const>>& arguments, core::Location const& location)
     {
         auto [signature, return_type] = bbt::getIntrinsicSignature(intrinsic, type_context_);
 
@@ -51,7 +51,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
             assert(arguments.size() == signature.parameters().size());
         }
 
-        auto const argument_types  = arguments | std::views::transform([](auto const& argument) -> bbt::Type const& { return argument->type(); });
+        auto const argument_types  = arguments | std::views::transform([](auto const& argument) -> bbt::Type const& { return *argument->type(); });
         auto const parameter_types = signature.parameters() | std::views::transform([](auto const& parameter) -> bbt::Type const& { return *parameter.type; });
 
         assert(std::ranges::equal(argument_types | std::views::take(parameter_types.size()), parameter_types));
@@ -315,7 +315,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
         Scope&                     scope       = state_.arguments->at(0)->as<ScopeRef>().value();
         core::Identifier const&    identifier  = state_.arguments->at(1)->as<bbt::Identifier>().value();
         bool const                 is_variable = state_.arguments->at(2)->as<bbt::Bool>().value();
-        utility::Shared<bbt::Type> type        = state_.arguments->at(3).as<bbt::Type>();
+        utility::Shared<bbt::Type const> type        = state_.arguments->at(3).as<bbt::Type>();
 
         auto variable = scope.declare(identifier, type, is_variable, state_.location, reporter_);
 
@@ -438,7 +438,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
             return;
         }
 
-        utility::List<utility::Shared<bbt::Value>> arguments;
+        utility::List<utility::Shared<bbt::Value const>> arguments;
         for (auto& argument : *state_.arguments | std::views::drop(1)) arguments.emplace_back(argument);
 
         State  outer_state  = std::move(state_);
@@ -655,13 +655,13 @@ struct ance::cet::IntrinsicsRunner::Implementation
 
     void runValueEquality(bool const negated)
     {
-        utility::Shared<bbt::Value> lhs        = state_.arguments->at(0);
-        utility::Shared<bbt::Value> rhs        = state_.arguments->at(1);
+        utility::Shared<bbt::Value const> lhs        = state_.arguments->at(0);
+        utility::Shared<bbt::Value const> rhs        = state_.arguments->at(1);
         bool const                  comparison = lhs->equals(*rhs);
         setResult(bbt::Bool::make(negated ? !comparison : comparison, type_context_));
     }
 
-    void setResult(utility::Shared<bbt::Value> value)
+    void setResult(utility::Shared<bbt::Value const> value)
     {
         assert(*value->type() == **state_.expected_return_type);
 
@@ -724,14 +724,14 @@ ance::cet::PendingResolution const& ance::cet::IntrinsicsRunner::Result::getPend
     return pending_resolution.value();
 }
 
-ance::utility::Shared<ance::bbt::Value> ance::cet::IntrinsicsRunner::Result::getResult()
+ance::utility::Shared<ance::bbt::Value const> ance::cet::IntrinsicsRunner::Result::getResult()
 {
     assert(!isPending() && return_value_.hasValue());
     return return_value_.value();
 }
 
 ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intrinsic const&                      intrinsic,
-                                                                     utility::List<utility::Shared<bbt::Value>>& arguments,
+                                                                     utility::List<utility::Shared<bbt::Value const>>& arguments,
                                                                      core::Location const&                       location)
 {
     return implementation_->run(intrinsic, arguments, location);

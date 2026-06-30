@@ -20,9 +20,9 @@ namespace ance::bbt
         struct Parameter
         {
             core::Identifier      name;
-            utility::Shared<Type> type;
+            utility::Shared<Type const> type;
 
-            Parameter(core::Identifier const& parameter_name, utility::Shared<Type> parameter_type);
+            Parameter(core::Identifier const& parameter_name, utility::Shared<Type const> parameter_type);
         };
 
         Signature(core::Identifier const& name, utility::List<Parameter> parameters, bool variadic = false);

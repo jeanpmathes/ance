@@ -14,7 +14,7 @@ namespace
 {
     void defineLanguageCoreTypes(ance::cet::Runner& runner)
     {
-        auto declare_type = [&](ance::utility::Shared<ance::bbt::Type> type) { runner.declareCoreVariable(type->name(), type); };
+        auto declare_type = [&](ance::utility::Shared<ance::bbt::Type const> type) { runner.declareCoreVariable(type->name(), type); };
 
         declare_type(runner.types().getBool());
         declare_type(runner.types().getUnit());

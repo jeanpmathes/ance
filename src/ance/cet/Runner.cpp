@@ -82,7 +82,7 @@ struct ance::cet::Runner::Implementation
             size_t                 statement_index = 0;
             Scope*                 scope           = nullptr;
 
-            utility::Optional<utility::Shared<bbt::Value>> return_value = std::nullopt;
+            utility::Optional<utility::Shared<bbt::Value const>> return_value = std::nullopt;
 
             RunPoint& getExecutableRunPoint()
             {
@@ -125,7 +125,7 @@ struct ance::cet::Runner::Implementation
                 executing_ = false;
             }
 
-            void popLevel(utility::Shared<bbt::Value> lower_return_value)
+            void popLevel(utility::Shared<bbt::Value const> lower_return_value)
             {
                 stack().pop_back();
 
@@ -243,7 +243,7 @@ struct ance::cet::Runner::Implementation
             }
         }
 
-        std::tuple<ExecutionResult, utility::Shared<bbt::Value>> execute(RunPoint* run_point)
+        std::tuple<ExecutionResult, utility::Shared<bbt::Value const>> execute(RunPoint* run_point)
         {
             State previous_state = std::move(state_);
             state_               = State(run_point->scope, run_point, run_point->statement_index, run_point->block);
@@ -267,7 +267,7 @@ struct ance::cet::Runner::Implementation
             run_point->statement_index = state_.current_statement_index;
 
             ExecutionResult const       result       = state_.execution_result.valueOr(ExecutionResult::Completed);
-            utility::Shared<bbt::Value> return_value = state_.return_value.valueOr(bbt::Unit::make(type_context_));
+            utility::Shared<bbt::Value const> return_value = state_.return_value.valueOr(bbt::Unit::make(type_context_));
 
             reporter_.trace(prefix, core::Location::nowhere()) << "execute run point exit {result=" << result << ", return_value=" << return_value->toString()
                                                                << ", return_type=" << return_value->type()->name() << "}";
@@ -360,7 +360,7 @@ struct ance::cet::Runner::Implementation
         /// Given a value, give a dereferenced value.
         /// If the value is a reference, the referenced value is accessed repeatedly until it is not a reference.
         /// If the value is not a reference, it is returned directly.
-        [[nodiscard]] static utility::Shared<bbt::Value> deReference(utility::Shared<bbt::Value> value)
+        [[nodiscard]] static utility::Shared<bbt::Value const> deReference(utility::Shared<bbt::Value const> value)
         {
             while (value->type()->isReference())
             {
@@ -381,7 +381,7 @@ struct ance::cet::Runner::Implementation
 
             while (current->isReference())
             {
-                current = &current->getConstructingType(0);
+                current = current->getConstructingType(0).get();
             }
 
             return *current;
@@ -389,7 +389,7 @@ struct ance::cet::Runner::Implementation
 
         /// Dereference and cast a value in one step.
         template<typename T>
-        static T const& deReference(utility::Shared<bbt::Value> value)
+        static T const& deReference(utility::Shared<bbt::Value const> value)
         {
             return deReference(value)->as<T>();
         }
@@ -397,17 +397,17 @@ struct ance::cet::Runner::Implementation
         /// Get a memory location as a reference.
         /// If the memory location already stores a reference, that is returned.
         /// If not, a reference to the memory location is created.
-        static utility::Shared<Reference> asReference(Memory& memory)
+        static utility::Shared<Reference const> asReference(Memory& memory)
         {
-            return (memory.type().isReference() ? memory.read({}) : memory.access()).as<Reference>();
+            return (memory.type()->isReference() ? memory.read({}) : memory.access()).as<Reference>();
         }
 
-        static utility::Optional<utility::Shared<bbt::Type>> getCommonType(std::span<utility::Shared<bbt::Type>> types)
+        static utility::Optional<utility::Shared<bbt::Type const>> getCommonType(std::span<utility::Shared<bbt::Type const>> types)
         {
             if (types.empty()) return std::nullopt;
 
             {// Check whether all types are the same type.
-                utility::Shared<bbt::Type> common_type = types[0];
+                utility::Shared<bbt::Type const> common_type = types[0];
 
                 if (!std::ranges::all_of(types | std::views::drop(1), [&common_type](auto const& type) { return *type == *common_type; })) return std::nullopt;
 
@@ -417,8 +417,8 @@ struct ance::cet::Runner::Implementation
             // todo: also check conversions to find common type
         }
 
-        bool expectCommonType(std::span<utility::Shared<bbt::Type>>          types,
-                              utility::Optional<utility::Shared<bbt::Type>>* common_type,
+        bool expectCommonType(std::span<utility::Shared<bbt::Type const>>          types,
+                              utility::Optional<utility::Shared<bbt::Type const>>* common_type,
                               core::Location const&                          location) const
         {
             auto result = getCommonType(types);
@@ -429,7 +429,7 @@ struct ance::cet::Runner::Implementation
                 return true;
             }
 
-            utility::List<utility::Shared<bbt::Type>> unique_types;
+            utility::List<utility::Shared<bbt::Type const>> unique_types;
             unique_types.reserve(types.size());
 
             for (auto& type : types)
@@ -462,7 +462,7 @@ struct ance::cet::Runner::Implementation
 
             friend std::ostream& operator<<(std::ostream& os, TemporaryOutput const& self)
             {
-                utility::Shared<bbt::Value> value = self.bbt->scope().getTemporary(self.temporary).read();
+                utility::Shared<bbt::Value const> value = self.bbt->scope().getTemporary(self.temporary).read();
                 return os << self.temporary.id() << "={value=" << value->toString() << ", type=" << value->type()->name() << "}";
             }
         };
@@ -587,7 +587,7 @@ struct ance::cet::Runner::Implementation
             trace("Branch", branch_link) << ", true_branch=" << branch_link.true_branch.id << ", false_branch=" << branch_link.false_branch.id
                                          << ", condition=" << temp(branch_link.condition);
 
-            utility::Shared<bbt::Value> condition = deReference(scope().getTemporary(branch_link.condition).read());
+            utility::Shared<bbt::Value const> condition = deReference(scope().getTemporary(branch_link.condition).read());
             if (!expectType(*type_context_.getBool(), *condition->type(), branch_link.condition.location))
             {
                 abort();
@@ -615,10 +615,10 @@ struct ance::cet::Runner::Implementation
         {
             trace("Switch", switch_link) << ", condition=" << temp(switch_link.condition) << ", #cases=" << switch_link.cases.size();
 
-            utility::Shared<bbt::Value> condition      = scope().getTemporary(switch_link.condition).read();
-            utility::Shared<bbt::Type>  condition_type = condition->type();
+            utility::Shared<bbt::Value const> condition      = scope().getTemporary(switch_link.condition).read();
+            utility::Shared<bbt::Type const>  condition_type = condition->type();
 
-            utility::List<utility::Shared<bbt::Value>> case_patterns = {};
+            utility::List<utility::Shared<bbt::Value const>> case_patterns = {};
             utility::Optional<core::Location>          default_pattern_location;
             bool                                       has_invalid_case = false;
             for (auto const& current_case : switch_link.cases)
@@ -629,7 +629,7 @@ struct ance::cet::Runner::Implementation
                     break;
                 }
 
-                utility::Shared<bbt::Value> value = deReference(scope().getTemporary(*current_case->pattern).read());
+                utility::Shared<bbt::Value const> value = deReference(scope().getTemporary(*current_case->pattern).read());
                 if (!expectType(*condition_type, *value->type(), current_case->pattern->location))
                 {
                     has_invalid_case = true;
@@ -670,11 +670,11 @@ struct ance::cet::Runner::Implementation
 
             for (size_t const index : std::views::iota(size_t {0}, case_patterns.size()))
             {
-                utility::Shared<bbt::Value> current_pattern = case_patterns[index];
+                utility::Shared<bbt::Value const> current_pattern = case_patterns[index];
 
                 for (size_t const other_index : std::views::iota(size_t {0}, index))
                 {
-                    utility::Shared<bbt::Value> other_pattern = case_patterns[other_index];
+                    utility::Shared<bbt::Value const> other_pattern = case_patterns[other_index];
 
                     if (other_pattern->equals(*current_pattern))
                     {
@@ -739,7 +739,7 @@ struct ance::cet::Runner::Implementation
             // todo: in runtime, it would call the corresponding function of the language runtime, using a runtime_library_call intrinsic
             // todo: to select the right variant, one could have overloads that just differ in execution mode
 
-            utility::Shared<bbt::Value> condition = deReference(scope().getTemporary(assert_statement.condition).read());
+            utility::Shared<bbt::Value const> condition = deReference(scope().getTemporary(assert_statement.condition).read());
             if (!expectType(*type_context_.getBool(), *condition->type(), assert_statement.condition.location))
             {
                 abort();
@@ -757,8 +757,8 @@ struct ance::cet::Runner::Implementation
         {
             trace("Store", store) << ", target=" << temp(store.target) << ", value=" << temp(store.value);
 
-            utility::Shared<bbt::Value> target = scope().getTemporary(store.target).read();
-            utility::Shared<bbt::Value> value  = scope().getTemporary(store.value).read();
+            utility::Shared<bbt::Value const> target = scope().getTemporary(store.target).read();
+            utility::Shared<bbt::Value const> value  = scope().getTemporary(store.value).read();
 
             if (!target->type()->isReference() || !target->type()->variability().isVariable())
             {
@@ -769,7 +769,7 @@ struct ance::cet::Runner::Implementation
 
             // todo: this is not ideal with constants, technically we could get a ref to it when it is not defined yet but then write twice to it through the same ref
 
-            utility::Shared<Reference> reference = target.as<Reference>();
+            utility::Shared<Reference const> reference = target.as<Reference>();
 
             if (!expectType(*target->type()->getConstructingType(0), *value->type(), store.value.location))
             {
@@ -784,7 +784,7 @@ struct ance::cet::Runner::Implementation
         {
             trace("Access", access) << ", variable=" << access.variable.id() << ", destination=" << access.destination.id();
 
-            utility::Shared<bbt::Value> target = deReference(scope().getTemporary(access.variable).read());
+            utility::Shared<bbt::Value const> target = deReference(scope().getTemporary(access.variable).read());
 
             if (!expectType(*type_context_.getVariableRef(), *target->type(), access.variable.location))
             {
@@ -813,7 +813,7 @@ struct ance::cet::Runner::Implementation
         {
             trace("Dereference", dereference) << ", target=" << temp(dereference.target) << ", destination=" << dereference.destination.id();
 
-            utility::Shared<bbt::Value> value = scope().getTemporary(dereference.target).read();
+            utility::Shared<bbt::Value const> value = scope().getTemporary(dereference.target).read();
             scope().getTemporary(dereference.destination).write(deReference(value));
         }
 
@@ -843,7 +843,7 @@ struct ance::cet::Runner::Implementation
 
             for (auto argument : intrinsic.arguments)
             {
-                utility::Shared<bbt::Value> value = scope().getTemporary(argument.get()).read();
+                utility::Shared<bbt::Value const> value = scope().getTemporary(argument.get()).read();
                 argument_types.emplace_back(*value->type());
                 argument_locations.emplace_back(argument.get().location);
             }
@@ -854,11 +854,11 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::List<utility::Shared<bbt::Value>> arguments = {};
+            utility::List<utility::Shared<bbt::Value const>> arguments = {};
 
             for (auto argument : intrinsic.arguments)
             {
-                utility::Shared<bbt::Value> value = scope().getTemporary(argument.get()).read();
+                utility::Shared<bbt::Value const> value = scope().getTemporary(argument.get()).read();
                 arguments.emplace_back(deReference(value));
             }
 
@@ -908,7 +908,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::Shared<bbt::Value> called = deReference(scope().getTemporary(call.called).read());
+            utility::Shared<bbt::Value const> called = deReference(scope().getTemporary(call.called).read());
 
             if (!expectType(*type_context_.getFunction(), *called->type(), call.called.location))
             {
@@ -916,7 +916,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::Shared<bbt::Function> function  = called.as<bbt::Function>();
+            utility::Shared<bbt::Function const> function  = called.as<bbt::Function>();
             bbt::Signature                 signature = function->signature();
 
             utility::List<std::reference_wrapper<bbt::Type const>> argument_types     = {};
@@ -924,7 +924,7 @@ struct ance::cet::Runner::Implementation
 
             for (auto argument : call.arguments)
             {
-                utility::Shared<bbt::Value> value = scope().getTemporary(argument.get()).read();
+                utility::Shared<bbt::Value const> value = scope().getTemporary(argument.get()).read();
                 argument_types.emplace_back(*value->type());
                 argument_locations.emplace_back(argument.get().location);
             }
@@ -935,7 +935,7 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::List<utility::Shared<bbt::Value>> arguments = {};
+            utility::List<utility::Shared<bbt::Value const>> arguments = {};
             for (auto argument : call.arguments)
             {
                 arguments.emplace_back(scope().getTemporary(argument.get()).read());
@@ -946,9 +946,9 @@ struct ance::cet::Runner::Implementation
             for (size_t const index : std::views::iota(size_t {0}, signature.arity()))
             {
                 bbt::Signature::Parameter&  parameter = signature[index];
-                utility::Shared<bbt::Value> argument  = arguments[index];
+                utility::Shared<bbt::Value const> argument  = arguments[index];
 
-                utility::Optional<utility::Shared<bbt::Value>> variable =
+                utility::Optional<utility::Shared<bbt::Value const>> variable =
                     function_scope.declare(parameter.name, parameter.type, false, core::Location::project(), reporter_);
 
                 if (!variable.hasValue())
@@ -970,16 +970,16 @@ struct ance::cet::Runner::Implementation
             trace("Subscript", subscript) << ", indexed=" << temp(subscript.indexed) << ", index=" << temp(subscript.index)
                                           << ", destination=" << subscript.destination.id();
 
-            utility::Shared<Reference> indexed_reference = asReference(scope().getTemporary(subscript.indexed));
+            utility::Shared<Reference const> indexed_reference = asReference(scope().getTemporary(subscript.indexed));
 
-            utility::Shared<bbt::Value> index_value = deReference(scope().getTemporary(subscript.index).read());
+            utility::Shared<bbt::Value const> index_value = deReference(scope().getTemporary(subscript.index).read());
             if (!expectType(*type_context_.getSize(), *index_value->type(), subscript.index.location))
             {
                 abort();
                 return;
             }
 
-            utility::Shared<bbt::Type> indexed_type = indexed_reference->type()->getConstructingType(0);
+            utility::Shared<bbt::Type const> indexed_type = indexed_reference->type()->getConstructingType(0);
             if (!indexed_type->isSubscriptDefined())
             {
                 reporter_.error(subscript.indexed.location) << "Cannot subscript value of type " << indexed_type->annotated();
@@ -1026,7 +1026,7 @@ struct ance::cet::Runner::Implementation
             utility::List<bbt::Signature::Parameter> parameters = {};
             for (auto const& param : function_constructor.parameters)
             {
-                utility::Shared<bbt::Value> type_value = deReference(scope().getTemporary(param.type).read());
+                utility::Shared<bbt::Value const> type_value = deReference(scope().getTemporary(param.type).read());
                 if (!expectType(*type_context_.getType(), *type_value->type(), param.type.location))
                 {
                     abort();
@@ -1037,7 +1037,7 @@ struct ance::cet::Runner::Implementation
 
             bbt::Signature const signature = bbt::Signature(function_constructor.name, std::move(parameters));
 
-            utility::Shared<bbt::Value> return_type = deReference(scope().getTemporary(function_constructor.return_type).read());
+            utility::Shared<bbt::Value const> return_type = deReference(scope().getTemporary(function_constructor.return_type).read());
             if (!expectType(*type_context_.getType(), *return_type->type(), function_constructor.return_type.location))
             {
                 abort();
@@ -1052,28 +1052,25 @@ struct ance::cet::Runner::Implementation
 
         void visit(bbt::Constant const& constant) override
         {
-            trace("Constant", constant) << ", value=" << constant.value->toString() << ", type=" << constant.value->type().name()
+            trace("Constant", constant) << ", value=" << constant.value->toString() << ", type=" << constant.value->type()->name()
                                         << ", destination=" << constant.destination.id();
 
-            // Because the value class is immutable, this operation is logically const, but requires mutability to copy the shared ownership.
-            auto* mutable_constant = const_cast<bbt::Constant*>(&constant);// todo: think about a nicer way to do this
-
-            scope().getTemporary(constant.destination).write(mutable_constant->value);
+            scope().getTemporary(constant.destination).write(constant.value);
         }
 
         void visit(bbt::Default const& default_value) override
         {
             trace("Default", default_value) << ", type=" << temp(default_value.type) << ", destination=" << default_value.destination.id();
 
-            utility::Shared<bbt::Value> type_value = deReference(scope().getTemporary(default_value.type).read());
+            utility::Shared<bbt::Value const> type_value = deReference(scope().getTemporary(default_value.type).read());
             if (!expectType(*type_context_.getType(), *type_value->type(), default_value.type.location))
             {
                 abort();
                 return;
             }
 
-            std::function<utility::Shared<bbt::Value>(utility::Shared<bbt::Type>)> get_default_value =
-                [&](utility::Shared<bbt::Type> type) -> utility::Shared<bbt::Value> {
+            std::function<utility::Shared<bbt::Value const>(utility::Shared<bbt::Type const>)> get_default_value =
+                [&](utility::Shared<bbt::Type const> type) -> utility::Shared<bbt::Value const> {
                 // todo: should become default constructor call at some point
 
                 if (*type == *type_context_.getBool()) return bbt::Bool::make(false, type_context_);
@@ -1087,7 +1084,7 @@ struct ance::cet::Runner::Implementation
                     auto const& array_type   = type->as<bbt::ArrayType>();
                     auto        element_type = type->getConstructingType(0);
 
-                    utility::List<utility::Shared<bbt::Value>> elements;
+                    utility::List<utility::Shared<bbt::Value const>> elements;
                     elements.reserve(array_type.length());
 
                     std::ranges::for_each(std::views::iota(size_t {0}, array_type.length()),
@@ -1103,7 +1100,7 @@ struct ance::cet::Runner::Implementation
                 return bbt::Unit::make(type_context_);
             };
 
-            utility::Shared<bbt::Value> value = get_default_value(type_value.as<bbt::Type>());
+            utility::Shared<bbt::Value const> value = get_default_value(type_value.as<bbt::Type>());
             scope().getTemporary(default_value.destination).write(value);
         }
 
@@ -1120,7 +1117,7 @@ struct ance::cet::Runner::Implementation
                 << ", op=" << get_unary_operator_function_identifier.op.toString() << ", type=" << get_unary_operator_function_identifier.type.id()
                 << ", destination=" << get_unary_operator_function_identifier.destination.id();
 
-            utility::Shared<bbt::Type> type = scope().getTemporary(get_unary_operator_function_identifier.type).read().as<bbt::Type>();
+            utility::Shared<bbt::Type const> type = scope().getTemporary(get_unary_operator_function_identifier.type).read().as<bbt::Type>();
 
             utility::Optional<core::Identifier> operator_function_identifier =
                 type->getUnaryOperatorFunctionIdentifier(get_unary_operator_function_identifier.op);
@@ -1145,8 +1142,8 @@ struct ance::cet::Runner::Implementation
                 << ", right_type=" << get_binary_operator_function_identifier.right_type.id()
                 << ", destination=" << get_binary_operator_function_identifier.destination.id();
 
-            utility::Shared<bbt::Type> left_type  = scope().getTemporary(get_binary_operator_function_identifier.left_type).read().as<bbt::Type>();
-            utility::Shared<bbt::Type> right_type = scope().getTemporary(get_binary_operator_function_identifier.right_type).read().as<bbt::Type>();
+            utility::Shared<bbt::Type const> left_type  = scope().getTemporary(get_binary_operator_function_identifier.left_type).read().as<bbt::Type>();
+            utility::Shared<bbt::Type const> right_type = scope().getTemporary(get_binary_operator_function_identifier.right_type).read().as<bbt::Type>();
 
             utility::Optional<core::Identifier> operator_function_identifier =
                 left_type->getBinaryOperatorFunctionIdentifier(get_binary_operator_function_identifier.op, *right_type);
@@ -1183,13 +1180,13 @@ struct ance::cet::Runner::Implementation
                 msg << ", destination=" << type_of.destination.id();
             }
 
-            utility::List<utility::Shared<bbt::Type>> types;
+            utility::List<utility::Shared<bbt::Type const>> types;
             for (auto const& expression : type_of.values)
             {
                 types.emplace_back(scope().getTemporary(expression.get()).read()->type());
             }
 
-            utility::Optional<utility::Shared<bbt::Type>> common_type;
+            utility::Optional<utility::Shared<bbt::Type const>> common_type;
             if (expectCommonType(types, &common_type, type_of.location))
             {
                 scope().getTemporary(type_of.destination).write(*common_type);
@@ -1205,21 +1202,21 @@ struct ance::cet::Runner::Implementation
             trace("ArrayType", array_type) << ", element_type=" << temp(array_type.element_type) << ", length=" << temp(array_type.length)
                                            << ", destination=" << array_type.destination.id();
 
-            utility::Shared<bbt::Value> element_type_value = deReference(scope().getTemporary(array_type.element_type).read());
+            utility::Shared<bbt::Value const> element_type_value = deReference(scope().getTemporary(array_type.element_type).read());
             if (!expectType(*type_context_.getType(), *element_type_value->type(), array_type.element_type.location))
             {
                 abort();
                 return;
             }
 
-            utility::Shared<bbt::Value> length_value = deReference(scope().getTemporary(array_type.length).read());
+            utility::Shared<bbt::Value const> length_value = deReference(scope().getTemporary(array_type.length).read());
             if (!expectType(*type_context_.getSize(), *length_value->type(), array_type.length.location))
             {
                 abort();
                 return;
             }
 
-            utility::Shared<bbt::Type> element_type = element_type_value.as<bbt::Type>();
+            utility::Shared<bbt::Type const> element_type = element_type_value.as<bbt::Type>();
             size_t const               length       = deReference<bbt::Size>(length_value).value();
 
             scope().getTemporary(array_type.destination).write(type_context_.getArray(std::move(element_type), length));
@@ -1256,10 +1253,10 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            utility::Optional<utility::Shared<bbt::Type>> element_type;
+            utility::Optional<utility::Shared<bbt::Type const>> element_type;
             if (array_constructor.element_type != nullptr)
             {
-                utility::Shared<bbt::Value> element_type_value = deReference(scope().getTemporary(*array_constructor.element_type).read());
+                utility::Shared<bbt::Value const> element_type_value = deReference(scope().getTemporary(*array_constructor.element_type).read());
                 if (!expectType(*type_context_.getType(), *element_type_value->type(), array_constructor.element_type->location))
                 {
                     abort();
@@ -1269,12 +1266,12 @@ struct ance::cet::Runner::Implementation
                 element_type = element_type_value.as<bbt::Type>();
             }
 
-            utility::List<utility::Shared<bbt::Value>> elements;
-            utility::List<utility::Shared<bbt::Type>>  element_types;
+            utility::List<utility::Shared<bbt::Value const>> elements;
+            utility::List<utility::Shared<bbt::Type const>>  element_types;
 
             for (auto const& element : array_constructor.elements)
             {
-                utility::Shared<bbt::Value> value = deReference(scope().getTemporary(element.get()).read());
+                utility::Shared<bbt::Value const> value = deReference(scope().getTemporary(element.get()).read());
 
                 elements.emplace_back(value);
                 element_types.emplace_back(value->type());
@@ -1297,7 +1294,7 @@ struct ance::cet::Runner::Implementation
                 }
             }
 
-            utility::Shared<bbt::Type> array_type = type_context_.getArray(element_type.value(), elements.size());
+            utility::Shared<bbt::Type const> array_type = type_context_.getArray(element_type.value(), elements.size());
             scope().getTemporary(array_constructor.destination).write(bbt::Array::make(std::move(array_type), std::move(elements), type_context_));
         }
 
@@ -1329,7 +1326,7 @@ struct ance::cet::Runner::Implementation
             state_.return_value = deReference(scope().getTemporary(set_return_value.value).read());
         }
 
-        void declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value> value)
+        void declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value const> value)
         {
             value = deReference(std::move(value));
 
@@ -1339,13 +1336,13 @@ struct ance::cet::Runner::Implementation
                 return;// todo: generally, we would want to throw in this case, but for now that is not possible
             }
 
-            utility::Optional<utility::Shared<bbt::Value>> declared =
+            utility::Optional<utility::Shared<bbt::Value const>> declared =
                 core_language_scope_->declare(name, value->type(), false, core::Location::core(), reporter_);
 
             if (declared.hasValue()) (*declared)->as<VariableRef>().value().write(std::move(value));
         }
 
-        utility::Shared<bbt::Value> getCoreVariableValue(core::Identifier const& name)
+        utility::Shared<bbt::Value const> getCoreVariableValue(core::Identifier const& name)
         {
             FindResult result = core_language_scope_->find(name);
 
@@ -1414,7 +1411,7 @@ struct ance::cet::Runner::Implementation
 
             bbt::BasicBlock const* next = nullptr;
 
-            utility::Optional<utility::Shared<bbt::Value>> return_value     = std::nullopt;
+            utility::Optional<utility::Shared<bbt::Value const>> return_value     = std::nullopt;
             utility::Optional<ExecutionResult>             execution_result = std::nullopt;
 
             State() = default;
@@ -1551,12 +1548,12 @@ struct ance::cet::Runner::Implementation
         return segmenter_.segmentUnorderedFile(file);
     }
 
-    void declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value> value)
+    void declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value const> value)
     {
         bbt_->declareCoreVariable(name, value);
     }
 
-    utility::Shared<bbt::Value> getCoreVariableValue(core::Identifier const& name)
+    utility::Shared<bbt::Value const> getCoreVariableValue(core::Identifier const& name)
     {
         return bbt_->getCoreVariableValue(name);
     }
@@ -1600,12 +1597,12 @@ ance::cet::Runner::Runner(sources::SourceTree& source_tree, core::Reporter& repo
 
 ance::cet::Runner::~Runner() = default;
 
-void ance::cet::Runner::declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value> value)
+void ance::cet::Runner::declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value const> value)
 {
     return implementation_->declareCoreVariable(name, std::move(value));
 }
 
-ance::utility::Shared<ance::bbt::Value> ance::cet::Runner::getCoreVariableValue(core::Identifier const& name)
+ance::utility::Shared<ance::bbt::Value const> ance::cet::Runner::getCoreVariableValue(core::Identifier const& name)
 {
     return implementation_->getCoreVariableValue(name);
 }

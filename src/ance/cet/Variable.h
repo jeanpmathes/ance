@@ -26,7 +26,7 @@ namespace ance::cet
         /// \param location The location where the variable was defined.
         /// \param type_context The type context.
         Variable(core::Identifier const&    identifier,
-                 utility::Shared<bbt::Type> type,
+                 utility::Shared<bbt::Type const> type,
                  bool                       is_variable,
                  core::Location const&      location,
                  bbt::TypeContext&          type_context);
@@ -34,31 +34,30 @@ namespace ance::cet
         ~Variable() override = default;
 
         [[nodiscard]] core::Identifier const&    name() const;
-        [[nodiscard]] utility::Shared<bbt::Type> type();
-        [[nodiscard]] bbt::Type const&           type() const override;
+        [[nodiscard]] utility::Shared<bbt::Type const> type() const override;
         [[nodiscard]] bool                       isVariable() const;
         [[nodiscard]] bool                       isConstant() const;
         [[nodiscard]] core::Location const&      location() const;
 
-        [[nodiscard]] utility::Shared<bbt::Value> access() override;
+        [[nodiscard]] utility::Shared<bbt::Value const> access() override;
 
-        utility::Shared<bbt::Value> read(std::span<size_t const> indices) override;
-        void                        write(utility::Shared<bbt::Value> value, std::span<size_t const> indices) override;
+        utility::Shared<bbt::Value const> read(std::span<size_t const> indices) override;
+        void                              write(utility::Shared<bbt::Value const> value, std::span<size_t const> indices) override;
 
-        utility::Shared<bbt::Value> read();
-        void                        write(utility::Shared<bbt::Value> value);
+        utility::Shared<bbt::Value const> read();
+        void                              write(utility::Shared<bbt::Value const> value);
 
         [[nodiscard]] bool isDefined() const override;
 
       private:
         core::Identifier           identifier_;
-        utility::Shared<bbt::Type> type_;
+        utility::Shared<bbt::Type const> type_;
         bool                       is_variable_;
         core::Location             location_;
 
         bbt::TypeContext& type_context_;
 
-        utility::Optional<utility::Shared<bbt::Value>> value_;
+        utility::Optional<utility::Shared<bbt::Value const>> value_;
     };
 }
 

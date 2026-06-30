@@ -12,7 +12,7 @@ namespace ance::bbt
     class TypeContext;
 
     /// Provides the signatures of an intrinsic.
-    std::tuple<Signature, utility::Shared<Type>> getIntrinsicSignature(core::Intrinsic intrinsic, TypeContext& type_context);
+    std::tuple<Signature, utility::Shared<Type const>> getIntrinsicSignature(core::Intrinsic intrinsic, TypeContext& type_context);
 }
 
 #endif

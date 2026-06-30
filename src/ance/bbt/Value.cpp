@@ -9,19 +9,14 @@
 
 namespace ance::bbt
 {
-    Value::Value(utility::Optional<utility::Shared<Type>> type, TypeContext& type_context) : type_(std::move(type)), type_context_(type_context) {}
+    Value::Value(utility::Optional<utility::Shared<Type const>> type, TypeContext& type_context) : type_(std::move(type)), type_context_(type_context) {}
 
-    utility::Shared<Type> Value::type()
+    utility::Shared<Type const> Value::type() const
     {
-        return type_.valueOr(type_context_.getType());
+        return type_.hasValue() ? type_.value() : type_context_.getType();
     }
 
-    Type const& Value::type() const
-    {
-        return type_.hasValue() ? *type_.value() : *type_context_.getType();
-    }
-
-    utility::Optional<utility::Shared<Value>> Value::access(size_t, utility::Shared<Value>*, TypeContext&)
+    utility::Optional<utility::Shared<Value const>> Value::access(size_t, utility::Shared<Value const>*, TypeContext&) const
     {
         // By default, access is not supported.
 
@@ -224,12 +219,14 @@ namespace ance::bbt
         return value_ == other.value_;
     }
 
-    Array::Array(utility::Shared<Type> array_type, utility::List<utility::Shared<Value>> element_list, TypeContext& type_context)
+    Array::Array(utility::Shared<Type const> array_type, utility::List<utility::Shared<Value const>> element_list, TypeContext& type_context)
         : Value(std::move(array_type), type_context), ValueBase()
         , elements_(std::move(element_list))
     {}
 
-    utility::Shared<Array> Array::make(utility::Shared<Type> array_type, utility::List<utility::Shared<Value>> element_list, TypeContext& type_context)
+    utility::Shared<Array> Array::make(utility::Shared<Type const>                 array_type,
+                                       utility::List<utility::Shared<Value const>> element_list,
+                                       TypeContext&                                type_context)
     {
         return utility::makeShared<Array>(std::move(array_type), std::move(element_list), type_context);
     }
@@ -248,7 +245,9 @@ namespace ance::bbt
         return result;
     }
 
-    utility::Optional<utility::Shared<Value>> Array::access(size_t const index, utility::Shared<Value>* replacement, TypeContext& type_context)
+    utility::Optional<utility::Shared<Value const>> Array::access(size_t const                  index,
+                                                                  utility::Shared<Value const>* replacement,
+                                                                  TypeContext&                  type_context) const
     {
         if (index >= elements_.size())
         {
@@ -260,7 +259,9 @@ namespace ance::bbt
             return elements_[index];
         }
 
-        utility::List<utility::Shared<Value>> elements_copy = elements_;
+        utility::List<utility::Shared<Value const>> elements_copy;
+        elements_copy.reserve(elements_.size());
+        std::ranges::copy(elements_, std::back_inserter(elements_copy));
 
         assert((*replacement)->type() == type()->getConstructingType(0));
         elements_copy[index] = *replacement;
@@ -268,14 +269,14 @@ namespace ance::bbt
         return make(type(), std::move(elements_copy), type_context);
     }
 
-    std::span<utility::Shared<Value> const> Array::elements() const
+    std::span<utility::Shared<Value const> const> Array::elements() const
     {
         return elements_;
     }
 
     bool Array::equals(Array const& other) const
     {
-        if (type().equals(other.type())) return false;
+        if (type()->equals(*other.type())) return false;
         if (elements_.size() != other.elements_.size()) return false;
 
         return std::ranges::equal(elements_, other.elements_, [](auto const& left, auto const& right) { return left->equals(*right); });

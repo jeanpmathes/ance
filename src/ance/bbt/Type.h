@@ -34,7 +34,7 @@ namespace ance::bbt
         /// Creates a new numeric type with binary operator functions.
         /// \param identifier The identifier of the type.
         /// \param constructing_types The types used to construct this type.
-        Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types);
+        Type(core::Identifier const& identifier, utility::List<utility::Shared<Type const>> constructing_types);
 
         Type(Type const&)            = delete;
         Type& operator=(Type const&) = delete;
@@ -63,9 +63,7 @@ namespace ance::bbt
         [[nodiscard]] size_t getConstructingTypeCount() const;
 
         /// Gets the i-th constructing type of this type.
-        [[nodiscard]] utility::Shared<Type> getConstructingType(size_t index);
-        /// Gets the i-th constructing type of this type.
-        [[nodiscard]] Type const& getConstructingType(size_t index) const;
+        [[nodiscard]] utility::Shared<Type const> getConstructingType(size_t index) const;
 
         [[nodiscard]] std::string toString() const override;
 
@@ -74,8 +72,8 @@ namespace ance::bbt
 
         /// Returns the identifier of the unary operator function for the given operator, if defined.
         [[nodiscard]] utility::Optional<core::Identifier> getUnaryOperatorFunctionIdentifier(
-            core::UnaryOperator
-                unary_operator);// todo: when reworking how ops are defined, this should be removed because retrieval would ideally not be name based
+            core::UnaryOperator unary_operator)
+            const;// todo: when reworking how ops are defined, this should be removed because retrieval would ideally not be name based
 
         /// Returns true if this type has a binary operator function for the given operator and right-hand type.
         [[nodiscard]] bool isBinaryOperatorDefined(core::BinaryOperator binary_operator, Type const& rhs_type) const;
@@ -83,7 +81,7 @@ namespace ance::bbt
         /// Returns the binary operator function for the given operator and right-hand type, if defined.
         [[nodiscard]] utility::Optional<core::Identifier> getBinaryOperatorFunctionIdentifier(
             core::BinaryOperator binary_operator,
-            Type const&          rhs_type);// todo: when reworking how ops are defined, this should be removed because retrieval would ideally not be name based
+            Type const& rhs_type) const;// todo: when reworking how ops are defined, this should be removed because retrieval would ideally not be name based
 
         /// Returns true if this type supports subscript access.
         /// If this is overridden and returns true, the corresponding value class needs to provide an implementation for \c access .
@@ -91,7 +89,7 @@ namespace ance::bbt
 
         /// Returns the element type accessed by the subscript operation.
         /// Only valid to call if \c isSubscriptDefined returns true.
-        [[nodiscard]] virtual utility::Shared<Type> getSubscriptType();
+        [[nodiscard]] virtual utility::Shared<Type const> getSubscriptType() const;
 
         /// Returns true if a given subscript index is within bounds.
         /// Only valid to call if \c isSubscriptDefined returns true.
@@ -130,7 +128,7 @@ namespace ance::bbt
         /// \param referenced_type The type being referenced.
         /// \param variability The variability of the reference.
         /// \param type_context The type context in which this type is created.
-        ReferenceType(utility::Shared<Type> referenced_type, core::VariabilityModifier variability, TypeContext& type_context);
+        ReferenceType(utility::Shared<Type const> referenced_type, core::VariabilityModifier variability, TypeContext& type_context);
 
         [[nodiscard]] bool isReference() const override;
 
@@ -142,7 +140,7 @@ namespace ance::bbt
         [[nodiscard]] bool equals(ReferenceType const& other) const override;
 
       private:
-        utility::Shared<Type>     referenced_type_;
+        utility::Shared<Type const> referenced_type_;
         core::VariabilityModifier variability_;
     };
 
@@ -155,15 +153,14 @@ namespace ance::bbt
         /// \param element_type The type of each array element.
         /// \param length The number of elements in the array.
         /// \param type_context The type context in which this type is created.
-        ArrayType(utility::Shared<Type> element_type, size_t length, TypeContext& type_context);
+        ArrayType(utility::Shared<Type const> element_type, size_t length, TypeContext& type_context);
 
         [[nodiscard]] bool                  isArray() const override;
-        [[nodiscard]] utility::Shared<Type> elementType();
-        [[nodiscard]] Type const&           elementType() const;
+        [[nodiscard]] utility::Shared<Type const> elementType() const;
         [[nodiscard]] size_t                length() const;
 
         [[nodiscard]] bool                  isSubscriptDefined() const override;
-        [[nodiscard]] utility::Shared<Type> getSubscriptType() override;
+        [[nodiscard]] utility::Shared<Type const> getSubscriptType() const override;
         [[nodiscard]] bool                  isSubscriptInBounds(size_t index) const override;
 
         using Value::equals;
@@ -171,7 +168,7 @@ namespace ance::bbt
         [[nodiscard]] bool equals(ArrayType const& other) const override;
 
       private:
-        utility::Shared<Type>     element_type_;
+        utility::Shared<Type const> element_type_;
         size_t length_;
     };
 
@@ -183,52 +180,57 @@ namespace ance::bbt
         ~TypeContext();
 
         /// Get the boolean type, which has two values: true and false.
-        utility::Shared<Type> getBool();
+        utility::Shared<Type const> getBool();
 
         /// Get the unit type, which has one value: ().
-        utility::Shared<Type> getUnit();
+        utility::Shared<Type const> getUnit();
 
         /// Get the size type, which has a platform-dependent size always larger enough to serve as a memory index.
-        utility::Shared<Type> getSize();
+        utility::Shared<Type const> getSize();
 
         /// Get a float type by its precision.
-        utility::Shared<Type> getFloat(core::Precision precision);
+        utility::Shared<Type const> getFloat(core::Precision precision);
 
         /// Get the string type.
-        utility::Shared<Type> getString();
+        utility::Shared<Type const> getString();
 
         /// Get the variable reference type, which is used to refer to variables.
-        utility::Shared<Type>
+        utility::Shared<Type const>
         getVariableRef();// todo: should be split into variable type and reference type (not the current ref), variable type should be parameterized
 
         /// Get a reference type.
         /// \param referenced_type The type being referenced.
         /// \param variability The variability of the referenced value.
-        utility::Shared<Type> getReference(utility::Shared<Type> referenced_type, core::VariabilityModifier variability);
+        utility::Shared<Type const> getReference(utility::Shared<Type const> referenced_type, core::VariabilityModifier variability);
 
         /// Get a fixed-size array type.
         /// \param element_type The type of each array element.
         /// \param length The number of elements in the array.
-        utility::Shared<Type> getArray(utility::Shared<Type> element_type, size_t length);
+        utility::Shared<Type const> getArray(utility::Shared<Type const> element_type, size_t length);
 
         /// Get the identifier type, which is the type of all identifiers.
-        utility::Shared<Type> getIdentifier();
+        utility::Shared<Type const> getIdentifier();
 
         /// Get the function type.
-        utility::Shared<Type> getFunction();// TODO: function type should be parameterized (signature and return type)
+        utility::Shared<Type const> getFunction();// TODO: function type should be parameterized (signature and return type)
 
         /// Get the type-type - the type of all types.
-        utility::Shared<Type> getType();
+        utility::Shared<Type const> getType();
+
+        /// Get the type-type - the type of all types.
+        utility::Shared<Type const> getType() const;
 
         /// Get the scope type, which refers to scope values.
-        utility::Shared<Type> getScopeRef();
+        utility::Shared<Type const> getScopeRef();
 
         /// Get the source location type.
-        utility::Shared<Type> getLocation();
+        utility::Shared<Type const> getLocation();
 
       private:
         struct Implementation;
         utility::Owned<Implementation> implementation_;
+
+        utility::Shared<Type const> type_;
     };
 }
 

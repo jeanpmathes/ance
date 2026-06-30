@@ -23,13 +23,12 @@ namespace ance::bbt
     {
       protected:
         /// The concrete value class must supply its type, except when the type is "Type"; then \c nullopt must be used to prevent infinite recursion.
-        explicit Value(utility::Optional<utility::Shared<Type>> type, TypeContext& type_context);
+        explicit Value(utility::Optional<utility::Shared<Type const>> type, TypeContext& type_context);
 
       public:
         virtual ~Value() = default;
 
-        utility::Shared<Type>             type();
-        [[nodiscard]] Type const&         type() const;
+        [[nodiscard]] utility::Shared<Type const> type() const;
         [[nodiscard]] virtual std::string toString() const = 0;
 
         /// \brief Access this value using an index.
@@ -39,7 +38,9 @@ namespace ance::bbt
         /// \param replacement If this is null, the value at the index is loaded and returned. If this is not null, a copy of this value is returned with the indexed element replaced. If passed, it must be of a valid type.
         /// \param type_context The type context.
         /// \return Depending on the mode, either the loaded element or the modified copy. If the access is out of bounds or not supported at all, \c std::nullopt is returned.
-        [[nodiscard]] virtual utility::Optional<utility::Shared<Value>> access(size_t index, utility::Shared<Value>* replacement, TypeContext& type_context);
+        [[nodiscard]] virtual utility::Optional<utility::Shared<Value const>> access(size_t                        index,
+                                                                                     utility::Shared<Value const>* replacement,
+                                                                                     TypeContext&                  type_context) const;
 
         /// Checks whether this value is equal to another value.
         [[nodiscard]] virtual bool equals(Value const& other) const = 0;
@@ -62,7 +63,7 @@ namespace ance::bbt
         }
 
       private:
-        utility::Optional<utility::Shared<Type>> type_;
+        utility::Optional<utility::Shared<Type const>> type_;
         TypeContext&                             type_context_;
     };
 
@@ -206,22 +207,26 @@ namespace ance::bbt
     class Array final : public ValueBase<Array>
     {
       public:
-        Array(utility::Shared<Type> array_type, utility::List<utility::Shared<Value>> element_list, TypeContext& type_context);
+        Array(utility::Shared<Type const> array_type, utility::List<utility::Shared<Value const>> element_list, TypeContext& type_context);
 
-        static utility::Shared<Array> make(utility::Shared<Type> array_type, utility::List<utility::Shared<Value>> element_list, TypeContext& type_context);
+        static utility::Shared<Array> make(utility::Shared<Type const>                 array_type,
+                                           utility::List<utility::Shared<Value const>> element_list,
+                                           TypeContext&                                type_context);
 
         ~Array() override = default;
 
         [[nodiscard]] std::string                                  toString() const override;
-        [[nodiscard]] utility::Optional<utility::Shared<Value>> access(size_t index, utility::Shared<Value>* replacement, TypeContext& type_context) override;
-        [[nodiscard]] std::span<utility::Shared<Value> const>   elements() const;
+        [[nodiscard]] utility::Optional<utility::Shared<Value const>> access(size_t                        index,
+                                                                             utility::Shared<Value const>* replacement,
+                                                                             TypeContext&                  type_context) const override;
+        [[nodiscard]] std::span<utility::Shared<Value const> const>   elements() const;
         [[nodiscard]] bool                                         equals(Array const& other) const override;
 
         [[nodiscard]] bool   isEmpty() const;
         [[nodiscard]] size_t length() const;
 
       private:
-        utility::List<utility::Shared<Value>> elements_;
+        utility::List<utility::Shared<Value const>> elements_;
     };
 }
 

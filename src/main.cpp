@@ -120,14 +120,19 @@ namespace ance
 
         return exit_code;
 
-        // todo: type semantics - types should now use value semantics, which means that types would have the == operator, all type constructors (so array, ref, ...) always return new instances
-        // todo: this also means that the type context might no longer be needed, and Value can get a clone() instead of using ugly const casts (function might be an issue here, so maybe make it a value type as well)
+        // todo: type semantics - types should now use "value semantics" (not exactly the right term), all type constructors (so array, ref, ...) always return new instances
+        // todo: write something about this in the doc comment of Type
         // todo: functions should be value types so we can use them as keys for native functions, also write something about that in later note
         // todo: also rename the type constructors to actually contain Constructor in the name
-        // todo: go through all Value const& and Type const&, evaluate if Shared would be appropriate
         // todo: to through all usage of Value::equals and replace with == and !=
         // todo: requires intensive testing
         // todo: write some related documentation for this, repeat this note for the next step
+
+        // todo: set up new test system, should for now only check compiler output and not run anything
+        // todo: should no longer use python but instead C++, so we have coverage data
+        // todo: but should have utilities to write them, so that they are as easy to write as the python tests
+        // todo: rename test to tests_old, add note somewhere to go through all and make sure equivalent test exists in new tests
+        // todo: also add some unit tests for stuff in utility, like Optional, and also SourceFile and such
 
         // todo: code gen - use python to generate the Node files, specifically Node.h and Node.generated.cpp, also integrate well with cmake
         // todo: use this for all Node trees, add a comment that when writing the compiler in ance it should of course not use python codegen
@@ -139,7 +144,7 @@ namespace ance
         // todo: think about doing some form of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar already
         // todo: write some related documentation for this, repeat this note for the next step
 
-        // todo: finally, think about doing compilation in very basic form first, so we can merge again and go back to the tests
+        // todo: finally, think about doing compilation in very basic form first, so we can merge again and extend tests for compiled programs
         // todo: maybe move all TODOs into the standard planning todoist, as a new note, and begin adapting all later notes
         // todo: write some related documentation for this, repeat this note for the next step
 

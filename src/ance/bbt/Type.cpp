@@ -20,10 +20,9 @@ namespace ance::bbt
     template<typename OtherKey = utility::Empty>
     class TypeDictionary final
     {
-        using TypeHandle = utility::Shared<Type>;
-        using InnerTypes = std::vector<TypeHandle>;
+        using InnerTypes = std::vector<utility::Shared<Type const>>;
         using Key        = std::pair<InnerTypes, OtherKey>;
-        using Entry      = std::pair<Key, TypeHandle>;
+        using Entry      = std::pair<Key, utility::Shared<Type>>;
 
       public:
         TypeDictionary() = default;
@@ -36,7 +35,7 @@ namespace ance::bbt
 
         template<typename Factory>
             requires(!std::same_as<OtherKey, utility::Empty>)
-        TypeHandle getOrCreate(InnerTypes const& inner_types, OtherKey const& other_key, Factory factory)
+        utility::Shared<Type> getOrCreate(InnerTypes const& inner_types, OtherKey const& other_key, Factory factory)
         {
             // todo: find a way to optimize this lookup, e.g. a simple map
             // todo: make sure that it actually works hashing-wise with the shared owners
@@ -51,7 +50,7 @@ namespace ance::bbt
                 }
             }
 
-            TypeHandle new_type = factory();
+            utility::Shared<Type> new_type = factory();
 
             types_.emplace_back(std::make_pair(std::make_pair(inner_types, other_key), new_type));
 
@@ -60,7 +59,7 @@ namespace ance::bbt
 
         template<typename Factory>
             requires std::same_as<OtherKey, utility::Empty>
-        TypeHandle getOrCreate(InnerTypes const& inner_types, Factory factory)
+        utility::Shared<Type> getOrCreate(InnerTypes const& inner_types, Factory factory)
         {
             return getOrCreate(inner_types, {}, factory);
         }
@@ -70,9 +69,9 @@ namespace ance::bbt
     };
 
     template<typename... Args>
-    std::vector<utility::Shared<Type>> bundleTypes(Args... args)
+    std::vector<utility::Shared<Type const>> bundleTypes(Args... args)
     {
-        std::vector<utility::Shared<Type>> types;
+        std::vector<utility::Shared<Type const>> types;
         (types.emplace_back(args), ...);
         return types;
     }
@@ -81,7 +80,7 @@ namespace ance::bbt
     {
         explicit Implementation(core::Identifier const& identifier) : identifier_(identifier) {}
 
-        Implementation(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types)
+        Implementation(core::Identifier const& identifier, utility::List<utility::Shared<Type const>> constructing_types)
             : identifier_(identifier)
             , constructing_types_(std::move(constructing_types))
         {}
@@ -96,14 +95,9 @@ namespace ance::bbt
             return constructing_types_.size();
         }
 
-        utility::Shared<Type> getConstructingType(size_t const index)
+        [[nodiscard]] utility::Shared<Type const> getConstructingType(size_t const index) const
         {
             return constructing_types_.at(index);
-        }
-
-        [[nodiscard]] Type const& getConstructingType(size_t const index) const
-        {
-            return *constructing_types_.at(index);
         }
 
         void addUnaryOperatorFunction(core::UnaryOperator const unary_operator, core::Identifier function_identifier)
@@ -121,7 +115,7 @@ namespace ance::bbt
             return unary_operator_map_.contains(unary_operator);
         }
 
-        utility::Optional<core::Identifier> getUnaryOperatorFunctionIdentifier(core::UnaryOperator const unary_operator)
+        [[nodiscard]] utility::Optional<core::Identifier> getUnaryOperatorFunctionIdentifier(core::UnaryOperator const unary_operator) const
         {
             auto const iterator = unary_operator_map_.find(unary_operator);
 
@@ -139,7 +133,8 @@ namespace ance::bbt
             return binary_operator_map_.contains(key);
         }
 
-        utility::Optional<core::Identifier> getBinaryOperatorFunctionIdentifier(core::BinaryOperator const binary_operator, Type const& rhs_type)
+        [[nodiscard]] utility::Optional<core::Identifier> getBinaryOperatorFunctionIdentifier(core::BinaryOperator const binary_operator,
+                                                                                              Type const&                rhs_type) const
         {
             auto const key      = std::make_pair(binary_operator, &rhs_type);
             auto const iterator = binary_operator_map_.find(key);
@@ -154,14 +149,14 @@ namespace ance::bbt
 
       private:
         core::Identifier                                                               identifier_;
-        utility::List<utility::Shared<Type>>                                           constructing_types_  = {};
+        utility::List<utility::Shared<Type const>>                                     constructing_types_  = {};
         std::map<core::UnaryOperator, core::Identifier>                                unary_operator_map_  = {};
         std::map<std::pair<core::BinaryOperator, Type const*>, core::Identifier>       binary_operator_map_ = {};
     };
 
     Type::Type(core::Identifier const& identifier) : implementation_(utility::makeOwned<Implementation>(identifier)) {}
 
-    Type::Type(core::Identifier const& identifier, utility::List<utility::Shared<Type>> constructing_types)
+    Type::Type(core::Identifier const& identifier, utility::List<utility::Shared<Type const>> constructing_types)
         : implementation_(utility::makeOwned<Implementation>(identifier, std::move(constructing_types)))
     {}
 
@@ -195,12 +190,7 @@ namespace ance::bbt
         return implementation_->getConstructingTypeCount();
     }
 
-    utility::Shared<Type> Type::getConstructingType(size_t const index)
-    {
-        return implementation_->getConstructingType(index);
-    }
-
-    Type const& Type::getConstructingType(size_t const index) const
+    utility::Shared<Type const> Type::getConstructingType(size_t const index) const
     {
         return implementation_->getConstructingType(index);
     }
@@ -215,7 +205,7 @@ namespace ance::bbt
         return implementation_->isUnaryOperatorDefined(unary_operator);
     }
 
-    utility::Optional<core::Identifier> Type::getUnaryOperatorFunctionIdentifier(core::UnaryOperator const unary_operator)
+    utility::Optional<core::Identifier> Type::getUnaryOperatorFunctionIdentifier(core::UnaryOperator const unary_operator) const
     {
         return implementation_->getUnaryOperatorFunctionIdentifier(unary_operator);
     }
@@ -225,7 +215,7 @@ namespace ance::bbt
         return implementation_->isBinaryOperatorDefined(binary_operator, rhs_type);
     }
 
-    utility::Optional<core::Identifier> Type::getBinaryOperatorFunctionIdentifier(core::BinaryOperator const binary_operator, Type const& rhs_type)
+    utility::Optional<core::Identifier> Type::getBinaryOperatorFunctionIdentifier(core::BinaryOperator const binary_operator, Type const& rhs_type) const
     {
         return implementation_->getBinaryOperatorFunctionIdentifier(binary_operator, rhs_type);
     }
@@ -235,7 +225,7 @@ namespace ance::bbt
         return false;
     }
 
-    utility::Shared<Type> Type::getSubscriptType()
+    utility::Shared<Type const> Type::getSubscriptType() const
     {
         throw std::logic_error("Not supported.");
     }
@@ -255,7 +245,7 @@ namespace ance::bbt
 
     namespace
     {
-        std::string createReferenceTypeName(utility::Shared<Type> referenced_type, core::VariabilityModifier variability)
+        std::string createReferenceTypeName(utility::Shared<Type const> referenced_type, core::VariabilityModifier variability)
         {
             std::string const type_representation(referenced_type->name().text());
             std::string const variability_representation = variability.toString();
@@ -266,7 +256,7 @@ namespace ance::bbt
         }
     }
 
-    ReferenceType::ReferenceType(utility::Shared<Type> referenced_type, core::VariabilityModifier const variability, TypeContext& type_context)
+    ReferenceType::ReferenceType(utility::Shared<Type const> referenced_type, core::VariabilityModifier const variability, TypeContext& type_context)
         : Value(std::nullopt, type_context)
         , ValueBase()
         , Type(core::Identifier::make(createReferenceTypeName(referenced_type, variability), core::Location::core()), bundleTypes(referenced_type))
@@ -289,7 +279,7 @@ namespace ance::bbt
         return referenced_type_->equals(*other.referenced_type_) && variability_ == other.variability_;
     }
 
-    ArrayType::ArrayType(utility::Shared<Type> element_type, size_t const length, TypeContext& type_context)
+    ArrayType::ArrayType(utility::Shared<Type const> element_type, size_t const length, TypeContext& type_context)
         : Value(std::nullopt, type_context)
         , ValueBase()
         , Type(core::Identifier::make(std::format("[{}; {}]", element_type->name().text(), length), core::Location::core()), bundleTypes(element_type))
@@ -302,12 +292,7 @@ namespace ance::bbt
         return true;
     }
 
-    utility::Shared<Type> ArrayType::elementType()
-    {
-        return getConstructingType(0);
-    }
-
-    Type const& ArrayType::elementType() const
+    utility::Shared<Type const> ArrayType::elementType() const
     {
         return getConstructingType(0);
     }
@@ -322,7 +307,7 @@ namespace ance::bbt
         return true;
     }
 
-    utility::Shared<Type> ArrayType::getSubscriptType()
+    utility::Shared<Type const> ArrayType::getSubscriptType() const
     {
         return element_type_;
     }
@@ -363,7 +348,7 @@ namespace ance::bbt
         TypeDictionary<size_t> array_types;
 
         template<typename Factory>
-        static utility::Shared<Type> getOrCreate(utility::Optional<utility::Shared<Type>>& type_slot, Factory factory)
+        static utility::Shared<Type const> getOrCreate(utility::Optional<utility::Shared<Type>>& type_slot, Factory factory)
         {
             if (!type_slot.hasValue())
             {
@@ -374,7 +359,7 @@ namespace ance::bbt
         }
 
         template<typename Factory, typename Initializer>
-        static utility::Shared<Type> getOrCreate(utility::Optional<utility::Shared<Type>>& type_slot, Factory factory, Initializer initializer)
+        static utility::Shared<Type const> getOrCreate(utility::Optional<utility::Shared<Type>>& type_slot, Factory factory, Initializer initializer)
         {
             if (!type_slot.hasValue())
             {
@@ -481,7 +466,7 @@ namespace ance::bbt
             type.implementation_->addUnaryOperatorFunction(unary_operator, declareUnaryOperatorFunction(type.toString(), type_prefix, unary_operator));
         }
 
-        void ensureReadiness(utility::Shared<Type> type) const
+        void ensureReadiness(utility::Shared<Type const> type) const
         {
             // todo: that this function is necessary is really ugly, it should be removed at some point
             // todo: ideally, we can define the core types entirely using source code, we build that and we pass it to the runner like we do with all other parts of the language core
@@ -492,11 +477,15 @@ namespace ance::bbt
         }
     };
 
-    TypeContext::TypeContext(cet::Runner& runner) : implementation_(utility::makeOwned<Implementation>(runner)) {}
+    TypeContext::TypeContext(cet::Runner& runner) : implementation_(utility::makeOwned<Implementation>(runner)), type_(getType())
+    {
+        // The type 'Type' is very integral and must be immediately available for the Value implementation.
+        // As the value implementation needs access to the type even in const method, the type is stored additionally to the standard handling.
+    }
 
     TypeContext::~TypeContext() = default;
 
-    utility::Shared<Type> TypeContext::getBool()
+    utility::Shared<Type const> TypeContext::getBool()
     {
         return Implementation::getOrCreate(
             implementation_->bool_type,
@@ -512,7 +501,7 @@ namespace ance::bbt
             });
     }
 
-    utility::Shared<Type> TypeContext::getUnit()
+    utility::Shared<Type const> TypeContext::getUnit()
     {
         return Implementation::getOrCreate(
             implementation_->unit_type,
@@ -527,7 +516,7 @@ namespace ance::bbt
             });
     }
 
-    utility::Shared<Type> TypeContext::getSize()
+    utility::Shared<Type const> TypeContext::getSize()
     {
         return Implementation::getOrCreate(
             implementation_->size_type,
@@ -545,7 +534,7 @@ namespace ance::bbt
             });
     }
 
-    utility::Shared<Type> TypeContext::getFloat(core::Precision const precision)
+    utility::Shared<Type const> TypeContext::getFloat(core::Precision const precision)
     {
         auto getOrCreateFloatType = [&](utility::Optional<utility::Shared<Type>>& slot, std::string const& type_name, std::string const& type_prefix) {
             return Implementation::getOrCreate(
@@ -580,7 +569,7 @@ namespace ance::bbt
         throw std::logic_error("Invalid precision");
     }
 
-    utility::Shared<Type> TypeContext::getString()
+    utility::Shared<Type const> TypeContext::getString()
     {
         return Implementation::getOrCreate(
             implementation_->string_type,
@@ -595,27 +584,27 @@ namespace ance::bbt
             });
     }
 
-    utility::Shared<Type> TypeContext::getVariableRef()
+    utility::Shared<Type const> TypeContext::getVariableRef()
     {
         return Implementation::getOrCreate(implementation_->variable_ref_type,
                                            [&] { return utility::makeShared<BasicType>(core::Identifier::make(".Variable", core::Location::core()), *this); });
     }
 
-    utility::Shared<Type> TypeContext::getReference(utility::Shared<Type> referenced_type, core::VariabilityModifier variability)
+    utility::Shared<Type const> TypeContext::getReference(utility::Shared<Type const> referenced_type, core::VariabilityModifier variability)
     {
         return implementation_->reference_types.getOrCreate(bundleTypes(referenced_type), variability, [&] {
             return utility::makeShared<ReferenceType>(referenced_type, variability, *this);
         });
     }
 
-    utility::Shared<Type> TypeContext::getArray(utility::Shared<Type> element_type, size_t const length)
+    utility::Shared<Type const> TypeContext::getArray(utility::Shared<Type const> element_type, size_t const length)
     {
         return implementation_->array_types.getOrCreate(bundleTypes(element_type), length, [&] {
             return utility::makeShared<ArrayType>(element_type, length, *this);
         });
     }
 
-    utility::Shared<Type> TypeContext::getIdentifier()
+    utility::Shared<Type const> TypeContext::getIdentifier()
     {
         return Implementation::getOrCreate(
             implementation_->identifier_type,
@@ -630,26 +619,31 @@ namespace ance::bbt
             });
     }
 
-    utility::Shared<Type> TypeContext::getFunction()
+    utility::Shared<Type const> TypeContext::getFunction()
     {
         return Implementation::getOrCreate(implementation_->function_type, [&] {
             return utility::makeShared<BasicType>(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), *this);
         });
     }
 
-    utility::Shared<Type> TypeContext::getType()
+    utility::Shared<Type const> TypeContext::getType()
     {
         return Implementation::getOrCreate(implementation_->type_type,
                                            [&] { return utility::makeShared<BasicType>(core::Identifier::make("Type", core::Location::core()), *this); });
     }
 
-    utility::Shared<Type> TypeContext::getScopeRef()
+    utility::Shared<Type const> TypeContext::getType() const
+    {
+        return type_;
+    }
+
+    utility::Shared<Type const> TypeContext::getScopeRef()
     {
         return Implementation::getOrCreate(implementation_->scope_ref_type,
                                            [&] { return utility::makeShared<BasicType>(core::Identifier::make(".Scope", core::Location::core()), *this); });
     }
 
-    utility::Shared<Type> TypeContext::getLocation()
+    utility::Shared<Type const> TypeContext::getLocation()
     {
         return Implementation::getOrCreate(
             implementation_->location_type,

@@ -21,22 +21,22 @@ namespace ance::cet
         virtual ~Memory() = default;
 
       /// Access the memory, returning a reference to it.
-      [[nodiscard]] virtual utility::Shared<bbt::Value> access() = 0;
+      [[nodiscard]] virtual utility::Shared<bbt::Value const> access() = 0;
 
         /// Read a value from the addressed memory location.
       /// \param indices Indices describing the target position inside the memory.
-      [[nodiscard]] virtual utility::Shared<bbt::Value> read(std::span<size_t const> indices) = 0;
+      [[nodiscard]] virtual utility::Shared<bbt::Value const> read(std::span<size_t const> indices) = 0;
 
       /// Write a value to the addressed memory location.
       /// \param value The value to write.
       /// \param indices Indices describing the target position inside the memory.
-        virtual void write(utility::Shared<bbt::Value> value, std::span<size_t const> indices) = 0;
+      virtual void write(utility::Shared<bbt::Value const> value, std::span<size_t const> indices) = 0;
 
       /// Check whether the memory currently stores a value.
         [[nodiscard]] virtual bool isDefined() const = 0;
 
         /// The type of the value stored in the memory location.
-        [[nodiscard]] virtual bbt::Type const& type() const = 0;
+        [[nodiscard]] virtual utility::Shared<bbt::Type const> type() const = 0;
 
       protected:
         /// \brief Load a value using a chain of indices.
@@ -45,8 +45,8 @@ namespace ance::cet
         /// \param indices The chain of indices to use.
         /// \param type_context The current type context.
         /// \returns The loaded value, or \c std::nullopt if any of the access operations failed.
-        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value>> load(utility::Shared<bbt::Value> value,
-                                                                                 std::span<size_t const>     indices,
+        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value const>> load(utility::Shared<bbt::Value const> value,
+                                                                                       std::span<size_t const>     indices,
                                                                                    bbt::TypeContext&           type_context);
 
         /// \brief Store a replacement value within another value, creating a modified value.
@@ -56,10 +56,10 @@ namespace ance::cet
         /// \param replacement The replacing value, it must have the correct type.
         /// \param type_context The current type context.
         /// \returns The replaced value, or \c std::nullopt if any of the access operations failed.
-        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value>> store(utility::Shared<bbt::Value> value,
-                                                                                  std::span<size_t const>     indices,
-                                                                                    utility::Shared<bbt::Value> replacement,
-                                                                                    bbt::TypeContext&           type_context);
+        [[nodiscard]] static utility::Optional<utility::Shared<bbt::Value const>> store(utility::Shared<bbt::Value const> value,
+                                                                                        std::span<size_t const>     indices,
+                                                                                        utility::Shared<bbt::Value const> replacement,
+                                                                                        bbt::TypeContext&           type_context);
     };
 }
 

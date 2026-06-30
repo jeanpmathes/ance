@@ -6,7 +6,7 @@
 #include "ance/cet/Temporary.h"
 #include "ance/cet/ValueExtensions.h"
 
-ance::cet::FindResult ance::cet::FindResult::found(utility::Shared<bbt::Value> value)
+ance::cet::FindResult ance::cet::FindResult::found(utility::Shared<bbt::Value const> value)
 {
     return {std::move(value), Status::FOUND, NotFound {}};
 }
@@ -28,9 +28,9 @@ ance::cet::Scope* ance::cet::Scope::parent() const
     return parent_;
 }
 
-ance::utility::Optional<ance::utility::Shared<ance::bbt::Value>> ance::cet::Scope::declare(core::Identifier const&    identifier,
-                                                                                           utility::Shared<bbt::Type> type,
-                                                                                           bool                       is_variable,
+ance::utility::Optional<ance::utility::Shared<ance::bbt::Value const>> ance::cet::Scope::declare(core::Identifier const&          identifier,
+                                                                                                 utility::Shared<bbt::Type const> type,
+                                                                                                 bool                       is_variable,
                                                                                            core::Location const&      location,
                                                                                            core::Reporter&            reporter)
 {

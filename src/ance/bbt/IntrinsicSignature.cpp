@@ -6,30 +6,30 @@
 
 namespace ance::bbt
 {
-    static std::tuple<Signature, utility::Shared<Type>> makeBinarySignature(core::Intrinsic const intrinsic, utility::Shared<Type> type)
+    static std::tuple<Signature, utility::Shared<Type const>> makeBinarySignature(core::Intrinsic const intrinsic, utility::Shared<Type const> type)
     {
         Signature signature = Signature::makeAndNameParameters(intrinsic.identifier(), type, type);
         return {std::move(signature), type};
     }
 
-    static std::tuple<Signature, utility::Shared<Type>> makeUnarySignature(core::Intrinsic const intrinsic, utility::Shared<Type> type)
+    static std::tuple<Signature, utility::Shared<Type const>> makeUnarySignature(core::Intrinsic const intrinsic, utility::Shared<Type const> type)
     {
         Signature signature = Signature::makeAndNameParameters(intrinsic.identifier(), type);
         return {std::move(signature), type};
     }
 
-    static std::tuple<Signature, utility::Shared<Type>> makeComparisonSignature(core::Intrinsic const intrinsic,
-                                                                                utility::Shared<Type> type,
-                                                                                TypeContext&          type_context)
+    static std::tuple<Signature, utility::Shared<Type const>> makeComparisonSignature(core::Intrinsic const       intrinsic,
+                                                                                      utility::Shared<Type const> type,
+                                                                                      TypeContext&          type_context)
     {
         Signature signature = Signature::makeAndNameParameters(intrinsic.identifier(), type, type);
         return {std::move(signature), type_context.getBool()};
     }
 
-    std::tuple<Signature, utility::Shared<Type>> getIntrinsicSignature(core::Intrinsic intrinsic, TypeContext& type_context)
+    std::tuple<Signature, utility::Shared<Type const>> getIntrinsicSignature(core::Intrinsic intrinsic, TypeContext& type_context)
     {
         utility::Optional<Signature>             signature;
-        utility::Optional<utility::Shared<Type>> return_type;
+        utility::Optional<utility::Shared<Type const>> return_type;
 
         switch (intrinsic.value())
         {

@@ -8,7 +8,7 @@
 namespace ance::cet
 {
     Variable::Variable(core::Identifier const&    identifier,
-                       utility::Shared<bbt::Type> type,
+                       utility::Shared<bbt::Type const> type,
                        bool const                 is_variable,
                        core::Location const&      location,
                        bbt::TypeContext&          type_context)
@@ -24,14 +24,9 @@ namespace ance::cet
         return identifier_;
     }
 
-    utility::Shared<bbt::Type> Variable::type()
+    utility::Shared<bbt::Type const> Variable::type() const
     {
         return type_;
-    }
-
-    bbt::Type const& Variable::type() const
-    {
-        return *type_;
     }
 
     bool Variable::isVariable() const
@@ -49,7 +44,7 @@ namespace ance::cet
         return location_;
     }
 
-    utility::Shared<bbt::Value> Variable::access()
+    utility::Shared<bbt::Value const> Variable::access()
     {
         core::VariabilityModifier variability = core::VariabilityModifier::VARIABLE;
 
@@ -61,7 +56,7 @@ namespace ance::cet
         return Reference::make(Address(*this), type_, variability, type_context_);
     }
 
-    utility::Shared<bbt::Value> Variable::read(std::span<size_t const> const indices)
+    utility::Shared<bbt::Value const> Variable::read(std::span<size_t const> const indices)
     {
         assert(isDefined());
 
@@ -71,7 +66,7 @@ namespace ance::cet
         return result.value();
     }
 
-    void Variable::write(utility::Shared<bbt::Value> value, std::span<size_t const> const indices)
+    void Variable::write(utility::Shared<bbt::Value const> value, std::span<size_t const> const indices)
     {
         assert(isVariable() || !isDefined());// todo: the isDefined() check is a bit ugly and should go at some point
 
@@ -90,12 +85,12 @@ namespace ance::cet
         value_ = result.value();
     }
 
-    utility::Shared<bbt::Value> Variable::read()
+    utility::Shared<bbt::Value const> Variable::read()
     {
         return read({});
     }
 
-    void Variable::write(utility::Shared<bbt::Value> value)
+    void Variable::write(utility::Shared<bbt::Value const> value)
     {
         write(std::move(value), {});
     }

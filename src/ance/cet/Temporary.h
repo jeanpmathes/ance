@@ -23,19 +23,19 @@ namespace ance::cet
         explicit Temporary(bbt::TypeContext& type_context);
         ~Temporary() override = default;
 
-        [[nodiscard]] utility::Shared<bbt::Value> access() override;
+        [[nodiscard]] utility::Shared<bbt::Value const> access() override;
 
-        utility::Shared<bbt::Value> read(std::span<size_t const> indices) override;
-        void                        write(utility::Shared<bbt::Value> value, std::span<size_t const> indices) override;
+        utility::Shared<bbt::Value const> read(std::span<size_t const> indices) override;
+        void                              write(utility::Shared<bbt::Value const> value, std::span<size_t const> indices) override;
 
-        utility::Shared<bbt::Value> read();
-        void                        write(utility::Shared<bbt::Value> value);
+        utility::Shared<bbt::Value const> read();
+        void                              write(utility::Shared<bbt::Value const> value);
 
         [[nodiscard]] bool isDefined() const override;
-        [[nodiscard]] bbt::Type const& type() const override;
+        [[nodiscard]] utility::Shared<bbt::Type const> type() const override;
 
       private:
-        utility::Shared<bbt::Value> value_;
+        utility::Shared<bbt::Value const> value_;
         bbt::TypeContext&           type_context_;
     };
 }

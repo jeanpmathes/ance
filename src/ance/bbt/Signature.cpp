@@ -6,7 +6,7 @@
 
 namespace ance::bbt
 {
-    Signature::Parameter::Parameter(core::Identifier const& parameter_name, utility::Shared<Type> parameter_type)
+    Signature::Parameter::Parameter(core::Identifier const& parameter_name, utility::Shared<Type const> parameter_type)
         : name(parameter_name)
         , type(std::move(parameter_type))
     {}

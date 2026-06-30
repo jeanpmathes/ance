@@ -6,7 +6,7 @@
 
 namespace ance::bbt
 {
-    Function::Function(Signature signature, utility::Shared<Type> return_type, Flow const& body, TypeContext& type_context)
+    Function::Function(Signature signature, utility::Shared<Type const> return_type, Flow const& body, TypeContext& type_context)
         : Value(type_context.getFunction(), type_context)
         , ValueBase()
         , signature_(std::move(signature))
@@ -14,7 +14,7 @@ namespace ance::bbt
         , body_(body)
     {}
 
-    Function::Function(Signature signature, utility::Shared<Type> return_type, utility::Shared<Flow> body, TypeContext& type_context)
+    Function::Function(Signature signature, utility::Shared<Type const> return_type, utility::Shared<Flow> body, TypeContext& type_context)
         : Value(type_context.getFunction(), type_context)
         , ValueBase()
         , signature_(std::move(signature))
@@ -23,7 +23,7 @@ namespace ance::bbt
         , owned_body_(std::move(body))
     {}
 
-    Function::Function(Signature signature, utility::Shared<Type> return_type, utility::Owned<Flow> body, TypeContext& type_context)
+    Function::Function(Signature signature, utility::Shared<Type const> return_type, utility::Owned<Flow> body, TypeContext& type_context)
         : Value(type_context.getFunction(), type_context)
         , ValueBase()
         , signature_(std::move(signature))
@@ -47,7 +47,7 @@ namespace ance::bbt
         return signature_;
     }
 
-    utility::Shared<Type> Function::returnType()
+    utility::Shared<Type const> Function::returnType()
     {
         return return_type_;
     }

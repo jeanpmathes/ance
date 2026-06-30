@@ -3,6 +3,7 @@
 
 #include <any>
 #include <memory>
+#include <type_traits>
 
 #include "Optional.h"
 
@@ -102,12 +103,20 @@ namespace ance::utility
         Shared(Shared& value) noexcept;
 
         template<typename OtherT>
+            requires(std::is_const_v<T> && std::same_as<T, OtherT>)
+        explicit(false) Shared(Shared<OtherT> const& value) noexcept;
+
+        template<typename OtherT>
             requires MoveConvertible<T*, OtherT*>
         explicit(false) Shared(Shared<OtherT>&& value) noexcept;
 
         template<typename OtherT>
             requires CopyConvertible<T*, OtherT*>
         explicit(false) Shared(Shared<OtherT>& value) noexcept;
+
+        template<typename OtherT>
+            requires(std::is_const_v<T> && CopyConvertible<T*, OtherT*>)
+        explicit(false) Shared(Shared<OtherT> const& value) noexcept;
 
         Shared& operator=(Shared value) noexcept;
 
@@ -118,6 +127,10 @@ namespace ance::utility
         template<typename OtherT>
             requires CopyConvertible<T*, OtherT*>
         Shared& operator=(Shared<OtherT>& value) noexcept;
+
+        template<typename OtherT>
+            requires(std::is_const_v<T> && CopyConvertible<T*, OtherT*>)
+        Shared& operator=(Shared<OtherT> const& value) noexcept;
 
         bool operator==(Shared const& other) const noexcept;
 
@@ -141,10 +154,10 @@ namespace ance::utility
         friend Shared<TargetT> makeShared(Args&&... args);
 
         template<typename OtherT>
-        Shared<OtherT> as();
+        [[nodiscard]] Shared<std::conditional_t<std::is_const_v<T>, std::add_const_t<OtherT>, OtherT>> as();
 
         template<typename OtherT>
-        OtherT const& as() const;
+        [[nodiscard]] Shared<std::add_const_t<OtherT>> as() const;
 
         template<typename OtherT>
         [[nodiscard]] bool is() const;

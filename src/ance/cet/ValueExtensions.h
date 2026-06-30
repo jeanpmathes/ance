@@ -47,10 +47,10 @@ namespace ance::cet
     class Reference final : public bbt::ValueBase<Reference>
     {
       public:
-        Reference(Address address, utility::Shared<bbt::Type> referenced_type, core::VariabilityModifier variability, bbt::TypeContext& type_context);
+        Reference(Address address, utility::Shared<bbt::Type const> referenced_type, core::VariabilityModifier variability, bbt::TypeContext& type_context);
 
         static utility::Shared<Reference> make(Address                    address,
-                                               utility::Shared<bbt::Type> referenced_type,
+                                               utility::Shared<bbt::Type const> referenced_type,
                                                core::VariabilityModifier  variability,
                                                bbt::TypeContext&          type_context);
 

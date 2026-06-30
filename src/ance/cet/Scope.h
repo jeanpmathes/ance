@@ -57,11 +57,11 @@ namespace ance::cet
             core::Location erase_location;
         };
 
-        utility::Optional<utility::Shared<bbt::Value>> value;
+        utility::Optional<utility::Shared<bbt::Value const>> value;
         Status                                         status;
         std::variant<NotFound, Erased>                 reason;
 
-        static FindResult found(utility::Shared<bbt::Value> value);
+        static FindResult found(utility::Shared<bbt::Value const> value);
         static FindResult notFound();
         static FindResult erased(core::Location const& location);
     };
@@ -76,9 +76,9 @@ namespace ance::cet
 
         [[nodiscard]] Scope* parent() const;
 
-        [[nodiscard]] utility::Optional<utility::Shared<bbt::Value>> declare(core::Identifier const&    identifier,
-                                                                             utility::Shared<bbt::Type> type,
-                                                                             bool                       is_variable,
+        [[nodiscard]] utility::Optional<utility::Shared<bbt::Value const>> declare(core::Identifier const&          identifier,
+                                                                                   utility::Shared<bbt::Type const> type,
+                                                                                   bool                       is_variable,
                                                                              core::Location const&      location,
                                                                              core::Reporter&            reporter);
 

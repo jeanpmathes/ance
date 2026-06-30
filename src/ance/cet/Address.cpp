@@ -27,12 +27,12 @@ namespace ance::cet
         return Address(memory_.get(), std::move(indices_copy));
     }
 
-    utility::Shared<bbt::Value> Address::read() const
+    utility::Shared<bbt::Value const> Address::read() const
     {
         return memory_.get().read(indices_);
     }
 
-    void Address::write(utility::Shared<bbt::Value> value) const
+    void Address::write(utility::Shared<bbt::Value const> value) const
     {
         memory_.get().write(std::move(value), indices_);
     }
