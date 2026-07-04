@@ -635,7 +635,7 @@ namespace ance::bbt
     utility::Shared<Type const> TypeContext::Type()
     {
         return Implementation::getOrCreate(implementation_->type_type,
-                                           [&] { return utility::makeShared<BasicType>(core::Identifier::make("T", core::Location::core()), *this); });
+                                           [&] { return utility::makeShared<BasicType>(core::Identifier::make("Type", core::Location::core()), *this); });
     }
 
     utility::Shared<Type const> TypeContext::Type() const

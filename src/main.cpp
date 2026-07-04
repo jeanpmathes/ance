@@ -120,7 +120,10 @@ namespace ance
 
         return exit_code;
 
+        // todo: fix that it currently does not work
+
         // todo: set up new test system, should for now only check compiler output and not run anything
+        // todo: use catch2 as it is available in vcpkg, add to readme
         // todo: should no longer use python but instead C++, so we have coverage data
         // todo: but should have utilities to write them, so that they are as easy to write as the python tests
         // todo: rename test to tests_old, add note somewhere to go through all and make sure equivalent test exists in new tests
