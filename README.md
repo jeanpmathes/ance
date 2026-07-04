@@ -16,6 +16,8 @@ Use `vcpkg` to install the dependencies:
 vcpkg install llvm antlr4 boost icu
 ```
 
+The project can then be built using cmake.
+
 # Architecture
 
 The current compiler is designed as a staged pipeline:
@@ -37,4 +39,3 @@ is used.
 The definitions of the language itself are defined using the ance language itself as much as possible.
 
 Note: `src_old/` contains the legacy compiler implementation, is currently not used and will be removed in the future.
-

@@ -934,7 +934,7 @@ namespace ance::ast
             utility::Owned<Expression> element_type = expectExpression(context->type);
             utility::Owned<Expression> length       = expectExpression(context->length);
 
-            Expression* expression = new ArrayType(std::move(element_type), std::move(length), location(context));
+            Expression* expression = new ArrayTypeConstructor(std::move(element_type), std::move(length), location(context));
             return expression;
         }
 

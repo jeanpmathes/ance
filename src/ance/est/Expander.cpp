@@ -950,11 +950,11 @@ struct ance::est::Expander::Implementation
             result_.setExpression(utility::makeOwned<TypeOf>(std::move(expressions), type_of.location));
         }
 
-        void visit(ast::ArrayType const& array_type) override
+        void visit(ast::ArrayTypeConstructor const& array_type) override
         {
             trace("ArrayType", array_type.location);
 
-            result_.setExpression(utility::makeOwned<ArrayType>(expand(*array_type.element_type), expand(*array_type.length), array_type.location));
+            result_.setExpression(utility::makeOwned<ArrayTypeConstructor>(expand(*array_type.element_type), expand(*array_type.length), array_type.location));
         }
 
         void visit(ast::ArrayConstructor const& array_constructor) override

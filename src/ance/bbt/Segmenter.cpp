@@ -1562,7 +1562,7 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
-        void visit(est::ArrayType const& array_type) override
+        void visit(est::ArrayTypeConstructor const& array_type) override
         {
             trace("ArrayType", array_type);
 
@@ -1574,7 +1574,7 @@ struct ance::bbt::Segmenter::Implementation
             auto& length_tmp = builder.addTemporary("ArrayType_Length", array_type.length->location);
             builder.addSegmented(*array_type.length, length_tmp);
 
-            builder.addStatement<CreateArrayType>(element_type_tmp, length_tmp, destination(), array_type.location);
+            builder.addStatement<ArrayTypeConstructor>(element_type_tmp, length_tmp, destination(), array_type.location);
 
             setResult(builder.take());
         }

@@ -196,7 +196,7 @@ ance::ast::TypeOf::TypeOf(utility::List<utility::Owned<Expression>> expression_l
     , expressions(std::move(expression_list))
 {}
 
-ance::ast::ArrayType::ArrayType(utility::Owned<Expression> type, utility::Owned<Expression> length_expression, core::Location const& source_location)
+ance::ast::ArrayTypeConstructor::ArrayTypeConstructor(utility::Owned<Expression> type, utility::Owned<Expression> length_expression, core::Location const& source_location)
     : Node(source_location)
     , Expression()
     , element_type(std::move(type))

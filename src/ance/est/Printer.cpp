@@ -378,7 +378,7 @@ struct ance::est::Printer::Implementation
             print(")");
         }
 
-        void visit(ArrayType const& array_type) override
+        void visit(ArrayTypeConstructor const& array_type) override
         {
             print("[");
             visit(*array_type.element_type);

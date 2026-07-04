@@ -24,6 +24,7 @@ namespace ance::bbt
 
     /// Represents a type.
     /// A type is a value of itself as the type, and each value has a type.
+    /// Types are not compared based on identity but by value.
     class Type : public virtual Value
     {
       public:
@@ -173,64 +174,67 @@ namespace ance::bbt
     };
 
     /// Context providing access to all built-in types.
+    /// Note that this constructs new values, but because type comparison is not identity- but value-based, this is not an issue.
     class TypeContext
     {
       public:
         explicit TypeContext(cet::Runner& runner);
         ~TypeContext();
 
+        using T = Type;
+
         /// Get the boolean type, which has two values: true and false.
-        utility::Shared<Type const> getBool();
+        utility::Shared<const T> Bool();
 
         /// Get the unit type, which has one value: ().
-        utility::Shared<Type const> getUnit();
+        utility::Shared<const T> Unit();
 
         /// Get the size type, which has a platform-dependent size always larger enough to serve as a memory index.
-        utility::Shared<Type const> getSize();
+        utility::Shared<const T> Size();
 
         /// Get a float type by its precision.
-        utility::Shared<Type const> getFloat(core::Precision precision);
+        utility::Shared<const T> Float(core::Precision precision);
 
         /// Get the string type.
-        utility::Shared<Type const> getString();
+        utility::Shared<const T> String();
 
         /// Get the variable reference type, which is used to refer to variables.
-        utility::Shared<Type const>
-        getVariableRef();// todo: should be split into variable type and reference type (not the current ref), variable type should be parameterized
+        // todo: should be split into variable type and reference type (not the current ref), variable type should be parameterized
+        utility::Shared<const T> VariableRef();
 
         /// Get a reference type.
         /// \param referenced_type The type being referenced.
         /// \param variability The variability of the referenced value.
-        utility::Shared<Type const> getReference(utility::Shared<Type const> referenced_type, core::VariabilityModifier variability);
+        utility::Shared<const T> Reference(utility::Shared<const T> referenced_type, core::VariabilityModifier variability);
 
         /// Get a fixed-size array type.
         /// \param element_type The type of each array element.
         /// \param length The number of elements in the array.
-        utility::Shared<Type const> getArray(utility::Shared<Type const> element_type, size_t length);
+        utility::Shared<const T> Array(utility::Shared<const T> element_type, size_t length);
 
         /// Get the identifier type, which is the type of all identifiers.
-        utility::Shared<Type const> getIdentifier();
+        utility::Shared<const T> Identifier();
 
         /// Get the function type.
-        utility::Shared<Type const> getFunction();// TODO: function type should be parameterized (signature and return type)
+        utility::Shared<const T> Function();// TODO: function type should be parameterized (signature and return type)
 
         /// Get the type-type - the type of all types.
-        utility::Shared<Type const> getType();
+        utility::Shared<const T> Type();
 
         /// Get the type-type - the type of all types.
-        utility::Shared<Type const> getType() const;
+        [[nodiscard]] utility::Shared<const T> Type() const;
 
         /// Get the scope type, which refers to scope values.
-        utility::Shared<Type const> getScopeRef();
+        utility::Shared<const T> ScopeRef();
 
         /// Get the source location type.
-        utility::Shared<Type const> getLocation();
+        utility::Shared<const T> Location();
 
       private:
         struct Implementation;
         utility::Owned<Implementation> implementation_;
 
-        utility::Shared<Type const> type_;
+        utility::Shared<const T> type_type_;
     };
 }
 

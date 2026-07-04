@@ -162,7 +162,7 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(TypeOf const&) override {}
 
-        void visit(CreateArrayType const&) override {}
+        void visit(ArrayTypeConstructor const&) override {}
 
         void visit(ArrayConstructor const&) override {}
 

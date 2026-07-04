@@ -328,27 +328,27 @@ namespace ance::bbt
 
         cet::Runner& runner_;
 
-        utility::Optional<utility::Shared<Type>> bool_type;
-        utility::Optional<utility::Shared<Type>> unit_type;
-        utility::Optional<utility::Shared<Type>> size_type;
-        utility::Optional<utility::Shared<Type>> string_type;
-        utility::Optional<utility::Shared<Type>> variable_ref_type;
-        utility::Optional<utility::Shared<Type>> identifier_type;
-        utility::Optional<utility::Shared<Type>> function_type;
-        utility::Optional<utility::Shared<Type>> type_type;
-        utility::Optional<utility::Shared<Type>> scope_ref_type;
-        utility::Optional<utility::Shared<Type>> location_type;
+        utility::Optional<utility::Shared<T>> bool_type;
+        utility::Optional<utility::Shared<T>> unit_type;
+        utility::Optional<utility::Shared<T>> size_type;
+        utility::Optional<utility::Shared<T>> string_type;
+        utility::Optional<utility::Shared<T>> variable_ref_type;
+        utility::Optional<utility::Shared<T>> identifier_type;
+        utility::Optional<utility::Shared<T>> function_type;
+        utility::Optional<utility::Shared<T>> type_type;
+        utility::Optional<utility::Shared<T>> scope_ref_type;
+        utility::Optional<utility::Shared<T>> location_type;
 
-        utility::Optional<utility::Shared<Type>> float_half_type;
-        utility::Optional<utility::Shared<Type>> float_single_type;
-        utility::Optional<utility::Shared<Type>> float_double_type;
-        utility::Optional<utility::Shared<Type>> float_quad_type;
+        utility::Optional<utility::Shared<T>> float_half_type;
+        utility::Optional<utility::Shared<T>> float_single_type;
+        utility::Optional<utility::Shared<T>> float_double_type;
+        utility::Optional<utility::Shared<T>> float_quad_type;
 
         TypeDictionary<core::VariabilityModifier> reference_types;
         TypeDictionary<size_t> array_types;
 
         template<typename Factory>
-        static utility::Shared<Type const> getOrCreate(utility::Optional<utility::Shared<Type>>& type_slot, Factory factory)
+        static utility::Shared<T const> getOrCreate(utility::Optional<utility::Shared<T>>& type_slot, Factory factory)
         {
             if (!type_slot.hasValue())
             {
@@ -359,8 +359,13 @@ namespace ance::bbt
         }
 
         template<typename Factory, typename Initializer>
-        static utility::Shared<Type const> getOrCreate(utility::Optional<utility::Shared<Type>>& type_slot, Factory factory, Initializer initializer)
+        static utility::Shared<T const> getOrCreate(utility::Optional<utility::Shared<T>>& type_slot, Factory factory, Initializer initializer)
         {
+            // todo: the main issue with getOrCreate is that it is a symptom of non-ideal type creation
+            // todo: ideally, all methods would create a new type value every time
+            // todo: but because types also create the functions, and these reference types, this would lead to endless recursion
+            // todo: so we need a way to split type declaration from operator declaration
+
             if (!type_slot.hasValue())
             {
                 type_slot = factory();
@@ -373,7 +378,7 @@ namespace ance::bbt
         [[nodiscard]] core::Identifier declareBinaryOperatorFunction(std::string const&         type_name,
                                                                      std::string const&         type_prefix,
                                                                            core::BinaryOperator const binary_operator,
-                                                                           Type const&                return_type) const
+                                                                           T const&                return_type) const
         {
             std::string const short_name     = binary_operator.toShortName();
             std::string const function_name  = std::format("__core_{}_op_{}", type_name, short_name);
@@ -416,21 +421,21 @@ namespace ance::bbt
             return core::Identifier::make(function_name, core::Location::core());
         }
 
-        void addBinaryOperator(Type& type, std::string const& type_prefix, core::BinaryOperator const binary_operator) const
+        void addBinaryOperator(T& type, std::string const& type_prefix, core::BinaryOperator const binary_operator) const
         {
             type.implementation_->addBinaryOperatorFunction(binary_operator,
                                                             type,
                                                             declareBinaryOperatorFunction(type.toString(), type_prefix, binary_operator, type));
         }
 
-        void addBinaryOperator(Type& type, std::string const& type_prefix, core::BinaryOperator const binary_operator, Type const& return_type) const
+        void addBinaryOperator(T& type, std::string const& type_prefix, core::BinaryOperator const binary_operator, T const& return_type) const
         {
             type.implementation_->addBinaryOperatorFunction(binary_operator,
                                                             type,
                                                             declareBinaryOperatorFunction(type.toString(), type_prefix, binary_operator, return_type));
         }
 
-        void addArithmeticOperators(Type& type, std::string const& type_prefix) const
+        void addArithmeticOperators(T& type, std::string const& type_prefix) const
         {
             for (auto const op : {core::BinaryOperator::ADDITION,
                                   core::BinaryOperator::SUBTRACTION,
@@ -442,7 +447,7 @@ namespace ance::bbt
             }
         }
 
-        void addRelationalOperators(Type& type, std::string const& type_prefix, Type const& return_type) const
+        void addRelationalOperators(T& type, std::string const& type_prefix, T const& return_type) const
         {
             for (auto const op : {core::BinaryOperator::LESS_THAN,
                                   core::BinaryOperator::LESS_THAN_OR_EQUAL,
@@ -453,7 +458,7 @@ namespace ance::bbt
             }
         }
 
-        void addEqualityOperators(Type& type, std::string const& type_prefix, Type const& return_type) const
+        void addEqualityOperators(T& type, std::string const& type_prefix, T const& return_type) const
         {
             for (auto const op : {core::BinaryOperator::EQUAL, core::BinaryOperator::NOT_EQUAL})
             {
@@ -461,38 +466,39 @@ namespace ance::bbt
             }
         }
 
-        void addUnaryOperator(Type& type, std::string const& type_prefix, core::UnaryOperator const unary_operator) const
+        void addUnaryOperator(T& type, std::string const& type_prefix, core::UnaryOperator const unary_operator) const
         {
             type.implementation_->addUnaryOperatorFunction(unary_operator, declareUnaryOperatorFunction(type.toString(), type_prefix, unary_operator));
         }
 
-        void ensureReadiness(utility::Shared<Type const> type) const
+        void ensureReadiness(utility::Shared<T const> type) const
         {
             // todo: that this function is necessary is really ugly, it should be removed at some point
             // todo: ideally, we can define the core types entirely using source code, we build that and we pass it to the runner like we do with all other parts of the language core
             // todo: it would then do everything and we simply query once to get the type
             // todo: when that is the case, we can also remove that the runner check for core declarations that they do not already exists (and skips when they do), instead it could throw
+            // todo: or at least we should split type definition and operator definition, so we can define the operators once and centrally, and then construct new types whenever asked for them
 
             runner_.declareCoreVariable(type->name(), type);
         }
     };
 
-    TypeContext::TypeContext(cet::Runner& runner) : implementation_(utility::makeOwned<Implementation>(runner)), type_(getType())
+    TypeContext::TypeContext(cet::Runner& runner) : implementation_(utility::makeOwned<Implementation>(runner)), type_type_(Type())
     {
-        // The type 'Type' is very integral and must be immediately available for the Value implementation.
+        // The type 'T' is very integral and must be immediately available for the Value implementation.
         // As the value implementation needs access to the type even in const method, the type is stored additionally to the standard handling.
     }
 
     TypeContext::~TypeContext() = default;
 
-    utility::Shared<Type const> TypeContext::getBool()
+    utility::Shared<Type const> TypeContext::Bool()
     {
         return Implementation::getOrCreate(
             implementation_->bool_type,
             [&] { return utility::makeShared<BasicType>(core::Identifier::make(core::BOOL_TYPE_NAME, core::Location::core()), *this); },
-            [&](utility::Shared<Type> type) {
+            [&](utility::Shared<T> type) {
                 implementation_->ensureReadiness(type);
-                implementation_->ensureReadiness(getFunction());
+                implementation_->ensureReadiness(Function());
 
                 std::string const type_prefix = "b";
 
@@ -501,52 +507,52 @@ namespace ance::bbt
             });
     }
 
-    utility::Shared<Type const> TypeContext::getUnit()
+    utility::Shared<Type const> TypeContext::Unit()
     {
         return Implementation::getOrCreate(
             implementation_->unit_type,
             [&] { return utility::makeShared<BasicType>(core::Identifier::make(core::UNIT_TYPE_NAME, core::Location::core()), *this); },
-            [&](utility::Shared<Type> type) {
+            [&](utility::Shared<T> type) {
                 implementation_->ensureReadiness(type);
-                implementation_->ensureReadiness(getFunction());
+                implementation_->ensureReadiness(Function());
 
                 std::string const type_prefix = "u";
 
-                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+                implementation_->addEqualityOperators(*type, type_prefix, *Bool());
             });
     }
 
-    utility::Shared<Type const> TypeContext::getSize()
+    utility::Shared<Type const> TypeContext::Size()
     {
         return Implementation::getOrCreate(
             implementation_->size_type,
             [&] { return utility::makeShared<BasicType>(core::Identifier::make("Size", core::Location::core()), *this); },
-            [&](utility::Shared<Type> type) {
+            [&](utility::Shared<T> type) {
                 implementation_->ensureReadiness(type);
-                implementation_->ensureReadiness(getFunction());
+                implementation_->ensureReadiness(Function());
 
                 std::string const type_prefix = "s";
 
                 implementation_->addArithmeticOperators(*type, type_prefix);
-                implementation_->addRelationalOperators(*type, type_prefix, *getBool());
-                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+                implementation_->addRelationalOperators(*type, type_prefix, *Bool());
+                implementation_->addEqualityOperators(*type, type_prefix, *Bool());
                 implementation_->addUnaryOperator(*type, type_prefix, core::UnaryOperator::BITWISE_NOT);
             });
     }
 
-    utility::Shared<Type const> TypeContext::getFloat(core::Precision const precision)
+    utility::Shared<Type const> TypeContext::Float(core::Precision const precision)
     {
-        auto getOrCreateFloatType = [&](utility::Optional<utility::Shared<Type>>& slot, std::string const& type_name, std::string const& type_prefix) {
+        auto getOrCreateFloatType = [&](utility::Optional<utility::Shared<T>>& slot, std::string const& type_name, std::string const& type_prefix) {
             return Implementation::getOrCreate(
                 slot,
                 [&] { return utility::makeShared<BasicType>(core::Identifier::make(type_name, core::Location::core()), *this); },
-                [&](utility::Shared<Type> type) {
+                [&](utility::Shared<T> type) {
                     implementation_->ensureReadiness(type);
-                    implementation_->ensureReadiness(getFunction());
+                    implementation_->ensureReadiness(Function());
 
                     implementation_->addArithmeticOperators(*type, type_prefix);
-                    implementation_->addRelationalOperators(*type, type_prefix, *getBool());
-                    implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+                    implementation_->addRelationalOperators(*type, type_prefix, *Bool());
+                    implementation_->addEqualityOperators(*type, type_prefix, *Bool());
                     implementation_->addUnaryOperator(*type, type_prefix, core::UnaryOperator::NEGATION);
                 });
         };
@@ -569,92 +575,92 @@ namespace ance::bbt
         throw std::logic_error("Invalid precision");
     }
 
-    utility::Shared<Type const> TypeContext::getString()
+    utility::Shared<Type const> TypeContext::String()
     {
         return Implementation::getOrCreate(
             implementation_->string_type,
             [&] { return utility::makeShared<BasicType>(core::Identifier::make("String", core::Location::core()), *this); },
-            [&](utility::Shared<Type> type) {
+            [&](utility::Shared<T> type) {
                 implementation_->ensureReadiness(type);
-                implementation_->ensureReadiness(getFunction());
+                implementation_->ensureReadiness(Function());
 
                 std::string const type_prefix = "str";
 
-                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+                implementation_->addEqualityOperators(*type, type_prefix, *Bool());
             });
     }
 
-    utility::Shared<Type const> TypeContext::getVariableRef()
+    utility::Shared<Type const> TypeContext::VariableRef()
     {
         return Implementation::getOrCreate(implementation_->variable_ref_type,
                                            [&] { return utility::makeShared<BasicType>(core::Identifier::make(".Variable", core::Location::core()), *this); });
     }
 
-    utility::Shared<Type const> TypeContext::getReference(utility::Shared<Type const> referenced_type, core::VariabilityModifier variability)
+    utility::Shared<Type const> TypeContext::Reference(utility::Shared<T const> referenced_type, core::VariabilityModifier variability)
     {
         return implementation_->reference_types.getOrCreate(bundleTypes(referenced_type), variability, [&] {
             return utility::makeShared<ReferenceType>(referenced_type, variability, *this);
         });
     }
 
-    utility::Shared<Type const> TypeContext::getArray(utility::Shared<Type const> element_type, size_t const length)
+    utility::Shared<Type const> TypeContext::Array(utility::Shared<T const> element_type, size_t const length)
     {
         return implementation_->array_types.getOrCreate(bundleTypes(element_type), length, [&] {
             return utility::makeShared<ArrayType>(element_type, length, *this);
         });
     }
 
-    utility::Shared<Type const> TypeContext::getIdentifier()
+    utility::Shared<Type const> TypeContext::Identifier()
     {
         return Implementation::getOrCreate(
             implementation_->identifier_type,
             [&] { return utility::makeShared<BasicType>(core::Identifier::make("Identifier", core::Location::core()), *this); },
-            [&](utility::Shared<Type> type) {
+            [&](utility::Shared<T> type) {
                 implementation_->ensureReadiness(type);
-                implementation_->ensureReadiness(getFunction());
+                implementation_->ensureReadiness(Function());
 
                 std::string const type_prefix = "id";
 
-                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+                implementation_->addEqualityOperators(*type, type_prefix, *Bool());
             });
     }
 
-    utility::Shared<Type const> TypeContext::getFunction()
+    utility::Shared<Type const> TypeContext::Function()
     {
         return Implementation::getOrCreate(implementation_->function_type, [&] {
             return utility::makeShared<BasicType>(core::Identifier::make(core::FUNCTION_TYPE_NAME, core::Location::core()), *this);
         });
     }
 
-    utility::Shared<Type const> TypeContext::getType()
+    utility::Shared<Type const> TypeContext::Type()
     {
         return Implementation::getOrCreate(implementation_->type_type,
-                                           [&] { return utility::makeShared<BasicType>(core::Identifier::make("Type", core::Location::core()), *this); });
+                                           [&] { return utility::makeShared<BasicType>(core::Identifier::make("T", core::Location::core()), *this); });
     }
 
-    utility::Shared<Type const> TypeContext::getType() const
+    utility::Shared<Type const> TypeContext::Type() const
     {
-        return type_;
+        return type_type_;
     }
 
-    utility::Shared<Type const> TypeContext::getScopeRef()
+    utility::Shared<Type const> TypeContext::ScopeRef()
     {
         return Implementation::getOrCreate(implementation_->scope_ref_type,
                                            [&] { return utility::makeShared<BasicType>(core::Identifier::make(".Scope", core::Location::core()), *this); });
     }
 
-    utility::Shared<Type const> TypeContext::getLocation()
+    utility::Shared<Type const> TypeContext::Location()
     {
         return Implementation::getOrCreate(
             implementation_->location_type,
             [&] { return utility::makeShared<BasicType>(core::Identifier::make("Location", core::Location::core()), *this); },
-            [&](utility::Shared<Type> type) {
+            [&](utility::Shared<T> type) {
                 implementation_->ensureReadiness(type);
-                implementation_->ensureReadiness(getFunction());
+                implementation_->ensureReadiness(Function());
 
                 std::string const type_prefix = "loc";
 
-                implementation_->addEqualityOperators(*type, type_prefix, *getBool());
+                implementation_->addEqualityOperators(*type, type_prefix, *Bool());
             });
     }
 }

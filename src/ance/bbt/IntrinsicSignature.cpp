@@ -23,7 +23,7 @@ namespace ance::bbt
                                                                                       TypeContext&          type_context)
     {
         Signature signature = Signature::makeAndNameParameters(intrinsic.identifier(), type, type);
-        return {std::move(signature), type_context.getBool()};
+        return {std::move(signature), type_context.Bool()};
     }
 
     std::tuple<Signature, utility::Shared<Type const>> getIntrinsicSignature(core::Intrinsic intrinsic, TypeContext& type_context)
@@ -36,97 +36,97 @@ namespace ance::bbt
             case core::Intrinsic::NO_OPERATION:
             {
                 signature   = Signature::make(intrinsic.identifier());
-                return_type = type_context.getUnit();
+                return_type = type_context.Unit();
 
                 break;
             }
             case core::Intrinsic::DECLARE:
             {
                 signature   = Signature::makeAndNameParameters(intrinsic.identifier(),
-                                                             type_context.getScopeRef(),
-                                                             type_context.getIdentifier(),
-                                                             type_context.getBool(),
-                                                             type_context.getType());
-                return_type = type_context.getVariableRef();
+                                                             type_context.ScopeRef(),
+                                                             type_context.Identifier(),
+                                                             type_context.Bool(),
+                                                             type_context.Type());
+                return_type = type_context.VariableRef();
 
                 break;
             }
             case core::Intrinsic::RESOLVE:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getScopeRef(), type_context.getIdentifier());
-                return_type = type_context.getVariableRef();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.ScopeRef(), type_context.Identifier());
+                return_type = type_context.VariableRef();
 
                 break;
             }
             case core::Intrinsic::ERASE:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getScopeRef(), type_context.getIdentifier());
-                return_type = type_context.getUnit();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.ScopeRef(), type_context.Identifier());
+                return_type = type_context.Unit();
 
                 break;
             }
             case core::Intrinsic::GET_PARENT:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getScopeRef());
-                return_type = type_context.getScopeRef();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.ScopeRef());
+                return_type = type_context.ScopeRef();
 
                 break;
             }
             case core::Intrinsic::LOG:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getString(), type_context.getLocation());
-                return_type = type_context.getUnit();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.String(), type_context.Location());
+                return_type = type_context.Unit();
 
                 break;
             }
             case core::Intrinsic::B_2_STR:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getBool());
-                return_type = type_context.getString();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.Bool());
+                return_type = type_context.String();
 
                 break;
             }
             case core::Intrinsic::FH_2_STR:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getFloat(core::Precision::HALF));
-                return_type = type_context.getString();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.Float(core::Precision::HALF));
+                return_type = type_context.String();
 
                 break;
             }
             case core::Intrinsic::FS_2_STR:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getFloat(core::Precision::SINGLE));
-                return_type = type_context.getString();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.Float(core::Precision::SINGLE));
+                return_type = type_context.String();
 
                 break;
             }
             case core::Intrinsic::FD_2_STR:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getFloat(core::Precision::DOUBLE));
-                return_type = type_context.getString();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.Float(core::Precision::DOUBLE));
+                return_type = type_context.String();
 
                 break;
             }
             case core::Intrinsic::FQ_2_STR:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getFloat(core::Precision::QUAD));
-                return_type = type_context.getString();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.Float(core::Precision::QUAD));
+                return_type = type_context.String();
 
                 break;
             }
             case core::Intrinsic::BOOL_NOT:
             {
-                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.getBool());
-                return_type = type_context.getBool();
+                signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.Bool());
+                return_type = type_context.Bool();
 
                 break;
             }
             case core::Intrinsic::INCLUDE:
             {
                 signature   = Signature::makeAndNameParameters(intrinsic.identifier(),
-                                                             type_context.getString(),// todo: path type
-                                                             type_context.getLocation());
-                return_type = type_context.getUnit();
+                                                             type_context.String(),// todo: path type
+                                                             type_context.Location());
+                return_type = type_context.Unit();
 
                 break;
             }
@@ -134,9 +134,9 @@ namespace ance::bbt
             {
                 // todo: remove variadic parameters, instead take a string and a list of arguments
                 utility::List<Signature::Parameter> parameters;
-                parameters.emplace_back(Signature::Parameter {core::Identifier::make("arg0", core::Location::nowhere()), type_context.getString()});
+                parameters.emplace_back(Signature::Parameter {core::Identifier::make("arg0", core::Location::nowhere()), type_context.String()});
                 signature   = Signature(intrinsic.identifier(), std::move(parameters), true);
-                return_type = type_context.getUnit();// Return type is determined dynamically by the called intrinsic.
+                return_type = type_context.Unit();// Return type is determined dynamically by the called intrinsic.
 
                 break;
             }
@@ -147,7 +147,7 @@ namespace ance::bbt
             case core::Intrinsic::SIZE_DIV:
             case core::Intrinsic::SIZE_REM:
             {
-                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getSize());
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.Size());
                 break;
             }
             case core::Intrinsic::SIZE_LT:
@@ -157,12 +157,12 @@ namespace ance::bbt
             case core::Intrinsic::SIZE_EQ:
             case core::Intrinsic::SIZE_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getSize(), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Size(), type_context);
                 break;
             }
             case core::Intrinsic::SIZE_BITNOT:
             {
-                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getSize());
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.Size());
                 break;
             }
 
@@ -172,7 +172,7 @@ namespace ance::bbt
             case core::Intrinsic::HALF_DIV:
             case core::Intrinsic::HALF_REM:
             {
-                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::HALF));
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.Float(core::Precision::HALF));
                 break;
             }
             case core::Intrinsic::HALF_LT:
@@ -182,12 +182,12 @@ namespace ance::bbt
             case core::Intrinsic::HALF_EQ:
             case core::Intrinsic::HALF_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getFloat(core::Precision::HALF), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Float(core::Precision::HALF), type_context);
                 break;
             }
             case core::Intrinsic::HALF_NEG:
             {
-                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getFloat(core::Precision::HALF));
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.Float(core::Precision::HALF));
                 break;
             }
 
@@ -197,7 +197,7 @@ namespace ance::bbt
             case core::Intrinsic::SINGLE_DIV:
             case core::Intrinsic::SINGLE_REM:
             {
-                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::SINGLE));
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.Float(core::Precision::SINGLE));
                 break;
             }
             case core::Intrinsic::SINGLE_LT:
@@ -207,12 +207,12 @@ namespace ance::bbt
             case core::Intrinsic::SINGLE_EQ:
             case core::Intrinsic::SINGLE_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getFloat(core::Precision::SINGLE), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Float(core::Precision::SINGLE), type_context);
                 break;
             }
             case core::Intrinsic::SINGLE_NEG:
             {
-                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getFloat(core::Precision::SINGLE));
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.Float(core::Precision::SINGLE));
                 break;
             }
 
@@ -222,7 +222,7 @@ namespace ance::bbt
             case core::Intrinsic::DOUBLE_DIV:
             case core::Intrinsic::DOUBLE_REM:
             {
-                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::DOUBLE));
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.Float(core::Precision::DOUBLE));
                 break;
             }
             case core::Intrinsic::DOUBLE_LT:
@@ -232,12 +232,12 @@ namespace ance::bbt
             case core::Intrinsic::DOUBLE_EQ:
             case core::Intrinsic::DOUBLE_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getFloat(core::Precision::DOUBLE), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Float(core::Precision::DOUBLE), type_context);
                 break;
             }
             case core::Intrinsic::DOUBLE_NEG:
             {
-                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getFloat(core::Precision::DOUBLE));
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.Float(core::Precision::DOUBLE));
                 break;
             }
 
@@ -247,7 +247,7 @@ namespace ance::bbt
             case core::Intrinsic::QUAD_DIV:
             case core::Intrinsic::QUAD_REM:
             {
-                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.getFloat(core::Precision::QUAD));
+                std::tie(signature, return_type) = makeBinarySignature(intrinsic, type_context.Float(core::Precision::QUAD));
                 break;
             }
             case core::Intrinsic::QUAD_LT:
@@ -257,43 +257,43 @@ namespace ance::bbt
             case core::Intrinsic::QUAD_EQ:
             case core::Intrinsic::QUAD_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getFloat(core::Precision::QUAD), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Float(core::Precision::QUAD), type_context);
                 break;
             }
             case core::Intrinsic::QUAD_NEG:
             {
-                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.getFloat(core::Precision::QUAD));
+                std::tie(signature, return_type) = makeUnarySignature(intrinsic, type_context.Float(core::Precision::QUAD));
                 break;
             }
 
             case core::Intrinsic::BOOL_EQ:
             case core::Intrinsic::BOOL_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getBool(), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Bool(), type_context);
                 break;
             }
             case core::Intrinsic::UNIT_EQ:
             case core::Intrinsic::UNIT_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getUnit(), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Unit(), type_context);
                 break;
             }
             case core::Intrinsic::STRING_EQ:
             case core::Intrinsic::STRING_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getString(), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.String(), type_context);
                 break;
             }
             case core::Intrinsic::IDENTIFIER_EQ:
             case core::Intrinsic::IDENTIFIER_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getIdentifier(), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Identifier(), type_context);
                 break;
             }
             case core::Intrinsic::LOCATION_EQ:
             case core::Intrinsic::LOCATION_NE:
             {
-                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.getLocation(), type_context);
+                std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Location(), type_context);
                 break;
             }
         }

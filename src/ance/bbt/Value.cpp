@@ -13,7 +13,7 @@ namespace ance::bbt
 
     utility::Shared<Type const> Value::type() const
     {
-        return type_.hasValue() ? type_.value() : type_context_.getType();
+        return type_.hasValue() ? type_.value() : type_context_.Type();
     }
 
     utility::Optional<utility::Shared<Value const>> Value::access(size_t, utility::Shared<Value const>*, TypeContext&) const
@@ -33,7 +33,7 @@ namespace ance::bbt
         return !equals(other);
     }
 
-    Unit::Unit(TypeContext& type_context) : Value(type_context.getUnit(), type_context), ValueBase() {}
+    Unit::Unit(TypeContext& type_context) : Value(type_context.Unit(), type_context), ValueBase() {}
 
     utility::Shared<Unit> Unit::make(TypeContext& type_context)
     {
@@ -50,7 +50,7 @@ namespace ance::bbt
         return true;
     }
 
-    Bool::Bool(bool const value, TypeContext& type_context) : Value(type_context.getBool(), type_context), ValueBase(), value_(value) {}
+    Bool::Bool(bool const value, TypeContext& type_context) : Value(type_context.Bool(), type_context), ValueBase(), value_(value) {}
 
     utility::Shared<Bool> Bool::make(bool const value, TypeContext& type_context)
     {
@@ -72,7 +72,7 @@ namespace ance::bbt
         return value_ == other.value_;
     }
 
-    Size::Size(size_t const value, TypeContext& type_context) : Value(type_context.getSize(), type_context), ValueBase(), value_(value) {}
+    Size::Size(size_t const value, TypeContext& type_context) : Value(type_context.Size(), type_context), ValueBase(), value_(value) {}
 
     utility::Shared<Size> Size::make(size_t value, TypeContext& type_context)
     {
@@ -103,7 +103,7 @@ namespace ance::bbt
     }
 
     Float::Float(llvm::APFloat value, TypeContext& type_context)
-        : Value(type_context.getFloat(core::Precision::get(value.getSemantics())), type_context)
+        : Value(type_context.Float(core::Precision::get(value.getSemantics())), type_context)
         , ValueBase()
         , value_(std::move(value))
     {}
@@ -145,7 +145,7 @@ namespace ance::bbt
     }
 
     Identifier::Identifier(core::Identifier const& identifier, TypeContext& type_context)
-        : Value(type_context.getIdentifier(), type_context)
+        : Value(type_context.Identifier(), type_context)
         , ValueBase()
         , identifier_(identifier)
     {}
@@ -171,7 +171,7 @@ namespace ance::bbt
     }
 
     Location::Location(core::Location const& location, TypeContext& type_context)
-        : Value(type_context.getLocation(), type_context)
+        : Value(type_context.Location(), type_context)
         , ValueBase()
         , location_(location) {}
 
@@ -197,7 +197,7 @@ namespace ance::bbt
         return location_ == other.location_;
     }
 
-    String::String(std::string value, TypeContext& type_context) : Value(type_context.getString(), type_context), ValueBase(), value_(std::move(value)) {}
+    String::String(std::string value, TypeContext& type_context) : Value(type_context.String(), type_context), ValueBase(), value_(std::move(value)) {}
 
     utility::Shared<String> String::make(std::string value, TypeContext& type_context)
     {
@@ -279,7 +279,7 @@ namespace ance::bbt
         if (type()->equals(*other.type())) return false;
         if (elements_.size() != other.elements_.size()) return false;
 
-        return std::ranges::equal(elements_, other.elements_, [](auto const& left, auto const& right) { return left->equals(*right); });
+        return std::ranges::equal(elements_, other.elements_, [](auto const& left, auto const& right) { return left == right; });
     }
 
     bool Array::isEmpty() const

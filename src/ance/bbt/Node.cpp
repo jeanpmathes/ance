@@ -188,7 +188,7 @@ ance::bbt::TypeOf::TypeOf(utility::List<std::reference_wrapper<Temporary const>>
     , destination(result)
 {}
 
-ance::bbt::CreateArrayType::CreateArrayType(Temporary const&      type,
+ance::bbt::ArrayTypeConstructor::ArrayTypeConstructor(Temporary const&      type,
                                             Temporary const&      length_value,
                                             Temporary const&      result,
                                             core::Location const& source_location)

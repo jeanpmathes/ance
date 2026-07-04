@@ -588,7 +588,7 @@ struct ance::cet::Runner::Implementation
                                          << ", condition=" << temp(branch_link.condition);
 
             utility::Shared<bbt::Value const> condition = deReference(scope().getTemporary(branch_link.condition).read());
-            if (!expectType(*type_context_.getBool(), *condition->type(), branch_link.condition.location))
+            if (!expectType(*type_context_.Bool(), *condition->type(), branch_link.condition.location))
             {
                 abort();
                 return;
@@ -740,7 +740,7 @@ struct ance::cet::Runner::Implementation
             // todo: to select the right variant, one could have overloads that just differ in execution mode
 
             utility::Shared<bbt::Value const> condition = deReference(scope().getTemporary(assert_statement.condition).read());
-            if (!expectType(*type_context_.getBool(), *condition->type(), assert_statement.condition.location))
+            if (!expectType(*type_context_.Bool(), *condition->type(), assert_statement.condition.location))
             {
                 abort();
                 return;
@@ -786,7 +786,7 @@ struct ance::cet::Runner::Implementation
 
             utility::Shared<bbt::Value const> target = deReference(scope().getTemporary(access.variable).read());
 
-            if (!expectType(*type_context_.getVariableRef(), *target->type(), access.variable.location))
+            if (!expectType(*type_context_.VariableRef(), *target->type(), access.variable.location))
             {
                 abort();
                 return;
@@ -910,7 +910,7 @@ struct ance::cet::Runner::Implementation
 
             utility::Shared<bbt::Value const> called = deReference(scope().getTemporary(call.called).read());
 
-            if (!expectType(*type_context_.getFunction(), *called->type(), call.called.location))
+            if (!expectType(*type_context_.Function(), *called->type(), call.called.location))
             {
                 abort();
                 return;
@@ -973,7 +973,7 @@ struct ance::cet::Runner::Implementation
             utility::Shared<Reference const> indexed_reference = asReference(scope().getTemporary(subscript.indexed));
 
             utility::Shared<bbt::Value const> index_value = deReference(scope().getTemporary(subscript.index).read());
-            if (!expectType(*type_context_.getSize(), *index_value->type(), subscript.index.location))
+            if (!expectType(*type_context_.Size(), *index_value->type(), subscript.index.location))
             {
                 abort();
                 return;
@@ -1027,7 +1027,7 @@ struct ance::cet::Runner::Implementation
             for (auto const& param : function_constructor.parameters)
             {
                 utility::Shared<bbt::Value const> type_value = deReference(scope().getTemporary(param.type).read());
-                if (!expectType(*type_context_.getType(), *type_value->type(), param.type.location))
+                if (!expectType(*type_context_.Type(), *type_value->type(), param.type.location))
                 {
                     abort();
                     return;
@@ -1038,7 +1038,7 @@ struct ance::cet::Runner::Implementation
             bbt::Signature const signature = bbt::Signature(function_constructor.name, std::move(parameters));
 
             utility::Shared<bbt::Value const> return_type = deReference(scope().getTemporary(function_constructor.return_type).read());
-            if (!expectType(*type_context_.getType(), *return_type->type(), function_constructor.return_type.location))
+            if (!expectType(*type_context_.Type(), *return_type->type(), function_constructor.return_type.location))
             {
                 abort();
                 return;
@@ -1063,7 +1063,7 @@ struct ance::cet::Runner::Implementation
             trace("Default", default_value) << ", type=" << temp(default_value.type) << ", destination=" << default_value.destination.id();
 
             utility::Shared<bbt::Value const> type_value = deReference(scope().getTemporary(default_value.type).read());
-            if (!expectType(*type_context_.getType(), *type_value->type(), default_value.type.location))
+            if (!expectType(*type_context_.Type(), *type_value->type(), default_value.type.location))
             {
                 abort();
                 return;
@@ -1073,11 +1073,11 @@ struct ance::cet::Runner::Implementation
                 [&](utility::Shared<bbt::Type const> type) -> utility::Shared<bbt::Value const> {
                 // todo: should become default constructor call at some point
 
-                if (*type == *type_context_.getBool()) return bbt::Bool::make(false, type_context_);
-                if (*type == *type_context_.getUnit()) return bbt::Unit::make(type_context_);
-                if (*type == *type_context_.getSize()) return bbt::Size::make(0, type_context_);
-                if (*type == *type_context_.getLocation()) return bbt::Location::make(core::Location::project(), type_context_);
-                if (*type == *type_context_.getString()) return bbt::String::make("", type_context_);
+                if (*type == *type_context_.Bool()) return bbt::Bool::make(false, type_context_);
+                if (*type == *type_context_.Unit()) return bbt::Unit::make(type_context_);
+                if (*type == *type_context_.Size()) return bbt::Size::make(0, type_context_);
+                if (*type == *type_context_.Location()) return bbt::Location::make(core::Location::project(), type_context_);
+                if (*type == *type_context_.String()) return bbt::String::make("", type_context_);
 
                 if (type->isArray())
                 {
@@ -1197,20 +1197,20 @@ struct ance::cet::Runner::Implementation
             }
         }
 
-        void visit(bbt::CreateArrayType const& array_type) override
+        void visit(bbt::ArrayTypeConstructor const& array_type) override
         {
             trace("ArrayType", array_type) << ", element_type=" << temp(array_type.element_type) << ", length=" << temp(array_type.length)
                                            << ", destination=" << array_type.destination.id();
 
             utility::Shared<bbt::Value const> element_type_value = deReference(scope().getTemporary(array_type.element_type).read());
-            if (!expectType(*type_context_.getType(), *element_type_value->type(), array_type.element_type.location))
+            if (!expectType(*type_context_.Type(), *element_type_value->type(), array_type.element_type.location))
             {
                 abort();
                 return;
             }
 
             utility::Shared<bbt::Value const> length_value = deReference(scope().getTemporary(array_type.length).read());
-            if (!expectType(*type_context_.getSize(), *length_value->type(), array_type.length.location))
+            if (!expectType(*type_context_.Size(), *length_value->type(), array_type.length.location))
             {
                 abort();
                 return;
@@ -1219,7 +1219,7 @@ struct ance::cet::Runner::Implementation
             utility::Shared<bbt::Type const> element_type = element_type_value.as<bbt::Type>();
             size_t const               length       = deReference<bbt::Size>(length_value).value();
 
-            scope().getTemporary(array_type.destination).write(type_context_.getArray(std::move(element_type), length));
+            scope().getTemporary(array_type.destination).write(type_context_.Array(std::move(element_type), length));
         }
 
         void visit(bbt::ArrayConstructor const& array_constructor) override
@@ -1257,7 +1257,7 @@ struct ance::cet::Runner::Implementation
             if (array_constructor.element_type != nullptr)
             {
                 utility::Shared<bbt::Value const> element_type_value = deReference(scope().getTemporary(*array_constructor.element_type).read());
-                if (!expectType(*type_context_.getType(), *element_type_value->type(), array_constructor.element_type->location))
+                if (!expectType(*type_context_.Type(), *element_type_value->type(), array_constructor.element_type->location))
                 {
                     abort();
                     return;
@@ -1294,7 +1294,7 @@ struct ance::cet::Runner::Implementation
                 }
             }
 
-            utility::Shared<bbt::Type const> array_type = type_context_.getArray(element_type.value(), elements.size());
+            utility::Shared<bbt::Type const> array_type = type_context_.Array(element_type.value(), elements.size());
             scope().getTemporary(array_constructor.destination).write(bbt::Array::make(std::move(array_type), std::move(elements), type_context_));
         }
 

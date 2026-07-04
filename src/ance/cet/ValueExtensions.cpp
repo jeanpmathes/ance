@@ -8,7 +8,7 @@
 
 namespace ance::cet
 {
-    ScopeRef::ScopeRef(Scope& scope, bbt::TypeContext& type_context) : Value(type_context.getScopeRef(), type_context), ValueBase(), scope_(scope) {}
+    ScopeRef::ScopeRef(Scope& scope, bbt::TypeContext& type_context) : Value(type_context.ScopeRef(), type_context), ValueBase(), scope_(scope) {}
 
     utility::Shared<ScopeRef> ScopeRef::make(Scope& scope, bbt::TypeContext& type_context)
     {
@@ -31,7 +31,7 @@ namespace ance::cet
     }
 
     VariableRef::VariableRef(Variable& variable, bbt::TypeContext& type_context)
-        : Value(type_context.getVariableRef(), type_context)
+        : Value(type_context.VariableRef(), type_context)
         , ValueBase()
         , variable_(variable)
     {}
@@ -60,7 +60,7 @@ namespace ance::cet
                          utility::Shared<bbt::Type const> referenced_type,
                          core::VariabilityModifier const variability,
                          bbt::TypeContext&               type_context)
-        : Value(type_context.getReference(std::move(referenced_type), variability), type_context), ValueBase()
+        : Value(type_context.Reference(std::move(referenced_type), variability), type_context), ValueBase()
         , address_(std::move(address))
     {}
 

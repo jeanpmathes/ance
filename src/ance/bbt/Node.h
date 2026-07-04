@@ -366,13 +366,13 @@ namespace ance::bbt
         Temporary const&                                       destination;
     };
 
-    /// An expression that retrieves an array type, meaning repeated calls with the same arguments provide the same type.
+    /// An expression that constructs an array type.
     /// The array type has a fixed length and element type.
-    struct CreateArrayType final
+    struct ArrayTypeConstructor final
         : Statement
-        , utility::ConcreteNode<CreateArrayType, Visitor>
+        , utility::ConcreteNode<ArrayTypeConstructor, Visitor>
     {
-        CreateArrayType(Temporary const& type, Temporary const& length_value, Temporary const& result, core::Location const& source_location);
+        ArrayTypeConstructor(Temporary const& type, Temporary const& length_value, Temporary const& result, core::Location const& source_location);
 
         Temporary const& element_type;
         Temporary const& length;
@@ -497,7 +497,7 @@ namespace ance::bbt
         virtual void visit(GetUnaryOperatorFunctionIdentifier const& get_unary_operator_function_identifier)   = 0;
         virtual void visit(GetBinaryOperatorFunctionIdentifier const& get_binary_operator_function_identifier) = 0;
         virtual void visit(TypeOf const& type_of)                                                              = 0;
-        virtual void visit(CreateArrayType const& create_array_type)                                           = 0;
+        virtual void visit(ArrayTypeConstructor const& create_array_type)                                           = 0;
         virtual void visit(ArrayConstructor const& array_constructor)                                          = 0;
         virtual void visit(OrderedScopeEnter const& scope_enter)                                               = 0;
         virtual void visit(OrderedScopeExit const& scope_exit)                                                 = 0;

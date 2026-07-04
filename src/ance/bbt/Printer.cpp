@@ -347,7 +347,7 @@ struct ance::bbt::Printer::Implementation
             print(");");
         }
 
-        void visit(CreateArrayType const& create_array_type) override
+        void visit(ArrayTypeConstructor const& create_array_type) override
         {
             print(create_array_type.destination.id());
             print(" ");

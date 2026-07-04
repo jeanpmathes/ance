@@ -25,11 +25,11 @@ namespace ance::bbt
         Function(Signature signature, utility::Shared<Type const> return_type, utility::Owned<Flow> body, TypeContext& type_context);
         ~Function() override = default;
 
-        [[nodiscard]] core::Identifier const& name() const;
-        [[nodiscard]] Signature               signature();
-        [[nodiscard]] Signature const&        signature() const;
+        [[nodiscard]] core::Identifier const&     name() const;
+        [[nodiscard]] Signature                   signature();
+        [[nodiscard]] Signature const&            signature() const;
         [[nodiscard]] utility::Shared<Type const> returnType();
-        [[nodiscard]] Type const&             returnType() const;
+        [[nodiscard]] Type const&                 returnType() const;
 
         [[nodiscard]] Flow const& body() const;
 
@@ -37,7 +37,7 @@ namespace ance::bbt
         [[nodiscard]] bool        equals(Function const& other) const override;
 
       private:
-        Signature             signature_;
+        Signature                   signature_;
         utility::Shared<Type const> return_type_;
 
         Flow const&                              body_;

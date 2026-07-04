@@ -120,25 +120,22 @@ namespace ance
 
         return exit_code;
 
-        // todo: type semantics - types should now use "value semantics" (not exactly the right term), all type constructors (so array, ref, ...) always return new instances
-        // todo: write something about this in the doc comment of Type
-        // todo: functions should be value types so we can use them as keys for native functions, also write something about that in later note
-        // todo: also rename the type constructors to actually contain Constructor in the name
-        // todo: to through all usage of Value::equals and replace with == and !=
-        // todo: requires intensive testing
-        // todo: write some related documentation for this, repeat this note for the next step
-
         // todo: set up new test system, should for now only check compiler output and not run anything
         // todo: should no longer use python but instead C++, so we have coverage data
         // todo: but should have utilities to write them, so that they are as easy to write as the python tests
         // todo: rename test to tests_old, add note somewhere to go through all and make sure equivalent test exists in new tests
         // todo: also add some unit tests for stuff in utility, like Optional, and also SourceFile and such
+        // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: code gen - use python to generate the Node files, specifically Node.h and Node.generated.cpp, also integrate well with cmake
         // todo: use this for all Node trees, add a comment that when writing the compiler in ance it should of course not use python codegen
         // todo: it should also assist with serialization later, by requiring a stable ID for each Node, generate an enum for each type
         // todo: also use this to improve tracing by automatically writing the trace, also creating an exit trace if needed (e.g. by allowing to easily access the destination of statements)
-        // todo: also give each a clone method that can clone them, use this to refactor Function - it currently keeps a const& to the body, but now function ctor could clone instead so the class can be streamlined
+        // todo: also give each some a clone method (clone would need to handle refs, so not everything would be cloneable) that can clone them, use this to refactor Function - it currently keeps a const& to the body, but now function ctor could clone instead so the class can be streamlined
+        // todo: also implement function in such a way that it can be used as a key in a dictionary, should be immutable and support hashing / ordering / whatever
+        // todo: instead of the current return handling, the generated visitors should allow generic return values for the different groups (statements, expressions, declarations), also think about how to apply that to parser as well
+        // todo: think of a way to split the large visitors into smaller files (so one header, multiple cpp, and a private header, could split for expressions/statements/...)
+        // todo: analyze code quality after this
         // todo: write some related documentation for this, repeat this note for the next step
 
         // todo: think about doing some form of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar already
@@ -238,6 +235,7 @@ namespace ance
         // todo: no vector types, instead array types support all operators of their element type and perform them element-wise
         // todo: no vectors yet because that has HW and alignment implications, should not be first class language element
         // todo: this should use generics, something like: op +<T1, T2, N>(a: [T1; N], b: [T2; N]) where exists(+(T1, T2))
+        // todo: also rethink operator declaration to allow reworking type context so that it always creates new values
 
         // todo: all the pointer and allocation stuff would only work with runtime code for now
 

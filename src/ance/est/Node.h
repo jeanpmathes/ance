@@ -445,13 +445,13 @@ namespace ance::est
         utility::List<utility::Owned<Expression>> expressions;
     };
 
-    /// An expression that retrieves an array type, meaning repeated calls with the same arguments provide the same type.
+    /// An expression that constructs an array type.
     /// The array type has a fixed length and element type.
-    struct ArrayType final
+    struct ArrayTypeConstructor final
         : Expression
-        , utility::ConcreteNode<ArrayType, Visitor>
+        , utility::ConcreteNode<ArrayTypeConstructor, Visitor>
     {
-        ArrayType(utility::Owned<Expression> type, utility::Owned<Expression> length_expression, core::Location const& source_location);
+        ArrayTypeConstructor(utility::Owned<Expression> type, utility::Owned<Expression> length_expression, core::Location const& source_location);
 
         utility::Owned<Expression> element_type;
         utility::Owned<Expression> length;
@@ -548,7 +548,7 @@ namespace ance::est
         virtual void visit(UnaryOperation const& unary_operation)              = 0;
         virtual void visit(BinaryOperation const& binary_operation)            = 0;
         virtual void visit(TypeOf const& type_of)                              = 0;
-        virtual void visit(ArrayType const& array_type)                        = 0;
+        virtual void visit(ArrayTypeConstructor const& array_type)                        = 0;
         virtual void visit(ArrayConstructor const& array_constructor)          = 0;
 
         virtual void visit(MatchCase const& match_case) = 0;

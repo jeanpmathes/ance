@@ -29,7 +29,7 @@ namespace ance::bbt
         virtual ~Value() = default;
 
         [[nodiscard]] utility::Shared<Type const> type() const;
-        [[nodiscard]] virtual std::string toString() const = 0;
+        [[nodiscard]] virtual std::string         toString() const = 0;
 
         /// \brief Access this value using an index.
         /// Access can either be performed in load or replace mode.
@@ -64,7 +64,7 @@ namespace ance::bbt
 
       private:
         utility::Optional<utility::Shared<Type const>> type_;
-        TypeContext&                             type_context_;
+        TypeContext&                                   type_context_;
     };
 
     template<typename T>
@@ -215,12 +215,12 @@ namespace ance::bbt
 
         ~Array() override = default;
 
-        [[nodiscard]] std::string                                  toString() const override;
+        [[nodiscard]] std::string                                     toString() const override;
         [[nodiscard]] utility::Optional<utility::Shared<Value const>> access(size_t                        index,
                                                                              utility::Shared<Value const>* replacement,
                                                                              TypeContext&                  type_context) const override;
         [[nodiscard]] std::span<utility::Shared<Value const> const>   elements() const;
-        [[nodiscard]] bool                                         equals(Array const& other) const override;
+        [[nodiscard]] bool                                            equals(Array const& other) const override;
 
         [[nodiscard]] bool   isEmpty() const;
         [[nodiscard]] size_t length() const;
