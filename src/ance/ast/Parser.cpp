@@ -48,7 +48,8 @@ namespace ance::ast
           public:
             explicit LexerErrorListener(ErrorHandler& parent) : parent_(parent) {}
 
-            void syntaxError(antlr4::Recognizer*, antlr4::Token*, size_t const, size_t const, std::string const& msg, std::exception_ptr const) override
+            [[noreturn]] void syntaxError(antlr4::Recognizer*, antlr4::Token*, size_t const, size_t const, std::string const& msg, std::exception_ptr const)
+                override
             {
                 throw std::logic_error("Unhandled lexer error: " + msg);
             }
@@ -1385,21 +1386,26 @@ struct ance::ast::Parser::Implementation
             reporter_.error(core::Location::file(source_file->index())) << "Failed to read file";
         }
 
-        std::filesystem::path file_path;
+        if (result.hasValue())
+        {
+            std::filesystem::path file_path;
 
-        if (source_file != nullptr) file_path = source_file->getRelativePath();
-        else file_path = std::filesystem::path("core") / id;
+            if (source_file != nullptr) file_path = source_file->getRelativePath();
+            else file_path = std::filesystem::path("core") / id;
 
-        context_.print<Printer>(**result, "ast", file_path);
+            context_.print<Printer>(**result, "ast", file_path);
+        }
 
         if (reporter_.isFailed())
         {
             reporter_.trace(prefix, core::Location::nowhere()) << "parse exit {id=" << id << ", status=fail}";
 
-            return std::nullopt;
+            result = std::nullopt;
         }
-
-        reporter_.trace(prefix, core::Location::nowhere()) << "parse exit {id=" << id << ", status=ok}";
+        else
+        {
+            reporter_.trace(prefix, core::Location::nowhere()) << "parse exit {id=" << id << ", status=ok}";
+        }
 
         return result;
     }

@@ -15,7 +15,7 @@ target_link_libraries(ance PRIVATE ${LLVM_AVAILABLE_LIBS} ${LLD_AVAILABLE_LIBS})
 target_link_libraries(ance PRIVATE Boost::boost Boost::locale Boost::regex)
 target_link_libraries(ance PRIVATE ICU ICU::data ICU::i18n ICU::io ICU::tu ICU::uc)
 
-set(ERROR_OPTIONS
+set(ERROR_OPTIONS # todo: check if any warnings here can be brought back
     -Werror -Weverything
     -Wno-c++98-compat
     -Wno-c++98-compat-pedantic

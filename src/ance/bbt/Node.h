@@ -1,7 +1,6 @@
 #ifndef ANCE_BBT_NODE_H
 #define ANCE_BBT_NODE_H
 
-#include "Node.h"
 #include "ance/core/BinaryOperator.h"
 #include "ance/core/Intrinsic.h"
 #include "ance/core/Location.h"

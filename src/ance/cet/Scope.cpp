@@ -58,23 +58,20 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value const>> ance::cet
 
 ance::cet::FindResult ance::cet::Scope::find(core::Identifier const& identifier)
 {
-    FindResult local = onFind(identifier);
+    FindResult const local  = onFind(identifier);
+    FindResult       result = local;
 
-    if (local.status == FindResult::Status::FOUND) return local;
+    if (local.status == FindResult::Status::FOUND) return result;
 
     if (parent_ != nullptr)
     {
-        FindResult from_parent = parent_->find(identifier);
-
-        if (from_parent.status == FindResult::Status::FOUND) return from_parent;
+        result = parent_->find(identifier);
 
         // In the case that it is not found in the parent scope, we do not want to lose the local erase information.
-        if (local.status == FindResult::Status::ERASED) return local;
-
-        return from_parent;
+        if (result.status != FindResult::Status::FOUND && local.status == FindResult::Status::ERASED) result = local;
     }
 
-    return local;
+    return result;
 }
 
 ance::cet::EraseResult ance::cet::Scope::erase(core::Identifier const& identifier)

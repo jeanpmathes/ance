@@ -7,7 +7,8 @@
 
 #include "ance/core/Identifier.h"
 
-#include "Node.h"
+#include "ance/bbt/Node.h"
+
 #include "Signature.h"
 #include "Value.h"
 

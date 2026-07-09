@@ -1,8 +1,6 @@
 #ifndef ANCE_AST_NODE_H
 #define ANCE_AST_NODE_H
 
-#include "Node.h"
-
 #include "ance/core/AccessModifier.h"
 #include "ance/core/Assigner.h"
 #include "ance/core/BinaryOperator.h"
