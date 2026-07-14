@@ -1,1 +1,1 @@
-target_sources(ance PRIVATE Expander.cpp Node.cpp Printer.cpp)
+target_sources(ance_compiler PRIVATE Expander.cpp Node.cpp Printer.cpp)

@@ -219,6 +219,26 @@ T const* ance::utility::Optional<T>::operator->() const
 }
 
 template<ance::utility::Moveable T>
+bool ance::utility::Optional<T>::operator==(std::nullopt_t) const
+{
+    return !hasValue();
+}
+
+template<ance::utility::Moveable T>
+bool ance::utility::Optional<T>::operator==(Optional const& other) const
+    requires std::equality_comparable<T>
+{
+    return hasValue() == other.hasValue() && (hasValue() ? value() == other.value() : true);
+}
+
+template<ance::utility::Moveable T>
+bool ance::utility::Optional<T>::operator==(T const& other) const
+    requires std::equality_comparable<T>
+{
+    return hasValue() && value() == other;
+}
+
+template<ance::utility::Moveable T>
 T ance::utility::Optional<T>::valueOr(T default_value)
     requires Copyable<T>
 {

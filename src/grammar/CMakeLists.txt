@@ -23,13 +23,13 @@ if (EXISTS "${ANTLR_JAR_PATH}")
             DEPENDS ${ANTLR4_SRC_FILES_ance_grammar}
     )
 
-    add_dependencies(ance ance_grammar)
+    add_dependencies(ance_compiler ance_grammar)
 
-    target_include_directories(ance SYSTEM PRIVATE
+    target_include_directories(ance_compiler SYSTEM PRIVATE
             ${ANTLR4_INCLUDE_DIR_ance_grammar}
     )
 
-    target_sources(ance PRIVATE
+    target_sources(ance_compiler PRIVATE
             ${ANTLR4_SRC_FILES_ance_grammar}
     )
 else()

@@ -7,17 +7,20 @@
 
 ance::sources::SourceFile::SourceFile(std::filesystem::path const& base_directory, std::filesystem::path const& file, size_t const index)
     : relative_path_(file)
-    , full_path_(base_directory / file)
+    , absolute_path_(std::filesystem::absolute(base_directory / file))
     , index_(index)
     , is_ok_(false)
 {
-    std::ifstream file_stream(full_path_);
+    std::ifstream file_stream(absolute_path_);
 
     is_ok_ = file_stream.is_open();
 
     if (is_ok_)
     {
-        for (std::string line; std::getline(file_stream, line);) { lines_.emplace_back(boost::locale::conv::utf_to_utf<char32_t>(line)); }
+        for (std::string line; std::getline(file_stream, line);)
+        {
+            lines_.emplace_back(boost::locale::conv::utf_to_utf<char32_t>(line));
+        }
 
         file_stream.close();
     }
@@ -49,9 +52,9 @@ std::filesystem::path const& ance::sources::SourceFile::getRelativePath() const
     return relative_path_;
 }
 
-std::filesystem::path const& ance::sources::SourceFile::getFullPath() const
+std::filesystem::path const& ance::sources::SourceFile::getAbsolutePath() const
 {
-    return full_path_;
+    return absolute_path_;
 }
 
 std::filesystem::path ance::sources::SourceFile::getDirectory() const

@@ -1419,7 +1419,7 @@ struct ance::ast::Parser::Implementation
             "",
             [&source_file] {
                 std::fstream code;// todo: this appears to be a double read as addFile also reads the file
-                code.open(source_file.getRelativePath());
+                code.open(source_file.getAbsolutePath());
 
                 return code;
             },
@@ -1435,7 +1435,7 @@ struct ance::ast::Parser::Implementation
             "",
             [&source_file] {
                 std::fstream code;// todo: this appears to be a double read as addFile also reads the file
-                code.open(source_file.getRelativePath());
+                code.open(source_file.getAbsolutePath());
 
                 return code;
             },

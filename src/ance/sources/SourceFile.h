@@ -34,17 +34,15 @@ namespace ance::sources
         /// \param column_start The first column to include, starting with index 1.
         /// \param column_end The last column to include.
         /// \return A view of the slice.
-        [[nodiscard]] std::u32string_view getLineSlice(size_t       line,
-                                                    unsigned int column_start,
-                                                    unsigned int column_end) const;
+        [[nodiscard]] std::u32string_view getLineSlice(size_t line, unsigned int column_start, unsigned int column_end) const;
 
         /// Get the path to the source file.
         /// \return The path, relative to the base directory.
         [[nodiscard]] std::filesystem::path const& getRelativePath() const;
 
-        /// Get the full path to the source file.
-        /// \return The full path.
-        [[nodiscard]] std::filesystem::path const& getFullPath() const;
+        /// Get the absolute path to the source file.
+        /// \return The absolute path.
+        [[nodiscard]] std::filesystem::path const& getAbsolutePath() const;
 
         /// Get the path from the base directory to the directory containing the source file.
         /// \return The path to the directory.
@@ -61,11 +59,11 @@ namespace ance::sources
       private:
         std::vector<std::u32string> lines_;
 
-        std::filesystem::path    relative_path_;
-        std::filesystem::path    full_path_;
+        std::filesystem::path relative_path_;
+        std::filesystem::path absolute_path_;
 
-        size_t                   index_;
-        bool                     is_ok_;
+        size_t index_;
+        bool   is_ok_;
     };
 }
 

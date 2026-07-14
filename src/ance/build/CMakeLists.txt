@@ -1,1 +1,1 @@
-target_sources(ance PRIVATE Compiler.cpp)
+target_sources(ance_compiler PRIVATE Compiler.cpp)

@@ -81,7 +81,14 @@ namespace ance::core
             std::vector<std::tuple<Annotation, std::ostringstream>> annotations_;
         };
 
-        Reporter(sources::SourceTree& source_tree, std::ostream& out, bool trace_enabled);
+        struct Options
+        {
+            bool trace_enabled;
+            bool color_enabled;
+            bool warning_as_error;// todo: allow setting
+        };
+
+        Reporter(sources::SourceTree& source_tree, std::ostream& out, Options const& options);
         ~Reporter();
 
         /// Start building a trace message. Trace messages are only output if the reported is configured to do so.

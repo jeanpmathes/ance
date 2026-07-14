@@ -13,7 +13,7 @@ The project needs to be built with clang-cl.
 Use `vcpkg` to install the dependencies:
 
 ```bash
-vcpkg install llvm antlr4 boost icu
+vcpkg install llvm antlr4 boost icu catch2
 ```
 
 The project can then be built using cmake.

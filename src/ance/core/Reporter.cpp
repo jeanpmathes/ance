@@ -81,39 +81,48 @@ namespace text
 
 struct ance::core::Reporter::Implementation
 {
-    Implementation(Reporter* reporter, sources::SourceTree& source_tree, std::ostream& out, bool trace_enable)
+    Implementation(Reporter* reporter, sources::SourceTree& source_tree, std::ostream& out, Options const& options)
         : reporter_(reporter)
         , source_tree_(source_tree)
         , out_(out)
-        , trace_enabled_(trace_enable)
+        , options_(options)
     {}
 
-    static char const* colorForLevel(Level const level)
+    [[nodiscard]] char const* color(char const* const value) const
     {
+        return options_.color_enabled ? value : "";
+    }
+
+    [[nodiscard]] char const* color(Level const level) const
+    {
+        if (!options_.color_enabled) return "";
+
         switch (level)
         {
             case Level::ERROR:
-                return ansi::ColorError;
+                return color(ansi::ColorError);
             case Level::WARNING:
-                return ansi::ColorWarning;
+                return color(ansi::ColorWarning);
             case Level::INFO:
-                return ansi::ColorInfo;
+                return color(ansi::ColorInfo);
             case Level::TRACE:
-                return ansi::ColorTrace;
+                return color(ansi::ColorTrace);
         }
 
-        return ansi::ColorReset;
+        return color(ansi::ColorReset);
     }
 
-    [[nodiscard]] bool outputAnnotation(Location const&    location,
-                                        std::string const& message,
-                                        Level const        level,
-                                        bool const         indent,
-                                        size_t             max_line_digits) const
+    [[nodiscard]] bool annotateOutput(Location const& location, std::string const& message, Level const level, bool const indent, size_t max_line_digits) const
     {
         if (indent) out_ << "  ";
 
-        if (location.isProject() || location.isNowhere())
+        if (location.isProject())
+        {
+            out_ << location << " " << message << std::endl;
+            return false;
+        }
+
+        if (location.isNowhere())
         {
             out_ << message << std::endl;
             return false;
@@ -164,14 +173,14 @@ struct ance::core::Reporter::Implementation
             size_t const marker_start  = std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 0uz);
             size_t const marker_length = std::max(text::estimateWidth(text_with_mark) + missing_with_mark, 1uz);
 
-            out_ << empty_line_prefix << std::string(marker_start, ' ') << colorForLevel(level) << std::string(marker_length, '~') << ansi::ColorReset
+            out_ << empty_line_prefix << std::string(marker_start, ' ') << color(level) << std::string(marker_length, '~') << color(ansi::ColorReset)
                  << std::endl;
         }
         else
         {
             size_t const extra_lines = location.lineEnd() - location.line();
-            out_ << empty_line_prefix << ansi::ColorMeta << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")" << ansi::ColorReset
-                 << std::endl;
+            out_ << empty_line_prefix << color(ansi::ColorMeta) << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")"
+                 << color(ansi::ColorReset) << std::endl;
         }
 
         return true;
@@ -187,15 +196,13 @@ struct ance::core::Reporter::Implementation
 
     void report()
     {
-        bool const warnings_as_errors = false;// todo: allow setting
-
-        if (errorCount() > 0 || (warnings_as_errors && warningCount() > 0))
+        if (errorCount() > 0 || (options_.warning_as_error && warningCount() > 0))
         {
             out_ << "ance: ";
 
             if (errorCount() > 0)
             {
-                out_ << ansi::ColorError << errorCount() << " error" << (errorCount() > 1 ? "s" : "") << ansi::ColorReset;
+                out_ << color(ansi::ColorError) << errorCount() << " error" << (errorCount() > 1 ? "s" : "") << color(ansi::ColorReset);
             }
             else
             {
@@ -206,7 +213,7 @@ struct ance::core::Reporter::Implementation
 
             if (warningCount() > 0)
             {
-                out_ << ansi::ColorWarning << warningCount() << " warning" << (warningCount() > 1 ? "s" : "") << ansi::ColorReset;
+                out_ << color(ansi::ColorWarning) << warningCount() << " warning" << (warningCount() > 1 ? "s" : "") << color(ansi::ColorReset);
             }
             else
             {
@@ -215,7 +222,7 @@ struct ance::core::Reporter::Implementation
 
             out_ << std::endl;
 
-            out_ << "ance: " << ansi::ColorError << "Failed" << ansi::ColorReset;
+            out_ << "ance: " << color(ansi::ColorError) << "Failed" << color(ansi::ColorReset);
 
             if (errorCount() == 0) out_ << " (by warning)";
 
@@ -225,10 +232,11 @@ struct ance::core::Reporter::Implementation
         {
             if (warningCount() > 0)
             {
-                out_ << "ance: " << ansi::ColorWarning << warningCount() << " warning" << (warningCount() > 1 ? "s" : "") << ansi::ColorReset << std::endl;
+                out_ << "ance: " << color(ansi::ColorWarning) << warningCount() << " warning" << (warningCount() > 1 ? "s" : "") << color(ansi::ColorReset)
+                     << std::endl;
             }
 
-            out_ << "ance: " << ansi::ColorSuccess << "Success" << ansi::ColorReset << std::endl;
+            out_ << "ance: " << color(ansi::ColorSuccess) << "Success" << color(ansi::ColorReset) << std::endl;
         }
 
         clear();
@@ -241,9 +249,7 @@ struct ance::core::Reporter::Implementation
 
     [[nodiscard]] bool isFailed() const
     {
-        bool const warnings_as_errors = false;// todo: allow setting
-
-        return errorCount() > 0 || (warnings_as_errors && warningCount() > 0);
+        return errorCount() > 0 || (options_.warning_as_error && warningCount() > 0);
     }
 
     [[nodiscard]] size_t errorCount() const
@@ -258,7 +264,7 @@ struct ance::core::Reporter::Implementation
 
     [[nodiscard]] bool isTraceEnabled() const
     {
-        return trace_enabled_;
+        return options_.trace_enabled;
     }
 
   private:
@@ -268,7 +274,7 @@ struct ance::core::Reporter::Implementation
     Reporter*            reporter_;
     sources::SourceTree& source_tree_;
     std::ostream&        out_;
-    bool                 trace_enabled_;
+    Options              options_;
 };
 
 ance::core::Reporter::Annotation::Annotation(Location const& location) : location_(location) {}
@@ -331,8 +337,8 @@ ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::oper
     return *this;
 }
 
-ance::core::Reporter::Reporter(sources::SourceTree& source_tree, std::ostream& out, bool trace_enabled)
-    : implementation_(utility::makeOwned<Implementation>(this, source_tree, out, trace_enabled))
+ance::core::Reporter::Reporter(sources::SourceTree& source_tree, std::ostream& out, Options const& options)
+    : implementation_(utility::makeOwned<Implementation>(this, source_tree, out, options))
 {}
 
 void ance::core::Reporter::Implementation::report(Level const                                                 level,
@@ -349,16 +355,16 @@ void ance::core::Reporter::Implementation::report(Level const                   
     switch (level)
     {
         case Level::ERROR:
-            out_ << ansi::ColorError << "error" << ansi::ColorReset << ": ";
+            out_ << color(ansi::ColorError) << "error" << color(ansi::ColorReset) << ": ";
             break;
         case Level::WARNING:
-            out_ << ansi::ColorWarning << "warning" << ansi::ColorReset << ": ";
+            out_ << color(ansi::ColorWarning) << "warning" << color(ansi::ColorReset) << ": ";
             break;
         case Level::INFO:
-            out_ << ansi::ColorInfo << "info" << ansi::ColorReset << ": ";
+            out_ << color(ansi::ColorInfo) << "info" << color(ansi::ColorReset) << ": ";
             break;
         case Level::TRACE:
-            out_ << ansi::ColorTrace << "trace" << ansi::ColorReset << ": ";
+            out_ << color(ansi::ColorTrace) << "trace" << color(ansi::ColorReset) << ": ";
             break;
     }
 
@@ -369,14 +375,14 @@ void ance::core::Reporter::Implementation::report(Level const                   
 
     auto const   annotation_lines = annotations | std::views::transform([](auto const& entry) { return std::get<0>(entry).location().line(); });
     size_t const max_line         = annotations.empty() ? 0 : std::ranges::max(annotation_lines);
-    auto const max_line_digits = max_line == 0 ? 1uz : static_cast<size_t>(std::log10(max_line) + 1);
+    auto const   max_line_digits  = max_line == 0 ? 1uz : static_cast<size_t>(std::log10(max_line) + 1);
 
     bool first            = true;
     bool included_snippet = false;
 
     for (auto const& [annotation, stream] : annotations)
     {
-        included_snippet |= outputAnnotation(annotation.location(), stream.str(), first ? level : Level::INFO, !first, max_line_digits);
+        included_snippet |= annotateOutput(annotation.location(), stream.str(), first ? level : Level::INFO, !first, max_line_digits);
         first = false;
     }
 

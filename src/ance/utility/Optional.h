@@ -78,6 +78,12 @@ namespace ance::utility
         [[nodiscard]] T*       operator->();
         [[nodiscard]] T const* operator->() const;
 
+        [[nodiscard]] bool operator==(std::nullopt_t) const;
+        [[nodiscard]] bool operator==(Optional const& other) const
+            requires std::equality_comparable<T>;
+        [[nodiscard]] bool operator==(T const& other) const
+            requires std::equality_comparable<T>;
+
         [[nodiscard]] T valueOr(T default_value)
             requires Copyable<T>;
         [[nodiscard]] T& valueOr(T& default_value)

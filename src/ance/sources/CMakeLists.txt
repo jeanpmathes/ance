@@ -1,1 +1,1 @@
-target_sources(ance PRIVATE SourceFile.cpp SourceTree.cpp)
+target_sources(ance_compiler PRIVATE SourceFile.cpp SourceTree.cpp)
