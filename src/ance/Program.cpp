@@ -116,7 +116,6 @@ namespace ance
 
             // todo: begin going through old tests, converting some (and deleting them)
             // todo: add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
-            // todo: add some unit tests for stuff in utility, like Optional, and also SourceFile and such, check coverage
 
             // todo: code gen - use python to generate the Node files, specifically Node.h and Node.generated.cpp, also integrate well with cmake
             // todo: use this for all Node trees, add a comment that when writing the compiler in ance it should of course not use python codegen

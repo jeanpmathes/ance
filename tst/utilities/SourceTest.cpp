@@ -1,41 +1,31 @@
 #include "SourceTest.h"
 
 #include <algorithm>
-#include <cstdint>
-#include <format>
-#include <fstream>
 #include <regex>
 #include <span>
 #include <sstream>
 #include <stdexcept>
-#include <system_error>
 #include <vector>
-
-#include <process.h>
 
 #include <catch2/catch_test_macros.hpp>
 
 #include "ance/Program.h"
+
+#include "TemporaryDirectory.h"
 
 namespace
 {
     class TestProject
     {
       public:
-        TestProject() : directory_(createTemporaryDirectory()) {}
+        TestProject() = default;
 
         TestProject(TestProject const&)            = delete;
         TestProject& operator=(TestProject const&) = delete;
 
-        ~TestProject()
-        {
-            std::error_code error;
-            std::filesystem::remove_all(directory_, error);
-        }
-
         [[nodiscard]] std::filesystem::path getSourcePath() const
         {
-            return directory_ / source_paths_.front();
+            return directory_.root() / source_paths_.front();
         }
 
         [[nodiscard]] std::span<std::filesystem::path const> getSourcePaths() const
@@ -47,39 +37,15 @@ namespace
         {
             std::filesystem::path const normalized_path = relative_path.lexically_normal();
 
-            if (normalized_path.empty() || normalized_path.is_absolute() || *normalized_path.begin() == "..")
-                throw std::invalid_argument("Test source paths must stay inside the test project");
-
             if (std::ranges::find(source_paths_, normalized_path) != source_paths_.end())
                 throw std::invalid_argument("Duplicate test source path: " + normalized_path.generic_string());
 
-            std::filesystem::path const absolute_path = directory_ / normalized_path;
-            std::filesystem::create_directories(absolute_path.parent_path());
-
-            std::ofstream source_file(absolute_path);
-            source_file << content;
-
-            if (!source_file) throw std::runtime_error("Failed to write test source: " + normalized_path.generic_string());
-
+            directory_.writeFile(normalized_path, content);
             source_paths_.push_back(normalized_path);
         }
 
       private:
-        static std::filesystem::path createTemporaryDirectory()
-        {
-            static std::uint64_t counter = 0;
-
-            std::string const           name = std::format("ance-tst-{}-{}", _getpid(), counter++);
-            std::filesystem::path const root = std::filesystem::temp_directory_path() / name;
-
-            std::filesystem::remove_all(root);
-
-            if (!std::filesystem::create_directory(root)) throw std::runtime_error("Failed to create a temporary test project");
-
-            return root;
-        }
-
-        std::filesystem::path              directory_;
+        ance::test::TemporaryDirectory     directory_;
         std::vector<std::filesystem::path> source_paths_;
     };
 

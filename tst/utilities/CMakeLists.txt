@@ -1,4 +1,4 @@
-add_library(ance_test_utilities STATIC SourceTest.cpp)
+add_library(ance_test_utilities STATIC SourceTest.cpp TemporaryDirectory.cpp)
 
 target_include_directories(ance_test_utilities PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(ance_test_utilities

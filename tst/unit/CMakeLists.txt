@@ -1,7 +1,6 @@
 add_executable(ance_unit_tests)
 target_link_libraries(ance_unit_tests PRIVATE
-        ance::compiler
-        ance::build_options
+        ance_test_utilities
         Catch2::Catch2WithMain)
 
 add_subdirectory(ance)

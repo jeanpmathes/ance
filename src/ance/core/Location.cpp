@@ -114,6 +114,8 @@ void ance::core::Location::extend(Location const& location)
         return;
     }
 
+    if (location.fileIndex() != fileIndex()) return;
+
     if (location.start_line_ < start_line_ || (location.start_line_ == start_line_ && location.start_column_ < start_column_))
     {
         start_line_   = location.start_line_;
