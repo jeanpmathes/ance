@@ -11,6 +11,7 @@
 #include <ranges>
 #include <set>
 #include <span>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -1348,7 +1349,7 @@ struct ance::cet::Runner::Implementation
 
             if (result.status != FindResult::Status::FOUND || !result.value.hasValue())
             {
-                throw std::logic_error("Failed to find core variable '" + std::string(name.text()) + "'");
+                throw std::out_of_range("Core variable not found: '" + std::string(name.text()) + "'");
             }
 
             return deReference(result.value.value()->as<VariableRef>().value().read());
@@ -1568,7 +1569,7 @@ struct ance::cet::Runner::Implementation
         {
             reporter_.trace(prefix, core::Location::nowhere()) << "declare core exit {id=" << id << ", status=no-segment}";
 
-            throw std::logic_error("Failed to parse core code");
+            throw std::runtime_error("Failed to parse embedded core declaration");
         }
 
         bbt_->scheduleCore(std::move(flow.value()));

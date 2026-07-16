@@ -2,6 +2,7 @@
 
 #include <format>
 #include <map>
+#include <stdexcept>
 #include <vector>
 
 #include "ance/core/BinaryOperator.h"
@@ -227,12 +228,12 @@ namespace ance::bbt
 
     utility::Shared<Type const> Type::getSubscriptType() const
     {
-        throw std::logic_error("Not supported.");
+        throw std::logic_error("Type does not support subscripting");
     }
 
     bool Type::isSubscriptInBounds(size_t) const
     {
-        throw std::logic_error("Not supported.");
+        throw std::logic_error("Type does not support subscripting");
     }
 
     BasicType::BasicType(core::Identifier const& identifier, TypeContext& type_context) : Value(std::nullopt, type_context), ValueBase(), Type(identifier, {})
@@ -572,7 +573,7 @@ namespace ance::bbt
                 return getOrCreateFloatType(implementation_->float_quad_type, "Quad", "fq");
         }
 
-        throw std::logic_error("Invalid precision");
+        throw std::invalid_argument("Invalid precision");
     }
 
     utility::Shared<Type const> TypeContext::String()

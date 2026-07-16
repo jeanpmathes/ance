@@ -114,11 +114,9 @@ namespace ance
 
             return exit_code;
 
-            // todo: rename test to tst_old, add note somewhere to go through all and make sure equivalent test exists in new tests
-            // todo: also add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
-            // todo: also add some unit tests for stuff in utility, like Optional, and also SourceFile and such, check coverage
-            // todo: also go through all thrown exceptions and use a better exception type
-            // todo: write some related documentation for this, repeat this note for the next step
+            // todo: begin going through old tests, converting some (and deleting them)
+            // todo: add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
+            // todo: add some unit tests for stuff in utility, like Optional, and also SourceFile and such, check coverage
 
             // todo: code gen - use python to generate the Node files, specifically Node.h and Node.generated.cpp, also integrate well with cmake
             // todo: use this for all Node trees, add a comment that when writing the compiler in ance it should of course not use python codegen
@@ -131,7 +129,7 @@ namespace ance
             // todo: analyze code quality after this
             // todo: write some related documentation for this, repeat this note for the next step
 
-            // todo: think about doing some form of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar already
+            // todo: think about doing som of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar already
             // todo: write some related documentation for this, repeat this note for the next step
 
             // todo: finally, think about doing compilation in very basic form first, so we can merge again and extend tests for compiled programs
@@ -147,8 +145,9 @@ namespace ance
             // todo: do not forget to write more documentation comments on this matter
             // todo: write some related documentation for this, repeat this note for the next step
 
-            // todo: the variable class is not always a variable, but can also be a constant
+            // todo: the variable class is not alwe formays a variable, but can also be a constant
             // todo: as such, it should be renamed, and all other mentions of Variable as well such as VariableDeclaration
+            // todo: write some related documentation for this, repeat this note for the next step
 
             // todo: implicit conversions
 
@@ -291,6 +290,8 @@ namespace ance
             // todo: evaluation caching - add a sort of side effect specification / analysis or at least pure/impure
             // todo: has to consider intrinsic level and what kind of scopes are passed to declare
             // todo: evaluation could then cache function results
+
+            // todo: ensure there is a note somewhere that all old tests are converted and subsequently removed
         }
     }
 }

@@ -31,7 +31,7 @@ ance::core::Precision ance::core::Precision::get(llvm::fltSemantics const& seman
         return QUAD;
     }
 
-    throw std::logic_error("Invalid fltSemantics");
+    throw std::invalid_argument("Unsupported floating-point semantics");
 }
 
 llvm::fltSemantics const& ance::core::Precision::getLlvmSemantics() const
@@ -44,7 +44,7 @@ llvm::fltSemantics const& ance::core::Precision::getLlvmSemantics() const
         case QUAD: return llvm::APFloat::IEEEquad();
     }
 
-    throw std::logic_error("Invalid precision");
+    throw std::invalid_argument("Invalid precision");
 }
 
 std::string ance::core::Precision::getSuffix() const
@@ -57,5 +57,5 @@ std::string ance::core::Precision::getSuffix() const
         case QUAD: return "q";
     }
 
-    throw std::logic_error("Invalid precision");
+    throw std::invalid_argument("Invalid precision");
 }

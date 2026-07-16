@@ -21,5 +21,5 @@ std::string ance::core::AccessModifier::toString() const
             return "extern";
     }
 
-    throw std::logic_error("Invalid access modifier");
+    throw std::invalid_argument("Invalid access modifier");
 }

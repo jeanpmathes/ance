@@ -3,6 +3,7 @@
 
 #include <span>
 #include <string>
+#include <typeinfo>
 
 #include <llvm/ADT/APFloat.h>
 

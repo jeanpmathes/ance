@@ -24,7 +24,7 @@ std::string ance::core::UnaryOperator::toString() const
             return "-";
     }
 
-    throw std::logic_error("Invalid unary operator");
+    throw std::invalid_argument("Invalid unary operator");
 }
 
 std::string ance::core::UnaryOperator::toShortName() const
@@ -44,5 +44,5 @@ std::string ance::core::UnaryOperator::toShortName() const
             return "neg";
     }
 
-    throw std::logic_error("Invalid unary operator");
+    throw std::invalid_argument("Invalid unary operator");
 }

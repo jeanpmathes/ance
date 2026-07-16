@@ -18,7 +18,7 @@ std::string ance::core::VariabilityModifier::toString() const
             return "";// Because this is the default, it has no textual representation.
     }
 
-    throw std::logic_error("Invalid variability modifier");
+    throw std::invalid_argument("Invalid variability modifier");
 }
 
 std::string ance::core::VariabilityModifier::toBindingKeyword() const
@@ -32,7 +32,7 @@ std::string ance::core::VariabilityModifier::toBindingKeyword() const
             return "let";
     }
 
-    throw std::logic_error("Invalid variability modifier");
+    throw std::invalid_argument("Invalid variability modifier");
 }
 
 bool ance::core::VariabilityModifier::isVariable() const

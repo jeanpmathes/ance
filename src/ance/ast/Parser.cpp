@@ -3,6 +3,7 @@
 #include <exception>
 #include <memory>
 #include <ranges>
+#include <stdexcept>
 
 #include <boost/locale/encoding_utf.hpp>
 

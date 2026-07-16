@@ -48,7 +48,7 @@ std::string ance::core::BinaryOperator::toString() const
             return "/=";
     }
 
-    throw std::logic_error("Invalid binary operator");
+    throw std::invalid_argument("Invalid binary operator");
 }
 
 std::string ance::core::BinaryOperator::toShortName() const
@@ -92,5 +92,5 @@ std::string ance::core::BinaryOperator::toShortName() const
             return "ne";
     }
 
-    throw std::logic_error("Invalid binary operator");
+    throw std::invalid_argument("Invalid binary operator");
 }
