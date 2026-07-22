@@ -237,7 +237,16 @@ struct ance::cet::Runner::Implementation
 
                     if (std::holds_alternative<FindResult::Erased>(reason))
                     {
-                        auto const& [erase_location] = std::get<FindResult::Erased>(reason);
+                        auto const& [erase_location, declaration_location, hides_outer_declaration] =
+                            std::get<FindResult::Erased>(reason);
+
+                        if (hides_outer_declaration)
+                        {
+                            msg << core::Reporter::Annotation(declaration_location)
+                                << "Declaration blocks access to " << identifier
+                                << " in outer scopes, even after erase";
+                        }
+
                         msg << core::Reporter::Annotation(erase_location) << identifier << " was erased here";
                     }
                 }

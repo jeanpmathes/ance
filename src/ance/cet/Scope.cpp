@@ -8,7 +8,7 @@
 
 ance::cet::FindResult ance::cet::FindResult::found(utility::Shared<bbt::Value const> value)
 {
-    return {std::move(value), Status::FOUND, NotFound {}};
+    return {value, Status::FOUND, NotFound {}};
 }
 
 ance::cet::FindResult ance::cet::FindResult::notFound()
@@ -16,12 +16,18 @@ ance::cet::FindResult ance::cet::FindResult::notFound()
     return {std::nullopt, Status::NOT_FOUND, NotFound {}};
 }
 
-ance::cet::FindResult ance::cet::FindResult::erased(core::Location const& location)
+ance::cet::FindResult ance::cet::FindResult::erased(
+    core::Location const& erase_location,
+    core::Location const& declaration_location,
+    bool const            hides_outer_declaration
+)
 {
-    return {std::nullopt, Status::ERASED, Erased {location}};
+    return {std::nullopt, Status::ERASED, Erased {erase_location, declaration_location, hides_outer_declaration}
+    };
 }
 
-ance::cet::Scope::Scope(Scope* parent, bbt::TypeContext& type_context) : parent_(parent), type_context_(type_context) {}
+ance::cet::Scope::Scope(Scope* parent, bbt::TypeContext& type_context)
+    : parent_(parent), type_context_(type_context) {}
 
 ance::cet::Scope* ance::cet::Scope::parent() const
 {
@@ -58,20 +64,35 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value const>> ance::cet
 
 ance::cet::FindResult ance::cet::Scope::find(core::Identifier const& identifier)
 {
-    FindResult const local  = onFind(identifier);
-    FindResult       result = local;
-
-    if (local.status == FindResult::Status::FOUND) return result;
+    FindResult local = onFind(identifier);
 
     if (parent_ != nullptr)
     {
-        result = parent_->find(identifier);
+        // If a name is erased locally, it does not unhide the outer name.
+        // The last local declaration is the declaration blocking access to the outer scope.
+        // Otherwise, if the name is not found locally, the parent can be searched.
 
-        // In the case that it is not found in the parent scope, we do not want to lose the local erase information.
-        if (result.status != FindResult::Status::FOUND && local.status == FindResult::Status::ERASED) result = local;
+        if (local.status == FindResult::Status::ERASED)
+        {
+            FindResult const outer = parent_->find(identifier);
+
+            if (outer.status == FindResult::Status::FOUND)
+            {
+                auto const& erased = std::get<FindResult::Erased>(local.reason);
+                local              = FindResult::erased(
+                    erased.erase_location,
+                    erased.declaration_location,
+                    true
+                );
+            }
+        }
+        else if (local.status == FindResult::Status::NOT_FOUND)
+        {
+            local = parent_->find(identifier);
+        }
     }
 
-    return result;
+    return local;
 }
 
 ance::cet::EraseResult ance::cet::Scope::erase(core::Identifier const& identifier)
@@ -187,7 +208,11 @@ ance::cet::FindResult ance::cet::OrderedScope::onFind(core::Identifier const& id
 {
     if (active_variables_.contains(identifier)) return FindResult::found(VariableRef::make(active_variables_.at(identifier).get(), types()));
 
-    if (erased_variables_.contains(identifier)) return FindResult::erased(erased_variables_.at(identifier));
+    if (erased_variables_.contains(identifier))
+    {
+        auto const& erased = erased_variables_.at(identifier);
+        return FindResult::erased(erased.erase_location, erased.declaration_location);
+    }
 
     outer_identifiers_.insert(identifier);
     return FindResult::notFound();
@@ -202,7 +227,11 @@ bool ance::cet::OrderedScope::onErase(core::Identifier const& identifier)
 {
     if (active_variables_.contains(identifier))
     {
-        erased_variables_.emplace(identifier, identifier.location());
+        Variable const& variable = active_variables_.at(identifier).get();
+        erased_variables_.emplace(
+            identifier,
+            ErasedVariable {identifier.location(), variable.name().location()}
+        );
         active_variables_.erase(identifier);
         return true;
     }

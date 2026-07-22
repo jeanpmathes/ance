@@ -13,6 +13,12 @@ namespace ance
     // nested scope use that outer name. This serves to keep code more understandable.
     //
     // The main file is an ordered scope on the top level, as are the bodies of functions.
+    //
+    // A name declared in an ordered scope can be erased using the 'erase' statement.
+    // This makes the name unresolvable for all statements below. Only a name declared
+    // directly in the current scope can be erased. Erasing a name that hides an enclosing
+    // declaration does not expose the enclosing declaration again, for the same
+    // reason of keeping code understandable as hiding after use.
 
     TEST_CASE(
         "A defined name can be used afterwards in the same ordered scope",
@@ -110,6 +116,104 @@ namespace ance
                           "Declaring 'x' in this scope would block previous access to it "
                                "outside of the scope",
                           test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 8, 9)}
+                }
+            }
+        );
+    }
+
+    TEST_CASE("A defined name can be erased", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    let x: String := "value";
+    log1s(x);
+
+    erase x;
+}
+)ance",
+
+                .expected_compilation = test::Compilation::SUCCESS,
+                .expected_output      = {{core::Reporter::Level::INFO, "value"}}
+            }
+        );
+    }
+
+    TEST_CASE("An erased name cannot be used afterwards", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    let x: String := "value";
+
+    erase x;
+
+    log1s(x);
+}
+)ance",
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Cannot resolve name 'x'",
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 7, 11)}
+                }
+            }
+        );
+    }
+
+    TEST_CASE("A name can only be erased in the scope it was declared in", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    let x: String := "value";
+
+    {
+        erase x;
+    }
+}
+)ance",
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Cannot erase 'x' because it is declared in an outer scope",
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 6, 15)}
+                }
+            }
+        );
+    }
+
+    TEST_CASE(
+        "Erasing a name that hides an enclosing declaration does not expose the "
+        "enclosing declaration",
+        "[language]"
+    )
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    let x: String := "outer";
+
+    {
+        let x: String := "inner";
+        erase x;
+
+        log1s(x);
+    }
+}
+)ance",
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Cannot resolve name 'x'",
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 9, 15)}
                 }
             }
         );

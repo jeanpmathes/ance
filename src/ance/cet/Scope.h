@@ -52,9 +52,15 @@ namespace ance::cet
         struct NotFound
         {
         };
+
         struct Erased
         {
             core::Location erase_location;
+            core::Location declaration_location;
+
+            /// Whether there is a name in any outer scope that cannot be accessed
+            /// because of the declaration which is erased by this erasing.
+            bool hides_outer_declaration = false;
         };
 
         utility::Optional<utility::Shared<bbt::Value const>> value;
@@ -63,7 +69,11 @@ namespace ance::cet
 
         static FindResult found(utility::Shared<bbt::Value const> value);
         static FindResult notFound();
-        static FindResult erased(core::Location const& location);
+        static FindResult erased(
+            core::Location const& erase_location,
+            core::Location const& declaration_location,
+            bool                  hides_outer_declaration = false
+        );
     };
 
     class Scope
@@ -150,10 +160,19 @@ namespace ance::cet
         [[nodiscard]] bool isOrdered() const override;
 
       private:
+        struct ErasedVariable
+        {
+            /// The location of the erase statement.
+            core::Location erase_location;
+
+            /// The location of the name declaration that was erased.
+            core::Location declaration_location;
+        };
+
         std::vector<utility::Owned<Variable>>                        all_variables_     = {};
         std::map<core::Identifier, std::reference_wrapper<Variable>> active_variables_  = {};
-        std::set<core::Identifier>                                   outer_identifiers_ = {};
-        std::map<core::Identifier, core::Location>                   erased_variables_  = {};
+        std::set<core::Identifier>                 outer_identifiers_ = {};
+        std::map<core::Identifier, ErasedVariable>                   erased_variables_  = {};
     };
 
     /// An unordered scope contains flows with no required order of evaluation.
