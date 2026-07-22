@@ -303,8 +303,8 @@ ance::ast::MatchExpressionCase::MatchExpressionCase(utility::List<utility::Owned
 
 ance::ast::IfExpression::IfExpression(utility::Owned<Expression>                    expression,
                                       utility::Owned<Expression>                    then_part,
-                                      utility::Optional<utility::Owned<Expression>> else_part,
-                                      core::Location const&                         source_location)
+    utility::Owned<Expression> else_part,
+    core::Location const&                         source_location)
     : Node(source_location)
     , Expression()
     , condition(std::move(expression))

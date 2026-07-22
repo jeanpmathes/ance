@@ -456,12 +456,8 @@ struct ance::ast::Printer::Implementation
             visit(*if_expression.condition);
             print(" then ");
             visit(*if_expression.then_expression);
-
-            if (if_expression.else_expression.hasValue())
-            {
-                print(" else ");
-                visit(**if_expression.else_expression);
-            }
+            print(" else ");
+            visit(*if_expression.else_expression);
         }
 
         void visit(MatchExpression const& match_expression) override

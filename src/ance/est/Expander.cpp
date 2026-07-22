@@ -848,36 +848,23 @@ struct ance::est::Expander::Implementation
 
         void visit(ast::IfExpression const& if_expression) override
         {
-            trace("IfExpression", if_expression.location) << ", has_else=" << std::boolalpha << if_expression.else_expression.hasValue();
+            trace("IfExpression", if_expression.location);
 
             EBuilder builder(*this, if_expression.location);
 
             utility::List<utility::Owned<Expression>> typeof_parameters;
             typeof_parameters.push_back(expand(*if_expression.then_expression));
-            if (if_expression.else_expression.hasValue())
-            {
-                typeof_parameters.push_back(expand(**if_expression.else_expression));
-            }
-            else
-            {
-                typeof_parameters.emplace_back(utility::makeOwned<BoolLiteral>(true, if_expression.location));
-            }
+            typeof_parameters.push_back(expand(*if_expression.else_expression));
             utility::Owned<Expression> common_type = utility::makeOwned<TypeOf>(std::move(typeof_parameters), if_expression.location);
 
             // todo: semantics are actually not correctly implemented because typeof currently evaluates the expressions
             builder.pushAnonymousBindAndSetAsResult(std::move(common_type), core::VariabilityModifier::VARIABLE, core::Assigner::COPY_ASSIGNMENT, std::nullopt);
 
             utility::Owned<Statement> then_part = builder.createExpansionAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, *if_expression.then_expression);
-            utility::Optional<utility::Owned<Statement>> else_part;
-            if (if_expression.else_expression.hasValue())
-            {
-                else_part = builder.createExpansionAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, **if_expression.else_expression);
-            }
-            else
-            {
-                // todo: the usage of bool literal is not quite uniform and should be replaced with the unit literal but only if unit has an implcit conversion to bool true
-                else_part = builder.createAssignmentToResult(core::Assigner::COPY_ASSIGNMENT, utility::makeOwned<BoolLiteral>(true, if_expression.location));
-            }
+            utility::Optional else_part = builder.createExpansionAssignmentToResult(
+                core::Assigner::COPY_ASSIGNMENT,
+                *if_expression.else_expression
+            );
 
             builder.pushStatement(
                 utility::makeOwned<If>(expand(*if_expression.condition), std::move(then_part), std::move(else_part.value()), if_expression.location));

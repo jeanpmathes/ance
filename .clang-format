@@ -1,6 +1,6 @@
 BasedOnStyle: LLVM
 AccessModifierOffset: -2
-AlignAfterOpenBracket: Align
+AlignAfterOpenBracket: BlockIndent
 AlignConsecutiveAssignments: Consecutive
 AlignConsecutiveDeclarations: Consecutive
 AlignOperands: AlignAfterOperator
@@ -33,14 +33,14 @@ BraceWrapping:
   SplitEmptyRecord: true
 BreakBeforeBinaryOperators: NonAssignment
 BreakBeforeTernaryOperators: true
-BreakConstructorInitializers: BeforeComma
-BreakInheritanceList: BeforeComma
+BreakConstructorInitializers: BeforeColon
+BreakInheritanceList: BeforeColon
 BinPackArguments: false
 BinPackParameters: false
-ColumnLimit: 160
+ColumnLimit: 90
 CompactNamespaces: false
 ContinuationIndentWidth: 4
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
+PackConstructorInitializers: CurrentLine
 EmptyLineBeforeAccessModifier: Always
 FixNamespaceComments: false
 IndentCaseLabels: true
@@ -65,7 +65,7 @@ SpaceBeforeInheritanceColon: true
 SpaceBeforeParens: ControlStatements
 SpaceBeforeRangeBasedForLoopColon: true
 SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 0
+SpacesBeforeTrailingComments: 1
 SpacesInAngles: false
 SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: false

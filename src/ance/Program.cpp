@@ -101,8 +101,12 @@ namespace ance
             create_directories(debug_path);
 
             sources::SourceTree source_tree {base_path};
-            core::Reporter      reporter {source_tree, compiler_out, {arguments.trace_enabled, arguments.color_enabled, false}};
-            core::Context       context {debug_path};
+            core::Reporter      reporter {
+                source_tree,
+                compiler_out,
+                     {arguments.trace_enabled, arguments.color_enabled, false}
+            };
+            core::Context context {debug_path};
 
             build::Compiler compiler {source_tree, reporter, context};
 
@@ -114,7 +118,9 @@ namespace ance
 
             return exit_code;
 
+            // todo: write a test file for the resolve-based ordering of names, should be in 02_semantics between syntax and core, should also check cycles and stuff (but how to handle indeterminism? maybe allow more complex output checkers, something like AnyOf)
             // todo: begin going through old tests, converting some (and deleting them)
+            // todo: go through things in first.ance, reduce it while doing that
             // todo: add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
 
             // todo: code gen - use python to generate the Node files, specifically Node.h and Node.generated.cpp, also integrate well with cmake
@@ -249,6 +255,8 @@ namespace ance
             // todo: think about making the typeof node an intrinsic, would either require an any type or something else for the argument like overloading
 
             // todo: maybe parametrized function types could be a thing now, could also need generics or at least varargs
+            // todo: also check if -> could replace : for function return declaration, check why not already done, maybe there is something in plans
+            // todo: -> could then be used for the types
 
             // todo: when adding serialization of trees for cmp libraries, also serialize the trees of the core language functions and of the types
             // todo: this means on first run the compiler has to build the core language functions and types, serialize them, and later it just loads them (add a command line flag to force rebuild)
@@ -306,7 +314,7 @@ int ance::run(std::ostream& program_out, std::ostream& compiler_out, int const a
     {
 #endif
         boost::locale::generator const gen;
-        std::locale const              loc = gen("");
+        std::locale const loc = gen("");
         std::locale::global(loc);
 
         utility::Optional<Arguments> const arguments = parseArguments(compiler_out, argc, argv);

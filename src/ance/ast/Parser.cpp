@@ -968,12 +968,8 @@ namespace ance::ast
 
             utility::Owned<Expression> condition  = expectExpression(context->condition);
             utility::Owned<Expression> true_block = expectExpression(context->trueBlock);
-
-            utility::Optional<utility::Owned<Expression>> false_block;
-            if (context->falseBlock != nullptr)
-            {
-                false_block = expectExpression(context->falseBlock);
-            }
+            utility::Owned<Expression> false_block =
+                expectExpression(context->falseBlock);
 
             Expression* expression = new IfExpression(std::move(condition), std::move(true_block), std::move(false_block), location(context));
             return expression;
