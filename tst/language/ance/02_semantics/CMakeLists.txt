@@ -1,1 +1,1 @@
-target_sources(ance_language_tests PRIVATE 01_unordered_scope.cpp)
+target_sources(ance_language_tests PRIVATE 01_ordered_scope.cpp 02_unordered_scope.cpp)
