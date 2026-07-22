@@ -118,7 +118,6 @@ namespace ance
 
             return exit_code;
 
-            // todo: write a test file for the resolve-based ordering of names, should be in 02_semantics between syntax and core, should also check cycles and stuff (but how to handle indeterminism? maybe allow more complex output checkers, something like AnyOf)
             // todo: begin going through old tests, converting some (and deleting them)
             // todo: go through things in first.ance, reduce it while doing that
             // todo: add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
