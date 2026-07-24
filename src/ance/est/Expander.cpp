@@ -372,7 +372,7 @@ struct ance::est::Expander::Implementation
             result_.setDeclaration(utility::makeOwned<RunnableDeclaration>(wrap(expand(*runnable.body)), runnable.location));
         }
 
-        void visit(ast::VariableDeclaration const& variable_declaration) override
+        void visit(ast::NameDeclaration const& variable_declaration) override
         {
             trace("VariableDeclaration", variable_declaration.location)
                 << ", access=" << variable_declaration.access_modifier << ", execution=" << variable_declaration.execution_modifier
@@ -387,8 +387,10 @@ struct ance::est::Expander::Implementation
                 value = expand(**variable_declaration.value);
             }
 
-            result_.setDeclaration(utility::makeOwned<VariableDeclaration>(variable_declaration.access_modifier,
-                                                                           variable_declaration.execution_modifier,
+            result_.setDeclaration(
+                utility::makeOwned<NameDeclaration>(
+                    variable_declaration.access_modifier,
+                    variable_declaration.execution_modifier,
                                                                            variable_declaration.identifier,
                                                                            std::move(type),
                                                                            variable_declaration.assigner,
@@ -431,8 +433,10 @@ struct ance::est::Expander::Implementation
                                                                                                 std::move(body),
                                                                                                 function_declaration.location);
 
-            result_.setDeclaration(utility::makeOwned<VariableDeclaration>(function_declaration.access_modifier,
-                                                                           function_declaration.execution_modifier,
+            result_.setDeclaration(
+                utility::makeOwned<NameDeclaration>(
+                    function_declaration.access_modifier,
+                    function_declaration.execution_modifier,
                                                                            function_declaration.identifier,
                                                                            std::move(function_type),
                                                                            core::Assigner::COPY_ASSIGNMENT,// todo: should be move

@@ -45,7 +45,7 @@ struct ance::est::Printer::Implementation
             print(*runnable.body);
         }
 
-        void visit(VariableDeclaration const& variable_declaration) override
+        void visit(NameDeclaration const& variable_declaration) override
         {
             print(variable_declaration.access_modifier);
             print(" ");

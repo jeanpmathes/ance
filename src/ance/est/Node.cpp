@@ -20,8 +20,9 @@ std::string ance::est::RunnableDeclaration::displayName() const
     return "runnable";
 }
 
-ance::est::VariableDeclaration::VariableDeclaration(core::AccessModifier                          access,
-                                                    core::ExecutionModifier                       execution,
+ance::est::NameDeclaration::NameDeclaration(
+    core::AccessModifier                          access,
+    core::ExecutionModifier                       execution,
                                                     core::Identifier const&                       name,
                                                     utility::Owned<Expression>                    t,
                                                     core::Assigner                                assignment,
@@ -37,7 +38,7 @@ ance::est::VariableDeclaration::VariableDeclaration(core::AccessModifier        
     , value(std::move(definition))
 {}
 
-std::string ance::est::VariableDeclaration::displayName() const
+std::string ance::est::NameDeclaration::displayName() const
 {
     return std::string(identifier.text());
 }

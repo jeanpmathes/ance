@@ -809,38 +809,54 @@ struct ance::bbt::Segmenter::Implementation
             setResult(builder.take());
         }
 
-        void visit(est::VariableDeclaration const& variable_declaration) override
+        void visit(est::NameDeclaration const& variable_declaration) override
         {
-            trace("VariableDeclaration", variable_declaration)
+            trace("NameDeclaration", variable_declaration)
                 << ", access=" << variable_declaration.access_modifier << ", execution=" << variable_declaration.execution_modifier
                 << ", identifier=" << variable_declaration.identifier << ", assigner=" << variable_declaration.assigner << ", has_value=" << std::boolalpha
                 << variable_declaration.value.hasValue();
 
             Builder builder(*this);
 
-            auto& type_tmp = builder.addTemporary("VariableDeclaration_Type", variable_declaration.type->location);
+            auto& type_tmp = builder.addTemporary(
+                "NameDeclaration_Type",
+                variable_declaration.type->location
+            );
             builder.addSegmented(*variable_declaration.type, type_tmp);
 
-            auto& value_tmp = builder.addTemporary("VariableDeclaration_Value", variable_declaration.location);
+            auto& value_tmp = builder.addTemporary(
+                "NameDeclaration_Value", variable_declaration.location);
             if (variable_declaration.value.hasValue())
             {
                 builder.addSegmented(**variable_declaration.value, value_tmp);
             }
             else
             {
-                builder.addStatement<Default>(type_tmp, value_tmp, variable_declaration.location);
+                builder.addStatement<Default>(
+                    type_tmp,
+                    value_tmp,
+                    variable_declaration.location
+                );
             }
 
-            auto& scope_tmp = builder.addTemporary("VariableDeclaration_Scope", variable_declaration.location);
+            auto& scope_tmp = builder.addTemporary(
+                "NameDeclaration_Scope",
+                variable_declaration.location
+            );
             builder.addStatement<CurrentScope>(scope_tmp, variable_declaration.location);
 
-            auto& identifier_tmp = builder.addTemporary("VariableDeclaration_Identifier", variable_declaration.location);
-            builder.addStatement<Constant>(Identifier::make(variable_declaration.identifier, type_context_), identifier_tmp, variable_declaration.location);
+            auto& identifier_tmp = builder.addTemporary("NameDeclaration_Identifier", variable_declaration.location
+            );
+            builder.addStatement<Constant>(
+                Identifier::make(variable_declaration.identifier, type_context_), identifier_tmp, variable_declaration.location);
 
-            auto& is_variable_tmp = builder.addTemporary("VariableDeclaration_IsVariable", variable_declaration.location);
+            auto& is_variable_tmp = builder.addTemporary(
+                "NameDeclaration_IsVariable",
+                variable_declaration.location
+            );
             builder.addStatement<Constant>(Bool::make(false, type_context_), is_variable_tmp, variable_declaration.location);
 
-            auto& declared_tmp = builder.addTemporary("VariableDeclaration_Declared", variable_declaration.location);
+            auto& declared_tmp = builder.addTemporary("NameDeclaration_Declared", variable_declaration.location);
             {
                 utility::List<std::reference_wrapper<Temporary const>> args;
                 args.emplace_back(scope_tmp);
@@ -850,7 +866,7 @@ struct ance::bbt::Segmenter::Implementation
                 builder.addStatement<Intrinsic>(core::Intrinsic::DECLARE, std::move(args), declared_tmp, variable_declaration.location);
             }
 
-            auto& ref_tmp = builder.addTemporary("VariableDeclaration_Ref", variable_declaration.location);
+            auto& ref_tmp = builder.addTemporary("NameDeclaration_Ref", variable_declaration.location);
             builder.addStatement<Access>(declared_tmp, ref_tmp, variable_declaration.location);
             builder.addStatement<Store>(ref_tmp, value_tmp, variable_declaration.location);
 

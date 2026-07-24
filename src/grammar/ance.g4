@@ -9,7 +9,7 @@ orderedScopeFile : statement EOF ;
 
 declaration
     : 'do' statement # RunnableDeclaration
-    | accessModifier ( executionMode )? IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # VariableDeclaration
+    | accessModifier ( executionMode )? IDENTIFIER ':' varType=expression ( assigner assigned=expression )? ';' # NameDeclaration
     | accessModifier ( executionMode )? IDENTIFIER '(' ( parameter (',' parameter)* )? ')' ( ':' type=expression )? '{' ( statement )* '}' # FunctionDeclaration
     ;
 

@@ -466,9 +466,11 @@ namespace ance::ast
             return declaration;
         }
 
-        std::any visitVariableDeclaration(grammar::anceParser::VariableDeclarationContext* context) override
+        std::any visitNameDeclaration(
+            grammar::anceParser::NameDeclarationContext* context
+        ) override
         {
-            trace("VariableDeclaration", context);
+            trace("NameDeclaration", context);
 
             core::AccessModifier const access_modifier    = expectAccessModifier(context->accessModifier());
             core::ExecutionModifier    execution_modifier = expectExecutionModifier(context->executionMode());
@@ -489,8 +491,14 @@ namespace ance::ast
                 expression = expectExpression(context->assigned);
             }
 
-            Declaration* declaration =
-                new VariableDeclaration(access_modifier, execution_modifier, name, std::move(type), assigner, std::move(expression), location(context));
+            Declaration* declaration = new NameDeclaration(
+                access_modifier,
+                execution_modifier,
+                name,
+                std::move(type),
+                assigner,
+                std::move(expression),
+                location(context));
             return declaration;
         }
 

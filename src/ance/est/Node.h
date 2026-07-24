@@ -62,13 +62,13 @@ namespace ance::est
         utility::Owned<Statement> body;
     };
 
-    /// Declares a variable in an unordered scope.
-    struct VariableDeclaration final
-        : Declaration
-        , utility::ConcreteNode<VariableDeclaration, Visitor>
+    /// Declares a name in an unordered scope.
+    struct NameDeclaration final : Declaration,
+                                   utility::ConcreteNode<NameDeclaration, Visitor>
     {
-        VariableDeclaration(core::AccessModifier                          access,
-                            core::ExecutionModifier                       execution,
+        NameDeclaration(
+            core::AccessModifier                          access,
+            core::ExecutionModifier                       execution,
                             core::Identifier const&                       name,
                             utility::Owned<Expression>                    t,
                             core::Assigner                                assignment,
@@ -512,8 +512,8 @@ namespace ance::est
 
         virtual void visit(File const& file) = 0;
 
-        virtual void visit(RunnableDeclaration const& runnable)             = 0;
-        virtual void visit(VariableDeclaration const& variable_declaration) = 0;
+        virtual void visit(RunnableDeclaration const& runnable)         = 0;
+        virtual void visit(NameDeclaration const& variable_declaration) = 0;
 
         virtual void visit(ErrorStatement const& error)        = 0;
         virtual void visit(Pass const& pass_statement)         = 0;

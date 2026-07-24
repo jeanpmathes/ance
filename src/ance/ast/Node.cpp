@@ -16,8 +16,9 @@ ance::ast::RunnableDeclaration::RunnableDeclaration(utility::Owned<Statement> st
     , body(std::move(statement))
 {}
 
-ance::ast::VariableDeclaration::VariableDeclaration(core::AccessModifier const                    access,
-                                                    core::ExecutionModifier const                 execution,
+ance::ast::NameDeclaration::NameDeclaration(
+    core::AccessModifier const                    access,
+    core::ExecutionModifier const                 execution,
                                                     core::Identifier const&                       name,
                                                     utility::Owned<Expression>                    t,
                                                     core::Assigner const                          assignment,
