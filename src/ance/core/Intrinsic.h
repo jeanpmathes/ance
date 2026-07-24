@@ -64,6 +64,14 @@ namespace ance::core
             /// It returns the string representation of the boolean.
             B_2_STR,// todo: implement as core function
 
+            /// Converts a size value to its string representation.
+            ///
+            /// This intrinsic takes the following parameters:
+            /// - The size value to convert.
+            ///
+            /// It returns the string representation of the size value.
+            S_2_STR, // todo: implement as core function
+
             /// Converts a half precision float value to its string representation.
             ///
             /// This intrinsic takes the following parameters:

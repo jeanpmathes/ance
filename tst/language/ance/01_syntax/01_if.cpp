@@ -19,20 +19,20 @@ namespace ance
                 .source = R"ance(
 {
     if true then
-        log1s("OK");
+        log1str("OK");
 
     if false then
-        log1s("NOT OK");
+        log1str("NOT OK");
 
     if true then
-        log1s("OK");
+        log1str("OK");
     else
-        log1s("NOT OK");
+        log1str("NOT OK");
 
     if false then
-        log1s("NOT OK");
+        log1str("NOT OK");
     else
-        log1s("OK");
+        log1str("OK");
 }
 )ance",
 
@@ -53,15 +53,15 @@ namespace ance
                 .source = R"ance(
 {
     if false then
-        log1s("NOT OK");
+        log1str("NOT OK");
     else if false then
-        log1s("NOT OK");
+        log1str("NOT OK");
     else if true then
-        log1s("OK");
+        log1str("OK");
     else if false then
-        log1s("NOT OK");
+        log1str("NOT OK");
     else
-        log1s("NOT OK");
+        log1str("NOT OK");
 }
 )ance",
 

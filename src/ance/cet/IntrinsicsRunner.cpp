@@ -79,6 +79,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::B_2_STR:
                 runB2Str();
                 break;
+            case core::Intrinsic::S_2_STR:
             case core::Intrinsic::FH_2_STR:
             case core::Intrinsic::FS_2_STR:
             case core::Intrinsic::FD_2_STR:

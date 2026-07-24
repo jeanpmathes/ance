@@ -23,8 +23,8 @@ namespace ance
     include("first.nc", here);
     include("nested/second.nc", here);
 
-    log1s(first);
-    log1s(second);
+    log1str(first);
+    log1str(second);
 }
 )ance",
 

@@ -7,15 +7,15 @@ namespace ance
     // The log functions serve to log compiler output during compiletime.
     // All variants of the log functions create messages of level 'INFO'.
     // A multitude of versions exists:
-    // log1s: 'String -> Unit'
+    // log1str: 'String -> Unit'
 
-    TEST_CASE("Intrinsic 'log1s' logs a ", "[language]")
+    TEST_CASE("Intrinsic 'log1str' logs a string", "[language]")
     {
         test::checkSource(
             test::SourceTest {
                 .source = R"ance(
 {
-    log1s("Hello, World!");
+    log1str("Hello, World!");
 }
 )ance",
 

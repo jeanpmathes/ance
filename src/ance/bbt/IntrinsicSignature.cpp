@@ -86,6 +86,16 @@ namespace ance::bbt
 
                 break;
             }
+            case core::Intrinsic::S_2_STR:
+            {
+                signature = Signature::makeAndNameParameters(
+                    intrinsic.identifier(),
+                    type_context.Size()
+                );
+                return_type = type_context.String();
+
+                break;
+            }
             case core::Intrinsic::FH_2_STR:
             {
                 signature   = Signature::makeAndNameParameters(intrinsic.identifier(), type_context.Float(core::Precision::HALF));

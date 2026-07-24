@@ -24,19 +24,19 @@ namespace ance
 
     loop
     {
-        log1s("A");
+        log1str("A");
         break;
     }
 
     loop
     {
         {
-            log1s("B");
+            log1str("B");
             break;
         }
     }
 
-    log1s("C");
+    log1str("C");
 }
 )ance",
 

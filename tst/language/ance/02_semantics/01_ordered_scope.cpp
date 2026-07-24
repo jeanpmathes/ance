@@ -30,7 +30,7 @@ namespace ance
                 .source = R"ance(
 {
     let x: String := "value";
-    log1s(x);
+    log1str(x);
 }
 )ance",
 
@@ -46,7 +46,7 @@ namespace ance
             test::SourceTest {
                 .source = R"ance(
 {
-    log1s(x);
+    log1str(x);
 
     let x: String := "value";
 }
@@ -56,7 +56,7 @@ namespace ance
                 .expected_output      = {
                     {core::Reporter::Level::ERROR,
                           "Cannot resolve name 'x'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 11)}
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 13)}
                 }
             }
         );
@@ -72,14 +72,14 @@ namespace ance
                 .source = R"ance(
 {
     let x: String := "outer";
-    log1s(x);
+    log1str(x);
 
     {
         let x: Bool := true;
         log1b(x);
     }
 
-    log1s(x);
+    log1str(x);
 }
 )ance",
 
@@ -102,7 +102,7 @@ namespace ance
     let x: String := "outer";
 
     {
-        log1s(x);
+        log1str(x);
 
         let x: String := "inner";
     }
@@ -128,7 +128,7 @@ namespace ance
                 .source = R"ance(
 {
     let x: String := "value";
-    log1s(x);
+    log1str(x);
 
     erase x;
 }
@@ -150,7 +150,7 @@ namespace ance
 
     erase x;
 
-    log1s(x);
+    log1str(x);
 }
 )ance",
 
@@ -158,7 +158,7 @@ namespace ance
                 .expected_output      = {
                     {core::Reporter::Level::ERROR,
                           "Cannot resolve name 'x'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 7, 11)}
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 7, 13)}
                 }
             }
         );
@@ -204,7 +204,7 @@ namespace ance
         let x: String := "inner";
         erase x;
 
-        log1s(x);
+        log1str(x);
     }
 }
 )ance",
@@ -213,7 +213,7 @@ namespace ance
                 .expected_output      = {
                     {core::Reporter::Level::ERROR,
                           "Cannot resolve name 'x'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 9, 15)}
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 9, 17)}
                 }
             }
         );

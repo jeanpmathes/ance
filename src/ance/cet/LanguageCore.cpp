@@ -63,20 +63,33 @@ public log2b (value: Bool, location: Location)
                            "log2b");
 
         runner.declareCore(R"ance(
-public log1s (value: String)
+public log1str (value: String)
 {
     intrinsic "log" args (value, nowhere);
 }
 )ance",
-                           "log1s");
+            "log1str"
+        );
 
         runner.declareCore(R"ance(
-public log2s (value: String, location: Location)
+public log2str (value: String, location: Location)
 {
     intrinsic "log" args (value, location);
 }
 )ance",
-                           "log2s");
+            "log2str"
+        );
+
+        runner.declareCore(
+            R"ance(
+public log1s (value: Size)
+{
+    let string_value: String := intrinsic "s_2_str" args (value);
+    intrinsic "log" args (string_value, nowhere);
+}
+)ance",
+            "log1s"
+        );
 
         runner.declareCore(R"ance(
 public log1fh (value: Half)

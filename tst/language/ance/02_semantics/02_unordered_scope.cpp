@@ -25,7 +25,7 @@ namespace ance
 {
     include("declarations.nc", here);
 
-    log1s(second);
+    log1str(second);
 }
 )ance",
 
