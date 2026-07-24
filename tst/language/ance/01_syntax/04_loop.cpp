@@ -119,7 +119,7 @@ public endless()
                 .expected_output      = {
                     {core::Reporter::Level::WARNING,
                           "Unreachable code",
-                          test::SourceLocation::inPosition("infinite_loop.nc", 6, 5)}
+                          test::SourceLocation::inPosition("endless_loop.nc", 6, 5)}
                 }
             }
         );

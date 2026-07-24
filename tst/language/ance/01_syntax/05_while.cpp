@@ -123,4 +123,24 @@ namespace ance
             }
         );
     }
+
+    TEST_CASE("The condition of a 'while' statement must be of type 'Bool'", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    while 1 do log1str("NOT OK");
+}
+)ance",
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Operator 'not' is not defined for type 'Size'",
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 11)}
+                }
+            }
+        );
+    }
 }

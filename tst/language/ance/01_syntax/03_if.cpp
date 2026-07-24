@@ -70,4 +70,25 @@ namespace ance
             }
         );
     }
+
+    TEST_CASE("The condition of an 'if' statement must be of type 'Bool'", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    if 1 then
+        log1str("NOT OK");
+}
+)ance",
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Expected type 'Bool' but got 'Size'",
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 8)}
+                }
+            }
+        );
+    }
 }
