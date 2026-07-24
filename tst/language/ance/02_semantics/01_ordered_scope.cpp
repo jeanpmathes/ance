@@ -72,23 +72,19 @@ namespace ance
                 .source = R"ance(
 {
     let x: String := "outer";
-    log1str(x);
+    assert x == "outer";
 
     {
         let x: Bool := true;
-        log1b(x);
+        assert x;
     }
 
-    log1str(x);
+    assert x == "outer";
 }
 )ance",
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {
-                    {core::Reporter::Level::INFO, "outer"},
-                    {core::Reporter::Level::INFO, "true"},
-                    {core::Reporter::Level::INFO, "outer"}
-                }
+                .expected_output      = {}
             }
         );
     }
@@ -128,14 +124,13 @@ namespace ance
                 .source = R"ance(
 {
     let x: String := "value";
-    log1str(x);
 
     erase x;
 }
 )ance",
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "value"}}
+                .expected_output      = {}
             }
         );
     }

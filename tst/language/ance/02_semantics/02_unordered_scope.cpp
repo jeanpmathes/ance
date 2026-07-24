@@ -25,7 +25,7 @@ namespace ance
 {
     include("declarations.nc", here);
 
-    log1str(second);
+    assert second == "first";
 }
 )ance",
 
@@ -38,7 +38,7 @@ public first: String := "first";
                 }},
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "first"}}
+                .expected_output      = {}
             }
         );
     }

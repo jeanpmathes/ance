@@ -23,8 +23,8 @@ namespace ance
     include("first.nc", here);
     include("nested/second.nc", here);
 
-    log1str(first);
-    log1str(second);
+    assert first == "first";
+    assert second == "second";
 }
 )ance",
 
@@ -43,10 +43,7 @@ public second: String := "second";
                      }},
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {
-                    {core::Reporter::Level::INFO, "first"},
-                    {core::Reporter::Level::INFO, "second"}
-                }
+                .expected_output      = {}
             }
         );
     }

@@ -17,12 +17,12 @@ namespace ance
 {
     let message: String := "value";
 
-    log1str(message);
+    assert message == "value";
 }
 )ance",
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "value", {}}}
+                .expected_output      = {}
             }
         );
     }
@@ -85,12 +85,12 @@ namespace ance
     var value: Size := 1;
     value := value + 2;
 
-    log1s(value);
+    assert value == 3;
 }
 )ance",
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "3", {}}}
+                .expected_output      = {}
             }
         );
     }
@@ -107,12 +107,12 @@ namespace ance
     var value: Size;
     value := value + 2;
 
-    log1s(value);
+    assert value == 2;
 }
 )ance",
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "2", {}}}
+                .expected_output      = {}
             }
         );
     }
