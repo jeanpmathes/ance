@@ -180,4 +180,34 @@ public value: Size := value;
             }
         );
     }
+
+    TEST_CASE(
+        "A name declaration's type expression must evaluate to a type",
+        "[language]"
+    )
+    {
+        test::checkSources(
+            test::SourcesTest {
+                .source = R"ance(
+{
+    include("declaration.nc", here);
+}
+)ance",
+
+                .additional_sources = {{
+                    "declaration.nc",
+                    R"ance(
+public value: 12 := 42;
+)ance",
+                }},
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Expected type 'Type' but got 'Size'",
+                          test::SourceLocation::inPosition("declaration.nc", 2, 15)}
+                }
+            }
+        );
+    }
 }

@@ -386,7 +386,7 @@ struct ance::ast::Printer::Implementation
 
         void visit(BlockExpression const& block_expression) override
         {
-            print("({");
+            print("{");
             line();
             enter();
 
@@ -404,7 +404,7 @@ struct ance::ast::Printer::Implementation
             }
 
             exit();
-            print("})");
+            print("}");
         }
 
         void visit(Parenthesis const& parenthesis) override

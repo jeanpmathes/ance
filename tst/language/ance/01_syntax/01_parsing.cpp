@@ -23,10 +23,7 @@ namespace ance
                 .expected_output      = {
                     {core::Reporter::Level::ERROR,
                           "Unexpected character",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)},
-                    {core::Reporter::Level::ERROR,
-                          "Unexpected character",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 7)}
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
                 }
             }
         );

@@ -238,7 +238,7 @@ struct ance::est::Printer::Implementation
 
         void visit(BlockExpression const& block_expression) override
         {
-            print("({");
+            print("{");
             line();
             enter();
             for (auto& statement : block_expression.statements)
@@ -250,7 +250,7 @@ struct ance::est::Printer::Implementation
             visit(*block_expression.result);
             line();
             exit();
-            print("})");
+            print("}");
         }
 
         void visit(Parenthesis const& parenthesis) override

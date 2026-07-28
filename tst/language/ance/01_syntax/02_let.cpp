@@ -47,6 +47,26 @@ namespace ance
         );
     }
 
+    TEST_CASE("A 'let' statement type expression must evaluate to a type", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    let message: 12 := 42;
+}
+)ance",
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Expected type 'Type' but got 'Size'",
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 18)}
+                }
+            }
+        );
+    }
+
     TEST_CASE(
         "Writing to a name declared by a 'let' statement is not allowed",
         "[language]"
