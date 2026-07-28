@@ -50,7 +50,8 @@ ance::utility::Optional<ance::utility::Shared<ance::bbt::Value const>> ance::cet
 
     if (check == DeclarationCheckResult::ALREADY_DEFINED)
     {
-        reporter.error(location) << "Identifier " << identifier << " is already defined in this scope";
+        reporter.error(location)
+            << "Name " << identifier << " is already defined in this scope";
         return std::nullopt;
     }
 
