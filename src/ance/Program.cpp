@@ -118,7 +118,7 @@ namespace ance
 
             return exit_code;
 
-            // todo: do function (with expansion explanation to lambda), then do declarations, then do type expression in general, then proceed from arguments_duplicate
+            // todo: do type expression in general, then proceed from arguments_duplicate
             // todo: begin going through old tests, converting some (and deleting them)
             // todo: go through things in first.ance, reduce it while doing that
             // todo: add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
