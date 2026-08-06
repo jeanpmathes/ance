@@ -24,7 +24,7 @@ namespace ance
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public compute(): Size
+public compute () : Size
 {
     return 6 * 7;
 }
@@ -55,7 +55,7 @@ public compute(): Size
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public add(a: Size, b: Size): Size
+public add (a: Size, b: Size) : Size
 {
     return a + b;
 }
@@ -85,12 +85,12 @@ public add(a: Size, b: Size): Size
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public compute(): Size
+public compute () : Size
 {
     return 1;
 }
 
-public compute(): Size
+public compute () : Size
 {
     return 2;
 }
@@ -126,7 +126,7 @@ public compute(): Size
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public compute(): Size
+public compute () : Size
 {
     return 42;
 }
@@ -157,12 +157,12 @@ public compute(): Size
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public quarter(x: Size): Size
+public quarter (x: Size) : Size
 {
     return half(half(x));
 }
 
-public half(x: Size): Size
+public half (x: Size) : Size
 {
     return x / 2;
 }
@@ -194,7 +194,7 @@ public half(x: Size): Size
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public f(x: Size, x: Size): Size
+public f (x: Size, x: Size) : Size
 {
     return x;
 }
@@ -205,7 +205,7 @@ public f(x: Size, x: Size): Size
                 .expected_output      = {
                     {core::Reporter::Level::WARNING,
                           "Parameter 'x' hides earlier parameter",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 19)}
+                          test::SourceLocation::inPosition("declaration.nc", 2, 20)}
                 }
             }
         );
@@ -227,7 +227,7 @@ public f(x: Size, x: Size): Size
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public f(x: 5): Size
+public f (x: 5) : Size
 {
     return x;
 }
@@ -238,7 +238,7 @@ public f(x: 5): Size
                 .expected_output      = {
                     {core::Reporter::Level::ERROR,
                           "Expected type 'Type' but got 'Size'",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 13)}
+                          test::SourceLocation::inPosition("declaration.nc", 2, 14)}
                 }
             }
         );
@@ -257,7 +257,7 @@ public f(x: 5): Size
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public f(x: Size): true
+public f (x: Size) : true
 {
     return x;
 }
@@ -268,7 +268,7 @@ public f(x: Size): true
                 .expected_output      = {
                     {core::Reporter::Level::ERROR,
                           "Expected type 'Type' but got 'Bool'",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 20)}
+                          test::SourceLocation::inPosition("declaration.nc", 2, 22)}
                 }
             }
         );
@@ -292,7 +292,7 @@ public f(x: Size): true
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public factorial(n: Size): Size
+public factorial (n: Size) : Size
 {
     if n == 0 then return 1;
     return n * factorial(n - 1);

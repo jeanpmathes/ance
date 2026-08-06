@@ -106,7 +106,7 @@ namespace ance
                 .additional_sources = {{
                     "endless_loop.nc",
                     R"ance(
-public endless()
+public endless ()
 {
     loop {}
 

@@ -72,7 +72,7 @@ public value: Size := 42;
                     R"ance(
 do
 {
-    log1str("OK")
+    log1str("OK");
 }
 
 do log1str("OK");

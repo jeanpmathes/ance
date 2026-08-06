@@ -107,7 +107,7 @@ public value: Size;
                 .additional_sources = {{
                     "declaration.nc",
                     R"ance(
-public compute(): Size
+public compute () : Size
 {
     return 6 * 7;
 }
