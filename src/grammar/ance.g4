@@ -86,7 +86,7 @@ primaryExpression
     | 'intrinsic' name=expression 'args' '(' (expression (',' expression)* )? ')' # IntrinsicExpression
     | 'typeof' '(' expression (',' expression)* ')' # TypeOfExpression // todo: looks like a function, which is not ideal, but one might be able to make it a core function especially with inference, maybe it could then be typeof(#expr)
     | '[' type=expression ';' length=expression ']' # ArrayTypeExpression
-    | '[' ( type=expression '|' )? expression ( ',' expression )* ']' # ArrayConstructorExpression
+    | '[' ( type=expression '|' )? ( expression ( ',' expression )* )? ']' # ArrayConstructorExpression
     | 'if' condition=expression 'then' trueBlock=expression 'else' falseBlock=expression # IfExpression
     | 'match' condition=expression 'with' '{' ( matchExpressionCase ( ',' matchExpressionCase )* )? '}' # MatchExpression
     | '{' ( statement )* ( '=>' expression )? '}' # BlockExpression

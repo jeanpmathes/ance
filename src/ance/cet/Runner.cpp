@@ -1537,10 +1537,13 @@ struct ance::cet::Runner::Implementation
                 msg << "}, destination=" << array_constructor.destination.id();
             }
 
-            if (array_constructor.elements.empty())
+            if (array_constructor.elements.empty()
+                && array_constructor.element_type == nullptr)
             {
+                // todo: once type inference exists, '[]' should be allowed
+
                 reporter_.error(array_constructor.location)
-                    << "Array constructor has no elements";
+                    << "Cannot infer element type of empty array constructor";
                 abort();
                 return;
             }

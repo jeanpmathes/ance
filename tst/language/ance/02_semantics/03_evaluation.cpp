@@ -12,6 +12,10 @@ namespace ance
     // One other effect of this is that types become ordinary expressions during
     // compile-time. Types can be computed using functions, assigned to alternative names,
     // and parts of types can be filled in using computations.
+    //
+    // As a consequence of this evaluation model, types are value-based, and type
+    // constructors generally create a new value, not simply return a reference to the
+    // same type instance.
 
     TEST_CASE("Types can be read from local names", "[language]")
     {
