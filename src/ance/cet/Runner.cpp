@@ -757,7 +757,6 @@ struct ance::cet::Runner::Implementation
                         << "Covered by preceding default pattern";
                 }
 
-                abort();
                 return;
             }
 
