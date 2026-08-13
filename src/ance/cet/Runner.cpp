@@ -756,8 +756,6 @@ struct ance::cet::Runner::Implementation
                         << core::Reporter::Annotation(default_pattern_location.value())
                         << "Covered by preceding default pattern";
                 }
-
-                return;
             }
 
             for (size_t const index : std::views::iota(size_t {0}, case_patterns.size()))

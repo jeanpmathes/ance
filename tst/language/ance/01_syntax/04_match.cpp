@@ -10,6 +10,9 @@ namespace ance
     // matching pattern being chosen. The used patterns must match the type of the matched
     // value. The 'default' pattern can be used to match any value.
     //
+    // Any match statement must be exhaustive, which means all values are covered by at
+    // least one pattern.
+    //
     // Similar to 'match' statements, 'match' expressions can be used to produce a value.
     // These expressions are expanded to a block containing a 'match' statement.
     // As such, for the following 'match' expression...
@@ -87,6 +90,30 @@ namespace ance
                     {core::Reporter::Level::ERROR,
                           "Expected type 'Size' but got 'Bool'",
                           test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 9)}
+                }
+            }
+        );
+    }
+
+    TEST_CASE("A 'match' statement must be exhaustive", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    match 1 with
+    {
+        1 => log1str("OK");
+        2 => log1str("NOT OK");
+    }
+}
+)ance",
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Match does not cover all possible states of type 'Size'",
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
                 }
             }
         );
