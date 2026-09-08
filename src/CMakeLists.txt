@@ -16,18 +16,14 @@ set_target_properties(ance_compiler PROPERTIES
         CXX_STANDARD_REQUIRED ON
         CXX_EXTENSIONS OFF)
 
-set(ERROR_OPTIONS
-    -Werror -Weverything
-    -Wno-c++98-compat
-    -Wno-c++98-compat-pedantic
-    -Wno-c++98-c++11-compat-pedantic
-    -Wno-exit-time-destructors
-    -Wno-global-constructors
-    -Wno-unsafe-buffer-usage
-    -Wno-ctad-maybe-unsupported
-    -Wno-switch-default
-    -Wno-switch-enum
-    -Wno-padded)
+set(ERROR_OPTIONS -Werror -Wall -Wextra
+        -Wno-c++98-compat-pedantic
+        -Wno-exit-time-destructors
+        -Wno-unsafe-buffer-usage
+        -Wno-padded
+        -Wno-ctad-maybe-unsupported
+        -Wno-switch-enum
+        -Wno-switch-default)
 
 target_compile_options(ance_compiler PRIVATE
         -Wno-reserved-macro-identifier

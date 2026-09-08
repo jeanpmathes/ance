@@ -118,8 +118,6 @@ namespace ance
 
             return exit_code;
 
-            // todo: take a look at all the new clangd inspections in the IDE
-
             // todo: maybe rename next everywhere with successors (for BBs)
             // todo: go through usage of map and replace with unordered_map where fitting, same for sets (for strings, use map, not unordered_map)
 
