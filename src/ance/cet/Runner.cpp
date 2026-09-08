@@ -78,10 +78,17 @@ struct ance::cet::Runner::Implementation
 
         struct RunPoint
         {
-            RunPoint(bbt::BasicBlock const& start, Scope* initial_scope)
-                : block(&start),
+            RunPoint(
+                bbt::BasicBlock const&                                     start,
+                utility::Optional<utility::Shared<bbt::Type const>> const& type,
+                Scope*                                                     initial_scope
+            )
+                : return_type(type),
+                  block(&start),
                   scope(initial_scope)
             {}
+
+            utility::Optional<utility::Shared<bbt::Type const>> return_type;
 
             bbt::BasicBlock const* block           = nullptr;
             size_t                 statement_index = 0;
@@ -145,9 +152,15 @@ struct ance::cet::Runner::Implementation
                 next->return_value = lower_return_value;
             }
 
-            void pushLevel(bbt::BasicBlock const& start, Scope& initial_scope) const
+            void pushLevel(
+                bbt::BasicBlock const& start,
+                utility::Optional<utility::Shared<bbt::Type const>> const&
+                       expected_return_type,
+                Scope& initial_scope
+            ) const
             {
-                RunPoint& lower_level     = stack().emplace_back(start, &initial_scope);
+                RunPoint& lower_level =
+                    stack().emplace_back(start, expected_return_type, &initial_scope);
                 lower_level.target_stack_ = target_stack_;
             }
 
@@ -193,13 +206,18 @@ struct ance::cet::Runner::Implementation
 
         ~BBT() override = default;
 
-        void schedule(bbt::Flow const& flow, Scope* scope)
+        void schedule(
+            bbt::Flow const& flow,
+            utility::Optional<utility::Shared<bbt::Type const>> const&
+                   expected_return_type,
+            Scope* scope
+        )
         {
             reporter_.trace(prefix, core::Location::nowhere())
                 << "schedule flow {id=" << flow.id() << "}";
 
             scope = scope != nullptr ? scope : &project_scope_;
-            run_points_.emplace_back(flow.entry, scope);
+            run_points_.emplace_back(flow.entry, expected_return_type, scope);
         }
 
         void scheduleCore(utility::Owned<bbt::Flow> flow)
@@ -208,7 +226,7 @@ struct ance::cet::Runner::Implementation
 
             core_flows_.emplace_back(std::move(flow));
 
-            schedule(flow_ref, core_language_scope_.get());
+            schedule(flow_ref, std::nullopt, core_language_scope_.get());
         }
 
         [[nodiscard]] bool hasExecutableRunPoints() const
@@ -647,6 +665,9 @@ struct ance::cet::Runner::Implementation
                                          << (state_.return_value.hasValue()
                                                  ? state_.return_value.value()->toString()
                                                  : "()");
+
+            // todo: as soon as there is type inference, it would be nice if we get an error for wrong return types
+            // todo: especially in obvious cases such as unit function but return 12;
 
             if (!state_.return_value.hasValue())
             {
@@ -1110,7 +1131,11 @@ struct ance::cet::Runner::Implementation
                 (*variable)->as<VariableRef>().value().write(deReference(argument));
             }
 
-            run_point.pushLevel(function->body().entry, function_scope);
+            run_point.pushLevel(
+                function->body().entry,
+                function->returnType(),
+                function_scope
+            );
 
             yield();
         }
@@ -1223,12 +1248,12 @@ struct ance::cet::Runner::Implementation
             bbt::Signature const signature =
                 bbt::Signature(function_constructor.name, std::move(parameters));
 
-            utility::Shared<bbt::Value const> return_type = deReference(
+            utility::Shared<bbt::Value const> return_type_value = deReference(
                 scope().getTemporary(function_constructor.return_type).read()
             );
             if (!expectType(
                     *type_context_.Type(),
-                    *return_type->type(),
+                    *return_type_value->type(),
                     function_constructor.return_type.location
                 ))
             {
@@ -1236,9 +1261,22 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
+            utility::Shared<bbt::Type const> return_type =
+                return_type_value.as<bbt::Type>();
+
+            if (!return_type->equals(*type_context_.Unit())
+                && !function_constructor.body->attributes.explicit_return_value_occurrence
+                        .isAtLeastOnce())
+            {
+                reporter_.error(function_constructor.body->location)
+                    << "Not all paths return a value";
+                abort();
+                return;
+            }
+
             utility::Shared<bbt::Function> function = utility::makeShared<bbt::Function>(
                 signature,
-                return_type.as<bbt::Type>(),
+                return_type,
                 *function_constructor.body,
                 type_context_
             );
@@ -1643,8 +1681,18 @@ struct ance::cet::Runner::Implementation
 
             assert(!state_.return_value.hasValue());
 
-            state_.return_value =
+            utility::Shared<bbt::Value const> value =
                 deReference(scope().getTemporary(set_return_value.value).read());
+            if (state_.current_run_point->return_type.hasValue())
+            {
+                bool const ok = expectType(
+                    *state_.current_run_point->return_type.value(),
+                    *value->type(),
+                    set_return_value.value.location
+                );
+                (void) ok; // We assign anyway so that later checks are not confused.
+            }
+            state_.return_value = value;
         }
 
         void declareCoreVariable(
@@ -1701,7 +1749,7 @@ struct ance::cet::Runner::Implementation
         {
             for (auto const& flow : flows.flows)
             {
-                schedule(*flow, &project_scope_);
+                schedule(*flow, std::nullopt, &project_scope_);
             }
         }
 
@@ -1713,7 +1761,7 @@ struct ance::cet::Runner::Implementation
 
             for (auto const& flow : scope.flows)
             {
-                schedule(*flow, &unordered_scope);
+                schedule(*flow, std::nullopt, &unordered_scope);
             }
         }
 
@@ -1885,7 +1933,7 @@ struct ance::cet::Runner::Implementation
             return std::nullopt;
         }
 
-        bbt_->schedule(**flow, nullptr);
+        bbt_->schedule(**flow, std::nullopt, nullptr);
 
         bool const ok = run(*bbt_);
 

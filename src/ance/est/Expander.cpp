@@ -559,6 +559,16 @@ struct ance::est::Expander::Implementation
             if (return_statement.value.hasValue())
             {
                 return_value = expand(**return_statement.value);
+
+                if (dynamic_cast<ast::UnitLiteral const*>(return_statement.value->get()))
+                {
+                    // todo: this dynamic cast is kinda ugly
+                    // todo: ideally, there would be an analysis layer after each phase
+                    // todo: and one could then define patterns to look for so each inspection does not need a complete new visitor
+
+                    reporter_.warning(return_statement.value.value()->location)
+                        << "The explicit unit literal return value can be omitted";
+                }
             }
 
             builder.pushStatement(utility::makeOwned<Return>(std::move(return_value), return_statement.location));

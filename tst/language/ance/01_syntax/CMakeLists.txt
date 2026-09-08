@@ -1,1 +1,1 @@
-target_sources(ance_language_tests PRIVATE 01_parsing.cpp 02_let.cpp 03_if.cpp 04_match.cpp 05_loop.cpp 06_while.cpp 07_assert.cpp 08_lambda.cpp 09_do_declaration.cpp 10_name_declaration.cpp 11_function_declaration.cpp 12_array.cpp)
+target_sources(ance_language_tests PRIVATE 01_parsing.cpp 02_let.cpp 03_if.cpp 04_match.cpp 05_loop.cpp 06_while.cpp 07_assert.cpp 08_lambda.cpp 09_return.cpp 10_do_declaration.cpp 11_name_declaration.cpp 12_function_declaration.cpp 13_array.cpp)

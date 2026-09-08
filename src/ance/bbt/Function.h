@@ -29,8 +29,7 @@ namespace ance::bbt
         [[nodiscard]] core::Identifier const&     name() const;
         [[nodiscard]] Signature                   signature();
         [[nodiscard]] Signature const&            signature() const;
-        [[nodiscard]] utility::Shared<Type const> returnType();
-        [[nodiscard]] Type const&                 returnType() const;
+        [[nodiscard]] utility::Shared<Type const> returnType() const;
 
         [[nodiscard]] Flow const& body() const;
 

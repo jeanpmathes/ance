@@ -105,7 +105,7 @@ namespace ance
     }
 
     TEST_CASE(
-        "Calling a lambda with the wrong number of arguments is an error",
+        "Calling a lambda with the wrong number of arguments is not alowed",
         "[language]"
     )
     {
@@ -130,7 +130,7 @@ namespace ance
     }
 
     TEST_CASE(
-        "Calling a lambda with an argument of the wrong type is an error",
+        "Calling a lambda with an argument of the wrong type is not allowed",
         "[language]"
     )
     {
@@ -220,7 +220,7 @@ namespace ance
     }
 
     TEST_CASE(
-        "A 'break' statement in a lambda's body outside of a loop is an error",
+        "A 'break' statement in a lambda's body outside of a loop is not allowed",
         "[language]"
     )
     {
@@ -286,6 +286,29 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {}
+            }
+        );
+    }
+
+    TEST_CASE(
+        "Lambdas with a non-'Unit' return type require a return statement",
+        "[language]"
+    )
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    let f: Function := \() : Size { let value: Size := 42; };
+}
+)ance",
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Not all paths return a value",
+                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 24)}
+                }
             }
         );
     }

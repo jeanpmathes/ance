@@ -118,7 +118,12 @@ namespace ance
 
             return exit_code;
 
-            // todo: proceed from control_return
+            // todo: take a look at all the new clangd inspections in the IDE
+
+            // todo: maybe rename next everywhere with successors (for BBs)
+            // todo: go through usage of map and replace with unordered_map where fitting, same for sets (for strings, use map, not unordered_map)
+
+            // todo: proceed from floats
             // todo: begin going through old tests, converting some (and deleting them)
             // todo: go through things in first.ance, reduce it while doing that
             // todo: add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
@@ -133,6 +138,7 @@ namespace ance
             // todo: instead of the current return handling, the generated visitors should allow generic return values for the different groups (statements, expressions, declarations), also think about how to apply that to parser as well
             // todo: think of a way to split the large visitors into smaller files (so one header, multiple cpp, and a private header, could split for expressions/statements/...)
             // todo: analyze code quality after this
+            // todo: try to get rid of the dynamic cast in Segementer for the control flow analysis, e.g. using a standard pass-through visitor that has nice default implementations for all methods (calling children) - generate that one
             // todo: write some related documentation for this, repeat this note for the next step
 
             // todo: think about doing som of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar already

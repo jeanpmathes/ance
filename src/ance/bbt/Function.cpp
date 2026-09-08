@@ -47,14 +47,9 @@ namespace ance::bbt
         return signature_;
     }
 
-    utility::Shared<Type const> Function::returnType()
+    utility::Shared<Type const> Function::returnType() const
     {
         return return_type_;
-    }
-
-    Type const& Function::returnType() const
-    {
-        return *return_type_;
     }
 
     Flow const& Function::body() const

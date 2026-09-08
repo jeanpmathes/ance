@@ -70,7 +70,7 @@ public add (a: Size, b: Size) : Size
 
     TEST_CASE(
         "Declaring a second function with the same name as an earlier function "
-        "declaration is an error",
+        "declaration is not allowed",
         "[language]"
     )
     {
@@ -302,6 +302,70 @@ public factorial (n: Size) : Size
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {}
+            }
+        );
+    }
+
+    TEST_CASE(
+        "Functions with a non-'Unit' return type require a return statement",
+        "[language]"
+    )
+    {
+        test::checkSources(
+            test::SourcesTest {
+                .source = R"ance(
+{
+    include("declaration.nc", here);
+}
+)ance",
+
+                .additional_sources = {{
+                    "declaration.nc",
+                    R"ance(
+public f () : Size
+{}
+)ance",
+                }},
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Not all paths return a value",
+                          test::SourceLocation::inPosition("declaration.nc", 2, 1)}
+                }
+            }
+        );
+    }
+
+    TEST_CASE(
+        "Functions with a non-'Unit' return type require a return statement in all paths",
+        "[language]"
+    )
+    {
+        test::checkSources(
+            test::SourcesTest {
+                .source = R"ance(
+{
+    include("declaration.nc", here);
+}
+)ance",
+
+                .additional_sources = {{
+                    "declaration.nc",
+                    R"ance(
+public f () : Size
+{
+    if true then return 42;
+}
+)ance",
+                }},
+
+                .expected_compilation = test::Compilation::FAILURE,
+                .expected_output      = {
+                    {core::Reporter::Level::ERROR,
+                          "Not all paths return a value",
+                          test::SourceLocation::inPosition("declaration.nc", 2, 1)}
+                }
             }
         );
     }

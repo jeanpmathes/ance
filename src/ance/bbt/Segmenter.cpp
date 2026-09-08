@@ -9,16 +9,18 @@
 #include <string_view>
 #include <vector>
 
+#include "ance/ast/Node.h"
+
 #include "ance/est/Expander.h"
 #include "ance/est/Node.h"
 
 #include "ance/bbt/Node.h"
+#include "ance/bbt/ControlFlowAnalysis.h"
 
 #include "Grapher.h"
 #include "Printer.h"
 #include "Type.h"
 #include "Value.h"
-#include "ance/ast/Node.h"
 
 namespace
 {
@@ -630,6 +632,20 @@ struct ance::bbt::Segmenter::Implementation
             state_ = std::move(previous_state);
 
             utility::Owned<Flow> flow = utility::makeOwned<Flow>(std::move(basic_blocks), first_block, std::move(flow_id), segmentable.location);
+
+            static ControlFlowAnalysis return_value_analysis(
+                [](Statement const& statement) -> size_t {
+                    if (dynamic_cast<SetReturnValue const*>(&statement) != nullptr)
+                    {
+                        return 1;
+                    }
+
+                    return 0;
+                }
+            );
+
+            flow->attributes.explicit_return_value_occurrence =
+                return_value_analysis.analyze(*flow);
 
             reporter_.trace(prefix, core::Location::nowhere()) << "apply exit {flow_id=" << flow->id() << ", count(block)=" << flow->blocks.size() << "}";
 
