@@ -2,7 +2,7 @@
 
 #include <queue>
 #include <ranges>
-#include <set>
+#include <unordered_set>
 
 #include "ance/core/Printer.h"
 
@@ -419,7 +419,7 @@ struct ance::bbt::Printer::Implementation
       private:
         size_t                          flow_depth_ = 0;
         std::queue<Flow const*>         nested_flows_to_print_;
-        std::set<Flow const*>           printed_flows_;
+        std::unordered_set<Flow const*> printed_flows_;
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}

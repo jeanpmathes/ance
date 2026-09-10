@@ -4,6 +4,7 @@
 #include <functional>
 #include <map>
 #include <set>
+#include <unordered_map>
 #include <variant>
 
 #include "ance/utility/Owners.h"
@@ -116,8 +117,9 @@ namespace ance::cet
         Scope*            parent_;
         bbt::TypeContext& type_context_;
 
-        std::map<bbt::Temporary const*, utility::Owned<Temporary>> temporaries_  = {};
-        std::list<utility::Owned<Scope>>                           child_scopes_ = {};
+        std::unordered_map<bbt::Temporary const*, utility::Owned<Temporary>>
+                                         temporaries_  = {};
+        std::list<utility::Owned<Scope>> child_scopes_ = {};
     };
 
     /// The core scope, which is the root of all scopes.

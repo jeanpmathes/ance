@@ -3,10 +3,10 @@
 #include <expected>
 #include <map>
 #include <ranges>
-#include <set>
 #include <span>
 #include <stack>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 #include "ance/ast/Node.h"
@@ -101,12 +101,12 @@ struct ance::bbt::Segmenter::Implementation
             return location;
         }
 
-        [[nodiscard]] virtual std::set<BaseBB*> successors() const = 0;
+        [[nodiscard]] virtual std::unordered_set<BaseBB*> successors() const = 0;
 
-        std::tuple<BaseBB*, std::set<BaseBB*>> simplify()
+        std::tuple<BaseBB*, std::unordered_set<BaseBB*>> simplify()
         {
-            std::set<BaseBB*> outgoing = successors();
-            BaseBB*           result   = this;
+            std::unordered_set<BaseBB*> outgoing = successors();
+            BaseBB*                     result   = this;
 
             if (outgoing.size() == 1)
             {
@@ -155,7 +155,7 @@ struct ance::bbt::Segmenter::Implementation
         virtual void swap(std::reference_wrapper<BaseBB> original, std::reference_wrapper<BaseBB> replacement) = 0;
 
       private:
-        std::set<BaseBB*>                        incoming_;
+        std::unordered_set<BaseBB*>              incoming_;
         utility::List<utility::Owned<Statement>> statements_;
 
         size_t id_ = 0;
@@ -193,9 +193,9 @@ struct ance::bbt::Segmenter::Implementation
             );
         }
 
-        [[nodiscard]] std::set<BaseBB*> successors() const override
+        [[nodiscard]] std::unordered_set<BaseBB*> successors() const override
         {
-            std::set<BaseBB*> links;
+            std::unordered_set<BaseBB*> links;
 
             if (successor_ != nullptr) links.emplace(successor_);
 
@@ -238,9 +238,9 @@ struct ance::bbt::Segmenter::Implementation
             );
         }
 
-        [[nodiscard]] std::set<BaseBB*> successors() const override
+        [[nodiscard]] std::unordered_set<BaseBB*> successors() const override
         {
-            std::set<BaseBB*> links;
+            std::unordered_set<BaseBB*> links;
 
             links.emplace(&true_.get());
             links.emplace(&false_.get());
@@ -318,9 +318,9 @@ struct ance::bbt::Segmenter::Implementation
             );
         }
 
-        [[nodiscard]] std::set<BaseBB*> successors() const override
+        [[nodiscard]] std::unordered_set<BaseBB*> successors() const override
         {
-            std::set<BaseBB*> links;
+            std::unordered_set<BaseBB*> links;
 
             for (auto& [pattern, pattern_location, block, location] : cases_)
             {
@@ -363,7 +363,7 @@ struct ance::bbt::Segmenter::Implementation
             return utility::makeOwned<Return>(core::Location::project());
         }
 
-        [[nodiscard]] std::set<BaseBB*> successors() const override
+        [[nodiscard]] std::unordered_set<BaseBB*> successors() const override
         {
             return {};
         }
@@ -672,7 +672,7 @@ struct ance::bbt::Segmenter::Implementation
                 block.get()->prune();
             }
 
-            std::set<BaseBB*>                          simplified;
+            std::unordered_set<BaseBB*>                simplified;
             std::stack<std::reference_wrapper<BaseBB>> to_simplify;
             to_simplify.emplace(entry);
 

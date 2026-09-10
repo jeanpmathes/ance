@@ -1,9 +1,9 @@
 #include "Grapher.h"
 
 #include <queue>
-#include <set>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 
 #include "ance/bbt/Node.h"
 #include "ance/bbt/Printer.h"
@@ -112,7 +112,7 @@ struct ance::bbt::Grapher::Implementation
 
         void visit(Switch const& switch_link) override
         {
-            std::set<size_t> connected;
+            std::unordered_set<size_t> connected;
 
             for (auto& switch_case : switch_link.cases)
             {
@@ -187,9 +187,9 @@ struct ance::bbt::Grapher::Implementation
       private:
         size_t current_id_ = 0;
 
-        size_t                  flow_depth_ = 0;
-        std::queue<Flow const*> nested_flows_to_graph_;
-        std::set<Flow const*>   graphed_flows_;
+        size_t                          flow_depth_ = 0;
+        std::queue<Flow const*>         nested_flows_to_graph_;
+        std::unordered_set<Flow const*> graphed_flows_;
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}

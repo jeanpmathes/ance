@@ -1,9 +1,9 @@
 #ifndef ANCE_CORE_GRAPHER_H
 #define ANCE_CORE_GRAPHER_H
 
-#include <map>
 #include <ostream>
 #include <sstream>
+#include <unordered_map>
 #include <vector>
 
 namespace ance::core
@@ -46,8 +46,8 @@ namespace ance::core
 
         uint32_t node_count_ {0};
 
-        uint32_t                                  current_group_id_ {0};
-        std::vector<std::map<uint32_t, uint32_t>> id_map_ {};
+        uint32_t                                            current_group_id_ {0};
+        std::vector<std::unordered_map<uint32_t, uint32_t>> id_map_ {};
     };
 }
 

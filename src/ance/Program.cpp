@@ -118,9 +118,6 @@ namespace ance
 
             return exit_code;
 
-            // todo: maybe rename next everywhere with successors (for BBs)
-            // todo: go through usage of map and replace with unordered_map where fitting, same for sets (for strings, use map, not unordered_map)
-
             // todo: proceed from floats
             // todo: begin going through old tests, converting some (and deleting them)
             // todo: go through things in first.ance, reduce it while doing that

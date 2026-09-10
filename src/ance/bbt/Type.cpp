@@ -1,8 +1,9 @@
 #include "Type.h"
 
 #include <format>
-#include <map>
+#include <functional>
 #include <stdexcept>
+#include <unordered_map>
 #include <vector>
 
 #include "ance/core/BinaryOperator.h"
@@ -79,6 +80,30 @@ namespace ance::bbt
 
     struct Type::Implementation
     {
+        struct UnaryOperatorHash
+        {
+            [[nodiscard]] size_t operator()(
+                core::UnaryOperator const unary_operator
+            ) const
+            {
+                return std::hash<core::UnaryOperator::Value> {}(unary_operator);
+            }
+        };
+
+        using BinaryOperatorKey = std::pair<core::BinaryOperator, Type const*>;
+
+        struct BinaryOperatorKeyHash
+        {
+            [[nodiscard]] size_t operator()(BinaryOperatorKey const& key) const
+            {
+                size_t const operator_hash =
+                    std::hash<core::BinaryOperator::Value> {}(key.first);
+                size_t const type_hash = std::hash<Type const*> {}(key.second);
+
+                return operator_hash ^ (type_hash << 1);
+            }
+        };
+
         explicit Implementation(core::Identifier const& identifier) : identifier_(identifier) {}
 
         Implementation(core::Identifier const& identifier, utility::List<utility::Shared<Type const>> constructing_types)
@@ -149,10 +174,12 @@ namespace ance::bbt
         }
 
       private:
-        core::Identifier                                                               identifier_;
-        utility::List<utility::Shared<Type const>>                                     constructing_types_  = {};
-        std::map<core::UnaryOperator, core::Identifier>                                unary_operator_map_  = {};
-        std::map<std::pair<core::BinaryOperator, Type const*>, core::Identifier>       binary_operator_map_ = {};
+        core::Identifier                           identifier_;
+        utility::List<utility::Shared<Type const>> constructing_types_ = {};
+        std::unordered_map<core::UnaryOperator, core::Identifier, UnaryOperatorHash>
+            unary_operator_map_ = {};
+        std::unordered_map<BinaryOperatorKey, core::Identifier, BinaryOperatorKeyHash>
+            binary_operator_map_ = {};
     };
 
     Type::Type(core::Identifier const& identifier) : implementation_(utility::makeOwned<Implementation>(identifier)) {}
