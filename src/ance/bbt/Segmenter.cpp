@@ -101,11 +101,11 @@ struct ance::bbt::Segmenter::Implementation
             return location;
         }
 
-        [[nodiscard]] virtual std::set<BaseBB*> next() const = 0;
+        [[nodiscard]] virtual std::set<BaseBB*> successors() const = 0;
 
         std::tuple<BaseBB*, std::set<BaseBB*>> simplify()
         {
-            std::set<BaseBB*> outgoing = next();
+            std::set<BaseBB*> outgoing = successors();
             BaseBB*           result   = this;
 
             if (outgoing.size() == 1)
@@ -145,11 +145,9 @@ struct ance::bbt::Segmenter::Implementation
         {
             if (statements_.empty() && incoming_.empty())
             {
-                std::set<BaseBB*> const outgoing = next();
-
-                for (auto& next : outgoing)
+                for (auto& successor : successors())
                 {
-                    next->incoming_.erase(this);
+                    successor->incoming_.erase(this);
                 }
             }
         }
@@ -174,43 +172,47 @@ struct ance::bbt::Segmenter::Implementation
             push(std::move(statement));
         }
 
-        void link(BaseBB& next)
+        void link(BaseBB& successor)
         {
-            assert(next_ == nullptr);
-            next_ = &next;
+            assert(successor_ == nullptr);
+            successor_ = &successor;
 
-            next.enter(*this);
+            successor.enter(*this);
         }
 
         [[nodiscard]] utility::Owned<Link> createLink(std::span<utility::Owned<BasicBlock> const> const blocks) override
         {
-            if (next_ == nullptr)
+            if (successor_ == nullptr)
             {
                 return utility::makeOwned<Return>(core::Location::project());// todo: should not be here but in the correct block maybe?
             }
 
-            return utility::makeOwned<Jump>(*blocks[next_->index()], core::Location::project());
+            return utility::makeOwned<Jump>(
+                *blocks[successor_->index()],
+                core::Location::project()
+            );
         }
 
-        [[nodiscard]] std::set<BaseBB*> next() const override
+        [[nodiscard]] std::set<BaseBB*> successors() const override
         {
             std::set<BaseBB*> links;
 
-            if (next_ != nullptr) links.emplace(next_);
+            if (successor_ != nullptr) links.emplace(successor_);
 
             return links;
         }
 
-        void swap(std::reference_wrapper<BaseBB> const original, std::reference_wrapper<BaseBB> const replacement) override
+        void swap(std::reference_wrapper<BaseBB> const original, std::reference_wrapper<BaseBB> const replacement
+        ) override
         {
-            if (next_ == &original.get())
+            if (successor_ == &original.get())
             {
-                next_ = &replacement.get();
+                successor_ = &replacement.get();
             }
         }
 
       private:
-        BaseBB* next_ = nullptr;
+        BaseBB* successor_ = nullptr;
     };
 
     class BranchBB final : public BaseBB
@@ -231,10 +233,12 @@ struct ance::bbt::Segmenter::Implementation
 
         [[nodiscard]] utility::Owned<Link> createLink(std::span<utility::Owned<BasicBlock> const> blocks) override
         {
-            return utility::makeOwned<Branch>(condition_, *blocks[true_.get().index()], *blocks[false_.get().index()], source_location_);
+            return utility::makeOwned<Branch>(condition_, *blocks[true_.get().index()], *blocks[false_.get().index()],
+                source_location_
+            );
         }
 
-        [[nodiscard]] std::set<BaseBB*> next() const override
+        [[nodiscard]] std::set<BaseBB*> successors() const override
         {
             std::set<BaseBB*> links;
 
@@ -307,10 +311,14 @@ struct ance::bbt::Segmenter::Implementation
                 }
             }
 
-            return utility::makeOwned<Switch>(condition_, std::move(switch_cases), source_location_);
+            return utility::makeOwned<Switch>(
+                condition_,
+                std::move(switch_cases),
+                source_location_
+            );
         }
 
-        [[nodiscard]] std::set<BaseBB*> next() const override
+        [[nodiscard]] std::set<BaseBB*> successors() const override
         {
             std::set<BaseBB*> links;
 
@@ -348,12 +356,14 @@ struct ance::bbt::Segmenter::Implementation
 
         explicit ReturnBB(core::Location const& source_location) : source_location_(source_location) {}
 
-        [[nodiscard]] utility::Owned<Link> createLink(std::span<utility::Owned<BasicBlock> const>) override
+        [[nodiscard]] utility::Owned<Link> createLink(
+            std::span<utility::Owned<BasicBlock> const>
+        ) override
         {
             return utility::makeOwned<Return>(core::Location::project());
         }
 
-        [[nodiscard]] std::set<BaseBB*> next() const override
+        [[nodiscard]] std::set<BaseBB*> successors() const override
         {
             return {};
         }
@@ -603,13 +613,14 @@ struct ance::bbt::Segmenter::Implementation
                 basic_blocks.emplace_back(current.createBlock(basic_blocks.size() + 1));
                 converted.emplace_back(current);
 
-                reporter_.trace(prefix, core::Location::nowhere()) << "apply create block " << block(current);
+                reporter_.trace(prefix, core::Location::nowhere())
+                    << "apply create block " << block(current);
 
-                for (auto& next : current.next())
+                for (auto& successor : current.successors())
                 {
-                    if (!next->isCreated())
+                    if (!successor->isCreated())
                     {
-                        unconverted.emplace(*next);
+                        unconverted.emplace(*successor);
                     }
                 }
             }
@@ -675,18 +686,18 @@ struct ance::bbt::Segmenter::Implementation
                 if (simplified.contains(&current)) continue;
                 simplified.insert(&current);
 
-                auto [result, next] = current.simplify();
+                auto [result, successors] = current.simplify();
 
                 if (&current == &current_entry.get())
                 {
                     current_entry = *result;
                 }
 
-                for (auto& next_block : next)
+                for (auto& successor : successors)
                 {
-                    if (!simplified.contains(next_block))
+                    if (!simplified.contains(successor))
                     {
-                        to_simplify.emplace(*next_block);
+                        to_simplify.emplace(*successor);
                     }
                 }
             }

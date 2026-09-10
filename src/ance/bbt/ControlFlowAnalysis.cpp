@@ -105,8 +105,8 @@ namespace
 
     struct BBData
     {
-        Count                                     count = Count::ZERO;
-        std::vector<ance::bbt::BasicBlock const*> next  = {};
+        Count                                     count      = Count::ZERO;
+        std::vector<ance::bbt::BasicBlock const*> successors = {};
     };
 
     class AnalyzingVisitor final : public ance::bbt::Visitor
@@ -144,20 +144,20 @@ namespace
 
         void visit(ance::bbt::Branch const& branch_link) override
         {
-            data_.next.emplace_back(&branch_link.true_branch);
-            data_.next.emplace_back(&branch_link.false_branch);
+            data_.successors.emplace_back(&branch_link.true_branch);
+            data_.successors.emplace_back(&branch_link.false_branch);
         }
 
         void visit(ance::bbt::Jump const& jump_link) override
         {
-            data_.next.emplace_back(&jump_link.target);
+            data_.successors.emplace_back(&jump_link.target);
         }
 
         void visit(ance::bbt::Switch const& switch_link) override
         {
             for (auto const& switch_case : switch_link.cases)
             {
-                data_.next.emplace_back(&switch_case->target);
+                data_.successors.emplace_back(&switch_case->target);
             }
         }
 
@@ -224,9 +224,9 @@ ance::core::Occurrence ance::bbt::ControlFlowAnalysis::analyze(Flow const& flow)
         BBData const& data           = block_data.at(block);
         Counts const  outgoing_range = incoming_range.at(block) + data.count;
 
-        for (BasicBlock const* const next : data.next)
+        for (BasicBlock const* const successor : data.successors)
         {
-            auto [iterator, inserted] = incoming_range.emplace(next, outgoing_range);
+            auto [iterator, inserted] = incoming_range.emplace(successor, outgoing_range);
             auto& [key, range]        = *iterator;
 
             Counts const previous_range = range;
@@ -244,7 +244,7 @@ ance::core::Occurrence ance::bbt::ControlFlowAnalysis::analyze(Flow const& flow)
     for (auto const& [block, range] : incoming_range)
     {
         BBData const& data = block_data.at(block);
-        if (!data.next.empty()) continue;
+        if (!data.successors.empty()) continue;
 
         Counts const outgoing_range = range + data.count;
 
