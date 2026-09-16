@@ -1,1 +1,2 @@
-target_sources(ance_language_tests PRIVATE 01_include.cpp 02_log.cpp)
+add_subdirectory(01_types)
+add_subdirectory(02_functions)

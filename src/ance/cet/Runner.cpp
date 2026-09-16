@@ -549,7 +549,7 @@ struct ance::cet::Runner::Implementation
 
         TemporaryOutput temp(bbt::Temporary const& temporary)
         {
-            return TemporaryOutput {this, temporary};
+            return TemporaryOutput {.bbt = this, .temporary = temporary};
         }
 
         // ReSharper disable once CppMemberFunctionMayBeConst
@@ -1311,11 +1311,11 @@ struct ance::cet::Runner::Implementation
                 return;
             }
 
-            std::function<
-                utility::Shared<bbt::Value const>(utility::Shared<bbt::Type const>)>
-                get_default_value = [&](
-                                        utility::Shared<bbt::Type const> type
-                                    ) -> utility::Shared<bbt::Value const> {
+            std::function<utility::Optional<utility::Shared<bbt::Value const>>(
+                utility::Shared<bbt::Type const>
+            )>
+                get_default_value = [&](utility::Shared<bbt::Type const> type)
+                -> utility::Optional<utility::Shared<bbt::Value const>> {
                 // todo: should become default constructor call at some point
 
                 if (*type == *type_context_.Bool())
@@ -1328,39 +1328,43 @@ struct ance::cet::Runner::Implementation
                 if (*type == *type_context_.String())
                     return bbt::String::make("", type_context_);
 
+                if (*type == *type_context_.Float(core::Precision::HALF))
+                    return bbt::Float::makeZero(core::Precision::HALF, type_context_);
+                if (*type == *type_context_.Float(core::Precision::SINGLE))
+                    return bbt::Float::makeZero(core::Precision::SINGLE, type_context_);
+                if (*type == *type_context_.Float(core::Precision::DOUBLE))
+                    return bbt::Float::makeZero(core::Precision::DOUBLE, type_context_);
+                if (*type == *type_context_.Float(core::Precision::QUAD))
+                    return bbt::Float::makeZero(core::Precision::QUAD, type_context_);
+
                 if (type->isArray())
                 {
                     auto const& array_type   = type->as<bbt::ArrayType>();
                     auto        element_type = type->getConstructingType(0);
 
-                    utility::List<utility::Shared<bbt::Value const>> elements;
-                    elements.reserve(array_type.length());
-
-                    std::ranges::for_each(
-                        std::views::iota(size_t {0}, array_type.length()),
-                        [&](size_t) {
-                            elements.emplace_back(get_default_value(element_type));
-                        }
-                    );
+                    utility::Optional<utility::Shared<bbt::Value const>> default_element =
+                        get_default_value(element_type);
+                    if (!default_element.hasValue()) return std::nullopt;
 
                     return bbt::Array::make(
                         std::move(type),
-                        std::move(elements),
+                        utility::List(array_type.length(), default_element.value()),
                         type_context_
                     );
                 }
 
-                // todo: float types
-
                 reporter_.error(default_value.type.location)
                     << "Cannot create default value for type " << type->annotated();
+                abort();
 
-                return bbt::Unit::make(type_context_);
+                return std::nullopt;
             };
 
-            utility::Shared<bbt::Value const> value =
+            utility::Optional<utility::Shared<bbt::Value const>> value =
                 get_default_value(type_value.as<bbt::Type>());
-            scope().getTemporary(default_value.destination).write(value);
+
+            if (!value.hasValue()) abort();
+            else scope().getTemporary(default_value.destination).write(value.value());
         }
 
         void visit(bbt::CurrentScope const& current_scope) override
@@ -1456,7 +1460,8 @@ struct ance::cet::Runner::Implementation
                 reporter_.error(get_binary_operator_function_identifier.location)
                     << "Operator '"
                     << get_binary_operator_function_identifier.op.toString()
-                    << "' is not defined for type " << left_type->annotated();
+                    << "' is not defined for types " << left_type->annotated() << " and "
+                    << right_type->annotated();
                 abort();
                 return;
             }

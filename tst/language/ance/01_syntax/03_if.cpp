@@ -61,9 +61,15 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::INFO, "OK", {}},
-                    {core::Reporter::Level::INFO, "OK", {}},
-                    {core::Reporter::Level::INFO, "OK", {}}
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
                 }
             }
         );
@@ -89,7 +95,11 @@ namespace ance
 )ance",
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "OK", {}}}
+                .expected_output      = {
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
+                }
             }
         );
     }
@@ -107,9 +117,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Bool' but got 'Size'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 8)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Bool' but got 'Size'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 8)}
                 }
             }
         );
@@ -144,9 +155,11 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Unexpected token ';', check it and previous tokens for errors",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 34)}
+                    {.level = core::Reporter::Level::ERROR,
+                          .content =
+                              "Unexpected token ';', check it and previous tokens for errors",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 34)}
                 }
             }
         );
@@ -164,9 +177,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Could not find common type for types 'Size' and 'Bool'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 20)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Could not find common type for types 'Size' and 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 20)}
                 }
             }
         );

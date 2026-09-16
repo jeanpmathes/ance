@@ -306,6 +306,13 @@ namespace ance::bbt
                 std::tie(signature, return_type) = makeComparisonSignature(intrinsic, type_context.Location(), type_context);
                 break;
             }
+            case core::Intrinsic::TYPE_EQ:
+            case core::Intrinsic::TYPE_NE:
+            {
+                std::tie(signature, return_type) =
+                    makeComparisonSignature(intrinsic, type_context.Type(), type_context);
+                break;
+            }
         }
 
         assert(signature.hasValue());

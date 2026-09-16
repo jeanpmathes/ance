@@ -104,7 +104,9 @@ namespace ance
             core::Reporter      reporter {
                 source_tree,
                 compiler_out,
-                     {arguments.trace_enabled, arguments.color_enabled, false}
+                     {.trace_enabled    = arguments.trace_enabled,
+                      .color_enabled    = arguments.color_enabled,
+                      .warning_as_error = false}
             };
             core::Context context {debug_path};
 
@@ -118,12 +120,6 @@ namespace ance
 
             return exit_code;
 
-            // todo: proceed from floats
-            // todo: begin going through old tests, converting some (and deleting them)
-            // todo: go through things in first.ance, reduce it while doing that
-            // todo: add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
-            // todo: ideally, every compiler report error is caused at least once
-
             // todo: code gen - use python to generate the Node files, specifically Node.h and Node.generated.cpp, also integrate well with cmake
             // todo: use this for all Node trees, add a comment that when writing the compiler in ance it should of course not use python codegen
             // todo: it should also assist with serialization later, by requiring a stable ID for each Node, generate an enum for each type
@@ -135,6 +131,46 @@ namespace ance
             // todo: analyze code quality after this
             // todo: try to get rid of the dynamic cast in Segementer for the control flow analysis, e.g. using a standard pass-through visitor that has nice default implementations for all methods (calling children) - generate that one
             // todo: write some related documentation for this, repeat this note for the next step
+
+            // todo: think about the following idea: (really think it through and design, is a bit more complicated)
+            // todo: instead of dynamic, static and then runtime, we would have stages
+            // todo: so either code is stage 0 (runtime), or stage N > 0 (compiletime), or stage N >= 0 (anything)
+            // todo: the idea would be that all code is compiled, there is no dynamic evaluation, only static
+            // todo: if resolving of a name is not possible, the containing part is pushed into the next stage, similar to how we have runpoints right now
+            // todo: the runpoint system would be removed, which means instead of the runner we might become a resolver, might create one per function so it can keep state and partially created tree
+            // todo: we can then bring in type checking and everything, potentially with a Typer stage
+            // todo: but consider also potential drawbacks of this approach, maybe things like identifier and type type would no longer make sense?
+            // todo: to make sure that everything works, some expression and such would also cause the inner code to be of higher stage, meaning by function compilation is not enough, it has to do expressions as well (or actually not, there are no expressions at that point, so instead it has to put them into groups or so - this is something to consider, how do we determine which parts need to be compiled, function resolution might not be done yet, maybe we need different keywords to indiciate, or the segmented part becomes a computation graph and basic blocks are only done in lowering)
+            // todo: maybe we should actually not do segmentation at all, that was just to make runner easier and allow stopping, instead we do typing and resolving on ast, so the process could be typing (find better name) -> lowering -> evaluating, meaning typing calls to resolving if not resolved yet, resolving finds parts it needs to evaluate / can evaluate, but then typing is a per-function activity so that is also not nice
+            // todo: maybe take a look at actual code examples and think what to do in those cases, like what to expect for a certain program that mixes things, also think about how generics would work later, about everything already possible, and what I want to be possible later like condition compilation with if, adding code in loops
+            // todo: and also potential benefits, maybe it could be possible to specificy stage of method, at least in relative terms to its parameters
+
+            // todo: think about the division by zero issue with its warning, bring back the two commented out tests
+            // todo: fundamentally, the issue is that currently we use compiler errors for things that are actually execution failures
+            // todo: therefore, any report.error() followed by an abort is actually wrong
+            // todo: instead, we should have a fail() function which takes a Failure that then allows printing nice diagnostics
+            // todo: it could have a method which receives the message builder of the reporter, so we get the same message quality
+            // todo: but the interception mechanism would add a preamble to the message (Direct CE failure: <type of failure:)
+            // todo: and the fail mechanism would also create a StackTrace that contains functions and can also contain a starting intrinsic
+            // todo: and that is printed nicely below the message as well
+            // todo: then think about the "internal error: Warnings and errors in core code indicate a critical language or compiler issue!" message
+            // todo: one could argue it is correct, it should have reject the argument before using typing or contracts
+            // todo: maybe additionally to assert, we need a require statement, and then this message is displayed for all failures except require if caller is user code (and underline shows that user code)
+            // todo: this would mean we would have both fail in intrinsic, and require in the language core op implementation for size
+            // todo: and at require, we add a TODO that this should be replaced with formal verification / dependent typing / whatever
+
+            // todo: also allow using fail() from user code, add a test for that
+            // todo: add a TODO to add an interception mechanism
+
+            // todo: change how the tests currently work
+            // todo: make the reporter an interface, allow to inject or so, use this to also assert annotations and stack traces of messages
+            // todo: also add a unit test for the report itself which asserts formatting, correct underline and such
+
+            // todo: proceed from floats tests
+            // todo: begin going through old tests, converting some (and deleting them)
+            // todo: go through things in first.ance, reduce it while doing that
+            // todo: add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
+            // todo: ideally, every compiler report error is caused at least once
 
             // todo: think about doing som of generics earlier, e.g. without using {}, instead something like foo(x: Type)(y: x) which could be done with syntactic sugar already
             // todo: write some related documentation for this, repeat this note for the next step
@@ -271,8 +307,8 @@ namespace ance
 
             // todo: think more about static type checking
             // todo: one idea - use the lowered CET for compile time evaluation as well, there would then actually be two modes of compiletime evaluation
-            // todo: 1. static compiletime evaluation (SCE): runs on CET, all types and such are already evaluated and static typing is easy, very machine like
-            // todo: 2. dynamic compiletime evaluation (DCE): essentially the current model, uses dynamic typing, not statically type safe
+            // todo: 1. static compiletime evaluation (SCE) - or maybe call it direct CE: runs on CET, all types and such are already evaluated and static typing is easy, very machine like
+            // todo: 2. dynamic compiletime evaluation (DCE) - or maybe call it lowered/checked CE: essentially the current model, uses dynamic typing, not statically type safe
             // todo: the big question is then when to use what mode
             // todo: one idea: unmarked functions use SCE, compiletime functions use SCE except when annotated with dynamic
             // todo: alternative would be for now to always require the model used for compiletime (so either static compiletime or dynamic compiletime)

@@ -49,8 +49,8 @@ namespace ance
 }
 )ance",
                 .additional_sources = {{
-                    "declarations.nc",
-                    R"ance(
+                    .relative_path = "declarations.nc",
+                    .content       = R"ance(
 public type: Type := String;
 )ance",
                 }},
@@ -77,8 +77,8 @@ public type: Type := String;
 }
 )ance",
                 .additional_sources = {{
-                    "declarations.nc",
-                    R"ance(
+                    .relative_path = "declarations.nc",
+                    .content       = R"ance(
 public compute_type (input: String) : Type
 {
     if input == "Text" then

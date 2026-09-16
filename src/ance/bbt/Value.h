@@ -144,6 +144,11 @@ namespace ance::bbt
         static utility::Shared<Float> make(llvm::APFloat value, TypeContext& type_context);
         static utility::Shared<Float> make(std::string const& value, core::Precision precision, TypeContext& type_context);
 
+        static utility::Shared<Float> makeZero(
+            core::Precision precision,
+            TypeContext&    type_context
+        );
+
         ~Float() override = default;
 
         [[nodiscard]] std::string   toString() const override;

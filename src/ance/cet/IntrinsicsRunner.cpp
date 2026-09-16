@@ -286,6 +286,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::STRING_EQ:
             case core::Intrinsic::IDENTIFIER_EQ:
             case core::Intrinsic::LOCATION_EQ:
+            case core::Intrinsic::TYPE_EQ:
                 runValueEquality(false);
                 break;
             case core::Intrinsic::BOOL_NE:
@@ -293,6 +294,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
             case core::Intrinsic::STRING_NE:
             case core::Intrinsic::IDENTIFIER_NE:
             case core::Intrinsic::LOCATION_NE:
+            case core::Intrinsic::TYPE_NE:
                 runValueEquality(true);
                 break;
         }
@@ -343,7 +345,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
         }
         else
         {
-            setPending(PendingResolution {identifier, reason});
+            setPending(PendingResolution {.identifier = identifier, .reason = reason});
         }
     }
 
@@ -359,7 +361,12 @@ struct ance::cet::IntrinsicsRunner::Implementation
                 break;
 
             case EraseResult::NOT_FOUND:
-                setPending(PendingResolution {identifier, FindResult::NotFound {}});
+                setPending(
+                    PendingResolution {
+                        .identifier = identifier,
+                        .reason     = FindResult::NotFound {}
+                    }
+                );
                 break;
 
             case EraseResult::IS_OUTER:

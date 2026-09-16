@@ -39,9 +39,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Constants must be assigned a value on declaration",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Constants must be assigned a value on declaration",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
                 }
             }
         );
@@ -59,9 +60,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Type' but got 'Size'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 18)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Type' but got 'Size'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 18)}
                 }
             }
         );
@@ -84,9 +86,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Can only store to variable reference values",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 5)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Can only store to variable reference values",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 5)}
                 }
             }
         );

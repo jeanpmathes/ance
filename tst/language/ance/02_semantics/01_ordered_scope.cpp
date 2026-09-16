@@ -35,7 +35,9 @@ namespace ance
 )ance",
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "value"}}
+                .expected_output      = {
+                    {.level = core::Reporter::Level::INFO, .content = "value"}
+                }
             }
         );
     }
@@ -54,9 +56,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot resolve name 'x'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 13)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot resolve name 'x'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 13)}
                 }
             }
         );
@@ -107,11 +110,13 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::INFO, "outer"},
-                    {core::Reporter::Level::ERROR,
-                          "Declaring 'x' in this scope would block previous access to it "
-                               "outside of the scope",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 8, 9)}
+                    {.level = core::Reporter::Level::INFO, .content = "outer"},
+                    {.level = core::Reporter::Level::ERROR,
+                          .content =
+                              "Declaring 'x' in this scope would block previous access to it "
+                                   "outside of the scope",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 8, 9)}
                 }
             }
         );
@@ -151,9 +156,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot resolve name 'x'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 7, 13)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot resolve name 'x'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 7, 13)}
                 }
             }
         );
@@ -175,9 +181,11 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot erase 'x' because it is declared in an outer scope",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 6, 15)}
+                    {.level = core::Reporter::Level::ERROR,
+                          .content =
+                              "Cannot erase 'x' because it is declared in an outer scope",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 6, 15)}
                 }
             }
         );
@@ -206,9 +214,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot resolve name 'x'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 9, 17)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot resolve name 'x'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 9, 17)}
                 }
             }
         );

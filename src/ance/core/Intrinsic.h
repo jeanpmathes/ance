@@ -218,7 +218,10 @@ namespace ance::core
             IDENTIFIER_NE,
 
             LOCATION_EQ,
-            LOCATION_NE
+            LOCATION_NE,
+
+            TYPE_EQ,
+            TYPE_NE
         };
 
         Intrinsic() = default;

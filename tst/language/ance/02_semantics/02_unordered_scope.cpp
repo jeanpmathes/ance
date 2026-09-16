@@ -30,8 +30,8 @@ namespace ance
 )ance",
 
                 .additional_sources = {{
-                    "declarations.nc",
-                    R"ance(
+                    .relative_path = "declarations.nc",
+                    .content       = R"ance(
 public second: String := first;
 public first: String := "first";
 )ance",
@@ -54,17 +54,18 @@ public first: String := "first";
 )ance",
 
                 .additional_sources = {{
-                    "declarations.nc",
-                    R"ance(
+                    .relative_path = "declarations.nc",
+                    .content       = R"ance(
 public a: String := a;
 )ance",
                 }},
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot resolve name 'a'",
-                          test::SourceLocation::inPosition("declarations.nc", 2, 21)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot resolve name 'a'",
+                          .location =
+                              test::SourceLocation::inPosition("declarations.nc", 2, 21)}
                 }
             }
         );
@@ -81,8 +82,8 @@ public a: String := a;
 )ance",
 
                 .additional_sources = {{
-                    "declarations.nc",
-                    R"ance(
+                    .relative_path = "declarations.nc",
+                    .content       = R"ance(
 public a: String := b;
 public b: String := a;
 )ance",
@@ -90,12 +91,14 @@ public b: String := a;
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot resolve name 'b'",
-                          test::SourceLocation::inPosition("declarations.nc", 2, 21)},
-                    {core::Reporter::Level::ERROR,
-                          "Cannot resolve name 'a'",
-                          test::SourceLocation::inPosition("declarations.nc", 3, 21)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot resolve name 'b'",
+                          .location =
+                              test::SourceLocation::inPosition("declarations.nc", 2, 21)},
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot resolve name 'a'",
+                          .location =
+                              test::SourceLocation::inPosition("declarations.nc", 3, 21)}
                 }
             }
         );

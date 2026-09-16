@@ -22,8 +22,8 @@ namespace ance
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public value: Size := 42;
 )ance",
                 }},
@@ -48,17 +48,17 @@ public value: Size := 42;
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public value: Size := true;
 )ance",
                 }},
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Size' but got 'Bool'",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 1)}
+                    {.level    = core::Reporter::Level::ERROR,
+                          .content  = "Expected type 'Size' but got 'Bool'",
+                          .location = test::SourceLocation::inPosition("declaration.nc", 2, 1)}
                 }
             }
         );
@@ -80,8 +80,8 @@ public value: Size := true;
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public value: Size;
 )ance",
                 }},
@@ -105,8 +105,8 @@ public value: Size;
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public compute () : Size
 {
     return 6 * 7;
@@ -135,17 +135,18 @@ public value: Size := compute() + 10;
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public value: Size := 1;
 )ance",
                 }},
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Can only store to variable reference values",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 5)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Can only store to variable reference values",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 5)}
                 }
             }
         );
@@ -165,17 +166,18 @@ public value: Size := 1;
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public value: Size := value;
 )ance",
                 }},
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot resolve name 'value'",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 23)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot resolve name 'value'",
+                          .location =
+                              test::SourceLocation::inPosition("declaration.nc", 2, 23)}
                 }
             }
         );
@@ -195,17 +197,18 @@ public value: Size := value;
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public value: 12 := 42;
 )ance",
                 }},
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Type' but got 'Size'",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 15)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Type' but got 'Size'",
+                          .location =
+                              test::SourceLocation::inPosition("declaration.nc", 2, 15)}
                 }
             }
         );

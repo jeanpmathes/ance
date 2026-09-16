@@ -30,14 +30,14 @@ namespace ance
 
                 .additional_sources =
                     {{
-                         "first.nc",
-                         R"ance(
+                         .relative_path = "first.nc",
+                         .content       = R"ance(
 public first: String := "first";
 )ance",
                      },
                      {
-                         "nested/second.nc",
-                         R"ance(
+                         .relative_path = "nested/second.nc",
+                         .content       = R"ance(
 public second: String := "second";
 )ance",
                      }},

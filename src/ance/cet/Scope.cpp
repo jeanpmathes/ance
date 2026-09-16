@@ -8,12 +8,12 @@
 
 ance::cet::FindResult ance::cet::FindResult::found(utility::Shared<bbt::Value const> value)
 {
-    return {value, Status::FOUND, NotFound {}};
+    return {.value = value, .status = Status::FOUND, .reason = NotFound {}};
 }
 
 ance::cet::FindResult ance::cet::FindResult::notFound()
 {
-    return {std::nullopt, Status::NOT_FOUND, NotFound {}};
+    return {.value = std::nullopt, .status = Status::NOT_FOUND, .reason = NotFound {}};
 }
 
 ance::cet::FindResult ance::cet::FindResult::erased(
@@ -22,7 +22,14 @@ ance::cet::FindResult ance::cet::FindResult::erased(
     bool const            hides_outer_declaration
 )
 {
-    return {std::nullopt, Status::ERASED, Erased {erase_location, declaration_location, hides_outer_declaration}
+    return {
+        .value  = std::nullopt,
+        .status = Status::ERASED,
+        .reason = Erased {
+            .erase_location          = erase_location,
+            .declaration_location    = declaration_location,
+            .hides_outer_declaration = hides_outer_declaration
+        }
     };
 }
 
@@ -231,7 +238,10 @@ bool ance::cet::OrderedScope::onErase(core::Identifier const& identifier)
         Variable const& variable = active_variables_.at(identifier).get();
         erased_variables_.emplace(
             identifier,
-            ErasedVariable {identifier.location(), variable.name().location()}
+            ErasedVariable {
+                .erase_location       = identifier.location(),
+                .declaration_location = variable.name().location()
+            }
         );
         active_variables_.erase(identifier);
         return true;

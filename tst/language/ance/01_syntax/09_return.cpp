@@ -27,8 +27,8 @@ namespace ance
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f ()
 {
     return;
@@ -53,8 +53,8 @@ public f ()
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f ()
 {
     return ();
@@ -64,9 +64,10 @@ public f ()
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::WARNING,
-                          "The explicit unit literal return value can be omitted",
-                          test::SourceLocation::inPosition("declaration.nc", 4, 12)}
+                    {.level   = core::Reporter::Level::WARNING,
+                          .content = "The explicit unit literal return value can be omitted",
+                          .location =
+                              test::SourceLocation::inPosition("declaration.nc", 4, 12)}
                 }
             }
         );
@@ -88,8 +89,8 @@ public f ()
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f () : Size
 {
     return 42;
@@ -117,8 +118,8 @@ public f () : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f () : Size
 {
     return;
@@ -128,9 +129,9 @@ public f () : Size
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Not all paths return a value",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 1)}
+                    {.level    = core::Reporter::Level::ERROR,
+                          .content  = "Not all paths return a value",
+                          .location = test::SourceLocation::inPosition("declaration.nc", 2, 1)}
                 }
             }
         );
@@ -151,9 +152,10 @@ public f () : Size
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Return statement outside of function",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Return statement outside of function",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
                 }
             }
         );
@@ -173,8 +175,8 @@ public f () : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f ()
 {
     return;
@@ -185,9 +187,9 @@ public f ()
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::WARNING,
-                          "Unreachable code",
-                          test::SourceLocation::inPosition("declaration.nc", 5, 5)}
+                    {.level    = core::Reporter::Level::WARNING,
+                          .content  = "Unreachable code",
+                          .location = test::SourceLocation::inPosition("declaration.nc", 5, 5)}
                 }
             }
         );
@@ -210,8 +212,8 @@ public f ()
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f (condition: Bool)
 {
     if condition then return;
@@ -222,7 +224,11 @@ public f (condition: Bool)
                 }},
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "OK", {}}}
+                .expected_output      = {
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
+                }
             }
         );
     }

@@ -61,8 +61,12 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::INFO, "OK", {}},
-                    {core::Reporter::Level::INFO, "OK", {}}
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
                 }
             }
         );
@@ -87,9 +91,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Size' but got 'Bool'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 9)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Size' but got 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 9)}
                 }
             }
         );
@@ -111,9 +116,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Match does not cover all possible states of type 'Size'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Match does not cover all possible states of type 'Size'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
                 }
             }
         );
@@ -168,9 +174,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Could not find common type for types 'Size' and 'Bool'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 24)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Could not find common type for types 'Size' and 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 24)}
                 }
             }
         );
@@ -196,10 +203,13 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::WARNING,
-                          "Pattern not reachable",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 6, 9)},
-                    {core::Reporter::Level::INFO, "OK", {}}
+                    {.level   = core::Reporter::Level::WARNING,
+                          .content = "Pattern not reachable",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 6, 9)},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
                 }
             }
         );
@@ -225,10 +235,13 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::WARNING,
-                          "Pattern not reachable",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 17)},
-                    {core::Reporter::Level::INFO, "OK", {}}
+                    {.level   = core::Reporter::Level::WARNING,
+                          .content = "Pattern not reachable",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 17)},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
                 }
             }
         );
@@ -253,10 +266,13 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::WARNING,
-                          "Pattern not reachable",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 6, 9)},
-                    {core::Reporter::Level::INFO, "OK", {}}
+                    {.level   = core::Reporter::Level::WARNING,
+                          .content = "Pattern not reachable",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 6, 9)},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
                 }
             }
         );

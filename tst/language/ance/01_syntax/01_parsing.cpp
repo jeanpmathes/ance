@@ -21,9 +21,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Unexpected character",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Unexpected character",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 5)}
                 }
             }
         );

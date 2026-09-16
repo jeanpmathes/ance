@@ -103,6 +103,8 @@ static std::pair<ance::core::Intrinsic::Value, char const*> const intrinsics[] =
     {ance::core::Intrinsic::IDENTIFIER_NE, "id_ne"},
     {ance::core::Intrinsic::LOCATION_EQ, "loc_eq"},
     {ance::core::Intrinsic::LOCATION_NE, "loc_ne"},
+    {ance::core::Intrinsic::TYPE_EQ, "t_eq"},
+    {ance::core::Intrinsic::TYPE_NE, "t_ne"},
 };
 
 std::string ance::core::Intrinsic::toString() const

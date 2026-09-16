@@ -47,9 +47,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Type' but got 'Size'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 13)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Type' but got 'Size'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 13)}
                 }
             }
         );
@@ -67,9 +68,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Size' but got 'Bool'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 19)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Size' but got 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 19)}
                 }
             }
         );
@@ -201,9 +203,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Size' but got 'Bool'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 36)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Size' but got 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 36)}
                 }
             }
         );
@@ -221,9 +224,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Could not find common type for types 'Size' and 'Bool'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 25)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Could not find common type for types 'Size' and 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 25)}
                 }
             }
         );
@@ -263,9 +267,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot infer element type of empty array constructor",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 25)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot infer element type of empty array constructor",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 25)}
                 }
             }
         );
@@ -285,9 +290,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Subscript index 3 is out of bounds",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 14)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Subscript index 3 is out of bounds",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 14)}
                 }
             }
         );
@@ -307,9 +313,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Size' but got 'Bool'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 14)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Size' but got 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 14)}
                 }
             }
         );
@@ -332,9 +339,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot subscript value of type 'Size'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 12)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot subscript value of type 'Size'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 12)}
                 }
             }
         );
@@ -396,9 +404,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Can only store to variable reference values",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 5)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Can only store to variable reference values",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 5)}
                 }
             }
         );

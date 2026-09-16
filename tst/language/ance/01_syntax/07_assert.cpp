@@ -24,7 +24,11 @@ namespace ance
 )ance",
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "OK", {}}}
+                .expected_output      = {
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
+                }
             }
         );
     }
@@ -46,9 +50,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Assertion failed",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 12)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Assertion failed",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 12)}
                 }
             }
         );

@@ -20,7 +20,9 @@ namespace ance
 )ance",
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "Hello, World!"}}
+                .expected_output      = {
+                    {.level = core::Reporter::Level::INFO, .content = "Hello, World!"}
+                }
             }
         );
     }

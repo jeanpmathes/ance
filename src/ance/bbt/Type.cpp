@@ -367,6 +367,9 @@ namespace ance::bbt
         utility::Optional<utility::Shared<T>> scope_ref_type;
         utility::Optional<utility::Shared<T>> location_type;
 
+        bool can_initialize_type        = false;
+        bool type_operators_initialized = false;
+
         utility::Optional<utility::Shared<T>> float_half_type;
         utility::Optional<utility::Shared<T>> float_single_type;
         utility::Optional<utility::Shared<T>> float_double_type;
@@ -515,6 +518,8 @@ namespace ance::bbt
     {
         // The type 'T' is very integral and must be immediately available for the Value implementation.
         // As the value implementation needs access to the type even in const method, the type is stored additionally to the standard handling.
+
+        implementation_->can_initialize_type = true;
     }
 
     TypeContext::~TypeContext() = default;
@@ -662,8 +667,25 @@ namespace ance::bbt
 
     utility::Shared<Type const> TypeContext::Type()
     {
-        return Implementation::getOrCreate(implementation_->type_type,
-                                           [&] { return utility::makeShared<BasicType>(core::Identifier::make("Type", core::Location::core()), *this); });
+        utility::Shared<T const> type =
+            Implementation::getOrCreate(implementation_->type_type, [&] {
+                return utility::makeShared<BasicType>(
+                    core::Identifier::make("Type", core::Location::core()),
+                    *this
+                );
+            });
+
+        if (implementation_->can_initialize_type
+            && !implementation_->type_operators_initialized)
+        {
+            implementation_->type_operators_initialized = true;
+            implementation_->ensureReadiness(type);
+            implementation_->ensureReadiness(Function());
+            implementation_
+                ->addEqualityOperators(*implementation_->type_type.value(), "t", *Bool());
+        }
+
+        return type;
     }
 
     utility::Shared<Type const> TypeContext::Type() const

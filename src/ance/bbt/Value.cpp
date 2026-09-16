@@ -118,6 +118,14 @@ namespace ance::bbt
         return make(llvm::APFloat(precision.getLlvmSemantics(), value), type_context);
     }
 
+    utility::Shared<Float> Float::makeZero(
+        core::Precision const precision,
+        TypeContext&          type_context
+    )
+    {
+        return make(llvm::APFloat::getZero(precision.getLlvmSemantics()), type_context);
+    }
+
     std::string Float::toString() const
     {
         llvm::SmallVector<char, 32> number;

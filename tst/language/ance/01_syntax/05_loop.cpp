@@ -45,9 +45,13 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "B", {}},
-                    {core::Reporter::Level::INFO, "C", {}}
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "B",
+                          .location = {}},
+                    {.level = core::Reporter::Level::INFO, .content = "C", .location = {}}
                 }
             }
         );
@@ -65,9 +69,13 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Break statement outside of loop",
-                          test::SourceLocation {test::MAIN_SOURCE_FILE, 3, 5}}
+                    {.level    = core::Reporter::Level::ERROR,
+                          .content  = "Break statement outside of loop",
+                          .location = test::SourceLocation {
+                              .relative_path = test::MAIN_SOURCE_FILE,
+                              .line          = 3,
+                              .column        = 5
+                     }}
                 }
             }
         );
@@ -85,9 +93,13 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Continue statement outside of loop",
-                          test::SourceLocation {test::MAIN_SOURCE_FILE, 3, 5}}
+                    {.level    = core::Reporter::Level::ERROR,
+                          .content  = "Continue statement outside of loop",
+                          .location = test::SourceLocation {
+                              .relative_path = test::MAIN_SOURCE_FILE,
+                              .line          = 3,
+                              .column        = 5
+                     }}
                 }
             }
         );
@@ -104,8 +116,8 @@ namespace ance
 )ance",
 
                 .additional_sources = {{
-                    "endless_loop.nc",
-                    R"ance(
+                    .relative_path = "endless_loop.nc",
+                    .content       = R"ance(
 public endless ()
 {
     loop {}
@@ -117,9 +129,10 @@ public endless ()
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::WARNING,
-                          "Unreachable code",
-                          test::SourceLocation::inPosition("endless_loop.nc", 6, 5)}
+                    {.level   = core::Reporter::Level::WARNING,
+                          .content = "Unreachable code",
+                          .location =
+                              test::SourceLocation::inPosition("endless_loop.nc", 6, 5)}
                 }
             }
         );

@@ -22,8 +22,8 @@ namespace ance
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public compute () : Size
 {
     return 6 * 7;
@@ -53,8 +53,8 @@ public compute () : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public add (a: Size, b: Size) : Size
 {
     return a + b;
@@ -83,8 +83,8 @@ public add (a: Size, b: Size) : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public compute () : Size
 {
     return 1;
@@ -99,9 +99,9 @@ public compute () : Size
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Name 'compute' is already defined in this scope",
-                          test::SourceLocation::inPosition("declaration.nc", 7, 1)}
+                    {.level    = core::Reporter::Level::ERROR,
+                          .content  = "Name 'compute' is already defined in this scope",
+                          .location = test::SourceLocation::inPosition("declaration.nc", 7, 1)}
                 }
             }
         );
@@ -124,8 +124,8 @@ public compute () : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public compute () : Size
 {
     return 42;
@@ -155,8 +155,8 @@ public compute () : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public quarter (x: Size) : Size
 {
     return half(half(x));
@@ -192,8 +192,8 @@ public half (x: Size) : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f (x: Size, x: Size) : Size
 {
     return x;
@@ -203,9 +203,10 @@ public f (x: Size, x: Size) : Size
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::WARNING,
-                          "Parameter 'x' hides earlier parameter",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 20)}
+                    {.level   = core::Reporter::Level::WARNING,
+                          .content = "Parameter 'x' hides earlier parameter",
+                          .location =
+                              test::SourceLocation::inPosition("declaration.nc", 2, 20)}
                 }
             }
         );
@@ -225,8 +226,8 @@ public f (x: Size, x: Size) : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f (x: 5) : Size
 {
     return x;
@@ -236,9 +237,10 @@ public f (x: 5) : Size
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Type' but got 'Size'",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 14)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Type' but got 'Size'",
+                          .location =
+                              test::SourceLocation::inPosition("declaration.nc", 2, 14)}
                 }
             }
         );
@@ -255,8 +257,8 @@ public f (x: 5) : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f (x: Size) : true
 {
     return x;
@@ -266,9 +268,10 @@ public f (x: Size) : true
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Type' but got 'Bool'",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 22)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Type' but got 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition("declaration.nc", 2, 22)}
                 }
             }
         );
@@ -290,8 +293,8 @@ public f (x: Size) : true
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public factorial (n: Size) : Size
 {
     if n == 0 then return 1;
@@ -320,8 +323,8 @@ public factorial (n: Size) : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f () : Size
 {}
 )ance",
@@ -329,9 +332,9 @@ public f () : Size
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Not all paths return a value",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 1)}
+                    {.level    = core::Reporter::Level::ERROR,
+                          .content  = "Not all paths return a value",
+                          .location = test::SourceLocation::inPosition("declaration.nc", 2, 1)}
                 }
             }
         );
@@ -351,8 +354,8 @@ public f () : Size
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 public f () : Size
 {
     if true then return 42;
@@ -362,9 +365,9 @@ public f () : Size
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Not all paths return a value",
-                          test::SourceLocation::inPosition("declaration.nc", 2, 1)}
+                    {.level    = core::Reporter::Level::ERROR,
+                          .content  = "Not all paths return a value",
+                          .location = test::SourceLocation::inPosition("declaration.nc", 2, 1)}
                 }
             }
         );

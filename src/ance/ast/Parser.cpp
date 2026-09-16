@@ -895,7 +895,7 @@ namespace ance::ast
             {
                 expression_body = expectExpression(context->body);
             }
-            else if (!context->statement().empty())
+            else
             {
                 statement_body = utility::wrap<Statement>(createBlockStatement(context->statement(), location(context)));
             }

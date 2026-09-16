@@ -58,6 +58,22 @@ namespace ance
         );
     }
 
+    TEST_CASE("An empty lambda expression is valid", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source = R"ance(
+{
+    assert typeof(\() {}) == Function;
+}
+)ance",
+
+                .expected_compilation = test::Compilation::SUCCESS,
+                .expected_output      = {}
+            }
+        );
+    }
+
     TEST_CASE(
         "A lambda expression without a declared return type can be called and returns no "
         "the unit value",
@@ -96,9 +112,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Cannot resolve name 'value'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 4, 44)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Cannot resolve name 'value'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 4, 44)}
                 }
             }
         );
@@ -120,10 +137,12 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Call to 'Lambda'0' with wrong number of arguments: expected 1 but "
-                               "got 2",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 4, 12)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Call to 'Lambda'0' with wrong number of arguments: "
+                                          "expected 1 but "
+                                          "got 2",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 4, 12)}
                 }
             }
         );
@@ -145,9 +164,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Size' but got 'Bool'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 4, 14)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Size' but got 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 4, 14)}
                 }
             }
         );
@@ -169,9 +189,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Type' but got 'Size'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 29)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Type' but got 'Size'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 29)}
                 }
             }
         );
@@ -190,9 +211,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Expected type 'Type' but got 'Bool'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 36)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Expected type 'Type' but got 'Bool'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 36)}
                 }
             }
         );
@@ -211,9 +233,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Can only store to variable reference values",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 43)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Can only store to variable reference values",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 43)}
                 }
             }
         );
@@ -238,9 +261,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Break statement outside of loop",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 41)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Break statement outside of loop",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 5, 41)}
                 }
             }
         );
@@ -263,9 +287,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::WARNING,
-                          "Parameter 'x' hides earlier parameter",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 35)}
+                    {.level   = core::Reporter::Level::WARNING,
+                          .content = "Parameter 'x' hides earlier parameter",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 35)}
                 }
             }
         );
@@ -305,9 +330,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Not all paths return a value",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 24)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Not all paths return a value",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 24)}
                 }
             }
         );

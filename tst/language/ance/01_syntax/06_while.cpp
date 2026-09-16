@@ -43,10 +43,16 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "A", {}}
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level = core::Reporter::Level::INFO, .content = "A", .location = {}}
                 }
             }
         );
@@ -82,14 +88,28 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "1", {}},
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "2", {}},
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "3", {}},
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "4", {}}
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "1",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "2",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "3",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level = core::Reporter::Level::INFO, .content = "4", .location = {}}
                 }
             }
         );
@@ -116,9 +136,13 @@ namespace ance
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "A", {}},
-                    {core::Reporter::Level::INFO, "A", {}}
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "A",
+                          .location = {}},
+                    {.level = core::Reporter::Level::INFO, .content = "A", .location = {}}
                 }
             }
         );
@@ -136,9 +160,10 @@ namespace ance
 
                 .expected_compilation = test::Compilation::FAILURE,
                 .expected_output      = {
-                    {core::Reporter::Level::ERROR,
-                          "Operator 'not' is not defined for type 'Size'",
-                          test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 11)}
+                    {.level   = core::Reporter::Level::ERROR,
+                          .content = "Operator 'not' is not defined for type 'Size'",
+                          .location =
+                              test::SourceLocation::inPosition(test::MAIN_SOURCE_FILE, 3, 11)}
                 }
             }
         );

@@ -20,14 +20,18 @@ namespace ance
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 do log1str("OK");
 )ance",
                 }},
 
                 .expected_compilation = test::Compilation::SUCCESS,
-                .expected_output      = {{core::Reporter::Level::INFO, "OK", {}}}
+                .expected_output      = {
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
+                }
             }
         );
     }
@@ -43,8 +47,8 @@ do log1str("OK");
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 do assert value == 42;
 
 public value: Size := 42;
@@ -68,8 +72,8 @@ public value: Size := 42;
 )ance",
 
                 .additional_sources = {{
-                    "declaration.nc",
-                    R"ance(
+                    .relative_path = "declaration.nc",
+                    .content       = R"ance(
 do
 {
     log1str("OK");
@@ -81,8 +85,12 @@ do log1str("OK");
 
                 .expected_compilation = test::Compilation::SUCCESS,
                 .expected_output      = {
-                    {core::Reporter::Level::INFO, "OK", {}},
-                    {core::Reporter::Level::INFO, "OK", {}}
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}},
+                    {.level    = core::Reporter::Level::INFO,
+                          .content  = "OK",
+                          .location = {}}
                 }
             }
         );
