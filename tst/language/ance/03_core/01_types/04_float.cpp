@@ -26,6 +26,113 @@ namespace ance
         );
     }
 
+    TEST_CASE("Floating-point literals can omit the integer part", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source               = R"ance(
+{
+    assert typeof(.5h) == Half;
+    assert .5h == 0.5h;
+    assert typeof(.5s) == Single;
+    assert .5s == 0.5s;
+    assert typeof(.5d) == Double;
+    assert .5d == 0.5d;
+    assert typeof(.5q) == Quad;
+    assert .5q == 0.5q;
+}
+)ance",
+                .expected_compilation = test::Compilation::SUCCESS,
+                .expected_output      = {}
+            }
+        );
+    }
+
+    TEST_CASE("Floating-point literals accept explicit leading signs", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source               = R"ance(
+{
+    assert typeof(+1.5h) == Half;
+    assert typeof(-1.5h) == Half;
+    assert +1.5h == 1.5h;
+    assert -1.5h == 0.0h - 1.5h;
+    assert typeof(+1.5s) == Single;
+    assert typeof(-1.5s) == Single;
+    assert +1.5s == 1.5s;
+    assert -1.5s == 0.0s - 1.5s;
+    assert typeof(+1.5d) == Double;
+    assert typeof(-1.5d) == Double;
+    assert +1.5d == 1.5d;
+    assert -1.5d == 0.0d - 1.5d;
+    assert typeof(+1.5q) == Quad;
+    assert typeof(-1.5q) == Quad;
+    assert +1.5q == 1.5q;
+    assert -1.5q == 0.0q - 1.5q;
+}
+)ance",
+                .expected_compilation = test::Compilation::SUCCESS,
+                .expected_output      = {}
+            }
+        );
+    }
+
+    TEST_CASE("Floating-point literals accept signed decimal exponents", "[language]")
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source               = R"ance(
+{
+    assert typeof(1.5e-1h) == Half;
+    assert typeof(1.5e+1h) == Half;
+    assert 1.5e-1h == 0.15h;
+    assert 1.5e+1h == 15.0h;
+    assert typeof(1.5e-1s) == Single;
+    assert typeof(1.5e+1s) == Single;
+    assert 1.5e-1s == 0.15s;
+    assert 1.5e+1s == 15.0s;
+    assert typeof(1.5e-1d) == Double;
+    assert typeof(1.5e+1d) == Double;
+    assert 1.5e-1d == 0.15d;
+    assert 1.5e+1d == 15.0d;
+    assert typeof(1.5e-1q) == Quad;
+    assert typeof(1.5e+1q) == Quad;
+    assert 1.5e-1q == 0.15q;
+    assert 1.5e+1q == 15.0q;
+}
+)ance",
+                .expected_compilation = test::Compilation::SUCCESS,
+                .expected_output      = {}
+            }
+        );
+    }
+
+    TEST_CASE(
+        "Zero floating-point literals accept very large decimal exponents",
+        "[language]"
+    )
+    {
+        test::checkSource(
+            test::SourceTest {
+                .source               = R"ance(
+{
+    assert typeof(0.0e999999h) == Half;
+    assert 0.0e999999h == 0.0h;
+    assert typeof(0.0e999999s) == Single;
+    assert 0.0e999999s == 0.0s;
+    assert typeof(0.0e999999d) == Double;
+    assert 0.0e999999d == 0.0d;
+    assert typeof(0.0e999999q) == Quad;
+    assert 0.0e999999q == 0.0q;
+}
+)ance",
+                .expected_compilation = test::Compilation::SUCCESS,
+                .expected_output      = {}
+            }
+        );
+    }
+
     TEST_CASE("Default-initialized floating-point values are zero", "[language]")
     {
         test::checkSource(
