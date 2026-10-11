@@ -11,9 +11,7 @@
 
 struct ance::bbt::Printer::Implementation
 {
-    class BBT final
-        : public Visitor
-        , core::Printer
+    class BBT final : public Visitor<>, core::Printer
     {
       public:
         using Visitor::visit;
@@ -210,7 +208,8 @@ struct ance::bbt::Printer::Implementation
             print(intrinsic.intrinsic);
             print(" (");
 
-            for (size_t const index : std::views::iota(size_t {0}, intrinsic.arguments.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, intrinsic.arguments.size()))
             {
                 if (index > 0) print(", ");
                 print(intrinsic.arguments[index].get().id());
@@ -258,12 +257,13 @@ struct ance::bbt::Printer::Implementation
             print(function_constructor.name);
             print(", [");
 
-            for (size_t const index : std::views::iota(size_t {0}, function_constructor.parameters.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, function_constructor.parameters.size()))
             {
                 print("(");
-                print(function_constructor.parameters[index].type.id());
+                print(function_constructor.parameters[index]->type.id());
                 print(", ");
-                print(function_constructor.parameters[index].identifier);
+                print(function_constructor.parameters[index]->identifier);
                 print(")");
                 if (index + 1 < function_constructor.parameters.size()) print(", ");
             }
@@ -305,7 +305,10 @@ struct ance::bbt::Printer::Implementation
             print(" scope;");
         }
 
-        void visit(GetUnaryOperatorFunctionIdentifier const& get_unary_operator_function_identifier) override
+        void visit(
+            GetUnaryOperatorFunctionIdentifier const&
+                get_unary_operator_function_identifier
+        ) override
         {
             print(get_unary_operator_function_identifier.destination.id());
             print(" ");
@@ -317,7 +320,10 @@ struct ance::bbt::Printer::Implementation
             print(");");
         }
 
-        void visit(GetBinaryOperatorFunctionIdentifier const& get_binary_operator_function_identifier) override
+        void visit(
+            GetBinaryOperatorFunctionIdentifier const&
+                get_binary_operator_function_identifier
+        ) override
         {
             print(get_binary_operator_function_identifier.destination.id());
             print(" ");
@@ -372,7 +378,8 @@ struct ance::bbt::Printer::Implementation
                 print(" | ");
             }
 
-            for (size_t const index : std::views::iota(size_t {0}, array_constructor.elements.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, array_constructor.elements.size()))
             {
                 print(array_constructor.elements[index].get().id());
                 if (index + 1 < array_constructor.elements.size()) print(", ");
@@ -416,6 +423,15 @@ struct ance::bbt::Printer::Implementation
             }
         }
 
+        void visit(Parameter const& parameter) override
+        {
+            print("(");
+            print(parameter.type.id());
+            print(", ");
+            print(parameter.identifier);
+            print(")");
+        }
+
       private:
         size_t                          flow_depth_ = 0;
         std::queue<Flow const*>         nested_flows_to_print_;
@@ -424,7 +440,8 @@ struct ance::bbt::Printer::Implementation
 
     explicit Implementation(std::ostream& out) : out_(out) {}
 
-    void print(Node const& node) const
+    template<typename T>
+    void print(T const& node) const
     {
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(out_);
         bbt->visit(node);
@@ -434,7 +451,9 @@ struct ance::bbt::Printer::Implementation
     std::ostream& out_;
 };
 
-ance::bbt::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
+ance::bbt::Printer::Printer(std::ostream& out)
+    : implementation_(utility::makeOwned<Implementation>(out))
+{}
 ance::bbt::Printer::~Printer() = default;
 
 void ance::bbt::Printer::print(Flows const& flows) const

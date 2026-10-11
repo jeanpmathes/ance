@@ -8,9 +8,7 @@
 
 struct ance::ast::Printer::Implementation
 {
-    class AST
-        : public Visitor
-        , core::Printer
+    class AST : public Visitor<>, core::Printer
     {
       public:
         using Visitor::visit;
@@ -55,7 +53,8 @@ struct ance::ast::Printer::Implementation
         {
             print(variable_declaration.access_modifier);
             print(" ");
-            if (variable_declaration.execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
+            if (variable_declaration.execution_modifier
+                != core::ExecutionModifier::ANY_EXECUTION)
             {
                 print(variable_declaration.execution_modifier);
                 print(" ");
@@ -78,7 +77,8 @@ struct ance::ast::Printer::Implementation
             print(function_declaration.access_modifier);
             print(" ");
 
-            if (function_declaration.execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
+            if (function_declaration.execution_modifier
+                != core::ExecutionModifier::ANY_EXECUTION)
             {
                 print(function_declaration.execution_modifier);
                 print(" ");
@@ -87,11 +87,12 @@ struct ance::ast::Printer::Implementation
             print(function_declaration.identifier);
             print(" (");
 
-            for (size_t const index : std::views::iota(size_t {0}, function_declaration.parameters.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, function_declaration.parameters.size()))
             {
-                print(function_declaration.parameters[index].identifier);
+                print(function_declaration.parameters[index]->identifier);
                 print(": ");
-                visit(*function_declaration.parameters[index].type);
+                visit(*function_declaration.parameters[index]->type);
                 if (index + 1 < function_declaration.parameters.size()) print(", ");
             }
 
@@ -301,11 +302,12 @@ struct ance::ast::Printer::Implementation
         {
             print("\\[](");
 
-            for (size_t const index : std::views::iota(size_t {0}, lambda.parameters.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, lambda.parameters.size()))
             {
-                print(lambda.parameters[index].identifier);
+                print(lambda.parameters[index]->identifier);
                 print(": ");
-                visit(*lambda.parameters[index].type);
+                visit(*lambda.parameters[index]->type);
                 if (index + 1 < lambda.parameters.size()) print(", ");
             }
 
@@ -334,7 +336,8 @@ struct ance::ast::Printer::Implementation
             visit(*intrinsic_expression.name);
             print(" args (");
 
-            for (size_t const index : std::views::iota(size_t {0}, intrinsic_expression.arguments.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, intrinsic_expression.arguments.size()))
             {
                 visit(*intrinsic_expression.arguments[index]);
                 if (index + 1 < intrinsic_expression.arguments.size()) print(", ");
@@ -347,7 +350,8 @@ struct ance::ast::Printer::Implementation
         {
             print("typeof(");
 
-            for (size_t const index : std::views::iota(size_t {0}, type_of.expressions.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, type_of.expressions.size()))
             {
                 visit(*type_of.expressions[index]);
                 if (index + 1 < type_of.expressions.size()) print(", ");
@@ -375,7 +379,8 @@ struct ance::ast::Printer::Implementation
                 print(" | ");
             }
 
-            for (size_t const index : std::views::iota(size_t {0}, array_constructor.elements.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, array_constructor.elements.size()))
             {
                 visit(*array_constructor.elements[index]);
                 if (index + 1 < array_constructor.elements.size()) print(", ");
@@ -470,7 +475,8 @@ struct ance::ast::Printer::Implementation
             line();
             enter();
 
-            for (size_t const index : std::views::iota(size_t {0}, match_expression.cases.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, match_expression.cases.size()))
             {
                 visit(*match_expression.cases[index]);
                 if (index + 1 < match_expression.cases.size())
@@ -505,7 +511,8 @@ struct ance::ast::Printer::Implementation
         {
             if (!match_case.patterns.empty())
             {
-                for (size_t const index : std::views::iota(size_t {0}, match_case.patterns.size()))
+                for (size_t const index :
+                     std::views::iota(size_t {0}, match_case.patterns.size()))
                 {
                     visit(*match_case.patterns[index]);
                     if (index + 1 < match_case.patterns.size()) print(" | ");
@@ -524,7 +531,8 @@ struct ance::ast::Printer::Implementation
         {
             if (!match_case.patterns.empty())
             {
-                for (size_t const index : std::views::iota(size_t {0}, match_case.patterns.size()))
+                for (size_t const index :
+                     std::views::iota(size_t {0}, match_case.patterns.size()))
                 {
                     visit(*match_case.patterns[index]);
                     if (index + 1 < match_case.patterns.size()) print(" | ");
@@ -538,11 +546,19 @@ struct ance::ast::Printer::Implementation
             print(" => ");
             visit(*match_case.result);
         }
+
+        void visit(Parameter const& parameter) override
+        {
+            print(parameter.identifier);
+            print(": ");
+            visit(*parameter.type);
+        }
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}
 
-    void print(Node const& node) const
+    template<typename T>
+    void print(T const& node) const
     {
         utility::Owned<AST> ast = utility::makeOwned<AST>(out_);
 
@@ -553,7 +569,9 @@ struct ance::ast::Printer::Implementation
     std::ostream& out_;
 };
 
-ance::ast::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
+ance::ast::Printer::Printer(std::ostream& out)
+    : implementation_(utility::makeOwned<Implementation>(out))
+{}
 ance::ast::Printer::~Printer() = default;
 
 void ance::ast::Printer::print(File const& file) const

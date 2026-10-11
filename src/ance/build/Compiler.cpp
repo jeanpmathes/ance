@@ -1,34 +1,38 @@
 #include "Compiler.h"
 
+#include "ance/cet/LanguageCore.h"
 #include "ance/cet/Node.h"
 #include "ance/cet/Runner.h"
-#include "ance/cet/LanguageCore.h"
 
 struct ance::build::Compiler::Implementation
 {
-    class CET final : public cet::Visitor
+    class CET final : public cet::Visitor<>
     {
       public:
-        using Visitor::visit;
+        using cet::Visitor<>::visit;
 
         explicit CET(core::Reporter& reporter) : reporter_(reporter) {}
         ~CET() override = default;
 
         void visit(cet::Unit const& unit) override
         {
-            (void) unit;     // todo: implement
-            (void) reporter_;// todo: use or remove
+            (void) unit;      // todo: implement
+            (void) reporter_; // todo: use or remove
         }
 
       private:
         core::Reporter& reporter_;
     };
 
-    explicit Implementation(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
-        : source_tree_(source_tree)
-        , reporter_(reporter)
-        , context_(context)
-        , runner_(source_tree, reporter, context)
+    explicit Implementation(
+        sources::SourceTree& source_tree,
+        core::Reporter&      reporter,
+        core::Context&       context
+    )
+        : source_tree_(source_tree),
+          reporter_(reporter),
+          context_(context),
+          runner_(source_tree, reporter, context)
     {
         cet::defineLanguageCore(runner_);
     }
@@ -43,8 +47,8 @@ struct ance::build::Compiler::Implementation
 
         cet->visit(**unit);
 
-        (void) context_;    // todo: use or remove
-        (void) source_tree_;// todo: use or remove
+        (void) context_;     // todo: use or remove
+        (void) source_tree_; // todo: use or remove
 
         bool const ok = !reporter_.isFailed();
 
@@ -59,7 +63,11 @@ struct ance::build::Compiler::Implementation
     cet::Runner runner_;
 };
 
-ance::build::Compiler::Compiler(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context)
+ance::build::Compiler::Compiler(
+    sources::SourceTree& source_tree,
+    core::Reporter&      reporter,
+    core::Context&       context
+)
     : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, context))
 {}
 

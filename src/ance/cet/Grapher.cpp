@@ -6,9 +6,7 @@
 
 struct ance::cet::Grapher::Implementation
 {
-    class CET final
-        : public Visitor
-        , core::Grapher
+    class CET final : public Visitor<>, core::Grapher
     {
       public:
         using Visitor::visit;
@@ -38,7 +36,9 @@ struct ance::cet::Grapher::Implementation
     std::ostream& out_;
 };
 
-ance::cet::Grapher::Grapher(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
+ance::cet::Grapher::Grapher(std::ostream& out)
+    : implementation_(utility::makeOwned<Implementation>(out))
+{}
 ance::cet::Grapher::~Grapher() = default;
 
 void ance::cet::Grapher::graph(Unit const& unit) const

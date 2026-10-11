@@ -38,10 +38,10 @@ namespace
 
 struct ance::cet::Runner::Implementation
 {
-    class BBT final : public bbt::Visitor
+    class BBT final : public bbt::Visitor<>
     {
       public:
-        using Visitor::visit;
+        using bbt::Visitor<>::visit;
 
         enum class ExecutionResult
         {
@@ -830,6 +830,11 @@ struct ance::cet::Runner::Implementation
             // Completely handled in visit(bbt::Switch const&) and therefore empty here.
         }
 
+        void visit(bbt::Parameter const&) override
+        {
+            std::unreachable();
+        }
+
         void visit(bbt::ErrorStatement const& error_statement) override
         {
             trace("ErrorStatement", error_statement);
@@ -1202,12 +1207,12 @@ struct ance::cet::Runner::Implementation
                 msg << ", name=" << function_constructor.name << ", parameters={";
 
                 bool first = true;
-                for (auto const& param : function_constructor.parameters)
+                for (auto const& parameter : function_constructor.parameters)
                 {
                     if (!first) msg << ", ";
                     else first = false;
 
-                    msg << param.identifier << ": " << temp(param.type);
+                    msg << parameter->identifier << ": " << temp(parameter->type);
                 }
 
                 msg << "}" << ", return_type=" << temp(function_constructor.return_type)
@@ -1216,14 +1221,14 @@ struct ance::cet::Runner::Implementation
 
             utility::List<bbt::Signature::Parameter>   parameters      = {};
             std::map<core::Identifier, core::Location> seen_parameters = {};
-            for (auto const& param : function_constructor.parameters)
+            for (auto const& parameter : function_constructor.parameters)
             {
                 utility::Shared<bbt::Value const> type_value =
-                    deReference(scope().getTemporary(param.type).read());
+                    deReference(scope().getTemporary(parameter->type).read());
                 if (!expectType(
                         *type_context_.Type(),
                         *type_value->type(),
-                        param.type.location
+                        parameter->type.location
                     ))
                 {
                     abort();
@@ -1231,18 +1236,22 @@ struct ance::cet::Runner::Implementation
                 }
 
                 auto const [previous, inserted] = seen_parameters.emplace(
-                    param.identifier,
-                    param.identifier.location()
+                    parameter->identifier,
+                    parameter->identifier.location()
                 );
                 if (!inserted)
                 {
-                    reporter_.warning(param.identifier.location())
-                        << "Parameter " << param.identifier << " hides earlier parameter"
+                    reporter_.warning(parameter->identifier.location())
+                        << "Parameter " << parameter->identifier
+                        << " hides earlier parameter"
                         << core::Reporter::Annotation(previous->second)
-                        << "Hidden parameter " << param.identifier;
+                        << "Hidden parameter " << parameter->identifier;
                 }
 
-                parameters.emplace_back(param.identifier, type_value.as<bbt::Type>());
+                parameters.emplace_back(
+                    parameter->identifier,
+                    type_value.as<bbt::Type>()
+                );
             }
 
             bbt::Signature const signature =
@@ -1265,7 +1274,7 @@ struct ance::cet::Runner::Implementation
                 return_type_value.as<bbt::Type>();
 
             if (!return_type->equals(*type_context_.Unit())
-                && !function_constructor.body->attributes.explicit_return_value_occurrence
+                && !function_constructor.body->explicit_return_value_occurrence
                         .isAtLeastOnce())
             {
                 reporter_.error(function_constructor.body->location)
@@ -1951,7 +1960,7 @@ struct ance::cet::Runner::Implementation
             return std::nullopt;
         }
 
-        utility::Owned<Unit> unit = utility::makeOwned<Unit>();
+        utility::Owned<Unit> unit = utility::makeOwned<Unit>(core::Location::project());
 
         context_.print<Printer>(*unit, "cet", file);
         context_.graph<Grapher>(*unit, "cet", file);

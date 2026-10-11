@@ -27,11 +27,16 @@ namespace ance
             bool color_enabled = true;
         };
 
-        utility::Optional<Arguments> parseArguments(std::ostream& out, int const argc, char** argv)
+        utility::Optional<Arguments> parseArguments(
+            std::ostream& out,
+            int const     argc,
+            char**        argv
+        )
         {
             Arguments arguments;
 
-            for (char const* const argument : std::span(argv, static_cast<size_t>(argc)) | std::views::drop(1))
+            for (char const* const argument :
+                 std::span(argv, static_cast<size_t>(argc)) | std::views::drop(1))
             {
                 std::string_view const arg(argument);
 
@@ -49,14 +54,22 @@ namespace ance
                 }
                 else if (arg.starts_with("-"))
                 {
-                    core::Reporter::print(out, "command", "Unknown command line argument: " + std::string(arg));
+                    core::Reporter::print(
+                        out,
+                        "command",
+                        "Unknown command line argument: " + std::string(arg)
+                    );
                     return std::nullopt;
                 }
                 else
                 {
                     if (arguments.input_file.hasValue())
                     {
-                        core::Reporter::print(out, "command", "Multiple input files provided");
+                        core::Reporter::print(
+                            out,
+                            "command",
+                            "Multiple input files provided"
+                        );
                         return std::nullopt;
                     }
 
@@ -73,7 +86,11 @@ namespace ance
             return arguments;
         }
 
-        int run(std::ostream& program_out, std::ostream& compiler_out, Arguments const& arguments)
+        int run(
+            std::ostream&    program_out,
+            std::ostream&    compiler_out,
+            Arguments const& arguments
+        )
         {
             if (arguments.print_version)
             {
@@ -120,6 +137,8 @@ namespace ance
 
             return exit_code;
 
+            // todo: run autoformat on everything
+
             // todo: code gen - use python to generate the Node files, specifically Node.h and Node.generated.cpp, also integrate well with cmake
             // todo: use this for all Node trees, add a comment that when writing the compiler in ance it should of course not use python codegen
             // todo: it should also assist with serialization later, by requiring a stable ID for each Node, generate an enum for each type
@@ -131,6 +150,12 @@ namespace ance
             // todo: analyze code quality after this
             // todo: try to get rid of the dynamic cast in Segementer for the control flow analysis, e.g. using a standard pass-through visitor that has nice default implementations for all methods (calling children) - generate that one
             // todo: write some related documentation for this, repeat this note for the next step
+
+            // todo: test if I can go back to a single expression rule in the grammar, instead of the current one
+            // todo: needs to pass all tests
+            // todo: needs to not introduce ambiguity
+            // todo: needs to have PEMDAS (needs tests for that anyways)
+            // todo: ordering: postfix > prefix > binary (mul > add) > () > literals > ifExpression > lambda (split lambda into ExpressionBodiedLambda and StatementBodiedLambda)
 
             // todo: think about the following idea: (really think it through and design, is a bit more complicated)
             // todo: instead of dynamic, static and then runtime, we would have stages
@@ -166,7 +191,7 @@ namespace ance
             // todo: make the reporter an interface, allow to inject or so, use this to also assert annotations and stack traces of messages
             // todo: also add a unit test for the report itself which asserts formatting, correct underline and such
 
-            // todo: proceed from floats tests
+            // todo: proceed from operators_logical tests
             // todo: begin going through old tests, converting some (and deleting them)
             // todo: go through things in first.ance, reduce it while doing that
             // todo: add coverage based tests for all current language functionality, should be specification-like, also use to enhance comments in code
@@ -345,17 +370,23 @@ namespace ance
 #define ANCE_HANDLE_ERRORS
 #endif
 
-int ance::run(std::ostream& program_out, std::ostream& compiler_out, int const argc, char** argv)
+int ance::run(
+    std::ostream& program_out,
+    std::ostream& compiler_out,
+    int const     argc,
+    char**        argv
+)
 {
 #if defined(ANCE_HANDLE_ERRORS)
     try
     {
 #endif
         boost::locale::generator const gen;
-        std::locale const loc = gen("");
+        std::locale const              loc = gen("");
         std::locale::global(loc);
 
-        utility::Optional<Arguments> const arguments = parseArguments(compiler_out, argc, argv);
+        utility::Optional<Arguments> const arguments =
+            parseArguments(compiler_out, argc, argv);
         if (!arguments.hasValue()) return EXIT_FAILURE;
 
         return run(program_out, compiler_out, arguments.value());

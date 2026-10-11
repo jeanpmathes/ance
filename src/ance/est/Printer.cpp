@@ -7,9 +7,7 @@
 
 struct ance::est::Printer::Implementation
 {
-    class EST final
-        : public Visitor
-        , core::Printer
+    class EST final : public Visitor<>, core::Printer
     {
       public:
         using Visitor::visit;
@@ -49,7 +47,8 @@ struct ance::est::Printer::Implementation
         {
             print(variable_declaration.access_modifier);
             print(" ");
-            if (variable_declaration.execution_modifier != core::ExecutionModifier::ANY_EXECUTION)
+            if (variable_declaration.execution_modifier
+                != core::ExecutionModifier::ANY_EXECUTION)
             {
                 print(variable_declaration.execution_modifier);
                 print(" ");
@@ -227,7 +226,8 @@ struct ance::est::Printer::Implementation
             visit(*intrinsic.name);
             print(" args (");
 
-            for (size_t const index : std::views::iota(size_t {0}, intrinsic.arguments.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, intrinsic.arguments.size()))
             {
                 visit(*intrinsic.arguments[index]);
                 if (index + 1 < intrinsic.arguments.size()) print(", ");
@@ -288,19 +288,22 @@ struct ance::est::Printer::Implementation
             print(function_constructor.name);
             print(", [");
 
-            for (size_t const index : std::views::iota(size_t {0}, function_constructor.parameters.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, function_constructor.parameters.size()))
             {
                 if (index > 0) print(", ");
                 print("(");
-                visit(*function_constructor.parameters[index].type);
+                visit(*function_constructor.parameters[index]->type);
                 print(", ");
-                print(function_constructor.parameters[index].identifier);
+                print(function_constructor.parameters[index]->identifier);
                 print(")");
             }
 
             print("]), ");
             visit(*function_constructor.return_type);
-            print(", Capture()");// todo: Capture could take a list of entries, each entry is name + type + (either value or reference)
+            print(
+                ", Capture()"
+            ); // todo: Capture could take a list of entries, each entry is name + type + (either value or reference)
             print(", code ");
             visit(*function_constructor.body);
             print(")");
@@ -369,7 +372,8 @@ struct ance::est::Printer::Implementation
         {
             print("typeof(");
 
-            for (size_t const index : std::views::iota(size_t {0}, type_of.expressions.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, type_of.expressions.size()))
             {
                 visit(*type_of.expressions[index]);
                 if (index + 1 < type_of.expressions.size()) print(", ");
@@ -397,7 +401,8 @@ struct ance::est::Printer::Implementation
                 print(" | ");
             }
 
-            for (size_t const index : std::views::iota(size_t {0}, array_constructor.elements.size()))
+            for (size_t const index :
+                 std::views::iota(size_t {0}, array_constructor.elements.size()))
             {
                 visit(*array_constructor.elements[index]);
                 if (index + 1 < array_constructor.elements.size()) print(", ");
@@ -410,7 +415,8 @@ struct ance::est::Printer::Implementation
         {
             if (!match_case.patterns.empty())
             {
-                for (size_t const index : std::views::iota(size_t {0}, match_case.patterns.size()))
+                for (size_t const index :
+                     std::views::iota(size_t {0}, match_case.patterns.size()))
                 {
                     visit(*match_case.patterns[index]);
                     if (index + 1 < match_case.patterns.size()) print(" | ");
@@ -424,11 +430,19 @@ struct ance::est::Printer::Implementation
             print(" => ");
             print(*match_case.body);
         }
+
+        void visit(Parameter const& parameter) override
+        {
+            print(parameter.identifier);
+            print(": ");
+            visit(*parameter.type);
+        }
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}
 
-    void print(Node const& node) const
+    template<typename T>
+    void print(T const& node) const
     {
         utility::Owned<EST> est = utility::makeOwned<EST>(out_);
         est->visit(node);
@@ -438,7 +452,9 @@ struct ance::est::Printer::Implementation
     std::ostream& out_;
 };
 
-ance::est::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
+ance::est::Printer::Printer(std::ostream& out)
+    : implementation_(utility::makeOwned<Implementation>(out))
+{}
 ance::est::Printer::~Printer() = default;
 
 void ance::est::Printer::print(File const& file) const

@@ -39,7 +39,7 @@ foreach(file IN LISTS ANCE_ANTLR_GENERATED_FILES)
     endif()
 endforeach()
 
-target_include_directories(ance_compiler PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(ance_compiler PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} "${ANCE_GENERATED_INCLUDE_DIR}")
 target_include_directories(ance_compiler SYSTEM PRIVATE
         ${ANTLR4_INCLUDE_DIR}
         ${LLVM_INCLUDE_DIRS}

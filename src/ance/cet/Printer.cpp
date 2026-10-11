@@ -1,13 +1,11 @@
 #include "Printer.h"
 
-#include "ance/core/Printer.h"
 #include "ance/cet/Node.h"
+#include "ance/core/Printer.h"
 
 struct ance::cet::Printer::Implementation
 {
-    class CET final
-        : public Visitor
-        , core::Printer
+    class CET final : public Visitor<>, core::Printer
     {
       public:
         using Visitor::visit;
@@ -23,7 +21,6 @@ struct ance::cet::Printer::Implementation
 
             exit();
         }
-
     };
 
     explicit Implementation(std::ostream& out) : out_(out) {}
@@ -38,7 +35,9 @@ struct ance::cet::Printer::Implementation
     std::ostream& out_;
 };
 
-ance::cet::Printer::Printer(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
+ance::cet::Printer::Printer(std::ostream& out)
+    : implementation_(utility::makeOwned<Implementation>(out))
+{}
 ance::cet::Printer::~Printer() = default;
 
 void ance::cet::Printer::print(Unit const& unit) const

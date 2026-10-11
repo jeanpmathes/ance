@@ -1,7 +1,7 @@
 #ifndef ANCE_UTILITY_NODE_H
 #define ANCE_UTILITY_NODE_H
 
-namespace ance::utility
+namespace ance::utility // todo: remove
 {
     template<typename VisitorT>
     class AbstractNode

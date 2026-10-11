@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-#include "Node.h"
+#include "ance/bbt/Node.h"
 
 namespace
 {
@@ -109,7 +109,7 @@ namespace
         std::vector<ance::bbt::BasicBlock const*> successors = {};
     };
 
-    class AnalyzingVisitor final : public ance::bbt::Visitor
+    class AnalyzingVisitor final : public ance::bbt::Visitor<>
     {
       public:
         using Visitor::visit;
@@ -188,6 +188,7 @@ namespace
         void visit(ance::bbt::OrderedScopeExit const&) override {}
         void visit(ance::bbt::SetReturnValue const&) override {}
         void visit(ance::bbt::SwitchCase const&) override {}
+        void visit(ance::bbt::Parameter const&) override {}
 
       private:
         ance::bbt::ControlFlowAnalysis::CounterFunction const& counter_;
@@ -199,23 +200,26 @@ ance::bbt::ControlFlowAnalysis::ControlFlowAnalysis(CounterFunction counter)
     : counter_(std::move(counter))
 {}
 
-ance::core::Occurrence ance::bbt::ControlFlowAnalysis::analyze(Flow const& flow) const
+ance::core::Occurrence ance::bbt::ControlFlowAnalysis::analyze(
+    utility::List<utility::Owned<BasicBlock>> const& blocks,
+    BasicBlock const&                                entry
+) const
 {
     AnalyzingVisitor visitor(counter_);
 
     std::unordered_map<BasicBlock const*, BBData> block_data;
-    block_data.reserve(flow.blocks.size());
-    for (auto const& block : flow.blocks)
+    block_data.reserve(blocks.size());
+    for (auto const& block : blocks)
     {
         block_data.emplace(block.get(), visitor.getData(*block));
     }
 
     std::unordered_map<BasicBlock const*, Counts> incoming_range;
-    incoming_range.reserve(flow.blocks.size());
-    incoming_range.emplace(&flow.entry, Count::ZERO);
+    incoming_range.reserve(blocks.size());
+    incoming_range.emplace(&entry, Count::ZERO);
 
     std::queue<BasicBlock const*> open;
-    open.emplace(&flow.entry);
+    open.emplace(&entry);
     while (!open.empty())
     {
         BasicBlock const* const block = open.front();
@@ -261,4 +265,9 @@ ance::core::Occurrence ance::bbt::ControlFlowAnalysis::analyze(Flow const& flow)
 
     if (!has_ending_path) return core::Occurrence::NOT_APPLICABLE;
     return end_range.occurrence();
+}
+
+ance::core::Occurrence ance::bbt::ControlFlowAnalysis::analyze(Flow const& flow) const
+{
+    return analyze(flow.blocks, flow.entry);
 }

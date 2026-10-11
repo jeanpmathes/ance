@@ -11,9 +11,7 @@
 
 struct ance::bbt::Grapher::Implementation
 {
-    class BBT final
-        : public Visitor
-        , core::Grapher
+    class BBT final : public Visitor<>, core::Grapher
     {
       public:
         using Visitor::visit;
@@ -173,6 +171,7 @@ struct ance::bbt::Grapher::Implementation
         void visit(SetReturnValue const&) override {}
 
         void visit(SwitchCase const&) override {}
+        void visit(Parameter const&) override {}
 
         void begin()
         {
@@ -194,7 +193,8 @@ struct ance::bbt::Grapher::Implementation
 
     explicit Implementation(std::ostream& out) : out_(out) {}
 
-    void graph(Node const& node) const
+    template<typename T>
+    void graph(T const& node) const
     {
         utility::Owned<BBT> bbt = utility::makeOwned<BBT>(out_);
         bbt->begin();
@@ -206,7 +206,9 @@ struct ance::bbt::Grapher::Implementation
     std::ostream& out_;
 };
 
-ance::bbt::Grapher::Grapher(std::ostream& out) : implementation_(utility::makeOwned<Implementation>(out)) {}
+ance::bbt::Grapher::Grapher(std::ostream& out)
+    : implementation_(utility::makeOwned<Implementation>(out))
+{}
 ance::bbt::Grapher::~Grapher() = default;
 
 void ance::bbt::Grapher::graph(Flows const& flows) const

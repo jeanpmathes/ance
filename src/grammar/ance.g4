@@ -34,6 +34,11 @@ matchCase
     | DEFAULT '=>' statement # DefaultMatchCase
     ;
 
+// While ANTLR4 generally supports putting all expressions into a single rule, using ordering for precedence,
+// in the case of this grammar this creates ambiguities. Consider the lambda and ifExpression rules,
+// which end in expressions. We want it to contain those expressions fully, not have the lambda or ifExpression be
+// part of the expression that follows it.
+
 expression
     : orExpression
     ;

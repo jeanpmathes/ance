@@ -39,7 +39,10 @@ if (BUILD_TESTING)
     message(STATUS "Found Catch2 ${Catch2_VERSION}")
 endif ()
 
+set(ANCE_GENERATED_INCLUDE_DIR "${PROJECT_BINARY_DIR}/generated_src")
+
 add_subdirectory(src)
+add_subdirectory(gen)
 
 if (BUILD_TESTING)
     add_subdirectory(tst)
