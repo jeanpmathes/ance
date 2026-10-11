@@ -1,8 +1,8 @@
 #ifndef ANCE_UTILITY_CONCEPTS_H
 #define ANCE_UTILITY_CONCEPTS_H
 
-#include <utility>
 #include <concepts>
+#include <utility>
 
 namespace ance::utility
 {
@@ -37,10 +37,11 @@ namespace ance::utility
     };
 
     template<typename T, typename OtherT>
-    concept ConstCopyConvertible = !std::is_same_v<T, OtherT> and requires(T const& t, OtherT u) {
-        T(u);
-        u = t;
-    };
+    concept ConstCopyConvertible =
+        !std::is_same_v<T, OtherT> and requires(T const& t, OtherT u) {
+            T(u);
+            u = t;
+        };
 }
 
 #endif

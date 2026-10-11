@@ -31,13 +31,14 @@ namespace ance::core
         };
 
         Precision() = default;
-        constexpr Precision(Value const val) : value_(val) {}// NOLINT(google-explicit-constructor)
+        constexpr Precision(Value const val)
+            : value_(val) {} // NOLINT(google-explicit-constructor)
 
-                 operator Value() const;// NOLINT(google-explicit-constructor)
+                 operator Value() const; // NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
 
-        static Precision get(llvm::fltSemantics const& semantics);
-        [[nodiscard]] llvm::fltSemantics const& getLlvmSemantics() const;
+                 static Precision get(llvm::fltSemantics const& semantics);
+                 [[nodiscard]] llvm::fltSemantics const& getLlvmSemantics() const;
 
         /// Get the suffix for this precision.
         /// @return The suffix for this precision.

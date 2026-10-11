@@ -25,7 +25,10 @@ namespace ance::test
         /// @param relative_path The path relative to the temporary directory.
         /// @param content The file content.
         /// @return The absolute path of the written file.
-        std::filesystem::path writeFile(std::filesystem::path const& relative_path, std::string_view content);
+        std::filesystem::path writeFile(
+            std::filesystem::path const& relative_path,
+            std::string_view             content
+        );
 
       private:
         std::filesystem::path root_;

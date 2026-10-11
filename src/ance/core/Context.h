@@ -15,7 +15,11 @@ namespace ance::core
         ~Context();
 
         template<class Printer, class Tree>
-        void print(Tree const& tree, std::string const& tree_name, std::filesystem::path const& file_path)
+        void print(
+            Tree const&                  tree,
+            std::string const&           tree_name,
+            std::filesystem::path const& file_path
+        )
         {
             std::ofstream out {makeOutputPath(file_path, tree_name, ".txt")};
 
@@ -24,7 +28,11 @@ namespace ance::core
         }
 
         template<class Grapher, class Tree>
-        void graph(Tree const& tree, std::string const& tree_name, std::filesystem::path const& file_path)
+        void graph(
+            Tree const&                  tree,
+            std::string const&           tree_name,
+            std::filesystem::path const& file_path
+        )
         {
             std::ofstream out {makeOutputPath(file_path, tree_name, ".gml")};
 
@@ -33,12 +41,15 @@ namespace ance::core
         }
 
       private:
-        [[nodiscard]] std::filesystem::path makeOutputPath(std::filesystem::path const& file_path,
-                                                           std::string const&           tree_name,
-                                                           std::string const&           extension) const
+        [[nodiscard]] std::filesystem::path makeOutputPath(
+            std::filesystem::path const& file_path,
+            std::string const&           tree_name,
+            std::string const&           extension
+        ) const
         {
             std::filesystem::path const normalized = file_path.lexically_normal();
-            std::filesystem::path const relative   = normalized.is_absolute() ? normalized.relative_path() : normalized;
+            std::filesystem::path const relative =
+                normalized.is_absolute() ? normalized.relative_path() : normalized;
 
             std::filesystem::path const stage_directory = debug_path_ / relative;
             std::filesystem::create_directories(stage_directory);

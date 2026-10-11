@@ -9,17 +9,23 @@ namespace
     {
         MODE_NOWHERE = 0,
         MODE_PROJECT = 1,
-        MODE_FILE   = 2,
-        MODE_CORE   = 3,
+        MODE_FILE    = 2,
+        MODE_CORE    = 3,
     };
 }
 
-ance::core::Location::Location(size_t const start_line, size_t const start_column, size_t const end_line, size_t const end_column, size_t const file_index)
-    : start_line_(start_line)
-    , start_column_(start_column)
-    , end_line_(end_line)
-    , end_column_(end_column)
-    , file_index_(file_index)
+ance::core::Location::Location(
+    size_t const start_line,
+    size_t const start_column,
+    size_t const end_line,
+    size_t const end_column,
+    size_t const file_index
+)
+    : start_line_(start_line),
+      start_column_(start_column),
+      end_line_(end_line),
+      end_column_(end_column),
+      file_index_(file_index)
 {}
 ance::core::Location ance::core::Location::nowhere()
 {
@@ -41,7 +47,11 @@ ance::core::Location ance::core::Location::core()
     return {0, 0, MODE_CORE, 0, 0};
 }
 
-ance::core::Location ance::core::Location::simple(size_t line, size_t column, size_t file_index)
+ance::core::Location ance::core::Location::simple(
+    size_t line,
+    size_t column,
+    size_t file_index
+)
 {
     assert(line > 0);
 
@@ -100,29 +110,29 @@ bool ance::core::Location::isSingleLine() const
 
 void ance::core::Location::extend(Location const& location)
 {
-    if (this->isProject() || this->isCore() || this->isFile())
-        return;
+    if (this->isProject() || this->isCore() || this->isFile()) return;
 
-    if (location.isProject() || location.isCore())
-        return;
+    if (location.isProject() || location.isCore()) return;
 
     if (location.isFile())
     {
-        if (location.fileIndex() == fileIndex())
-            *this = location;
+        if (location.fileIndex() == fileIndex()) *this = location;
 
         return;
     }
 
     if (location.fileIndex() != fileIndex()) return;
 
-    if (location.start_line_ < start_line_ || (location.start_line_ == start_line_ && location.start_column_ < start_column_))
+    if (location.start_line_ < start_line_
+        || (location.start_line_ == start_line_
+            && location.start_column_ < start_column_))
     {
         start_line_   = location.start_line_;
         start_column_ = location.start_column_;
     }
 
-    if (location.end_line_ > end_line_ || (location.end_line_ == end_line_ && location.end_column_ > end_column_))
+    if (location.end_line_ > end_line_
+        || (location.end_line_ == end_line_ && location.end_column_ > end_column_))
     {
         end_line_   = location.end_line_;
         end_column_ = location.end_column_;

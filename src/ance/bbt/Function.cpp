@@ -6,30 +6,45 @@
 
 namespace ance::bbt
 {
-    Function::Function(Signature signature, utility::Shared<Type const> return_type, Flow const& body, TypeContext& type_context)
-        : Value(type_context.Function(), type_context)
-        , ValueBase()
-        , signature_(std::move(signature))
-        , return_type_(std::move(return_type))
-        , body_(body)
+    Function::Function(
+        Signature                   signature,
+        utility::Shared<Type const> return_type,
+        Flow const&                 body,
+        TypeContext&                type_context
+    )
+        : Value(type_context.Function(), type_context),
+          ValueBase(),
+          signature_(std::move(signature)),
+          return_type_(std::move(return_type)),
+          body_(body)
     {}
 
-    Function::Function(Signature signature, utility::Shared<Type const> return_type, utility::Shared<Flow> body, TypeContext& type_context)
-        : Value(type_context.Function(), type_context)
-        , ValueBase()
-        , signature_(std::move(signature))
-        , return_type_(std::move(return_type))
-        , body_(*body)
-        , owned_body_(std::move(body))
+    Function::Function(
+        Signature                   signature,
+        utility::Shared<Type const> return_type,
+        utility::Shared<Flow>       body,
+        TypeContext&                type_context
+    )
+        : Value(type_context.Function(), type_context),
+          ValueBase(),
+          signature_(std::move(signature)),
+          return_type_(std::move(return_type)),
+          body_(*body),
+          owned_body_(std::move(body))
     {}
 
-    Function::Function(Signature signature, utility::Shared<Type const> return_type, utility::Owned<Flow> body, TypeContext& type_context)
-        : Value(type_context.Function(), type_context)
-        , ValueBase()
-        , signature_(std::move(signature))
-        , return_type_(std::move(return_type))
-        , body_(*body)
-        , owned_body_(utility::Shared(*utility::Owned<Flow>::release(std::move(body))))
+    Function::Function(
+        Signature                   signature,
+        utility::Shared<Type const> return_type,
+        utility::Owned<Flow>        body,
+        TypeContext&                type_context
+    )
+        : Value(type_context.Function(), type_context),
+          ValueBase(),
+          signature_(std::move(signature)),
+          return_type_(std::move(return_type)),
+          body_(*body),
+          owned_body_(utility::Shared(*utility::Owned<Flow>::release(std::move(body))))
     {}
 
     core::Identifier const& Function::name() const

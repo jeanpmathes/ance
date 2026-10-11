@@ -27,24 +27,35 @@ namespace ance::ast
     class Parser
     {
       public:
-        Parser(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
+        Parser(
+            sources::SourceTree& source_tree,
+            core::Reporter&      reporter,
+            core::Context&       context
+        );
         ~Parser();
 
         /// Reads and parses a passed unordered scope file into an AST.
         /// \param file The path to the file, relative to the source tree base directory.
         /// \return The parsed AST.
-        utility::Optional<utility::Owned<File>> parseUnorderedFile(std::filesystem::path const& file);
+        utility::Optional<utility::Owned<File>> parseUnorderedFile(
+            std::filesystem::path const& file
+        );
 
         /// Reads and parses a passed ordered scope file into an AST.
         /// \param file The path to the file, relative to the source tree base directory.
         /// \return The parsed AST.
-        utility::Optional<utility::Owned<Statement>> parseOrderedFile(std::filesystem::path const& file);
+        utility::Optional<utility::Owned<Statement>> parseOrderedFile(
+            std::filesystem::path const& file
+        );
 
         /// Parses a piece of core code containing a single declaration into an AST.
         /// \param code The code to parse.
         /// \param id An identifier of the declaration.
         /// \return The parsed AST.
-        utility::Optional<utility::Owned<Declaration>> parseDeclaration(std::string const& code, std::string const& id);
+        utility::Optional<utility::Owned<Declaration>> parseDeclaration(
+            std::string const& code,
+            std::string const& id
+        );
 
       private:
         struct Implementation;

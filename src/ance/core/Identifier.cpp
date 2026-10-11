@@ -4,9 +4,18 @@
 
 #include "StringStorage.h"
 
-ance::core::Identifier::Identifier(std::string_view const string, Location const& location) : string_(string), location_(location) {}
+ance::core::Identifier::Identifier(
+    std::string_view const string,
+    Location const&        location
+)
+    : string_(string),
+      location_(location)
+{}
 
-ance::core::Identifier ance::core::Identifier::make(std::string const& string, Location location)
+ance::core::Identifier ance::core::Identifier::make(
+    std::string const& string,
+    Location           location
+)
 {
     std::string_view const view = StringStorage::shared().store(string);
 

@@ -18,8 +18,9 @@ namespace ance::sources
 
         SourceTree tree(directory.root());
 
-        SourceFile& first  = tree.addFile("first.ance");
-        SourceFile& second = tree.addFile(std::filesystem::path("nested") / "second.ance");
+        SourceFile& first = tree.addFile("first.ance");
+        SourceFile& second =
+            tree.addFile(std::filesystem::path("nested") / "second.ance");
 
         CHECK(first.index() == 0);
         CHECK(second.index() == 1);

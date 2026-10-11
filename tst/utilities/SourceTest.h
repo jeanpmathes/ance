@@ -34,7 +34,11 @@ namespace ance::test
 
         static SourceLocation inProject();
         static SourceLocation inFile(std::filesystem::path const& path);
-        static SourceLocation inPosition(std::filesystem::path const& path, size_t line, size_t column);
+        static SourceLocation inPosition(
+            std::filesystem::path const& path,
+            size_t                       line,
+            size_t                       column
+        );
 
         bool operator==(SourceLocation const&) const = default;
     };
@@ -55,17 +59,23 @@ namespace ance::test
     /// \param source The only source code; will be considered as a top-level source file.
     /// \param expected_compilation The expected compilation result.
     /// \param expected_output The expected compiler output.
-    void checkSource(std::string_view source, Compilation expected_compilation, std::initializer_list<CompilerOutput> expected_output);
+    void checkSource(
+        std::string_view                      source,
+        Compilation                           expected_compilation,
+        std::initializer_list<CompilerOutput> expected_output
+    );
 
     /// Compile source code and check whether the compilation result and compiler output match the expected values.
     /// \param source The entry source code. It will be considered as a top-level source file.
     /// \param additional_sources Will be made available as additional files during compilation. The entry source code needs to include them first.
     /// \param expected_compilation The expected compilation result.
     /// \param expected_output The expected compiler output.
-    void checkSources(std::string_view                      source,
-                      std::initializer_list<Source>         additional_sources,
-                      Compilation                           expected_compilation,
-                      std::initializer_list<CompilerOutput> expected_output);
+    void checkSources(
+        std::string_view                      source,
+        std::initializer_list<Source>         additional_sources,
+        Compilation                           expected_compilation,
+        std::initializer_list<CompilerOutput> expected_output
+    );
 
     struct SourceTest
     {

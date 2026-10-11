@@ -12,7 +12,7 @@ namespace ance::core
         enum Value
         {
             /// Any unspecified operator, used as a default value for error handling and such.
-            UNSPECIFIED,// todo: remove, replace with optional in AST/EST
+            UNSPECIFIED, // todo: remove, replace with optional in AST/EST
 
             /// The logical not operator. Inverts a boolean value.
             NOT,
@@ -21,13 +21,14 @@ namespace ance::core
             BITWISE_NOT,
 
             /// The arithmetic negation operator. Inverts a numerical value.
-            NEGATION,// todo: for integers, check that value is invertible
+            NEGATION, // todo: for integers, check that value is invertible
         };
 
         UnaryOperator() = default;
-        constexpr UnaryOperator(Value const val) : value_(val) {}// NOLINT(google-explicit-constructor)
+        constexpr UnaryOperator(Value const val)
+            : value_(val) {} // NOLINT(google-explicit-constructor)
 
-                 operator Value() const;// NOLINT(google-explicit-constructor)
+                 operator Value() const; // NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
 
         [[nodiscard]] std::string toString() const;

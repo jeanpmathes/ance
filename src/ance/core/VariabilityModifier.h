@@ -23,9 +23,10 @@ namespace ance::core
         };
 
         VariabilityModifier() = default;
-        constexpr VariabilityModifier(Value const val) : value_(val) {}// NOLINT(google-explicit-constructor)
+        constexpr VariabilityModifier(Value const val)
+            : value_(val) {} // NOLINT(google-explicit-constructor)
 
-                 operator Value() const;// NOLINT(google-explicit-constructor)
+                 operator Value() const; // NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
 
         /// Get this variability modifier as a string.

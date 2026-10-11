@@ -12,13 +12,13 @@ namespace ance::cet
     /// Graphs the CET to a stream.
     class Grapher
     {
-    public:
+      public:
         explicit Grapher(std::ostream& out);
         ~Grapher();
 
         void graph(Unit const& unit) const;
 
-    private:
+      private:
         struct Implementation;
         utility::Owned<Implementation> implementation_;
     };

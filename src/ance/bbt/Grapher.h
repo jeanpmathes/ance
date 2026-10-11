@@ -13,14 +13,14 @@ namespace ance::bbt
     /// Graphs the BBT to a stream.
     class Grapher
     {
-    public:
+      public:
         explicit Grapher(std::ostream& out);
         ~Grapher();
 
         void graph(Flows const& flows) const;
         void graph(Flow const& flow) const;
 
-    private:
+      private:
         struct Implementation;
         utility::Owned<Implementation> implementation_;
     };

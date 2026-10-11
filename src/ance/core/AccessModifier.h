@@ -19,9 +19,10 @@ namespace ance::core
         };
 
         AccessModifier() = default;
-        constexpr AccessModifier(Value const val) : value_(val) {}// NOLINT(google-explicit-constructor)
+        constexpr AccessModifier(Value const val)
+            : value_(val) {} // NOLINT(google-explicit-constructor)
 
-        operator Value() const;// NOLINT(google-explicit-constructor)
+                 operator Value() const; // NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
 
         /// Get this access modifier as a string.

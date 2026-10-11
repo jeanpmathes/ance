@@ -33,12 +33,18 @@ namespace
             return source_paths_;
         }
 
-        void addSource(std::filesystem::path const& relative_path, std::string_view const content)
+        void addSource(
+            std::filesystem::path const& relative_path,
+            std::string_view const       content
+        )
         {
-            std::filesystem::path const normalized_path = relative_path.lexically_normal();
+            std::filesystem::path const normalized_path =
+                relative_path.lexically_normal();
 
             if (std::ranges::find(source_paths_, normalized_path) != source_paths_.end())
-                throw std::invalid_argument("Duplicate test source path: " + normalized_path.generic_string());
+                throw std::invalid_argument(
+                    "Duplicate test source path: " + normalized_path.generic_string()
+                );
 
             directory_.writeFile(normalized_path, content);
             source_paths_.push_back(normalized_path);
@@ -56,24 +62,42 @@ namespace
         if (level == "warning") return ance::core::Reporter::Level::WARNING;
         if (level == "error") return ance::core::Reporter::Level::ERROR;
 
-        throw std::invalid_argument("Unknown compiler output level: " + std::string(level));
+        throw std::invalid_argument(
+            "Unknown compiler output level: " + std::string(level)
+        );
     }
 
-    bool isSourcePath(std::string_view const path, std::span<std::filesystem::path const> const source_paths)
+    bool isSourcePath(
+        std::string_view const                       path,
+        std::span<std::filesystem::path const> const source_paths
+    )
     {
-        return std::ranges::any_of(source_paths, [&](std::filesystem::path const& source_path) { return source_path.generic_string() == path; });
+        return std::ranges::any_of(
+            source_paths,
+            [&](std::filesystem::path const& source_path) {
+                return source_path.generic_string() == path;
+            }
+        );
     }
 
-    void parseCompilerOutput(ance::test::CompilerOutput& output, std::string const& message, std::span<std::filesystem::path const> const source_paths)
+    void parseCompilerOutput(
+        ance::test::CompilerOutput&                  output,
+        std::string const&                           message,
+        std::span<std::filesystem::path const> const source_paths
+    )
     {
-        static std::regex const message_pattern {R"(^(?:((?:(.+) )?\((?:(\d+):(\d+))?\) ))?(.*)$)"};
+        static std::regex const message_pattern {
+            R"(^(?:((?:(.+) )?\((?:(\d+):(\d+))?\) ))?(.*)$)"
+        };
 
         std::smatch match;
 
         if (std::regex_match(message, match, message_pattern))
         {
-            bool const is_project_location = match[1].matched && !match[2].matched && !match[3].matched;
-            bool const is_source_location  = match[1].matched && match[2].matched && isSourcePath(match[2].str(), source_paths);
+            bool const is_project_location =
+                match[1].matched && !match[2].matched && !match[3].matched;
+            bool const is_source_location = match[1].matched && match[2].matched
+                                         && isSourcePath(match[2].str(), source_paths);
 
             if (is_project_location || is_source_location)
             {
@@ -104,9 +128,14 @@ namespace
         }
     }
 
-    std::vector<ance::test::CompilerOutput> parseCompilerOutput(std::string const& output, std::span<std::filesystem::path const> const source_paths)
+    std::vector<ance::test::CompilerOutput> parseCompilerOutput(
+        std::string const&                           output,
+        std::span<std::filesystem::path const> const source_paths
+    )
     {
-        static std::regex const output_pattern {R"(^ance: (trace|info|warning|error): (.*)$)"};
+        static std::regex const output_pattern {
+            R"(^ance: (trace|info|warning|error): (.*)$)"
+        };
 
         std::istringstream                      lines(output);
         std::vector<ance::test::CompilerOutput> compiler_output;
@@ -134,12 +163,18 @@ ance::test::SourceLocation ance::test::SourceLocation::inProject()
     return {};
 }
 
-ance::test::SourceLocation ance::test::SourceLocation::inFile(std::filesystem::path const& path)
+ance::test::SourceLocation ance::test::SourceLocation::inFile(
+    std::filesystem::path const& path
+)
 {
     return {.relative_path = path};
 }
 
-ance::test::SourceLocation ance::test::SourceLocation::inPosition(std::filesystem::path const& path, size_t line, size_t column)
+ance::test::SourceLocation ance::test::SourceLocation::inPosition(
+    std::filesystem::path const& path,
+    size_t                       line,
+    size_t                       column
+)
 {
     return {.relative_path = path, .line = line, .column = column};
 }
@@ -210,33 +245,53 @@ std::ostream& ance::test::operator<<(std::ostream& out, SourceLocation const& lo
     return out;
 }
 
-void ance::test::checkSource(std::string_view const source, Compilation const expected_compilation, std::initializer_list<CompilerOutput> const expected_output)
+void ance::test::checkSource(
+    std::string_view const                      source,
+    Compilation const                           expected_compilation,
+    std::initializer_list<CompilerOutput> const expected_output
+)
 {
     checkSources(source, {}, expected_compilation, expected_output);
 }
 
-void ance::test::checkSources(std::string_view const                      source,
-                              std::initializer_list<Source> const         additional_sources,
-                              Compilation const                           expected_compilation,
-                              std::initializer_list<CompilerOutput> const expected_output)
+void ance::test::checkSources(
+    std::string_view const                      source,
+    std::initializer_list<Source> const         additional_sources,
+    Compilation const                           expected_compilation,
+    std::initializer_list<CompilerOutput> const expected_output
+)
 {
     TestProject project;
     project.addSource(MAIN_SOURCE_FILE, source);
 
-    for (auto const& [relative_path, content] : additional_sources) project.addSource(relative_path, content);
+    for (auto const& [relative_path, content] : additional_sources)
+        project.addSource(relative_path, content);
 
     std::ostringstream program_output;
     std::ostringstream compiler_output;
 
-    std::vector<std::string> arguments {"ance", "--no-color", project.getSourcePath().string()};
-    std::vector<char*>       argument_pointers(arguments.size(), nullptr);
-    std::ranges::transform(arguments, argument_pointers.begin(), [](std::string& argument) { return argument.data(); });
+    std::vector<std::string> arguments {
+        "ance",
+        "--no-color",
+        project.getSourcePath().string()
+    };
+    std::vector<char*> argument_pointers(arguments.size(), nullptr);
+    std::ranges::transform(
+        arguments,
+        argument_pointers.begin(),
+        [](std::string& argument) { return argument.data(); }
+    );
 
-    int const exit_code = run(program_output, compiler_output, static_cast<int>(argument_pointers.size()), argument_pointers.data());
+    int const exit_code =
+        run(program_output,
+            compiler_output,
+            static_cast<int>(argument_pointers.size()),
+            argument_pointers.data());
 
-    std::vector<CompilerOutput> const actual_output = parseCompilerOutput(compiler_output.str(), project.getSourcePaths());
-    std::vector const                 expected_output_vector(expected_output);
-    bool const                        expected_success = expected_compilation == Compilation::SUCCESS;
+    std::vector<CompilerOutput> const actual_output =
+        parseCompilerOutput(compiler_output.str(), project.getSourcePaths());
+    std::vector const expected_output_vector(expected_output);
+    bool const        expected_success = expected_compilation == Compilation::SUCCESS;
 
     CAPTURE(program_output.str(), compiler_output.str());
     CHECK((exit_code == EXIT_SUCCESS) == expected_success);
@@ -250,5 +305,10 @@ void ance::test::checkSource(SourceTest const& test)
 
 void ance::test::checkSources(SourcesTest const& test)
 {
-    checkSources(test.source, test.additional_sources, test.expected_compilation, test.expected_output);
+    checkSources(
+        test.source,
+        test.additional_sources,
+        test.expected_compilation,
+        test.expected_output
+    );
 }

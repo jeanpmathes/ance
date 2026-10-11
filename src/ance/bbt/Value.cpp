@@ -9,14 +9,24 @@
 
 namespace ance::bbt
 {
-    Value::Value(utility::Optional<utility::Shared<Type const>> type, TypeContext& type_context) : type_(std::move(type)), type_context_(type_context) {}
+    Value::Value(
+        utility::Optional<utility::Shared<Type const>> type,
+        TypeContext&                                   type_context
+    )
+        : type_(std::move(type)),
+          type_context_(type_context)
+    {}
 
     utility::Shared<Type const> Value::type() const
     {
         return type_.hasValue() ? type_.value() : type_context_.Type();
     }
 
-    utility::Optional<utility::Shared<Value const>> Value::access(size_t, utility::Shared<Value const>*, TypeContext&) const
+    utility::Optional<utility::Shared<Value const>> Value::access(
+        size_t,
+        utility::Shared<Value const>*,
+        TypeContext&
+    ) const
     {
         // By default, access is not supported.
 
@@ -33,7 +43,10 @@ namespace ance::bbt
         return !equals(other);
     }
 
-    Unit::Unit(TypeContext& type_context) : Value(type_context.Unit(), type_context), ValueBase() {}
+    Unit::Unit(TypeContext& type_context)
+        : Value(type_context.Unit(), type_context),
+          ValueBase()
+    {}
 
     utility::Shared<Unit> Unit::make(TypeContext& type_context)
     {
@@ -50,7 +63,11 @@ namespace ance::bbt
         return true;
     }
 
-    Bool::Bool(bool const value, TypeContext& type_context) : Value(type_context.Bool(), type_context), ValueBase(), value_(value) {}
+    Bool::Bool(bool const value, TypeContext& type_context)
+        : Value(type_context.Bool(), type_context),
+          ValueBase(),
+          value_(value)
+    {}
 
     utility::Shared<Bool> Bool::make(bool const value, TypeContext& type_context)
     {
@@ -72,7 +89,11 @@ namespace ance::bbt
         return value_ == other.value_;
     }
 
-    Size::Size(size_t const value, TypeContext& type_context) : Value(type_context.Size(), type_context), ValueBase(), value_(value) {}
+    Size::Size(size_t const value, TypeContext& type_context)
+        : Value(type_context.Size(), type_context),
+          ValueBase(),
+          value_(value)
+    {}
 
     utility::Shared<Size> Size::make(size_t value, TypeContext& type_context)
     {
@@ -103,9 +124,12 @@ namespace ance::bbt
     }
 
     Float::Float(llvm::APFloat value, TypeContext& type_context)
-        : Value(type_context.Float(core::Precision::get(value.getSemantics())), type_context)
-        , ValueBase()
-        , value_(std::move(value))
+        : Value(
+              type_context.Float(core::Precision::get(value.getSemantics())),
+              type_context
+          ),
+          ValueBase(),
+          value_(std::move(value))
     {}
 
     utility::Shared<Float> Float::make(llvm::APFloat value, TypeContext& type_context)
@@ -113,7 +137,11 @@ namespace ance::bbt
         return utility::makeShared<Float>(std::move(value), type_context);
     }
 
-    utility::Shared<Float> Float::make(std::string const& value, core::Precision const precision, TypeContext& type_context)
+    utility::Shared<Float> Float::make(
+        std::string const&    value,
+        core::Precision const precision,
+        TypeContext&          type_context
+    )
     {
         return make(llvm::APFloat(precision.getLlvmSemantics(), value), type_context);
     }
@@ -131,7 +159,8 @@ namespace ance::bbt
         llvm::SmallVector<char, 32> number;
         value_.toString(number);
 
-        std::string const suffix = core::Precision::get(value_.getSemantics()).getSuffix();
+        std::string const suffix =
+            core::Precision::get(value_.getSemantics()).getSuffix();
 
         std::string result;
         result.reserve(number.size() + suffix.size());
@@ -153,12 +182,15 @@ namespace ance::bbt
     }
 
     Identifier::Identifier(core::Identifier const& identifier, TypeContext& type_context)
-        : Value(type_context.Identifier(), type_context)
-        , ValueBase()
-        , identifier_(identifier)
+        : Value(type_context.Identifier(), type_context),
+          ValueBase(),
+          identifier_(identifier)
     {}
 
-    utility::Shared<Identifier> Identifier::make(core::Identifier const& identifier, TypeContext& type_context)
+    utility::Shared<Identifier> Identifier::make(
+        core::Identifier const& identifier,
+        TypeContext&            type_context
+    )
     {
         return utility::makeShared<Identifier>(identifier, type_context);
     }
@@ -179,11 +211,15 @@ namespace ance::bbt
     }
 
     Location::Location(core::Location const& location, TypeContext& type_context)
-        : Value(type_context.Location(), type_context)
-        , ValueBase()
-        , location_(location) {}
+        : Value(type_context.Location(), type_context),
+          ValueBase(),
+          location_(location)
+    {}
 
-    utility::Shared<Location> Location::make(core::Location const& location, TypeContext& type_context)
+    utility::Shared<Location> Location::make(
+        core::Location const& location,
+        TypeContext&          type_context
+    )
     {
         return utility::makeShared<Location>(location, type_context);
     }
@@ -205,7 +241,11 @@ namespace ance::bbt
         return location_ == other.location_;
     }
 
-    String::String(std::string value, TypeContext& type_context) : Value(type_context.String(), type_context), ValueBase(), value_(std::move(value)) {}
+    String::String(std::string value, TypeContext& type_context)
+        : Value(type_context.String(), type_context),
+          ValueBase(),
+          value_(std::move(value))
+    {}
 
     utility::Shared<String> String::make(std::string value, TypeContext& type_context)
     {
@@ -227,16 +267,27 @@ namespace ance::bbt
         return value_ == other.value_;
     }
 
-    Array::Array(utility::Shared<Type const> array_type, utility::List<utility::Shared<Value const>> element_list, TypeContext& type_context)
-        : Value(std::move(array_type), type_context), ValueBase()
-        , elements_(std::move(element_list))
+    Array::Array(
+        utility::Shared<Type const>                 array_type,
+        utility::List<utility::Shared<Value const>> element_list,
+        TypeContext&                                type_context
+    )
+        : Value(std::move(array_type), type_context),
+          ValueBase(),
+          elements_(std::move(element_list))
     {}
 
-    utility::Shared<Array> Array::make(utility::Shared<Type const>                 array_type,
-                                       utility::List<utility::Shared<Value const>> element_list,
-                                       TypeContext&                                type_context)
+    utility::Shared<Array> Array::make(
+        utility::Shared<Type const>                 array_type,
+        utility::List<utility::Shared<Value const>> element_list,
+        TypeContext&                                type_context
+    )
     {
-        return utility::makeShared<Array>(std::move(array_type), std::move(element_list), type_context);
+        return utility::makeShared<Array>(
+            std::move(array_type),
+            std::move(element_list),
+            type_context
+        );
     }
 
     std::string Array::toString() const
@@ -253,9 +304,11 @@ namespace ance::bbt
         return result;
     }
 
-    utility::Optional<utility::Shared<Value const>> Array::access(size_t const                  index,
-                                                                  utility::Shared<Value const>* replacement,
-                                                                  TypeContext&                  type_context) const
+    utility::Optional<utility::Shared<Value const>> Array::access(
+        size_t const                  index,
+        utility::Shared<Value const>* replacement,
+        TypeContext&                  type_context
+    ) const
     {
         if (index >= elements_.size())
         {
@@ -287,7 +340,11 @@ namespace ance::bbt
         if (type()->equals(*other.type())) return false;
         if (elements_.size() != other.elements_.size()) return false;
 
-        return std::ranges::equal(elements_, other.elements_, [](auto const& left, auto const& right) { return left == right; });
+        return std::ranges::equal(
+            elements_,
+            other.elements_,
+            [](auto const& left, auto const& right) { return left == right; }
+        );
     }
 
     bool Array::isEmpty() const

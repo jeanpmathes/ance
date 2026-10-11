@@ -16,11 +16,18 @@ namespace ance::core
         /// \param end_line The line end of the location.
         /// \param end_column The column end of the location.
         /// \param file_index The index of the file the location is in.
-        Location(size_t start_line, size_t start_column, size_t end_line, size_t end_column, size_t file_index);
+        Location(
+            size_t start_line,
+            size_t start_column,
+            size_t end_line,
+            size_t end_column,
+            size_t file_index
+        );
 
         /// Create a nowhere location. A nowhere location is used for code that does not have a location.
         /// \return A nowhere location.
-        static Location nowhere();// todo: possibly remove with Optional<Location> as soon as language has Optional
+        static Location
+        nowhere(); // todo: possibly remove with Optional<Location> as soon as language has Optional
 
         /// Create a project location. A project location is used for code that is associated with a project but not an actual source location.
         /// \return A project location.

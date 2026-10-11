@@ -47,7 +47,13 @@ namespace ance::core
           public:
             MessageBuilder() = delete;
 
-            MessageBuilder(Reporter& reporter, Level level, std::string compiler_location, Location const& location, bool enabled);
+            MessageBuilder(
+                Reporter&       reporter,
+                Level           level,
+                std::string     compiler_location,
+                Location const& location,
+                bool            enabled
+            );
             MessageBuilder(MessageBuilder&& other) noexcept;
 
             MessageBuilder(MessageBuilder const&) = delete;
@@ -85,17 +91,24 @@ namespace ance::core
         {
             bool trace_enabled;
             bool color_enabled;
-            bool warning_as_error;// todo: allow setting
+            bool warning_as_error; // todo: allow setting
         };
 
-        Reporter(sources::SourceTree& source_tree, std::ostream& out, Options const& options);
+        Reporter(
+            sources::SourceTree& source_tree,
+            std::ostream&        out,
+            Options const&       options
+        );
         ~Reporter();
 
         /// Start building a trace message. Trace messages are only output if the reported is configured to do so.
         /// \param location The location in the source code where the trace is relevant.
         /// \param compiler_location The location in the compiler where the trace is relevant, e.g. the name of the step.
         /// \return A message builder that can be used to build the message describing the trace. The message is output when the message builder is destroyed.
-        MessageBuilder trace(std::string const& compiler_location, Location const& location);
+        MessageBuilder trace(
+            std::string const& compiler_location,
+            Location const&    location
+        );
 
         /// Start building an informational message.
         /// \param location The location in the source code where the information is relevant.
@@ -141,7 +154,11 @@ namespace ance::core
         /// \param out The output stream to print to.
         /// \param prefix The prefix to use, e.g. "info", "command",
         /// \param message The message to print.
-        static void print(std::ostream& out, std::string const& prefix, std::string const& message);
+        static void print(
+            std::ostream&      out,
+            std::string const& prefix,
+            std::string const& message
+        );
 
         /// Print a critical message to the given output stream with the given prefix.
         /// It uses the formatting of the reporter.

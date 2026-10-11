@@ -15,7 +15,7 @@ std::string ance::core::VariabilityModifier::toString() const
             return "var";
 
         case CONSTANT:
-            return "";// Because this is the default, it has no textual representation.
+            return ""; // Because this is the default, it has no textual representation.
     }
 
     throw std::invalid_argument("Invalid variability modifier");

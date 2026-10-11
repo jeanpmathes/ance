@@ -24,7 +24,10 @@ namespace ance::bbt
     {
       protected:
         /// The concrete value class must supply its type, except when the type is "Type"; then \c nullopt must be used to prevent infinite recursion.
-        explicit Value(utility::Optional<utility::Shared<Type const>> type, TypeContext& type_context);
+        explicit Value(
+            utility::Optional<utility::Shared<Type const>> type,
+            TypeContext&                                   type_context
+        );
 
       public:
         virtual ~Value() = default;
@@ -39,9 +42,11 @@ namespace ance::bbt
         /// \param replacement If this is null, the value at the index is loaded and returned. If this is not null, a copy of this value is returned with the indexed element replaced. If passed, it must be of a valid type.
         /// \param type_context The type context.
         /// \return Depending on the mode, either the loaded element or the modified copy. If the access is out of bounds or not supported at all, \c std::nullopt is returned.
-        [[nodiscard]] virtual utility::Optional<utility::Shared<Value const>> access(size_t                        index,
-                                                                                     utility::Shared<Value const>* replacement,
-                                                                                     TypeContext&                  type_context) const;
+        [[nodiscard]] virtual utility::Optional<utility::Shared<Value const>> access(
+            size_t                        index,
+            utility::Shared<Value const>* replacement,
+            TypeContext&                  type_context
+        ) const;
 
         /// Checks whether this value is equal to another value.
         [[nodiscard]] virtual bool equals(Value const& other) const = 0;
@@ -124,7 +129,10 @@ namespace ance::bbt
         Size(size_t value, TypeContext& type_context);
 
         static utility::Shared<Size> make(size_t value, TypeContext& type_context);
-        static utility::Shared<Size> make(std::string const& value, TypeContext& type_context);
+        static utility::Shared<Size> make(
+            std::string const& value,
+            TypeContext&       type_context
+        );
 
         ~Size() override = default;
 
@@ -141,8 +149,15 @@ namespace ance::bbt
       public:
         Float(llvm::APFloat value, TypeContext& type_context);
 
-        static utility::Shared<Float> make(llvm::APFloat value, TypeContext& type_context);
-        static utility::Shared<Float> make(std::string const& value, core::Precision precision, TypeContext& type_context);
+        static utility::Shared<Float> make(
+            llvm::APFloat value,
+            TypeContext&  type_context
+        );
+        static utility::Shared<Float> make(
+            std::string const& value,
+            core::Precision    precision,
+            TypeContext&       type_context
+        );
 
         static utility::Shared<Float> makeZero(
             core::Precision precision,
@@ -159,18 +174,23 @@ namespace ance::bbt
         llvm::APFloat value_;
     };
 
-    class Identifier final : public ValueBase<Identifier>// todo: try to make the core::Identifier a value in some way
+    class Identifier final
+        : public ValueBase<
+              Identifier> // todo: try to make the core::Identifier a value in some way
     {
       public:
         Identifier(core::Identifier const& identifier, TypeContext& type_context);
 
-        static utility::Shared<Identifier> make(core::Identifier const& identifier, TypeContext& type_context);
+        static utility::Shared<Identifier> make(
+            core::Identifier const& identifier,
+            TypeContext&            type_context
+        );
 
         ~Identifier() override = default;
 
         [[nodiscard]] std::string             toString() const override;
         [[nodiscard]] core::Identifier const& value() const;
-        [[nodiscard]] bool                    equals(Identifier const& other) const override;
+        [[nodiscard]] bool equals(Identifier const& other) const override;
 
       private:
         core::Identifier identifier_;
@@ -181,7 +201,10 @@ namespace ance::bbt
       public:
         explicit Location(core::Location const& location, TypeContext& type_context);
 
-        static utility::Shared<Location> make(core::Location const& location, TypeContext& type_context);
+        static utility::Shared<Location> make(
+            core::Location const& location,
+            TypeContext&          type_context
+        );
 
         ~Location() override = default;
 
@@ -213,20 +236,28 @@ namespace ance::bbt
     class Array final : public ValueBase<Array>
     {
       public:
-        Array(utility::Shared<Type const> array_type, utility::List<utility::Shared<Value const>> element_list, TypeContext& type_context);
+        Array(
+            utility::Shared<Type const>                 array_type,
+            utility::List<utility::Shared<Value const>> element_list,
+            TypeContext&                                type_context
+        );
 
-        static utility::Shared<Array> make(utility::Shared<Type const>                 array_type,
-                                           utility::List<utility::Shared<Value const>> element_list,
-                                           TypeContext&                                type_context);
+        static utility::Shared<Array> make(
+            utility::Shared<Type const>                 array_type,
+            utility::List<utility::Shared<Value const>> element_list,
+            TypeContext&                                type_context
+        );
 
         ~Array() override = default;
 
-        [[nodiscard]] std::string                                     toString() const override;
-        [[nodiscard]] utility::Optional<utility::Shared<Value const>> access(size_t                        index,
-                                                                             utility::Shared<Value const>* replacement,
-                                                                             TypeContext&                  type_context) const override;
-        [[nodiscard]] std::span<utility::Shared<Value const> const>   elements() const;
-        [[nodiscard]] bool                                            equals(Array const& other) const override;
+        [[nodiscard]] std::string toString() const override;
+        [[nodiscard]] utility::Optional<utility::Shared<Value const>> access(
+            size_t                        index,
+            utility::Shared<Value const>* replacement,
+            TypeContext&                  type_context
+        ) const override;
+        [[nodiscard]] std::span<utility::Shared<Value const> const> elements() const;
+        [[nodiscard]] bool equals(Array const& other) const override;
 
         [[nodiscard]] bool   isEmpty() const;
         [[nodiscard]] size_t length() const;

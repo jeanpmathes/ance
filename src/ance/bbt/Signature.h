@@ -19,13 +19,20 @@ namespace ance::bbt
       public:
         struct Parameter
         {
-            core::Identifier      name;
+            core::Identifier            name;
             utility::Shared<Type const> type;
 
-            Parameter(core::Identifier const& parameter_name, utility::Shared<Type const> parameter_type);
+            Parameter(
+                core::Identifier const&     parameter_name,
+                utility::Shared<Type const> parameter_type
+            );
         };
 
-        Signature(core::Identifier const& name, utility::List<Parameter> parameters, bool variadic = false);
+        Signature(
+            core::Identifier const&  name,
+            utility::List<Parameter> parameters,
+            bool                     variadic = false
+        );
 
         /// Get the name of the signature.
         [[nodiscard]] core::Identifier const& name() const;
@@ -55,11 +62,23 @@ namespace ance::bbt
         }
 
         template<typename... Args>
-        static Signature makeAndNameParameters(core::Identifier const& name, Args&&... args)
+        static Signature makeAndNameParameters(
+            core::Identifier const& name,
+            Args&&... args
+        )
         {
             utility::List<Parameter> parameters;
             size_t                   index = 0;
-            (parameters.emplace_back(Parameter {core::Identifier::make("arg" + std::to_string(index++), name.location()), std::forward<Args>(args)}), ...);
+            (parameters.emplace_back(
+                 Parameter {
+                     core::Identifier::make(
+                         "arg" + std::to_string(index++),
+                         name.location()
+                     ),
+                     std::forward<Args>(args)
+                 }
+             ),
+             ...);
             return {name, std::move(parameters)};
         }
 

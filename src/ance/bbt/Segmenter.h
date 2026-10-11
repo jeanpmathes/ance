@@ -30,24 +30,36 @@ namespace ance::bbt
     class Segmenter
     {
       public:
-        Segmenter(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context, TypeContext& type_context);
+        Segmenter(
+            sources::SourceTree& source_tree,
+            core::Reporter&      reporter,
+            core::Context&       context,
+            TypeContext&         type_context
+        );
         ~Segmenter();
 
         /// Segment an ordered file into a basic block control flow.
         /// \param file The path to the file to segment.
         /// \return The control flow built from the file.
-        utility::Optional<utility::Owned<Flow>> segmentOrderedFile(std::filesystem::path const& file);
+        utility::Optional<utility::Owned<Flow>> segmentOrderedFile(
+            std::filesystem::path const& file
+        );
 
         /// Segment an unordered file into the set of flows it contains.
         /// \param file The path to the file to segment.
         /// \return The unordered scope built from the file.
-        utility::Optional<utility::Owned<Flows>> segmentUnorderedFile(std::filesystem::path const& file);
+        utility::Optional<utility::Owned<Flows>> segmentUnorderedFile(
+            std::filesystem::path const& file
+        );
 
         /// Segment a piece of core code containing a single declaration into a flow.
         /// \param code The code to segment.
         /// \param id An identifier of the declaration.
         /// \return The flow built from the code.
-        utility::Optional<utility::Owned<Flow>> segmentDeclaration(std::string const& code, std::string const& id);
+        utility::Optional<utility::Owned<Flow>> segmentDeclaration(
+            std::string const& code,
+            std::string const& id
+        );
 
       private:
         struct Implementation;

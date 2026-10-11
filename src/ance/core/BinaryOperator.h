@@ -12,7 +12,7 @@ namespace ance::core
         enum Value
         {
             /// Any unspecified operator, used as a default value for error handling and such.
-            UNSPECIFIED,// todo: remove, replace with optional in AST/EST
+            UNSPECIFIED, // todo: remove, replace with optional in AST/EST
 
             /// The addition operator, adding two (numerical) values.
             ADDITION,
@@ -56,9 +56,10 @@ namespace ance::core
         };
 
         BinaryOperator() = default;
-        constexpr BinaryOperator(Value const value) : value_(value) {}// NOLINT(google-explicit-constructor)
+        constexpr BinaryOperator(Value const value)
+            : value_(value) {} // NOLINT(google-explicit-constructor)
 
-                 operator Value() const;// NOLINT(google-explicit-constructor)
+                 operator Value() const; // NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
 
         [[nodiscard]] std::string toString() const;

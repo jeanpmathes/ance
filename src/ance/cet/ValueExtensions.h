@@ -17,7 +17,10 @@ namespace ance::cet
       public:
         ScopeRef(Scope& scope, bbt::TypeContext& type_context);
 
-        static utility::Shared<ScopeRef> make(Scope& scope, bbt::TypeContext& type_context);
+        static utility::Shared<ScopeRef> make(
+            Scope&            scope,
+            bbt::TypeContext& type_context
+        );
 
         [[nodiscard]] std::string toString() const override;
         [[nodiscard]] Scope&      value() const;
@@ -32,7 +35,10 @@ namespace ance::cet
       public:
         VariableRef(Variable& variable, bbt::TypeContext& type_context);
 
-        static utility::Shared<VariableRef> make(Variable& variable, bbt::TypeContext& type_context);
+        static utility::Shared<VariableRef> make(
+            Variable&         variable,
+            bbt::TypeContext& type_context
+        );
 
         ~VariableRef() override = default;
 
@@ -47,12 +53,19 @@ namespace ance::cet
     class Reference final : public bbt::ValueBase<Reference>
     {
       public:
-        Reference(Address address, utility::Shared<bbt::Type const> referenced_type, core::VariabilityModifier variability, bbt::TypeContext& type_context);
+        Reference(
+            Address                          address,
+            utility::Shared<bbt::Type const> referenced_type,
+            core::VariabilityModifier        variability,
+            bbt::TypeContext&                type_context
+        );
 
-        static utility::Shared<Reference> make(Address                    address,
-                                               utility::Shared<bbt::Type const> referenced_type,
-                                               core::VariabilityModifier  variability,
-                                               bbt::TypeContext&          type_context);
+        static utility::Shared<Reference> make(
+            Address                          address,
+            utility::Shared<bbt::Type const> referenced_type,
+            core::VariabilityModifier        variability,
+            bbt::TypeContext&                type_context
+        );
 
         ~Reference() override = default;
 

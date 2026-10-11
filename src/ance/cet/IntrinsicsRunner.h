@@ -37,27 +37,34 @@ namespace ance::cet
     class IntrinsicsRunner final
     {
       public:
-        IntrinsicsRunner(sources::SourceTree&                              source_tree,
-                         core::Reporter&                                   reporter,
-                         bbt::TypeContext&                                 type_context,
-                         std::function<void(std::filesystem::path const&)> include);
+        IntrinsicsRunner(
+            sources::SourceTree&                              source_tree,
+            core::Reporter&                                   reporter,
+            bbt::TypeContext&                                 type_context,
+            std::function<void(std::filesystem::path const&)> include
+        );
 
         ~IntrinsicsRunner();
 
         struct Result
         {
-            utility::Optional<utility::Shared<bbt::Value const>> return_value_      = std::nullopt;
-            utility::Optional<PendingResolution>           pending_resolution = std::nullopt;
+            utility::Optional<utility::Shared<bbt::Value const>> return_value_ =
+                std::nullopt;
+            utility::Optional<PendingResolution> pending_resolution = std::nullopt;
 
             bool isPending() const;
             bool isFailed() const;
 
-            [[nodiscard]] PendingResolution const&    getPending() const;
+            [[nodiscard]] PendingResolution const&          getPending() const;
             [[nodiscard]] utility::Shared<bbt::Value const> getResult();
         };
 
         /// Run an intrinsic with the given arguments.
-        Result run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<bbt::Value const>>& arguments, core::Location const& location);
+        Result run(
+            core::Intrinsic const&                            intrinsic,
+            utility::List<utility::Shared<bbt::Value const>>& arguments,
+            core::Location const&                             location
+        );
 
       private:
         struct Implementation;

@@ -31,43 +31,44 @@ void ance::core::Printer::print(Identifier const& identifier)
 void ance::core::Printer::print(AccessModifier const access_modifier)
 {
     indent();
-    out_ << access_modifier.toString();// todo: access modifier should provide operator<<
+    out_ << access_modifier.toString(); // todo: access modifier should provide operator<<
 }
 
 void ance::core::Printer::print(ExecutionModifier const execution_modifier)
 {
     indent();
-    out_ << execution_modifier.toString(); // todo: execution modifier should provide operator<<
+    out_ << execution_modifier
+                .toString(); // todo: execution modifier should provide operator<<
 }
 
 void ance::core::Printer::print(UnaryOperator const unary_operator)
 {
     indent();
-    out_ << unary_operator.toString();// todo: unary operator should provide operator<<
+    out_ << unary_operator.toString(); // todo: unary operator should provide operator<<
 }
 
 void ance::core::Printer::print(BinaryOperator const binary_operator)
 {
     indent();
-    out_ << binary_operator.toString();// todo: binary operator should provide operator<<
+    out_ << binary_operator.toString(); // todo: binary operator should provide operator<<
 }
 
 void ance::core::Printer::print(Assigner const assigner)
 {
     indent();
-    out_ << assigner.getSymbol();// todo: assigner should provide operator<<
+    out_ << assigner.getSymbol(); // todo: assigner should provide operator<<
 }
 
 void ance::core::Printer::print(Precision const precision)
 {
     indent();
-    out_ << precision.getSuffix();// todo: precision should provide operator<<
+    out_ << precision.getSuffix(); // todo: precision should provide operator<<
 }
 
 void ance::core::Printer::print(Intrinsic const intrinsic)
 {
     indent();
-    out_ << intrinsic.toString();// todo: intrinsic should provide operator<<
+    out_ << intrinsic.toString(); // todo: intrinsic should provide operator<<
 }
 
 void ance::core::Printer::line()

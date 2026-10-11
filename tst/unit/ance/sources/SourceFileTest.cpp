@@ -11,7 +11,8 @@ namespace ance::sources
     TEST_CASE("SourceFile reads UTF-8 content as UTF-32 lines", "[unit]")
     {
         test::TemporaryDirectory    directory;
-        std::filesystem::path const relative_path = std::filesystem::path("nested") / "source.ance";
+        std::filesystem::path const relative_path =
+            std::filesystem::path("nested") / "source.ance";
 
         directory.writeFile(relative_path, "first\nAB😂ö");
 
@@ -36,13 +37,17 @@ namespace ance::sources
     TEST_CASE("SourceFile exposes its path and index metadata", "[unit]")
     {
         test::TemporaryDirectory    directory;
-        std::filesystem::path const relative_path = std::filesystem::path("nested") / "source.ance";
+        std::filesystem::path const relative_path =
+            std::filesystem::path("nested") / "source.ance";
         directory.writeFile(relative_path, "source");
 
         SourceFile const source(directory.root(), relative_path, 9);
 
         CHECK(source.getRelativePath() == relative_path);
-        CHECK(source.getAbsolutePath() == std::filesystem::absolute(directory.root() / relative_path));
+        CHECK(
+            source.getAbsolutePath()
+            == std::filesystem::absolute(directory.root() / relative_path)
+        );
         CHECK(source.getDirectory() == "nested");
         CHECK(source.getFilename() == "source.ance");
         CHECK(source.index() == 9);

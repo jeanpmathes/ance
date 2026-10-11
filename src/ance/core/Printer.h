@@ -4,12 +4,12 @@
 #include <ostream>
 
 #include "ance/core/AccessModifier.h"
-#include "ance/core/ExecutionModifier.h"
 #include "ance/core/Assigner.h"
-#include "ance/core/Identifier.h"
-#include "ance/core/UnaryOperator.h"
 #include "ance/core/BinaryOperator.h"
+#include "ance/core/ExecutionModifier.h"
+#include "ance/core/Identifier.h"
 #include "ance/core/Precision.h"
+#include "ance/core/UnaryOperator.h"
 
 namespace ance::core
 {

@@ -6,13 +6,22 @@
 
 namespace ance::bbt
 {
-    Signature::Parameter::Parameter(core::Identifier const& parameter_name, utility::Shared<Type const> parameter_type)
-        : name(parameter_name)
-        , type(std::move(parameter_type))
+    Signature::Parameter::Parameter(
+        core::Identifier const&     parameter_name,
+        utility::Shared<Type const> parameter_type
+    )
+        : name(parameter_name),
+          type(std::move(parameter_type))
     {}
 
-    Signature::Signature(core::Identifier const& name, utility::List<Parameter> parameters, bool const variadic)
-        : name_(name), parameters_(std::move(parameters)), variadic_(variadic)
+    Signature::Signature(
+        core::Identifier const&  name,
+        utility::List<Parameter> parameters,
+        bool const               variadic
+    )
+        : name_(name),
+          parameters_(std::move(parameters)),
+          variadic_(variadic)
     {}
 
     core::Identifier const& Signature::name() const

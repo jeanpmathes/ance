@@ -44,19 +44,28 @@ namespace ance::cet
     class Runner
     {
       public:
-        Runner(sources::SourceTree& source_tree, core::Reporter& reporter, core::Context& context);
+        Runner(
+            sources::SourceTree& source_tree,
+            core::Reporter&      reporter,
+            core::Context&       context
+        );
         ~Runner();
 
         /// Add a variable to the runner, making it available for all subsequently run code.
         /// The variable is placed in the core language scope, the core scope.
         /// \param name The name of the variable to declare.
         /// \param value The value of the variable to declare.
-        void declareCoreVariable(core::Identifier const& name, utility::Shared<bbt::Value const> value);
+        void declareCoreVariable(
+            core::Identifier const&           name,
+            utility::Shared<bbt::Value const> value
+        );
 
         /// Look up a variable from the core scope by identifier and read its value.
         /// \param name The identifier to look up.
         /// \return The variable value associated with the identifier, or an absent optional if not found.
-        utility::Shared<bbt::Value const> getCoreVariableValue(core::Identifier const& name);
+        utility::Shared<bbt::Value const> getCoreVariableValue(
+            core::Identifier const& name
+        );
 
         /// Run the given code containing a declaration and make the declared entities available for all subsequently run code.
         /// The code is run the core language scope, the core scope.
@@ -67,7 +76,9 @@ namespace ance::cet
         /// Run the given project file and return the resulting unit.
         /// \param file The path to the file to run.
         /// \return The resulting compile-able unit.
-        utility::Optional<utility::Owned<Unit>> runProjectFile(std::filesystem::path const& file);
+        utility::Optional<utility::Owned<Unit>> runProjectFile(
+            std::filesystem::path const& file
+        );
 
         /// Get the used type context of this runner.
         bbt::TypeContext& types();

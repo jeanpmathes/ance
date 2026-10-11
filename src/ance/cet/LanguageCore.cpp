@@ -14,7 +14,9 @@ namespace
 {
     void defineLanguageCoreTypes(ance::cet::Runner& runner)
     {
-        auto declare_type = [&](ance::utility::Shared<ance::bbt::Type const> type) { runner.declareCoreVariable(type->name(), type); };
+        auto declare_type = [&](ance::utility::Shared<ance::bbt::Type const> type) {
+            runner.declareCoreVariable(type->name(), type);
+        };
 
         declare_type(runner.types().Bool());
         declare_type(runner.types().Unit());
@@ -35,8 +37,13 @@ namespace
     {
         // todo: maybe remove true and false literals and define them as variables here
 
-        runner.declareCoreVariable(ance::core::Identifier::make("nowhere", ance::core::Location::nowhere()),
-                                   ance::utility::makeShared<ance::bbt::Location>(ance::core::Location::nowhere(), runner.types()));
+        runner.declareCoreVariable(
+            ance::core::Identifier::make("nowhere", ance::core::Location::nowhere()),
+            ance::utility::makeShared<ance::bbt::Location>(
+                ance::core::Location::nowhere(),
+                runner.types()
+            )
+        );
     }
 
     void defineLanguageCoreFunctions(ance::cet::Runner& runner)
@@ -44,25 +51,30 @@ namespace
         // todo: remove / improve the functions
         // todo: probably make them all compiletime only
 
-        runner.declareCore(R"ance(
+        runner.declareCore(
+            R"ance(
 public log1b (value: Bool)
 {
     let string_value: String := intrinsic "b_2_str" args (value);
     intrinsic "log" args (string_value, nowhere);
 }
 )ance",
-                           "log1b");
+            "log1b"
+        );
 
-        runner.declareCore(R"ance(
+        runner.declareCore(
+            R"ance(
 public log2b (value: Bool, location: Location)
 {
     let string_value: String := intrinsic "b_2_str" args (value);
     intrinsic "log" args (string_value, location);
 }
 )ance",
-                           "log2b");
+            "log2b"
+        );
 
-        runner.declareCore(R"ance(
+        runner.declareCore(
+            R"ance(
 public log1str (value: String)
 {
     intrinsic "log" args (value, nowhere);
@@ -71,7 +83,8 @@ public log1str (value: String)
             "log1str"
         );
 
-        runner.declareCore(R"ance(
+        runner.declareCore(
+            R"ance(
 public log2str (value: String, location: Location)
 {
     intrinsic "log" args (value, location);
@@ -91,49 +104,59 @@ public log1s (value: Size)
             "log1s"
         );
 
-        runner.declareCore(R"ance(
+        runner.declareCore(
+            R"ance(
 public log1fh (value: Half)
 {
     let string_value: String := intrinsic "fh_2_str" args (value);
     intrinsic "log" args (string_value, nowhere);
 }
 )ance",
-                           "log1fh");
+            "log1fh"
+        );
 
-        runner.declareCore(R"ance(
+        runner.declareCore(
+            R"ance(
 public log1fs (value: Single)
 {
     let string_value: String := intrinsic "fs_2_str" args (value);
     intrinsic "log" args (string_value, nowhere);
 }
 )ance",
-                           "log1fs");
+            "log1fs"
+        );
 
-        runner.declareCore(R"ance(
+        runner.declareCore(
+            R"ance(
 public log1fd (value: Double)
 {
     let string_value: String := intrinsic "fd_2_str" args (value);
     intrinsic "log" args (string_value, nowhere);
 }
 )ance",
-                           "log1fd");
+            "log1fd"
+        );
 
-        runner.declareCore(R"ance(
+        runner.declareCore(
+            R"ance(
 public log1fq (value: Quad)
 {
     let string_value: String := intrinsic "fq_2_str" args (value);
     intrinsic "log" args (string_value, nowhere);
 }
 )ance",
-                           "log1fq");
+            "log1fq"
+        );
 
-        runner.declareCore(R"ance(
+        runner.declareCore(
+            R"ance(
 public include (file: String, location: Location)
 {
     intrinsic "include" args (file, location);
 }
 )ance",
-                           "include");
+            "include"
+        );
     }
 }
 

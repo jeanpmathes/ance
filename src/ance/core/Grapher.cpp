@@ -57,7 +57,11 @@ void ance::core::Grapher::endGroup()
     in_group_ = false;
 }
 
-void ance::core::Grapher::addNode(std::string const& content, size_t const id, Style const style)
+void ance::core::Grapher::addNode(
+    std::string const& content,
+    size_t const       id,
+    Style const        style
+)
 {
     std::string color   = "#F8F8F8";
     bool        is_code = false;
@@ -112,7 +116,10 @@ uint32_t ance::core::Grapher::map(size_t id)
 
     auto& group_map = id_map_.back();
 
-    if (auto const it = group_map.find(key); it != group_map.end()) { return it->second; }
+    if (auto const it = group_map.find(key); it != group_map.end())
+    {
+        return it->second;
+    }
 
     uint32_t const mapped_id = node_count_++;
     group_map[key]           = mapped_id;

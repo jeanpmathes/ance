@@ -9,24 +9,25 @@ namespace ance::core
     /// Defines an assignment operation.
     class Assigner
     {
-    public:
+      public:
         enum Value : uint8_t
         {
-          /// A simple copy assignment.
-          COPY_ASSIGNMENT,
+            /// A simple copy assignment.
+            COPY_ASSIGNMENT,
 
-          /// A move assignment, which is a special assignment that copies and performs additional operations.
-          /// It has no obligation to leave the source value in a valid state, allowing an overall cheaper transfer.
-          MOVE_ASSIGNMENT,
+            /// A move assignment, which is a special assignment that copies and performs additional operations.
+            /// It has no obligation to leave the source value in a valid state, allowing an overall cheaper transfer.
+            MOVE_ASSIGNMENT,
 
-          /// An unspecified assignment. The actual assignment can be inferred from the used types.
-          UNSPECIFIED// todo: remove, replace with optional in AST/EST
-      };
+            /// An unspecified assignment. The actual assignment can be inferred from the used types.
+            UNSPECIFIED // todo: remove, replace with optional in AST/EST
+        };
 
         Assigner() = default;
-        constexpr Assigner(Value const val) : value_(val) {}// NOLINT(google-explicit-constructor)
+        constexpr Assigner(Value const val)
+            : value_(val) {} // NOLINT(google-explicit-constructor)
 
-        operator Value() const;// NOLINT(google-explicit-constructor)
+                 operator Value() const; // NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
 
         /// Get whether this assignment is represented by a symbol.
@@ -37,7 +38,7 @@ namespace ance::core
         /// @return The symbol for this assignment.
         [[nodiscard]] std::string getSymbol() const;
 
-    private:
+      private:
         Value value_;
     };
 }

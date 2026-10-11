@@ -11,36 +11,46 @@
 
 struct ance::cet::IntrinsicsRunner::Implementation
 {
-    Implementation(sources::SourceTree&                              source_tree,
-                   core::Reporter&                                   reporter,
-                   bbt::TypeContext&                                 type_context,
-                   std::function<void(std::filesystem::path const&)> include)
-        : source_tree_(source_tree)
-        , reporter_(reporter)
-        , type_context_(type_context)
-        , include_(std::move(include))
+    Implementation(
+        sources::SourceTree&                              source_tree,
+        core::Reporter&                                   reporter,
+        bbt::TypeContext&                                 type_context,
+        std::function<void(std::filesystem::path const&)> include
+    )
+        : source_tree_(source_tree),
+          reporter_(reporter),
+          type_context_(type_context),
+          include_(std::move(include))
     {}
 
     struct State
     {
-        core::Location                                location             = core::Location::project();
-        utility::List<utility::Shared<bbt::Value const>>*   arguments            = nullptr;
-        utility::Optional<utility::Shared<bbt::Type const>> expected_return_type = std::nullopt;
+        core::Location location = core::Location::project();
+        utility::List<utility::Shared<bbt::Value const>>*   arguments = nullptr;
+        utility::Optional<utility::Shared<bbt::Type const>> expected_return_type =
+            std::nullopt;
 
-        utility::Optional<utility::Shared<bbt::Value const>> return_value_      = std::nullopt;
-        utility::Optional<PendingResolution>           pending_resolution = std::nullopt;
-        bool                                           aborted            = false;
+        utility::Optional<utility::Shared<bbt::Value const>> return_value_ = std::nullopt;
+        utility::Optional<PendingResolution> pending_resolution            = std::nullopt;
+        bool                                 aborted                       = false;
     };
 
-    Result run(core::Intrinsic const& intrinsic, utility::List<utility::Shared<bbt::Value const>>& arguments, core::Location const& location)
+    Result run(
+        core::Intrinsic const&                            intrinsic,
+        utility::List<utility::Shared<bbt::Value const>>& arguments,
+        core::Location const&                             location
+    )
     {
-        auto [signature, return_type] = bbt::getIntrinsicSignature(intrinsic, type_context_);
+        auto [signature, return_type] =
+            bbt::getIntrinsicSignature(intrinsic, type_context_);
 
-        state_ = State {.location             = location,
-                        .arguments            = &arguments,
-                        .expected_return_type = return_type,
-                        .return_value_        = std::nullopt,
-                        .pending_resolution   = std::nullopt};
+        state_ = State {
+            .location             = location,
+            .arguments            = &arguments,
+            .expected_return_type = return_type,
+            .return_value_        = std::nullopt,
+            .pending_resolution   = std::nullopt
+        };
 
         if (signature.isVariadic())
         {
@@ -51,10 +61,23 @@ struct ance::cet::IntrinsicsRunner::Implementation
             assert(arguments.size() == signature.parameters().size());
         }
 
-        auto const argument_types  = arguments | std::views::transform([](auto const& argument) -> bbt::Type const& { return *argument->type(); });
-        auto const parameter_types = signature.parameters() | std::views::transform([](auto const& parameter) -> bbt::Type const& { return *parameter.type; });
+        auto const argument_types =
+            arguments
+            | std::views::transform([](auto const& argument) -> bbt::Type const& {
+                  return *argument->type();
+              });
+        auto const parameter_types =
+            signature.parameters()
+            | std::views::transform([](auto const& parameter) -> bbt::Type const& {
+                  return *parameter.type;
+              });
 
-        assert(std::ranges::equal(argument_types | std::views::take(parameter_types.size()), parameter_types));
+        assert(
+            std::ranges::equal(
+                argument_types | std::views::take(parameter_types.size()),
+                parameter_types
+            )
+        );
 
         switch (intrinsic.value())
         {
@@ -299,9 +322,15 @@ struct ance::cet::IntrinsicsRunner::Implementation
                 break;
         }
 
-        assert(state_.return_value_.hasValue() || state_.pending_resolution.hasValue() || state_.aborted);
+        assert(
+            state_.return_value_.hasValue() || state_.pending_resolution.hasValue()
+            || state_.aborted
+        );
 
-        Result result {.return_value_ = std::move(state_.return_value_), .pending_resolution = std::move(state_.pending_resolution)};
+        Result result {
+            .return_value_      = std::move(state_.return_value_),
+            .pending_resolution = std::move(state_.pending_resolution)
+        };
 
         state_ = State {};
 
@@ -315,12 +344,14 @@ struct ance::cet::IntrinsicsRunner::Implementation
 
     void runDeclare()
     {
-        Scope&                     scope       = state_.arguments->at(0)->as<ScopeRef>().value();
-        core::Identifier const&    identifier  = state_.arguments->at(1)->as<bbt::Identifier>().value();
-        bool const                 is_variable = state_.arguments->at(2)->as<bbt::Bool>().value();
-        utility::Shared<bbt::Type const> type        = state_.arguments->at(3).as<bbt::Type>();
+        Scope&                  scope = state_.arguments->at(0)->as<ScopeRef>().value();
+        core::Identifier const& identifier =
+            state_.arguments->at(1)->as<bbt::Identifier>().value();
+        bool const is_variable = state_.arguments->at(2)->as<bbt::Bool>().value();
+        utility::Shared<bbt::Type const> type = state_.arguments->at(3).as<bbt::Type>();
 
-        auto variable = scope.declare(identifier, type, is_variable, state_.location, reporter_);
+        auto variable =
+            scope.declare(identifier, type, is_variable, state_.location, reporter_);
 
         if (variable.hasValue())
         {
@@ -334,8 +365,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
 
     void runResolve()
     {
-        Scope&                  scope      = state_.arguments->at(0)->as<ScopeRef>().value();
-        core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
+        Scope&                  scope = state_.arguments->at(0)->as<ScopeRef>().value();
+        core::Identifier const& identifier =
+            state_.arguments->at(1)->as<bbt::Identifier>().value();
 
         auto [variable, status, reason] = scope.find(identifier);
 
@@ -351,8 +383,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
 
     void runErase()
     {
-        Scope&                  scope      = state_.arguments->at(0)->as<ScopeRef>().value();
-        core::Identifier const& identifier = state_.arguments->at(1)->as<bbt::Identifier>().value();
+        Scope&                  scope = state_.arguments->at(0)->as<ScopeRef>().value();
+        core::Identifier const& identifier =
+            state_.arguments->at(1)->as<bbt::Identifier>().value();
 
         switch (EraseResult const result = scope.erase(identifier); result)
         {
@@ -370,7 +403,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
                 break;
 
             case EraseResult::IS_OUTER:
-                reporter_.error(identifier.location()) << "Cannot erase " << identifier << " because it is declared in an outer scope";
+                reporter_.error(identifier.location())
+                    << "Cannot erase " << identifier
+                    << " because it is declared in an outer scope";
                 abort();
                 break;
             case EraseResult::IS_NOT_ORDERED:
@@ -396,8 +431,9 @@ struct ance::cet::IntrinsicsRunner::Implementation
 
     void runLog()
     {
-        std::string const&    value    = state_.arguments->at(0)->as<bbt::String>().value();
-        core::Location const& location = state_.arguments->at(1)->as<bbt::Location>().value();
+        std::string const&    value = state_.arguments->at(0)->as<bbt::String>().value();
+        core::Location const& location =
+            state_.arguments->at(1)->as<bbt::Location>().value();
 
         reporter_.info(location) << value;
 
@@ -424,10 +460,12 @@ struct ance::cet::IntrinsicsRunner::Implementation
 
     void runInclude()
     {
-        std::string const&    file     = state_.arguments->at(0)->as<bbt::String>().value();
-        core::Location const& location = state_.arguments->at(1)->as<bbt::Location>().value();
+        std::string const&    file = state_.arguments->at(0)->as<bbt::String>().value();
+        core::Location const& location =
+            state_.arguments->at(1)->as<bbt::Location>().value();
 
-        std::filesystem::path const path = source_tree_.getFile(location.fileIndex()).getDirectory() / file;
+        std::filesystem::path const path =
+            source_tree_.getFile(location.fileIndex()).getDirectory() / file;
 
         include_(path);
 
@@ -447,7 +485,8 @@ struct ance::cet::IntrinsicsRunner::Implementation
         }
 
         utility::List<utility::Shared<bbt::Value const>> arguments;
-        for (auto& argument : *state_.arguments | std::views::drop(1)) arguments.emplace_back(argument);
+        for (auto& argument : *state_.arguments | std::views::drop(1))
+            arguments.emplace_back(argument);
 
         State  outer_state  = std::move(state_);
         Result inner_result = run(target.value(), arguments, outer_state.location);
@@ -618,45 +657,61 @@ struct ance::cet::IntrinsicsRunner::Implementation
     {
         llvm::APFloat const lhs = state_.arguments->at(0)->as<bbt::Float>().value();
         llvm::APFloat const rhs = state_.arguments->at(1)->as<bbt::Float>().value();
-        setResult(bbt::Bool::make(lhs.compare(rhs) == llvm::APFloat::cmpLessThan, type_context_));
+        setResult(
+            bbt::Bool::make(lhs.compare(rhs) == llvm::APFloat::cmpLessThan, type_context_)
+        );
     }
 
     void runFloatLe(core::Precision const)
     {
-        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
-        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat const lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const rhs = state_.arguments->at(1)->as<bbt::Float>().value();
         llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
-        setResult(bbt::Bool::make(comparison == llvm::APFloat::cmpLessThan || comparison == llvm::APFloat::cmpEqual, type_context_));
+        setResult(
+            bbt::Bool::make(
+                comparison == llvm::APFloat::cmpLessThan
+                    || comparison == llvm::APFloat::cmpEqual,
+                type_context_
+            )
+        );
     }
 
     void runFloatGt(core::Precision const)
     {
-        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
-        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat const lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const rhs = state_.arguments->at(1)->as<bbt::Float>().value();
         llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
-        setResult(bbt::Bool::make(comparison == llvm::APFloat::cmpGreaterThan, type_context_));
+        setResult(
+            bbt::Bool::make(comparison == llvm::APFloat::cmpGreaterThan, type_context_)
+        );
     }
 
     void runFloatGe(core::Precision const)
     {
-        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
-        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat const lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const rhs = state_.arguments->at(1)->as<bbt::Float>().value();
         llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
-        setResult(bbt::Bool::make(comparison == llvm::APFloat::cmpGreaterThan || comparison == llvm::APFloat::cmpEqual, type_context_));
+        setResult(
+            bbt::Bool::make(
+                comparison == llvm::APFloat::cmpGreaterThan
+                    || comparison == llvm::APFloat::cmpEqual,
+                type_context_
+            )
+        );
     }
 
     void runFloatEq(core::Precision const)
     {
-        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
-        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat const lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const rhs = state_.arguments->at(1)->as<bbt::Float>().value();
         llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
         setResult(bbt::Bool::make(comparison == llvm::APFloat::cmpEqual, type_context_));
     }
 
     void runFloatNe(core::Precision const)
     {
-        llvm::APFloat const            lhs        = state_.arguments->at(0)->as<bbt::Float>().value();
-        llvm::APFloat const            rhs        = state_.arguments->at(1)->as<bbt::Float>().value();
+        llvm::APFloat const lhs = state_.arguments->at(0)->as<bbt::Float>().value();
+        llvm::APFloat const rhs = state_.arguments->at(1)->as<bbt::Float>().value();
         llvm::APFloat::cmpResult const comparison = lhs.compare(rhs);
         setResult(bbt::Bool::make(comparison != llvm::APFloat::cmpEqual, type_context_));
     }
@@ -665,7 +720,7 @@ struct ance::cet::IntrinsicsRunner::Implementation
     {
         utility::Shared<bbt::Value const> lhs        = state_.arguments->at(0);
         utility::Shared<bbt::Value const> rhs        = state_.arguments->at(1);
-        bool const                  comparison = lhs->equals(*rhs);
+        bool const                        comparison = lhs->equals(*rhs);
         setResult(bbt::Bool::make(negated ? !comparison : comparison, type_context_));
     }
 
@@ -707,11 +762,20 @@ struct ance::cet::IntrinsicsRunner::Implementation
     State state_;
 };
 
-ance::cet::IntrinsicsRunner::IntrinsicsRunner(sources::SourceTree&                              source_tree,
-                                              core::Reporter&                                   reporter,
-                                              bbt::TypeContext&                                 type_context,
-                                              std::function<void(std::filesystem::path const&)> include)
-    : implementation_(utility::makeOwned<Implementation>(source_tree, reporter, type_context, std::move(include)))
+ance::cet::IntrinsicsRunner::IntrinsicsRunner(
+    sources::SourceTree&                              source_tree,
+    core::Reporter&                                   reporter,
+    bbt::TypeContext&                                 type_context,
+    std::function<void(std::filesystem::path const&)> include
+)
+    : implementation_(
+          utility::makeOwned<Implementation>(
+              source_tree,
+              reporter,
+              type_context,
+              std::move(include)
+          )
+      )
 {}
 
 ance::cet::IntrinsicsRunner::~IntrinsicsRunner() = default;
@@ -726,21 +790,25 @@ bool ance::cet::IntrinsicsRunner::Result::isFailed() const
     return !return_value_.hasValue() && !pending_resolution.hasValue();
 }
 
-ance::cet::PendingResolution const& ance::cet::IntrinsicsRunner::Result::getPending() const
+ance::cet::PendingResolution const& ance::cet::IntrinsicsRunner::Result::
+    getPending() const
 {
     assert(isPending());
     return pending_resolution.value();
 }
 
-ance::utility::Shared<ance::bbt::Value const> ance::cet::IntrinsicsRunner::Result::getResult()
+ance::utility::Shared<ance::bbt::Value const> ance::cet::IntrinsicsRunner::Result::
+    getResult()
 {
     assert(!isPending() && return_value_.hasValue());
     return return_value_.value();
 }
 
-ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(core::Intrinsic const&                      intrinsic,
-                                                                     utility::List<utility::Shared<bbt::Value const>>& arguments,
-                                                                     core::Location const&                       location)
+ance::cet::IntrinsicsRunner::Result ance::cet::IntrinsicsRunner::run(
+    core::Intrinsic const&                            intrinsic,
+    utility::List<utility::Shared<bbt::Value const>>& arguments,
+    core::Location const&                             location
+)
 {
     return implementation_->run(intrinsic, arguments, location);
 }

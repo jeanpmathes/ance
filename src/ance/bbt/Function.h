@@ -21,9 +21,24 @@ namespace ance::bbt
     class Function final : public ValueBase<Function>
     {
       public:
-        Function(Signature signature, utility::Shared<Type const> return_type, Flow const& body, TypeContext& type_context);
-        Function(Signature signature, utility::Shared<Type const> return_type, utility::Shared<Flow> body, TypeContext& type_context);
-        Function(Signature signature, utility::Shared<Type const> return_type, utility::Owned<Flow> body, TypeContext& type_context);
+        Function(
+            Signature                   signature,
+            utility::Shared<Type const> return_type,
+            Flow const&                 body,
+            TypeContext&                type_context
+        );
+        Function(
+            Signature                   signature,
+            utility::Shared<Type const> return_type,
+            utility::Shared<Flow>       body,
+            TypeContext&                type_context
+        );
+        Function(
+            Signature                   signature,
+            utility::Shared<Type const> return_type,
+            utility::Owned<Flow>        body,
+            TypeContext&                type_context
+        );
         ~Function() override = default;
 
         [[nodiscard]] core::Identifier const&     name() const;

@@ -15,7 +15,6 @@ namespace ance::utility
     template<typename T, class... Args>
     Owned<T> makeOwned(Args&&... args);
 
-
     /// Owns a value. Prefer this over std::unique_ptr for ownership.
     /// @tparam T The type of the value.
 
@@ -91,7 +90,6 @@ namespace ance::utility
     template<typename T, class... Args>
     Shared<T> makeShared(Args&&... args);
 
-
     /// Shares a value. Prefer this over std::shared_ptr for shared ownership.
     /// \tparam T The type of the value.
     template<typename T>
@@ -154,7 +152,9 @@ namespace ance::utility
         friend Shared<TargetT> makeShared(Args&&... args);
 
         template<typename OtherT>
-        [[nodiscard]] Shared<std::conditional_t<std::is_const_v<T>, std::add_const_t<OtherT>, OtherT>> as();
+        [[nodiscard]] Shared<
+            std::conditional_t<std::is_const_v<T>, std::add_const_t<OtherT>, OtherT>>
+        as();
 
         template<typename OtherT>
         [[nodiscard]] Shared<std::add_const_t<OtherT>> as() const;

@@ -51,10 +51,16 @@ namespace text
 
         size_t width = 0;
 
-        std::string const utf8_str = boost::locale::conv::utf_to_utf<char>(std::u32string(str));
+        std::string const utf8_str =
+            boost::locale::conv::utf_to_utf<char>(std::u32string(str));
 
-        using SegmentIndex = boost::locale::boundary::segment_index<std::string::const_iterator>;
-        SegmentIndex const characters(boost::locale::boundary::character, utf8_str.cbegin(), utf8_str.cend());
+        using SegmentIndex =
+            boost::locale::boundary::segment_index<std::string::const_iterator>;
+        SegmentIndex const characters(
+            boost::locale::boundary::character,
+            utf8_str.cbegin(),
+            utf8_str.cend()
+        );
 
         for (auto char_it = characters.begin(); char_it != characters.end(); ++char_it)
         {
@@ -68,7 +74,10 @@ namespace text
 
             char32_t const code_point = *code_point_it;
 
-            int const width_type = u_getIntPropertyValue(static_cast<UChar32>(code_point), UCHAR_EAST_ASIAN_WIDTH);
+            int const width_type = u_getIntPropertyValue(
+                static_cast<UChar32>(code_point),
+                UCHAR_EAST_ASIAN_WIDTH
+            );
             if ((width_type == U_EA_FULLWIDTH) || (width_type == U_EA_WIDE))
             {
                 width += 1;
@@ -81,11 +90,16 @@ namespace text
 
 struct ance::core::Reporter::Implementation
 {
-    Implementation(Reporter* reporter, sources::SourceTree& source_tree, std::ostream& out, Options const& options)
-        : reporter_(reporter)
-        , source_tree_(source_tree)
-        , out_(out)
-        , options_(options)
+    Implementation(
+        Reporter*            reporter,
+        sources::SourceTree& source_tree,
+        std::ostream&        out,
+        Options const&       options
+    )
+        : reporter_(reporter),
+          source_tree_(source_tree),
+          out_(out),
+          options_(options)
     {}
 
     [[nodiscard]] char const* color(char const* const value) const
@@ -112,7 +126,13 @@ struct ance::core::Reporter::Implementation
         return color(ansi::ColorReset);
     }
 
-    [[nodiscard]] bool annotateOutput(Location const& location, std::string const& message, Level const level, bool const indent, size_t max_line_digits) const
+    [[nodiscard]] bool annotateOutput(
+        Location const&    location,
+        std::string const& message,
+        Level const        level,
+        bool const         indent,
+        size_t             max_line_digits
+    ) const
     {
         if (indent) out_ << "  ";
 
@@ -134,59 +154,80 @@ struct ance::core::Reporter::Implementation
 
             if (level == Level::ERROR || level == Level::WARNING)
             {
-                printCritical(out_, "Warnings and errors in core code indicate a critical language or compiler issue!");
+                printCritical(
+                    out_,
+                    "Warnings and errors in core code indicate a critical language or "
+                    "compiler issue!"
+                );
                 out_ << std::endl;
             }
 
             return false;
         }
 
-        sources::SourceFile const& source_file = source_tree_.getFile(location.fileIndex());
+        sources::SourceFile const& source_file =
+            source_tree_.getFile(location.fileIndex());
 
         out_ << source_file.getRelativePath().generic_string() << " ";
         out_ << location << " " << message << std::endl;
 
         if (location.isFile()) return false;
 
-        std::string const line_prefix       = std::format(" {0:>{1}} | ", location.line(), max_line_digits);
-        std::string const empty_line_prefix = std::format(" {0:>{1}} | ", "", max_line_digits);
+        std::string const line_prefix =
+            std::format(" {0:>{1}} | ", location.line(), max_line_digits);
+        std::string const empty_line_prefix =
+            std::format(" {0:>{1}} | ", "", max_line_digits);
         assert(line_prefix.length() == empty_line_prefix.length());
 
         out_ << empty_line_prefix << std::endl;
 
         size_t start = 0;
 
-        std::u32string_view const line_view = text::trim(source_file.getLine(location.line()), start);
-        out_ << line_prefix << boost::locale::conv::utf_to_utf<char>(std::u32string(line_view)) << std::endl;
+        std::u32string_view const line_view =
+            text::trim(source_file.getLine(location.line()), start);
+        out_ << line_prefix
+             << boost::locale::conv::utf_to_utf<char>(std::u32string(line_view))
+             << std::endl;
 
         if (location.isSingleLine())
         {
             size_t const length_to_mark = location.column() - start - 1;
             size_t const length_of_mark = location.columnEnd() - location.column() + 1;
 
-            std::u32string_view const text_to_mark   = line_view.substr(0, length_to_mark);
-            std::u32string_view const text_with_mark = length_to_mark >= line_view.size() ? U"" : line_view.substr(length_to_mark, length_of_mark);
+            std::u32string_view const text_to_mark = line_view.substr(0, length_to_mark);
+            std::u32string_view const text_with_mark =
+                length_to_mark >= line_view.size()
+                    ? U""
+                    : line_view.substr(length_to_mark, length_of_mark);
 
             size_t const missing_to_mark   = length_to_mark - text_to_mark.size();
             size_t const missing_with_mark = length_of_mark - text_with_mark.size();
 
-            size_t const marker_start  = std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 0uz);
-            size_t const marker_length = std::max(text::estimateWidth(text_with_mark) + missing_with_mark, 1uz);
+            size_t const marker_start =
+                std::max(text::estimateWidth(text_to_mark) + missing_to_mark, 0uz);
+            size_t const marker_length =
+                std::max(text::estimateWidth(text_with_mark) + missing_with_mark, 1uz);
 
-            out_ << empty_line_prefix << std::string(marker_start, ' ') << color(level) << std::string(marker_length, '~') << color(ansi::ColorReset)
+            out_ << empty_line_prefix << std::string(marker_start, ' ') << color(level)
+                 << std::string(marker_length, '~') << color(ansi::ColorReset)
                  << std::endl;
         }
         else
         {
             size_t const extra_lines = location.lineEnd() - location.line();
-            out_ << empty_line_prefix << color(ansi::ColorMeta) << "(+ " << extra_lines << " more line" << (extra_lines > 1 ? "s" : "") << ")"
+            out_ << empty_line_prefix << color(ansi::ColorMeta) << "(+ " << extra_lines
+                 << " more line" << (extra_lines > 1 ? "s" : "") << ")"
                  << color(ansi::ColorReset) << std::endl;
         }
 
         return true;
     }
 
-    void report(Level level, std::span<std::tuple<Annotation, std::ostringstream> const> annotations, std::string const& compiler_location);
+    void report(
+        Level                                                       level,
+        std::span<std::tuple<Annotation, std::ostringstream> const> annotations,
+        std::string const&                                          compiler_location
+    );
 
     void clear()
     {
@@ -202,7 +243,8 @@ struct ance::core::Reporter::Implementation
 
             if (errorCount() > 0)
             {
-                out_ << color(ansi::ColorError) << errorCount() << " error" << (errorCount() > 1 ? "s" : "") << color(ansi::ColorReset);
+                out_ << color(ansi::ColorError) << errorCount() << " error"
+                     << (errorCount() > 1 ? "s" : "") << color(ansi::ColorReset);
             }
             else
             {
@@ -213,7 +255,8 @@ struct ance::core::Reporter::Implementation
 
             if (warningCount() > 0)
             {
-                out_ << color(ansi::ColorWarning) << warningCount() << " warning" << (warningCount() > 1 ? "s" : "") << color(ansi::ColorReset);
+                out_ << color(ansi::ColorWarning) << warningCount() << " warning"
+                     << (warningCount() > 1 ? "s" : "") << color(ansi::ColorReset);
             }
             else
             {
@@ -222,7 +265,8 @@ struct ance::core::Reporter::Implementation
 
             out_ << std::endl;
 
-            out_ << "ance: " << color(ansi::ColorError) << "Failed" << color(ansi::ColorReset);
+            out_ << "ance: " << color(ansi::ColorError) << "Failed"
+                 << color(ansi::ColorReset);
 
             if (errorCount() == 0) out_ << " (by warning)";
 
@@ -232,19 +276,31 @@ struct ance::core::Reporter::Implementation
         {
             if (warningCount() > 0)
             {
-                out_ << "ance: " << color(ansi::ColorWarning) << warningCount() << " warning" << (warningCount() > 1 ? "s" : "") << color(ansi::ColorReset)
-                     << std::endl;
+                out_ << "ance: " << color(ansi::ColorWarning) << warningCount()
+                     << " warning" << (warningCount() > 1 ? "s" : "")
+                     << color(ansi::ColorReset) << std::endl;
             }
 
-            out_ << "ance: " << color(ansi::ColorSuccess) << "Success" << color(ansi::ColorReset) << std::endl;
+            out_ << "ance: " << color(ansi::ColorSuccess) << "Success"
+                 << color(ansi::ColorReset) << std::endl;
         }
 
         clear();
     }
 
-    MessageBuilder beginReport(Level const level, std::string const& compiler_location, Location const& location)
+    MessageBuilder beginReport(
+        Level const        level,
+        std::string const& compiler_location,
+        Location const&    location
+    )
     {
-        return {*reporter_, level, compiler_location, location, level != Level::TRACE || isTraceEnabled()};
+        return {
+            *reporter_,
+            level,
+            compiler_location,
+            location,
+            level != Level::TRACE || isTraceEnabled()
+        };
     }
 
     [[nodiscard]] bool isFailed() const
@@ -277,35 +333,41 @@ struct ance::core::Reporter::Implementation
     Options              options_;
 };
 
-ance::core::Reporter::Annotation::Annotation(Location const& location) : location_(location) {}
+ance::core::Reporter::Annotation::Annotation(Location const& location)
+    : location_(location)
+{}
 
 ance::core::Location const& ance::core::Reporter::Annotation::location() const
 {
     return location_;
 }
 
-ance::core::Reporter::MessageBuilder::MessageBuilder(Reporter&       reporter,
-                                                     Level const     level,
-                                                     std::string     compiler_location,
-                                                     Location const& location,
-                                                     bool const      enabled)
-    : reporter_(&reporter)
-    , level_(level)
-    , compiler_location_(std::move(compiler_location))
+ance::core::Reporter::MessageBuilder::MessageBuilder(
+    Reporter&       reporter,
+    Level const     level,
+    std::string     compiler_location,
+    Location const& location,
+    bool const      enabled
+)
+    : reporter_(&reporter),
+      level_(level),
+      compiler_location_(std::move(compiler_location))
 {
     if (enabled) annotations_.emplace_back(Annotation(location), std::ostringstream());
 }
 
 ance::core::Reporter::MessageBuilder::MessageBuilder(MessageBuilder&& other) noexcept
-    : reporter_(other.reporter_)
-    , level_(other.level_)
-    , compiler_location_(std::move(other.compiler_location_))
-    , annotations_(std::move(other.annotations_))
+    : reporter_(other.reporter_),
+      level_(other.level_),
+      compiler_location_(std::move(other.compiler_location_)),
+      annotations_(std::move(other.annotations_))
 {
     other.reporter_ = nullptr;
 }
 
-ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::operator=(MessageBuilder&& other) noexcept
+ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::operator=(
+    MessageBuilder&& other
+) noexcept
 {
     if (this == &other) return *this;
 
@@ -327,7 +389,9 @@ ance::core::Reporter::MessageBuilder::~MessageBuilder()
     }
 }
 
-ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::operator<<(Annotation const& annotation)
+ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::operator<<(
+    Annotation const& annotation
+)
 {
     if (reporter_ != nullptr && !annotations_.empty())
     {
@@ -337,13 +401,19 @@ ance::core::Reporter::MessageBuilder& ance::core::Reporter::MessageBuilder::oper
     return *this;
 }
 
-ance::core::Reporter::Reporter(sources::SourceTree& source_tree, std::ostream& out, Options const& options)
+ance::core::Reporter::Reporter(
+    sources::SourceTree& source_tree,
+    std::ostream&        out,
+    Options const&       options
+)
     : implementation_(utility::makeOwned<Implementation>(this, source_tree, out, options))
 {}
 
-void ance::core::Reporter::Implementation::report(Level const                                                 level,
-                                                  std::span<std::tuple<Annotation, std::ostringstream> const> annotations,
-                                                  std::string const&                                          compiler_location)
+void ance::core::Reporter::Implementation::report(
+    Level const                                                 level,
+    std::span<std::tuple<Annotation, std::ostringstream> const> annotations,
+    std::string const&                                          compiler_location
+)
 {
     if (level == Level::TRACE && !isTraceEnabled()) return;
 
@@ -358,7 +428,8 @@ void ance::core::Reporter::Implementation::report(Level const                   
             out_ << color(ansi::ColorError) << "error" << color(ansi::ColorReset) << ": ";
             break;
         case Level::WARNING:
-            out_ << color(ansi::ColorWarning) << "warning" << color(ansi::ColorReset) << ": ";
+            out_ << color(ansi::ColorWarning) << "warning" << color(ansi::ColorReset)
+                 << ": ";
             break;
         case Level::INFO:
             out_ << color(ansi::ColorInfo) << "info" << color(ansi::ColorReset) << ": ";
@@ -373,16 +444,26 @@ void ance::core::Reporter::Implementation::report(Level const                   
         out_ << "[" << compiler_location << "] ";
     }
 
-    auto const   annotation_lines = annotations | std::views::transform([](auto const& entry) { return std::get<0>(entry).location().line(); });
-    size_t const max_line         = annotations.empty() ? 0 : std::ranges::max(annotation_lines);
-    auto const   max_line_digits  = max_line == 0 ? 1uz : static_cast<size_t>(std::log10(max_line) + 1);
+    auto const annotation_lines =
+        annotations | std::views::transform([](auto const& entry) {
+            return std::get<0>(entry).location().line();
+        });
+    size_t const max_line = annotations.empty() ? 0 : std::ranges::max(annotation_lines);
+    auto const   max_line_digits =
+        max_line == 0 ? 1uz : static_cast<size_t>(std::log10(max_line) + 1);
 
     bool first            = true;
     bool included_snippet = false;
 
     for (auto const& [annotation, stream] : annotations)
     {
-        included_snippet |= annotateOutput(annotation.location(), stream.str(), first ? level : Level::INFO, !first, max_line_digits);
+        included_snippet |= annotateOutput(
+            annotation.location(),
+            stream.str(),
+            first ? level : Level::INFO,
+            !first,
+            max_line_digits
+        );
         first = false;
     }
 
@@ -394,7 +475,10 @@ void ance::core::Reporter::Implementation::report(Level const                   
 
 ance::core::Reporter::~Reporter() = default;
 
-ance::core::Reporter::MessageBuilder ance::core::Reporter::trace(std::string const& compiler_location, Location const& location)
+ance::core::Reporter::MessageBuilder ance::core::Reporter::trace(
+    std::string const& compiler_location,
+    Location const&    location
+)
 {
     return implementation_->beginReport(Level::TRACE, compiler_location, location);
 }
@@ -404,7 +488,9 @@ ance::core::Reporter::MessageBuilder ance::core::Reporter::info(Location const& 
     return implementation_->beginReport(Level::INFO, "", location);
 }
 
-ance::core::Reporter::MessageBuilder ance::core::Reporter::warning(Location const& location)
+ance::core::Reporter::MessageBuilder ance::core::Reporter::warning(
+    Location const& location
+)
 {
     return implementation_->beginReport(Level::WARNING, "", location);
 }
@@ -444,12 +530,17 @@ void ance::core::Reporter::print(std::ostream& out, std::string const& message)
     out << "ance: " << message << std::endl;
 }
 
-void ance::core::Reporter::print(std::ostream& out, std::string const& prefix, std::string const& message)
+void ance::core::Reporter::print(
+    std::ostream&      out,
+    std::string const& prefix,
+    std::string const& message
+)
 {
     out << "ance: " << prefix << ": " << message << std::endl;
 }
 
 void ance::core::Reporter::printCritical(std::ostream& out, std::string const& message)
 {
-    out << "ance: " << ansi::ColorCritical << "internal error" << ansi::ColorReset << ": " << ansi::ColorCritical << message << ansi::ColorReset << std::endl;
+    out << "ance: " << ansi::ColorCritical << "internal error" << ansi::ColorReset << ": "
+        << ansi::ColorCritical << message << ansi::ColorReset << std::endl;
 }

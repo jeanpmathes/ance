@@ -5,7 +5,8 @@
 namespace ance::cet
 {
     Address::Address(Memory& memory, std::vector<size_t> indices)
-        : memory_(memory), indices_(std::move(indices))
+        : memory_(memory),
+          indices_(std::move(indices))
     {}
 
     Memory& Address::memory() const

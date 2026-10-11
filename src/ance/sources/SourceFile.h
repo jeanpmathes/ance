@@ -15,7 +15,11 @@ namespace ance::sources
         /// \param base_directory The base directory.
         /// \param file The path to the file from the base directory.
         /// \param index The index of the file in the source tree.
-        SourceFile(std::filesystem::path const& base_directory, std::filesystem::path const& file, size_t index);
+        SourceFile(
+            std::filesystem::path const& base_directory,
+            std::filesystem::path const& file,
+            size_t                       index
+        );
 
         SourceFile(SourceFile const& other) = delete;
         SourceFile(SourceFile&& other)      = delete;
@@ -34,7 +38,11 @@ namespace ance::sources
         /// \param column_start The first column to include, starting with index 1.
         /// \param column_end The last column to include.
         /// \return A view of the slice.
-        [[nodiscard]] std::u32string_view getLineSlice(size_t line, unsigned int column_start, unsigned int column_end) const;
+        [[nodiscard]] std::u32string_view getLineSlice(
+            size_t       line,
+            unsigned int column_start,
+            unsigned int column_end
+        ) const;
 
         /// Get the path to the source file.
         /// \return The path, relative to the base directory.

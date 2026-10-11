@@ -28,7 +28,7 @@ namespace ance::core
             /// - The type of the variable to declare.
             ///
             /// It returns a reference to the declared variable.
-            DECLARE,// todo: after compilation: maybe this should be a method on scope
+            DECLARE, // todo: after compilation: maybe this should be a method on scope
 
             /// Finds a variable in the chain of scopes and provides a reference to it.
             ///
@@ -37,7 +37,7 @@ namespace ance::core
             /// - The identifier of the variable to resolve.
             ///
             /// It returns a reference to the resolved variable.
-            RESOLVE,// todo: after compilation: maybe this should be a method on scope
+            RESOLVE, // todo: after compilation: maybe this should be a method on scope
 
             /// Erases a variable from a scope, making it inaccessible for future lookups.
             ///
@@ -46,7 +46,7 @@ namespace ance::core
             /// - The identifier of the variable to erase.
             ///
             /// It returns the unit type.
-            ERASE,// todo: after compilation: maybe this should be a method on scope
+            ERASE, // todo: after compilation: maybe this should be a method on scope
 
             /// Provides access to the parent scope of a scope.
             ///
@@ -54,7 +54,7 @@ namespace ance::core
             /// - The scope to get the parent of.
             ///
             /// It returns the parent scope.
-            GET_PARENT,// todo: after compilation: maybe this should be a method on scope
+            GET_PARENT, // todo: after compilation: maybe this should be a method on scope
 
             /// Converts a boolean value to its string representation.
             ///
@@ -62,7 +62,7 @@ namespace ance::core
             /// - The boolean to convert.
             ///
             /// It returns the string representation of the boolean.
-            B_2_STR,// todo: implement as core function
+            B_2_STR, // todo: implement as core function
 
             /// Converts a size value to its string representation.
             ///
@@ -78,7 +78,7 @@ namespace ance::core
             /// - The half precision float to convert.
             ///
             /// It returns the string representation of the float.
-            FH_2_STR,// todo: implement as core function
+            FH_2_STR, // todo: implement as core function
 
             /// Converts a single precision float value to its string representation.
             ///
@@ -86,7 +86,7 @@ namespace ance::core
             /// - The single precision float to convert.
             ///
             /// It returns the string representation of the float.
-            FS_2_STR,// todo: implement as core function
+            FS_2_STR, // todo: implement as core function
 
             /// Converts a double precision float value to its string representation.
             ///
@@ -94,7 +94,7 @@ namespace ance::core
             /// - The double precision float to convert.
             ///
             /// It returns the string representation of the float.
-            FD_2_STR,// todo: implement as core function
+            FD_2_STR, // todo: implement as core function
 
             /// Converts a quad precision float value to its string representation.
             ///
@@ -102,7 +102,7 @@ namespace ance::core
             /// - The quad precision float to convert.
             ///
             /// It returns the string representation of the float.
-            FQ_2_STR,// todo: implement as core function
+            FQ_2_STR, // todo: implement as core function
 
             /// Computes logical negation of a boolean value.
             ///
@@ -138,7 +138,7 @@ namespace ance::core
             /// - Any number of additional arguments to pass to the intrinsic.
             ///
             /// It returns the result of the called intrinsic.
-            CALL_INTRINSIC,// todo: remove variadic parameters, instead take a string and a list of arguments
+            CALL_INTRINSIC, // todo: remove variadic parameters, instead take a string and a list of arguments
 
             SIZE_ADD,
             SIZE_SUB,
@@ -153,7 +153,7 @@ namespace ance::core
             SIZE_EQ,
             SIZE_NE,
 
-            HALF_ADD,// todo: maybe these can be made generic in the same way that integer ops are, just not over bit size but precisions
+            HALF_ADD, // todo: maybe these can be made generic in the same way that integer ops are, just not over bit size but precisions
             HALF_SUB,
             HALF_MUL,
             HALF_DIV,
@@ -225,9 +225,10 @@ namespace ance::core
         };
 
         Intrinsic() = default;
-        constexpr Intrinsic(Value const value) : value_(value) {}// NOLINT(google-explicit-constructor)
+        constexpr Intrinsic(Value const value)
+            : value_(value) {} // NOLINT(google-explicit-constructor)
 
-                 operator Value() const;// NOLINT(google-explicit-constructor)
+                 operator Value() const; // NOLINT(google-explicit-constructor)
         explicit operator bool() = delete;
 
         [[nodiscard]] Value       value() const;

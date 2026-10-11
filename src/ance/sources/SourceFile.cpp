@@ -5,11 +5,15 @@
 
 #include <boost/locale/encoding.hpp>
 
-ance::sources::SourceFile::SourceFile(std::filesystem::path const& base_directory, std::filesystem::path const& file, size_t const index)
-    : relative_path_(file)
-    , absolute_path_(std::filesystem::absolute(base_directory / file))
-    , index_(index)
-    , is_ok_(false)
+ance::sources::SourceFile::SourceFile(
+    std::filesystem::path const& base_directory,
+    std::filesystem::path const& file,
+    size_t const                 index
+)
+    : relative_path_(file),
+      absolute_path_(std::filesystem::absolute(base_directory / file)),
+      index_(index),
+      is_ok_(false)
 {
     std::ifstream file_stream(absolute_path_);
 
@@ -38,7 +42,11 @@ std::u32string_view ance::sources::SourceFile::getLine(size_t const line) const
     return std::u32string_view(lines_[line - 1]);
 }
 
-std::u32string_view ance::sources::SourceFile::getLineSlice(size_t const line, unsigned int column_start, unsigned int column_end) const
+std::u32string_view ance::sources::SourceFile::getLineSlice(
+    size_t const line,
+    unsigned int column_start,
+    unsigned int column_end
+) const
 {
     column_start -= 1;
     column_end -= 1;

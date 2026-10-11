@@ -33,7 +33,10 @@ namespace ance::sources
         /// \return The source files.
         [[nodiscard]] auto getSourceFiles()
         {
-            return source_files_ | std::views::transform([](auto& source_file) -> SourceFile& { return *source_file; });
+            return source_files_
+                 | std::views::transform([](auto& source_file) -> SourceFile& {
+                       return *source_file;
+                   });
         }
 
       private:

@@ -12,8 +12,7 @@ bool ance::core::Assigner::hasSymbol() const
 
 std::string ance::core::Assigner::getSymbol() const
 {
-    if (!hasSymbol())
-        return "";
+    if (!hasSymbol()) return "";
 
     switch (value_)
     {

@@ -38,10 +38,14 @@ llvm::fltSemantics const& ance::core::Precision::getLlvmSemantics() const
 {
     switch (value_)
     {
-        case HALF: return llvm::APFloat::IEEEhalf();
-        case SINGLE: return llvm::APFloat::IEEEsingle();
-        case DOUBLE: return llvm::APFloat::IEEEdouble();
-        case QUAD: return llvm::APFloat::IEEEquad();
+        case HALF:
+            return llvm::APFloat::IEEEhalf();
+        case SINGLE:
+            return llvm::APFloat::IEEEsingle();
+        case DOUBLE:
+            return llvm::APFloat::IEEEdouble();
+        case QUAD:
+            return llvm::APFloat::IEEEquad();
     }
 
     throw std::invalid_argument("Invalid precision");
@@ -51,10 +55,14 @@ std::string ance::core::Precision::getSuffix() const
 {
     switch (value_)
     {
-        case HALF: return "h";
-        case SINGLE: return "s";
-        case DOUBLE: return "d";
-        case QUAD: return "q";
+        case HALF:
+            return "h";
+        case SINGLE:
+            return "s";
+        case DOUBLE:
+            return "d";
+        case QUAD:
+            return "q";
     }
 
     throw std::invalid_argument("Invalid precision");

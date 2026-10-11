@@ -18,7 +18,10 @@ namespace ance::utility // todo: remove
       public:
         ~ConcreteNode() override = default;
 
-        void accept(VisitorT& visitor) const override { visitor.visit(static_cast<T const&>(*this)); }
+        void accept(VisitorT& visitor) const override
+        {
+            visitor.visit(static_cast<T const&>(*this));
+        }
     };
 
     template<typename VisitorT>
@@ -27,7 +30,10 @@ namespace ance::utility // todo: remove
       public:
         virtual ~AbstractVisitor() = default;
 
-        void visit(AbstractNode<VisitorT> const& node) { node.accept(static_cast<VisitorT&>(*this)); }
+        void visit(AbstractNode<VisitorT> const& node)
+        {
+            node.accept(static_cast<VisitorT&>(*this));
+        }
     };
 }
 
