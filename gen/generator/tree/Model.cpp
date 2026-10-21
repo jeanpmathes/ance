@@ -136,7 +136,8 @@ namespace
         std::set<std::string> const&                   all_node_names
     )
     {
-        if (!all_node_names.contains(definition.type))
+        bool const is_child_node = all_node_names.contains(definition.type);
+        if (!is_child_node)
         {
             model.external_forward_declarations.insert(definition.type);
         }
@@ -164,9 +165,11 @@ namespace
         }
 
         return {
-            .name      = definition.name,
-            .type      = full_type,
-            .semantics = tree::MemberSemantics::VALUE_MOVE
+            .name                  = definition.name,
+            .type                  = full_type,
+            .semantics             = tree::MemberSemantics::VALUE_MOVE,
+            .multiplicity          = definition.multiplicity,
+            .is_owned_tree_element = is_child_node
         };
     }
 
@@ -185,20 +188,22 @@ namespace
         {
             case tree::Definition::Multiplicity::ONE:
                 return {
-                    .name      = definition.name,
-                    .type      = definition.type,
-                    .semantics = definition.is_const
-                                   ? tree::MemberSemantics::CONST_REFERENCE
-                                   : tree::MemberSemantics::MUTABLE_REFERENCE
+                    .name         = definition.name,
+                    .type         = definition.type,
+                    .semantics    = definition.is_const
+                                      ? tree::MemberSemantics::CONST_REFERENCE
+                                      : tree::MemberSemantics::MUTABLE_REFERENCE,
+                    .multiplicity = definition.multiplicity
                 };
 
             case tree::Definition::Multiplicity::ZERO_OR_ONE:
                 return {
-                    .name      = definition.name,
-                    .type      = definition.type,
-                    .semantics = definition.is_const
-                                   ? tree::MemberSemantics::CONST_POINTER
-                                   : tree::MemberSemantics::MUTABLE_POINTER
+                    .name         = definition.name,
+                    .type         = definition.type,
+                    .semantics    = definition.is_const
+                                      ? tree::MemberSemantics::CONST_POINTER
+                                      : tree::MemberSemantics::MUTABLE_POINTER,
+                    .multiplicity = definition.multiplicity
                 };
 
             case tree::Definition::Multiplicity::ZERO_OR_MORE:
@@ -208,7 +213,8 @@ namespace
                     .name = definition.name,
                     .type = "utility::List<std::reference_wrapper<" + definition.type
                           + (definition.is_const ? " const" : "") + ">>",
-                    .semantics = tree::MemberSemantics::VALUE_MOVE
+                    .semantics    = tree::MemberSemantics::VALUE_MOVE,
+                    .multiplicity = definition.multiplicity
                 };
         }
 
@@ -357,10 +363,7 @@ namespace tree
 
         model.project_includes.insert("ance/core/Location.h");
 
-        if (!builder.categories.empty())
-        {
-            model.standard_includes.insert("<utility>");
-        }
+        model.standard_includes.insert("<utility>");
 
         std::set<std::string> all_node_names = {"Node"};
         for (Definition::NodeBuilder const& node_builder : builder.nodes)

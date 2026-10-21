@@ -12,7 +12,11 @@
 
 namespace tree
 {
-    /// Defines a node tree.
+    /// Defines a node tree for which both all needed node structs and visitors are
+    /// generated. A tree is a structure of nodes, where each node has members and
+    /// methods. Nodes can own other nodes and reference nodes of the same tree.
+    /// Nodes can also have attributes.
+    /// An example of such a tree is the Abstract Syntax Tree (AST).
     class Definition : public ::Definition
     {
       public:

@@ -137,18 +137,25 @@ namespace ance
 
             return exit_code;
 
-            // todo: run autoformat on everything
+            // todo: add two auto-generated subclasses of the visitor:
+            // todo: one where all methods have a default implementation that returns just a provided default value (in ctor, there is only one generic return type) -> but void should be supported
+            // todo: one where all methods by default traverse the children and use an aggregation function to combine return values -> but void should be supported
 
-            // todo: code gen - use python to generate the Node files, specifically Node.h and Node.generated.cpp, also integrate well with cmake
-            // todo: use this for all Node trees, add a comment that when writing the compiler in ance it should of course not use python codegen
-            // todo: it should also assist with serialization later, by requiring a stable ID for each Node, generate an enum for each type
-            // todo: also use this to improve tracing by automatically writing the trace, also creating an exit trace if needed (e.g. by allowing to easily access the destination of statements)
-            // todo: also give each some a clone method (clone would need to handle refs, so not everything would be cloneable) that can clone them, use this to refactor Function - it currently keeps a const& to the body, but now function ctor could clone instead so the class can be streamlined
+            // todo: refactor all visitor inheritors so that they use that the return values can be set in template
+
+            // todo: use code gen to improve tracing by automatically writing the trace, also creating an exit trace if needed (e.g. by allowing to easily access the destination of statements)
+
+            // todo: use code gen give each some a clone method (clone would need to handle refs, so not everything would be cloneable) that can clone them, use this to refactor Function - it currently keeps a const& to the body, but now function ctor could clone instead so the class can be streamlined
             // todo: also implement function in such a way that it can be used as a key in a dictionary, should be immutable and support hashing / ordering / whatever
-            // todo: instead of the current return handling, the generated visitors should allow generic return values for the different groups (statements, expressions, declarations), also think about how to apply that to parser as well
+
+            // todo: try to get rid of the dynamic cast in Segementer for the control flow analysis, e.g. using a standard pass-through visitor that has nice default implementations for all methods (calling children) - generate that one
+
+            // todo: maybe instead of string references for references/ownership of nodes, move out node constructors into separate variables, and use those variables, same for categories
+            // todo: and maybe allow tree inheritance, so basing AST on EST, maybe even make the generated code compatible
+
             // todo: think of a way to split the large visitors into smaller files (so one header, multiple cpp, and a private header, could split for expressions/statements/...)
             // todo: analyze code quality after this
-            // todo: try to get rid of the dynamic cast in Segementer for the control flow analysis, e.g. using a standard pass-through visitor that has nice default implementations for all methods (calling children) - generate that one
+
             // todo: write some related documentation for this, repeat this note for the next step
 
             // todo: test if I can go back to a single expression rule in the grammar, instead of the current one
@@ -323,6 +330,7 @@ namespace ance
 
             // todo: when adding serialization of trees for cmp libraries, also serialize the trees of the core language functions and of the types
             // todo: this means on first run the compiler has to build the core language functions and types, serialize them, and later it just loads them (add a command line flag to force rebuild)
+            // todo: the code gen can help, supporting automatic serialization and deserialization of trees
 
             // todo: the compiler should also serialize each file it compiles on EST or BBT level, so that recompilation can be avoided if the file did not change
             // todo: determine which tree is the best for this, so that no other factors like compiler parameters need to be considered

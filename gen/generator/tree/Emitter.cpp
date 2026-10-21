@@ -110,15 +110,10 @@ namespace
             stream << "    >\n";
         }
         stream << "    class Visitor;\n\n";
-
-        if (visitor_template_names.empty())
-        {
-            stream << "    using DefaultVisitor = Visitor;\n\n";
-        }
-        else
-        {
-            stream << "    using DefaultVisitor = Visitor<>;\n\n";
-        }
+        stream << "    template<typename Result = void>\n";
+        stream << "    class DirectVisitor;\n\n";
+        stream << "    template<typename Result = void>\n";
+        stream << "    class TraversingVisitor;\n\n";
     }
 
     void emitNodeForwardDeclarations(
@@ -341,6 +336,7 @@ namespace
         {
             std::string const result_type = category.name + "Result";
 
+            stream << "\n";
             for (std::size_t const child_index : category.child_node_indices)
             {
                 tree::Node const& node           = model.nodes[child_index];
@@ -349,26 +345,23 @@ namespace
                 stream << "        virtual " << result_type << " visit(" << node.name
                        << " const& " << parameter_name << ") = 0;\n";
             }
-
-            stream << "\n";
         }
     }
 
     void emitVisitorTopLevelPureVirtuals(std::ostream& stream, tree::Model const& model)
     {
-        for (std::size_t const index : model.top_level_node_indices)
-        {
-            tree::Node const& node           = model.nodes[index];
-            std::string const result_type    = node.name + "Result";
-            std::string const parameter_name = formatNodeParameterName(node.name);
-
-            stream << "        virtual " << result_type << " visit(" << node.name
-                   << " const& " << parameter_name << ") = 0;\n";
-        }
-
         if (!model.top_level_node_indices.empty())
         {
             stream << "\n";
+            for (std::size_t const index : model.top_level_node_indices)
+            {
+                tree::Node const& node           = model.nodes[index];
+                std::string const result_type    = node.name + "Result";
+                std::string const parameter_name = formatNodeParameterName(node.name);
+
+                stream << "        virtual " << result_type << " visit(" << node.name
+                       << " const& " << parameter_name << ") = 0;\n";
+            }
         }
     }
 
@@ -381,6 +374,7 @@ namespace
         std::string const result_type    = category.name + "Result";
         std::string const parameter_name = formatNodeParameterName(category.name);
 
+        stream << "\n";
         stream << "        virtual " << result_type << " visit(" << category.name
                << " const& " << parameter_name << ")\n";
         stream << "        {\n";
@@ -394,12 +388,13 @@ namespace
                    << utility::toUpperCase(utility::toSnakeCase(child_node.name))
                    << ":\n";
             stream << "                    return visit(static_cast<" << child_node.name
-                   << " const&>(" << parameter_name << "));\n";
+                   << " const&>(" << parameter_name
+                   << ")); // NOLINT(cppcoreguidelines-pro-type-static-cast-downcast)\n";
         }
 
         stream << "            }\n";
         stream << "            std::unreachable();\n";
-        stream << "        }\n\n";
+        stream << "        }\n";
     }
 
     void emitVisitorCategoryDispatches(std::ostream& stream, tree::Model const& model)
@@ -434,13 +429,363 @@ namespace
         stream << "    class Visitor\n";
         stream << "    {\n";
         stream << "      public:\n";
-        stream << "        virtual ~Visitor() = default;\n\n";
+        stream << "        virtual ~Visitor() = default;\n";
 
         emitVisitorCategoryPureVirtuals(stream, model);
         emitVisitorTopLevelPureVirtuals(stream, model);
         emitVisitorCategoryDispatches(stream, model);
 
+        stream << "    };\n\n";
+    }
+
+    std::string formatVisitorBaseType(
+        std::size_t const  template_parameter_count,
+        std::string const& argument_type
+    )
+    {
+        if (template_parameter_count == 0)
+        {
+            return "Visitor";
+        }
+
+        std::string base = "Visitor<";
+        for (std::size_t index = 0; index < template_parameter_count; ++index)
+        {
+            base += argument_type;
+            if (index + 1 < template_parameter_count)
+            {
+                base += ", ";
+            }
+        }
+        base += '>';
+        return base;
+    }
+
+    void emitDirectVisitorPrimaryTemplate(
+        std::ostream&      stream,
+        tree::Model const& model,
+        std::size_t const  template_parameter_count
+    )
+    {
+        std::string const base_type =
+            formatVisitorBaseType(template_parameter_count, "Result");
+
+        stream << "    template<typename Result>\n";
+        stream << "    class DirectVisitor : public " << base_type << "\n";
+        stream << "    {\n";
+        stream << "      public:\n";
+        stream << "        using Base = " << base_type << ";\n";
+        stream << "        using Base::visit;\n\n";
+        stream << "        DirectVisitor() = default;\n";
+
+        for (std::size_t index = 1; index < model.nodes.size(); ++index)
+        {
+            tree::Node const& node = model.nodes[index];
+            if (node.is_abstract)
+            {
+                continue;
+            }
+
+            stream << "\n";
+            stream << "        Result visit(" << node.name << " const&) override\n";
+            stream << "        {\n";
+            stream << "            return Result {};\n";
+            stream << "        }\n";
+        }
+
+        stream << "    };\n\n";
+    }
+
+    void emitDirectVisitorVoidSpecialization(
+        std::ostream&      stream,
+        tree::Model const& model,
+        std::size_t const  template_parameter_count
+    )
+    {
+        std::string const base_type =
+            template_parameter_count == 0 ? "Visitor" : "Visitor<>";
+
+        stream << "    template<>\n";
+        stream << "    class DirectVisitor<void> : public " << base_type << "\n";
+        stream << "    {\n";
+        stream << "      public:\n";
+        stream << "        using Base = Visitor;\n";
+        stream << "        using Base::visit;\n\n";
+        stream << "        DirectVisitor() = default;\n\n";
+
+        for (std::size_t index = 1; index < model.nodes.size(); ++index)
+        {
+            tree::Node const& node = model.nodes[index];
+            if (node.is_abstract)
+            {
+                continue;
+            }
+
+            stream << "        void visit(" << node.name << " const&) override {}\n";
+        }
+
+        stream << "    };\n\n";
+    }
+
+    void emitDirectVisitorClass(
+        std::ostream&      stream,
+        tree::Model const& model,
+        std::size_t const  template_parameter_count
+    )
+    {
+        emitDirectVisitorPrimaryTemplate(stream, model, template_parameter_count);
+        emitDirectVisitorVoidSpecialization(stream, model, template_parameter_count);
+    }
+
+    void emitAccumulatingSingleChildVisit(
+        std::ostream&       stream,
+        std::string const&  parameter_name,
+        tree::Member const& member
+    )
+    {
+        stream << "            accumulator = "
+                  "this->combine(std::move(accumulator), this->visit(*"
+               << parameter_name << "." << member.name << "));\n";
+    }
+
+    void emitAccumulatingOptionalChildVisit(
+        std::ostream&       stream,
+        std::string const&  parameter_name,
+        tree::Member const& member
+    )
+    {
+        stream << "            if (" << parameter_name << "." << member.name
+               << ".hasValue())\n";
+        stream << "            {\n";
+        stream << "                accumulator = "
+                  "this->combine(std::move(accumulator), this->visit(**"
+               << parameter_name << "." << member.name << "));\n";
+        stream << "            }\n";
+    }
+
+    void emitAccumulatingListChildVisit(
+        std::ostream&       stream,
+        std::string const&  parameter_name,
+        tree::Member const& member
+    )
+    {
+        stream << "            for (auto const& element : " << parameter_name << "."
+               << member.name << ")\n";
+        stream << "            {\n";
+        stream << "                accumulator = "
+                  "this->combine(std::move(accumulator), this->visit(*element));\n";
+        stream << "            }\n";
+    }
+
+    void emitAccumulatingChildVisit(
+        std::ostream&       stream,
+        std::string const&  parameter_name,
+        tree::Member const& member
+    )
+    {
+        switch (member.multiplicity)
+        {
+            case tree::Definition::Multiplicity::ONE:
+                emitAccumulatingSingleChildVisit(stream, parameter_name, member);
+                break;
+
+            case tree::Definition::Multiplicity::ZERO_OR_ONE:
+                emitAccumulatingOptionalChildVisit(stream, parameter_name, member);
+                break;
+
+            case tree::Definition::Multiplicity::ZERO_OR_MORE:
+                emitAccumulatingListChildVisit(stream, parameter_name, member);
+                break;
+        }
+    }
+
+    void emitTraversingVisitorPrimaryTemplate(
+        std::ostream&      stream,
+        tree::Model const& model,
+        std::size_t const  template_parameter_count
+    )
+    {
+        std::string const base_type =
+            formatVisitorBaseType(template_parameter_count, "Result");
+
+        stream << "    template<typename Result>\n";
+        stream << "    class TraversingVisitor : public " << base_type << "\n";
+        stream << "    {\n";
+        stream << "      public:\n";
+        stream << "        using Base = " << base_type << ";\n";
+        stream << "        using Base::visit;\n\n";
+        stream << "        TraversingVisitor() = default;\n\n";
+        stream << "        [[nodiscard]] virtual Result initial() const = 0;\n";
+        stream
+            << "        virtual Result combine(Result accumulator, Result value) = 0;\n";
+
+        for (std::size_t index = 1; index < model.nodes.size(); ++index)
+        {
+            tree::Node const& node = model.nodes[index];
+            if (node.is_abstract)
+            {
+                continue;
+            }
+
+            std::vector<tree::Member> child_members;
+            for (tree::Member const& member : node.members)
+            {
+                if (member.is_owned_tree_element)
+                {
+                    child_members.push_back(member);
+                }
+            }
+
+            stream << "\n";
+            if (child_members.empty())
+            {
+                stream << "        Result visit(" << node.name << " const&) override\n";
+                stream << "        {\n";
+                stream << "            return this->initial();\n";
+                stream << "        }\n";
+            }
+            else
+            {
+                std::string const parameter_name = formatNodeParameterName(node.name);
+                stream << "        Result visit(" << node.name << " const& "
+                       << parameter_name << ") override\n";
+                stream << "        {\n";
+                stream << "            Result accumulator = this->initial();\n";
+                for (tree::Member const& member : child_members)
+                {
+                    emitAccumulatingChildVisit(stream, parameter_name, member);
+                }
+                stream << "            return accumulator;\n";
+                stream << "        }\n";
+            }
+        }
+
+        stream << "    };\n\n";
+    }
+
+    void emitVoidSingleChildVisit(
+        std::ostream&       stream,
+        std::string const&  parameter_name,
+        tree::Member const& member
+    )
+    {
+        stream << "            this->visit(*" << parameter_name << "." << member.name
+               << ");\n";
+    }
+
+    void emitVoidOptionalChildVisit(
+        std::ostream&       stream,
+        std::string const&  parameter_name,
+        tree::Member const& member
+    )
+    {
+        stream << "            if (" << parameter_name << "." << member.name
+               << ".hasValue())\n";
+        stream << "            {\n";
+        stream << "                this->visit(**" << parameter_name << "." << member.name
+               << ");\n";
+        stream << "            }\n";
+    }
+
+    void emitVoidListChildVisit(
+        std::ostream&       stream,
+        std::string const&  parameter_name,
+        tree::Member const& member
+    )
+    {
+        stream << "            for (auto const& element : " << parameter_name << "."
+               << member.name << ")\n";
+        stream << "            {\n";
+        stream << "                this->visit(*element);\n";
+        stream << "            }\n";
+    }
+
+    void emitVoidChildVisit(
+        std::ostream&       stream,
+        std::string const&  parameter_name,
+        tree::Member const& member
+    )
+    {
+        switch (member.multiplicity)
+        {
+            case tree::Definition::Multiplicity::ONE:
+                emitVoidSingleChildVisit(stream, parameter_name, member);
+                break;
+
+            case tree::Definition::Multiplicity::ZERO_OR_ONE:
+                emitVoidOptionalChildVisit(stream, parameter_name, member);
+                break;
+
+            case tree::Definition::Multiplicity::ZERO_OR_MORE:
+                emitVoidListChildVisit(stream, parameter_name, member);
+                break;
+        }
+    }
+
+    void emitTraversingVisitorVoidSpecialization(
+        std::ostream&      stream,
+        tree::Model const& model,
+        std::size_t const  template_parameter_count
+    )
+    {
+        std::string const base_type =
+            template_parameter_count == 0 ? "Visitor" : "Visitor<>";
+
+        stream << "    template<>\n";
+        stream << "    class TraversingVisitor<void> : public " << base_type << "\n";
+        stream << "    {\n";
+        stream << "      public:\n";
+        stream << "        using Base = Visitor;\n";
+        stream << "        using Base::visit;\n\n";
+        stream << "        TraversingVisitor() = default;\n";
+
+        for (std::size_t index = 1; index < model.nodes.size(); ++index)
+        {
+            tree::Node const& node = model.nodes[index];
+            if (node.is_abstract)
+            {
+                continue;
+            }
+
+            std::vector<tree::Member> child_members;
+            for (tree::Member const& member : node.members)
+            {
+                if (member.is_owned_tree_element)
+                {
+                    child_members.push_back(member);
+                }
+            }
+
+            stream << "\n";
+            if (child_members.empty())
+            {
+                stream << "        void visit(" << node.name << " const&) override {}\n";
+            }
+            else
+            {
+                std::string const parameter_name = formatNodeParameterName(node.name);
+                stream << "        void visit(" << node.name << " const& "
+                       << parameter_name << ") override\n";
+                stream << "        {\n";
+                for (tree::Member const& member : child_members)
+                {
+                    emitVoidChildVisit(stream, parameter_name, member);
+                }
+                stream << "        }\n";
+            }
+        }
+
         stream << "    };\n";
+    }
+
+    void emitTraversingVisitorClass(
+        std::ostream&      stream,
+        tree::Model const& model,
+        std::size_t const  template_parameter_count
+    )
+    {
+        emitTraversingVisitorPrimaryTemplate(stream, model, template_parameter_count);
+        emitTraversingVisitorVoidSpecialization(stream, model, template_parameter_count);
     }
 
     void emitHeaderIncludeGuardClose(std::ostream& stream)
@@ -592,6 +937,8 @@ namespace tree
         emitTopLevelNodeDeclarations(stream, model);
         emitCategoryDeclarations(stream, model);
         emitVisitorClass(stream, model, visitor_template_names);
+        emitDirectVisitorClass(stream, model, visitor_template_names.size());
+        emitTraversingVisitorClass(stream, model, visitor_template_names.size());
 
         emitHeaderIncludeGuardClose(stream);
 

@@ -38,9 +38,11 @@ namespace tree
 
     struct Member
     {
-        std::string     name;
-        std::string     type;
-        MemberSemantics semantics;
+        std::string              name;
+        std::string              type;
+        MemberSemantics          semantics;
+        Definition::Multiplicity multiplicity          = Definition::Multiplicity::ONE;
+        bool                     is_owned_tree_element = false;
     };
 
     struct Method
